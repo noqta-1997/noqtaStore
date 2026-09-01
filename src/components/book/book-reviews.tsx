@@ -1,0 +1,121 @@
+import { MessageSquareQuote } from "lucide-react";
+
+import { ReviewForm } from "@/components/book/review-form";
+import { Rating } from "@/components/ui/rating";
+import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/get-dictionary";
+import { formatDate, formatNumber } from "@/lib/format";
+import type { BookWithRelations, Review } from "@/types";
+
+interface BookReviewsProps {
+  book: BookWithRelations;
+  reviews: Review[];
+  locale: Locale;
+  dictionary: Dictionary;
+}
+
+/** Rating summary with distribution bars, followed by the review list. */
+export function BookReviews({ book, reviews, locale, dictionary }: BookReviewsProps) {
+  const t = dictionary.bookDetails.reviewsSection;
+
+  const distribution = [5, 4, 3, 2, 1].map((stars) => {
+    const count = reviews.filter((review) => review.rating === stars).length;
+    const share = reviews.length ? Math.round((count / reviews.length) * 100) : 0;
+    return { stars, count, share };
+  });
+
+  return (
+    <div className="space-y-8">
+      <div className="grid gap-6 sm:grid-cols-12 sm:items-center">
+        <div className="space-y-2 border border-line bg-surface-high p-5 text-center sm:col-span-4">
+          <p className="font-mono text-5xl font-bold text-on-surface" data-numeric>
+            {book.rating.toFixed(1)}
+          </p>
+          <p className="text-label-sm text-muted">{t.averageOf}</p>
+          <Rating value={book.rating} locale={locale} size="md" className="justify-center" />
+          <p className="text-label-sm text-muted">
+            {t.basedOn}{" "}
+            <span data-numeric>{formatNumber(book.reviewsCount, locale)}</span>{" "}
+            {dictionary.common.reviews}
+          </p>
+        </div>
+
+        <ul className="space-y-2 sm:col-span-8">
+          {distribution.map((row) => (
+            <li key={row.stars} className="flex items-center gap-3">
+              <span className="w-4 font-mono text-label-sm text-muted" data-numeric>
+                {row.stars}
+              </span>
+              <span className="h-3 flex-1 border border-line bg-card">
+                <span
+                  className="block h-full bg-primary-container"
+                  style={{ width: `${row.share}%` }}
+                />
+              </span>
+              <span className="w-10 text-end font-mono text-label-sm text-muted" data-numeric>
+                {row.share}%
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {reviews.length ? (
+        <ul className="divide-y divide-outline-variant border-t border-outline-variant">
+          {reviews.map((review) => (
+            <li key={review.id} className="py-5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-3">
+                  <span
+                    aria-hidden
+                    className="flex size-9 items-center justify-center border border-line bg-surface-high font-display text-sm font-bold"
+                  >
+                    {review.authorName.slice(0, 1)}
+                  </span>
+                  <div>
+                    <p className="text-body-md font-semibold text-on-surface">
+                      {review.authorName}
+                    </p>
+                    <p className="text-label-sm text-muted">
+                      {formatDate(review.createdAt, locale)}
+                    </p>
+                  </div>
+                </div>
+                <Rating value={review.rating} locale={locale} />
+              </div>
+
+              <h3 className="mt-3 font-display text-base font-bold">
+                {review.title[locale]}
+              </h3>
+              <p className="mt-1 text-body-md leading-relaxed text-on-surface-variant">
+                {review.body[locale]}
+              </p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="flex flex-col items-center gap-3 border border-dashed border-outline p-8 text-center">
+          <MessageSquareQuote aria-hidden className="size-6 text-muted" strokeWidth={2} />
+          <p className="text-body-md text-muted">{t.empty}</p>
+        </div>
+      )}
+
+      <ReviewForm
+        bookId={book.id}
+        errorMessages={dictionary.common.actionErrors}
+        labels={{
+          trigger: t.writeReview,
+          formTitle: t.formTitle,
+          ratingLabel: t.ratingLabel,
+          titleLabel: t.titleLabel,
+          bodyLabel: t.bodyLabel,
+          submit: t.submit,
+          cancel: t.cancel,
+          pendingNote: t.pendingNote,
+          success: dictionary.common.toast.reviewSubmitted,
+          fallbackError: dictionary.common.toast.actionFailed,
+        }}
+      />
+    </div>
+  );
+}

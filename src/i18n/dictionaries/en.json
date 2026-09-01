@@ -1,0 +1,791 @@
+{
+  "brand": {
+    "name": "Noqta",
+    "tagline": "Bookshop & store"
+  },
+  "common": {
+    "search": "Search",
+    "searchPlaceholder": "Search for a book, author or publisher…",
+    "cart": "Cart",
+    "wishlist": "Wishlist",
+    "account": "Account",
+    "login": "Sign in",
+    "menu": "Menu",
+    "close": "Close",
+    "addToCart": "Add to cart",
+    "viewAll": "View all",
+    "by": "By",
+    "reviews": "reviews",
+    "off": "off",
+    "inStock": "In stock",
+    "lowStock": "Only a few left",
+    "outOfStock": "Out of stock",
+    "next": "Next",
+    "previous": "Previous",
+    "skipToContent": "Skip to content",
+    "home": "Home",
+    "apply": "Apply",
+    "clear": "Clear",
+    "clearAll": "Clear all",
+    "filters": "Filters",
+    "sort": "Sort",
+    "results": "results",
+    "quantity": "Quantity",
+    "remove": "Remove",
+    "save": "Save",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "back": "Back",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "discount": "Discount",
+    "total": "Total",
+    "free": "Free",
+    "optional": "optional",
+    "increase": "Increase",
+    "decrease": "Decrease",
+    "page": "Page",
+    "backToHome": "Back to home",
+    "tags": {
+      "bestseller": "Bestseller",
+      "new": "New",
+      "featured": "Editor's pick",
+      "award": "Award winner"
+    },
+    "theme": {
+      "toggle": "Toggle theme",
+      "light": "Light mode",
+      "dark": "Dark mode"
+    },
+    "toast": {
+      "addedToCart": "Added to cart",
+      "addedToCartNote": "Keep browsing or head to checkout",
+      "addedToWishlist": "Added to wishlist",
+      "removedFromWishlist": "Removed from wishlist",
+      "saved": "Changes saved",
+      "sent": "Your message was sent",
+      "subscribed": "You are subscribed to the monthly letter",
+      "couponApplied": "Discount code applied",
+      "deleted": "Deleted",
+      "statusUpdated": "Order status updated",
+      "reviewPublished": "Review published",
+      "reviewRejected": "Review rejected",
+      "addressSaved": "Address saved",
+      "bookPublished": "Book published",
+      "draftSaved": "Draft saved",
+      "itemAdded": "Item added",
+      "dismiss": "Dismiss notification",
+      "signInRequired": "Sign in first to do that",
+      "removedFromCart": "Removed from cart",
+      "cartUpdated": "Cart updated",
+      "actionFailed": "Could not complete the action",
+      "orderPlaced": "Your order was created",
+      "emptyCart": "Your cart is empty",
+      "missingAddress": "Complete the address fields first",
+      "stockChanged": "Stock changed for one of the books",
+      "couponRemoved": "Discount code removed",
+      "reviewSubmitted": "Review received — awaiting moderation",
+      "reordered": "The order's books are back in your cart"
+    },
+    "confirm": {
+      "deleteTitle": "Confirm deletion",
+      "deleteDescription": "This action cannot be undone.",
+      "confirm": "Yes, delete",
+      "cancel": "Cancel"
+    },
+    "loading": "Loading…",
+    "validation": {
+      "required": "This field is required",
+      "email": "Enter a valid email address",
+      "phone": "Enter a valid phone number",
+      "minLength": "At least {n} characters",
+      "mismatch": "The two fields do not match",
+      "number": "Enter a valid number"
+    },
+    "actionErrors": {
+      "forbidden": "You are not allowed to do that",
+      "inUse": "This item is referenced elsewhere and cannot be deleted",
+      "duplicate": "Duplicate value — change the slug or ISBN",
+      "missingTitle": "The name is required in both languages",
+      "missingRelation": "Pick an author and a category",
+      "missingName": "A name is required",
+      "notFound": "That item no longer exists",
+      "selfBlock": "You cannot block your own account",
+      "unknownCoupon": "That discount code is not valid",
+      "expiredCoupon": "This code has expired",
+      "couponMinimum": "Your cart is below this code's minimum",
+      "invalidEmail": "Enter a valid email address",
+      "missingFields": "Complete the required fields",
+      "unknownSection": "Unknown settings section",
+      "unauthenticated": "Sign in first to do that",
+      "alreadyReviewed": "You have already reviewed this book",
+      "invalidRating": "Pick a rating from 1 to 5",
+      "missingReview": "Add a title and a body",
+      "missingCode": "Enter a discount code",
+      "invalidValue": "That discount value is not valid",
+      "ownerProtected": "The store owner's account cannot be blocked"
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "books": "Books",
+    "categories": "Categories",
+    "authors": "Authors",
+    "publishers": "Publishers",
+    "offers": "Offers",
+    "about": "About"
+  },
+  "announcement": {
+    "text": "Free delivery nationwide on orders over 50,000 IQD",
+    "link": "Learn more"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Noqta Bookshop",
+      "title": "Carefully chosen books",
+      "titleHighlight": "for readers who know what they want",
+      "subtitle": "Over a thousand Arabic and translated titles from trusted publishers, delivered to your door across Iraq with cash on delivery.",
+      "primaryCta": "Browse books",
+      "secondaryCta": "Explore categories",
+      "featuredLabel": "Book of the week",
+      "stats": {
+        "books": "titles in stock",
+        "authors": "authors",
+        "publishers": "publishers"
+      }
+    },
+    "features": {
+      "shipping": {
+        "title": "Nationwide delivery",
+        "description": "Within 2 to 5 working days"
+      },
+      "payment": {
+        "title": "Cash on delivery",
+        "description": "Check your order before paying"
+      },
+      "authentic": {
+        "title": "Authentic copies",
+        "description": "Sourced straight from publishers"
+      },
+      "returns": {
+        "title": "7-day returns",
+        "description": "If your book arrives damaged"
+      }
+    },
+    "bestsellers": {
+      "title": "Bestsellers",
+      "subtitle": "What people are reading this month"
+    },
+    "newArrivals": {
+      "title": "New arrivals",
+      "subtitle": "The latest additions to our shelves"
+    },
+    "categories": {
+      "title": "Browse by category",
+      "subtitle": "Start from the shelf that suits you",
+      "count": "titles"
+    },
+    "promo": {
+      "eyebrow": "Seasonal offer",
+      "title": "Up to 25% off translated fiction",
+      "description": "A selected shelf of major world titles in trusted Arabic translations, for a limited time.",
+      "cta": "Shop the offer"
+    },
+    "authors": {
+      "title": "Authors in focus",
+      "subtitle": "Names that shaped the Arabic library",
+      "booksCount": "books"
+    },
+    "newsletter": {
+      "title": "The monthly Noqta letter",
+      "description": "A short round-up of new releases and offers, once a month. No noise.",
+      "placeholder": "Your email address",
+      "cta": "Subscribe",
+      "note": "You can unsubscribe at any time."
+    }
+  },
+  "books": {
+    "title": "All books",
+    "subtitle": "Browse the whole library and sort it your way",
+    "resultsLabel": "titles",
+    "filtersTitle": "Refine results",
+    "openFilters": "Filters & sort",
+    "category": "Category",
+    "allCategories": "All categories",
+    "priceRange": "Price range",
+    "minPrice": "From",
+    "maxPrice": "To",
+    "rating": "Rating",
+    "ratingAndUp": "& up",
+    "coverType": "Cover type",
+    "hardcover": "Hardcover",
+    "paperback": "Paperback",
+    "availability": "Availability",
+    "inStockOnly": "In stock only",
+    "onSaleOnly": "On sale only",
+    "sortOptions": {
+      "relevance": "Most relevant",
+      "newest": "Newest",
+      "popular": "Bestselling",
+      "priceAsc": "Price: low to high",
+      "priceDesc": "Price: high to low",
+      "rating": "Top rated"
+    },
+    "empty": {
+      "title": "No books match",
+      "description": "Try widening the price range or removing a filter.",
+      "action": "Clear filters"
+    },
+    "publisher": "Publisher",
+    "allPublishers": "All publishers"
+  },
+  "bookDetails": {
+    "addToWishlist": "Add to wishlist",
+    "buyNow": "Buy now",
+    "stockLeft": "copies left",
+    "deliveryNote": "Delivered in 2–5 working days with cash on delivery",
+    "returnsNote": "Free returns within 7 days if the book arrives damaged",
+    "tabs": {
+      "description": "About the book",
+      "specs": "Specifications",
+      "reviews": "Reviews"
+    },
+    "specs": {
+      "publisher": "Publisher",
+      "publishedYear": "Published",
+      "pages": "Pages",
+      "language": "Language",
+      "isbn": "ISBN",
+      "coverType": "Cover type",
+      "weight": "Weight",
+      "grams": "g",
+      "page": "pages"
+    },
+    "reviewsSection": {
+      "title": "Reader reviews",
+      "averageOf": "out of 5",
+      "basedOn": "based on",
+      "empty": "No reviews for this book yet.",
+      "writeReview": "Write a review",
+      "formTitle": "Share your thoughts",
+      "ratingLabel": "Your rating",
+      "titleLabel": "Review title",
+      "bodyLabel": "What did you think?",
+      "submit": "Submit review",
+      "cancel": "Cancel",
+      "pendingNote": "Reviews appear once the store team has read them."
+    },
+    "aboutAuthor": "About the author",
+    "related": "Similar books",
+    "relatedSubtitle": "From the same category"
+  },
+  "categoriesPage": {
+    "title": "Categories",
+    "subtitle": "Shelves that cover what you are after",
+    "browse": "Browse category",
+    "inCategory": "in this category"
+  },
+  "authorsPage": {
+    "title": "Authors",
+    "subtitle": "The names behind our library",
+    "booksBy": "Books by this author",
+    "viewProfile": "Full profile",
+    "country": "Country",
+    "booksCount": "Books"
+  },
+  "publishersPage": {
+    "title": "Publishers",
+    "subtitle": "The houses behind the books we carry",
+    "booksBy": "Published by this house",
+    "country": "Country",
+    "founded": "Founded",
+    "booksCount": "Titles",
+    "empty": "No publishers yet."
+  },
+  "searchPage": {
+    "title": "Search results",
+    "resultsFor": "Results for",
+    "placeholder": "Type a book or author name…",
+    "empty": {
+      "title": "No results found",
+      "description": "Check the spelling or try broader words.",
+      "action": "Browse all books"
+    },
+    "suggestions": "Search suggestions"
+  },
+  "offersPage": {
+    "title": "Offers",
+    "subtitle": "Everything discounted right now, in one place",
+    "empty": "No offers at the moment."
+  },
+  "cart": {
+    "title": "Shopping cart",
+    "itemsCount": "items in cart",
+    "product": "Product",
+    "price": "Price",
+    "summary": "Order summary",
+    "checkout": "Checkout",
+    "continueShopping": "Continue shopping",
+    "couponLabel": "Coupon code",
+    "couponPlaceholder": "Enter code",
+    "couponApply": "Apply",
+    "freeShippingHint": "Add more books to qualify for free shipping",
+    "freeShippingReached": "Your order qualifies for free shipping",
+    "empty": {
+      "title": "Your cart is empty",
+      "description": "No books added yet. Start with the bestsellers.",
+      "action": "Browse books"
+    },
+    "couponRemove": "Remove code",
+    "couponActive": "Active code"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "steps": {
+      "address": "Address",
+      "shipping": "Shipping",
+      "payment": "Payment"
+    },
+    "addressSection": "Delivery address",
+    "fullName": "Full name",
+    "phone": "Phone number",
+    "altPhone": "Alternative number",
+    "governorate": "Governorate",
+    "selectGovernorate": "Select a governorate",
+    "city": "City / district",
+    "addressLine": "Nearest landmark",
+    "notes": "Notes for the courier",
+    "saveAddress": "Save this address for future orders",
+    "shippingSection": "Shipping method",
+    "shippingOptions": {
+      "standardTitle": "Standard delivery",
+      "standardNote": "2–5 working days",
+      "expressTitle": "Express delivery",
+      "expressNote": "Within 24 hours inside Baghdad",
+      "pickupTitle": "Pick up in store",
+      "pickupNote": "Al-Mutanabbi Street — Baghdad"
+    },
+    "paymentSection": "Payment method",
+    "paymentOptions": {
+      "codTitle": "Cash on delivery",
+      "codNote": "Pay in cash when the order arrives",
+      "cardTitle": "Payment card",
+      "cardNote": "Not available yet",
+      "walletTitle": "Digital wallet",
+      "walletNote": "ZainCash / Asia Hawala"
+    },
+    "placeOrder": "Place order",
+    "orderSummary": "Order summary",
+    "itemsInOrder": "Items in this order",
+    "termsNote": "By placing the order you agree to our terms of use and returns policy."
+  },
+  "orderSuccess": {
+    "title": "Order received",
+    "subtitle": "Thank you. We will call you to confirm the order before it ships.",
+    "orderNumber": "Order number",
+    "estimatedDelivery": "Estimated delivery",
+    "paymentMethod": "Payment method",
+    "trackOrder": "Track order",
+    "continueShopping": "Continue shopping",
+    "nextSteps": "What happens next?",
+    "steps": {
+      "confirm": "We call to confirm the order and address",
+      "pack": "We pick and wrap your books",
+      "deliver": "The courier arrives and you pay on delivery"
+    }
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "loginSubtitle": "Welcome back to Noqta",
+    "registerTitle": "Create an account",
+    "registerSubtitle": "One account for orders, wishlist and reading lists",
+    "email": "Email address",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "fullName": "Full name",
+    "phone": "Phone number",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "remember": "Remember me",
+    "forgot": "Forgot password?",
+    "loginCta": "Sign in",
+    "registerCta": "Create account",
+    "noAccount": "No account yet?",
+    "hasAccount": "Already have an account?",
+    "createOne": "Create one",
+    "signIn": "Sign in",
+    "orContinue": "or continue with",
+    "google": "Continue with Google",
+    "terms": "By creating an account you agree to our terms of use and privacy policy.",
+    "passwordHint": "At least 8 characters, including one number.",
+    "aside": {
+      "title": "Your library, anywhere",
+      "description": "Save books to your wishlist, follow your orders, and get recommendations based on what you read.",
+      "point1": "Reading lists of your own",
+      "point2": "Order tracking at every step",
+      "point3": "Alerts when a sold-out book returns"
+    },
+    "forgotTitle": "Reset your password",
+    "forgotSubtitle": "Enter your email and we will send you a reset link",
+    "forgotHint": "The link arrives within minutes. Check your spam folder if it does not.",
+    "sendLink": "Send the link",
+    "backToLogin": "Back to sign in",
+    "linkSent": "If that email is registered, a reset link is on its way.",
+    "resetTitle": "New password",
+    "resetSubtitle": "Choose a strong password for your account",
+    "newPassword": "New password",
+    "confirmNewPassword": "Confirm new password",
+    "resetCta": "Save password",
+    "signOut": "Sign out",
+    "signedInAs": "Signed in as",
+    "errors": {
+      "invalidCredentials": "Email or password is incorrect",
+      "emailInUse": "That email is already registered — sign in instead",
+      "weakPassword": "That password is too weak, pick a longer one",
+      "generic": "Could not complete the request, please try again"
+    },
+    "working": "Working…",
+    "checkEmailTitle": "Check your inbox",
+    "checkEmailBody": "We sent a confirmation link to your email. Open it to activate your account, then sign in.",
+    "resetChecking": "Checking the link…",
+    "resetInvalidTitle": "This link no longer works",
+    "resetInvalidBody": "The reset link has expired or was already used. Ask for a new one.",
+    "resetRequestAgain": "Request a new link",
+    "resetDone": "Password updated"
+  },
+  "account": {
+    "title": "My account",
+    "greeting": "Hello",
+    "nav": {
+      "profile": "Profile",
+      "orders": "Orders",
+      "wishlist": "Wishlist",
+      "addresses": "Addresses",
+      "logout": "Sign out",
+      "reviews": "My reviews"
+    },
+    "profile": {
+      "title": "Profile",
+      "subtitle": "Your details and how we reach you",
+      "personalInfo": "Personal information",
+      "fullName": "Full name",
+      "email": "Email address",
+      "phone": "Phone number",
+      "birthDate": "Date of birth",
+      "saveChanges": "Save changes",
+      "security": "Security",
+      "changePassword": "Change password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "preferences": "Preferences",
+      "newsletterOptIn": "Send me the monthly Noqta letter",
+      "offersOptIn": "Notify me about offers and discounts",
+      "memberSince": "Member since",
+      "stats": {
+        "orders": "orders",
+        "wishlist": "in wishlist",
+        "books": "books bought"
+      }
+    },
+    "orders": {
+      "title": "My orders",
+      "subtitle": "Every order you placed and its status",
+      "orderNumber": "Order",
+      "date": "Date",
+      "items": "Items",
+      "totalLabel": "Total",
+      "status": "Status",
+      "details": "Details",
+      "reorder": "Order again",
+      "itemsCount": "items",
+      "filterAll": "All",
+      "empty": {
+        "title": "No orders yet",
+        "description": "Your first order will show up here.",
+        "action": "Start shopping"
+      }
+    },
+    "orderDetails": {
+      "title": "Order details",
+      "placedOn": "Placed on",
+      "timeline": "Order timeline",
+      "shippingAddress": "Delivery address",
+      "paymentMethod": "Payment method",
+      "shippingMethod": "Shipping method",
+      "itemsTitle": "Items in this order",
+      "downloadInvoice": "Download invoice",
+      "cancelOrder": "Cancel order",
+      "needHelp": "Need help with this order?",
+      "contactSupport": "Contact support"
+    },
+    "wishlist": {
+      "title": "Wishlist",
+      "subtitle": "Books you saved for later",
+      "itemsCount": "saved books",
+      "moveAllToCart": "Add all to cart",
+      "empty": {
+        "title": "Your wishlist is empty",
+        "description": "Tap the heart on any book to keep it here.",
+        "action": "Browse books"
+      }
+    },
+    "addresses": {
+      "title": "Addresses",
+      "subtitle": "Saved delivery addresses",
+      "addNew": "Add address",
+      "default": "Default address",
+      "setDefault": "Make default",
+      "empty": {
+        "title": "No saved addresses",
+        "description": "Add one so checkout is ready when you are.",
+        "action": "Add address"
+      },
+      "form": {
+        "newTitle": "Add address",
+        "newSubtitle": "A new address to use at checkout",
+        "editTitle": "Edit address",
+        "editSubtitle": "Update this saved address",
+        "label": "Address label",
+        "labelHint": "For example: Home, Work",
+        "makeDefault": "Make this the default address",
+        "save": "Save address",
+        "delete": "Delete address"
+      }
+    },
+    "reviews": {
+      "title": "My reviews",
+      "subtitle": "What you wrote about the books you read",
+      "itemsCount": "reviews",
+      "onBook": "on",
+      "statuses": {
+        "pending": "Pending",
+        "published": "Published",
+        "rejected": "Rejected"
+      },
+      "empty": {
+        "title": "No reviews yet",
+        "description": "Share your take on a book you read to help other readers.",
+        "action": "Browse books"
+      }
+    }
+  },
+  "orderStatus": {
+    "pending": "Awaiting confirmation",
+    "processing": "Being prepared",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled"
+  },
+  "info": {
+    "about": {
+      "title": "About us",
+      "subtitle": "A small bookshop with a large ambition",
+      "sections": [
+        {
+          "title": "We started on Al-Mutanabbi Street",
+          "body": "Noqta began as a small shelf on Al-Mutanabbi Street in Baghdad and grew into a store that delivers nationwide. The selection is still made by hand: we read before we stock."
+        },
+        {
+          "title": "Why we choose carefully",
+          "body": "We do not list everything in print. We pick good editions and trusted translations, and we write about each book so you can decide before you buy."
+        },
+        {
+          "title": "How we work",
+          "body": "We buy from publishers directly, wrap every order by hand, and support cash on delivery — trust is built by experience, not promises."
+        }
+      ]
+    },
+    "contact": {
+      "title": "Contact us",
+      "subtitle": "We usually reply within one working day",
+      "formTitle": "Send a message",
+      "name": "Name",
+      "email": "Email address",
+      "subject": "Subject",
+      "message": "Message",
+      "send": "Send",
+      "channels": "Ways to reach us",
+      "hours": "Opening hours",
+      "hoursValue": "Saturday – Thursday, 9am – 8pm"
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "subtitle": "What people ask most before ordering",
+      "items": [
+        {
+          "title": "How long does delivery take?",
+          "body": "2 to 5 working days depending on the governorate, or within 24 hours for express delivery inside Baghdad."
+        },
+        {
+          "title": "Is cash on delivery available?",
+          "body": "Yes, and it is the default option. You can inspect the order before paying the courier."
+        },
+        {
+          "title": "What if a book arrives damaged?",
+          "body": "Tell us within 7 days and we will replace it or refund you in full, with shipping on us."
+        },
+        {
+          "title": "Are the books authentic?",
+          "body": "Yes. We buy from publishers and their authorised distributors directly."
+        },
+        {
+          "title": "Can I request a book you do not stock?",
+          "body": "Send us the title through the contact page and we will try to source it and quote you a price."
+        }
+      ]
+    },
+    "shipping": {
+      "title": "Shipping & delivery",
+      "subtitle": "Everything to know before you order",
+      "sections": [
+        {
+          "title": "Areas and timing",
+          "body": "We deliver to every Iraqi governorate. Baghdad: 1–2 working days. Elsewhere: 2–5 working days."
+        },
+        {
+          "title": "Shipping cost",
+          "body": "5,000 IQD on orders under 50,000 IQD and free above that. Express delivery inside Baghdad is 10,000 IQD."
+        },
+        {
+          "title": "Store pickup",
+          "body": "You can collect from our Al-Mutanabbi Street branch at no cost; we hold the order for 5 days."
+        }
+      ]
+    },
+    "returns": {
+      "title": "Returns & exchanges",
+      "subtitle": "A clear policy with no hidden conditions",
+      "sections": [
+        {
+          "title": "Return window",
+          "body": "7 days from delivery for damaged or incorrect books, provided the cover and condition are unchanged."
+        },
+        {
+          "title": "How to return a book",
+          "body": "Call us or use the contact page with your order number and a photo, and we will arrange collection."
+        },
+        {
+          "title": "Refunds",
+          "body": "Refunded in cash when the book is collected, or as store credit if you prefer."
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Privacy policy",
+      "subtitle": "What we collect and why",
+      "sections": [
+        {
+          "title": "Data we collect",
+          "body": "Name, phone number and address purely to fulfil the order, plus your email if you subscribe to the monthly letter."
+        },
+        {
+          "title": "How we use it",
+          "body": "To prepare orders and talk to you about them. We never sell your data or share it with third parties for marketing."
+        },
+        {
+          "title": "Your rights",
+          "body": "You can ask us to correct your details or delete your account at any time through the contact page."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms of use",
+      "subtitle": "The rules we both work by",
+      "sections": [
+        {
+          "title": "Orders and prices",
+          "body": "Prices are in Iraqi dinars and include tax where applicable. We may cancel an order if stock runs out, and will tell you."
+        },
+        {
+          "title": "Your account",
+          "body": "You are responsible for keeping your account details private and for every order placed through it."
+        },
+        {
+          "title": "Intellectual property",
+          "body": "The site's text and design belong to Noqta and may not be republished without written permission."
+        }
+      ]
+    },
+    "publishers": {
+      "title": "Publishers",
+      "subtitle": "The partners who stock our shelves",
+      "sections": [
+        {
+          "title": "Direct relationships",
+          "body": "We work with more than a hundred Arabic publishers and authorised distributors to guarantee original editions and fair prices."
+        },
+        {
+          "title": "Are you a publisher?",
+          "body": "To list your titles on Noqta, write to us through the contact page with your catalogue and distribution terms."
+        },
+        {
+          "title": "Rare editions",
+          "body": "We search for out-of-print editions on request and tell you the price and availability before any commitment."
+        }
+      ]
+    },
+    "careers": {
+      "title": "Careers",
+      "subtitle": "We look for people who love books and detail",
+      "sections": [
+        {
+          "title": "Why Noqta",
+          "body": "A small team, fast decisions, and work whose effect you see directly at the reader's door. Based in Baghdad, partly remote."
+        },
+        {
+          "title": "Open roles",
+          "body": "Warehouse lead, customer support agent, and books content editor. Full time, based in Baghdad."
+        },
+        {
+          "title": "How to apply",
+          "body": "Send your CV and a short note about the last book you loved through the contact page."
+        }
+      ]
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The link is wrong or the page has moved. Head back home or search for a book.",
+    "code": "Error 404"
+  },
+  "footer": {
+    "about": "An Iraqi bookstore that picks its titles with care and delivers them nationwide with cash on delivery.",
+    "shop": {
+      "title": "Shop",
+      "newArrivals": "New arrivals",
+      "bestsellers": "Bestsellers",
+      "offers": "Offers",
+      "categories": "Categories"
+    },
+    "help": {
+      "title": "Help",
+      "shipping": "Shipping & delivery",
+      "returns": "Returns & exchanges",
+      "faq": "FAQ",
+      "contact": "Contact us"
+    },
+    "store": {
+      "title": "Store",
+      "about": "About us",
+      "publishers": "Publishers",
+      "authors": "Authors",
+      "careers": "Careers"
+    },
+    "contact": {
+      "title": "Contact",
+      "address": "Baghdad — Al-Mutanabbi Street",
+      "phone": "+964 770 000 0000",
+      "email": "hello@noqta.iq"
+    },
+    "rights": "All rights reserved",
+    "privacy": "Privacy policy",
+    "terms": "Terms of use"
+  },
+  "errorPage": {
+    "title": "Something went wrong",
+    "description": "This section could not be rendered. Try again, and head home if the problem persists.",
+    "retry": "Try again",
+    "code": "Application error"
+  }
+}

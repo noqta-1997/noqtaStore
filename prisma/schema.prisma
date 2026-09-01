@@ -1,0 +1,411 @@
+// Noqta Store — database schema, modelled from src/types/index.ts.
+//
+// Conventions
+// - Editorial content (books, categories, authors) carries one column per
+//   locale: the store ships exactly two, so a column pair beats a join.
+// - Customer-written content (addresses, reviews) is a single column — a
+//   reader types one string, not a translation pair.
+// - Money is stored as whole Iraqi dinars; IQD has no minor units.
+// - Enum values mirror the TypeScript unions exactly, so no mapping layer
+//   is needed between Prisma Client and the existing app types.
+//
+// Connection URLs live in prisma7.config.ts (Prisma 7 removed them here).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ------------------------------------------------------------------
+// Enums
+// ------------------------------------------------------------------
+
+enum CoverType {
+  hardcover
+  paperback
+}
+
+enum BookTag {
+  bestseller
+  new
+  featured
+  award
+}
+
+enum OrderStatus {
+  pending
+  processing
+  shipped
+  delivered
+  cancelled
+}
+
+enum PaymentMethod {
+  cod
+  card
+  wallet
+}
+
+enum ShippingMethod {
+  standard
+  express
+  pickup
+}
+
+enum ReviewStatus {
+  pending
+  published
+  rejected
+}
+
+enum CustomerStatus {
+  active
+  blocked
+}
+
+enum CustomerRole {
+  customer
+  admin
+}
+
+enum CouponType {
+  percentage
+  fixed
+}
+
+enum ContactStatus {
+  new
+  read
+}
+
+// ------------------------------------------------------------------
+// Catalogue
+// ------------------------------------------------------------------
+
+model Category {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  nameAr        String
+  nameEn        String
+  descriptionAr String
+  descriptionEn String
+  /// Lucide icon name; the UI layer owns the mapping.
+  icon          String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  books Book[]
+
+  @@map("categories")
+}
+
+model Publisher {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  nameAr        String
+  nameEn        String
+  countryAr     String   @default("")
+  countryEn     String   @default("")
+  descriptionAr String   @default("")
+  descriptionEn String   @default("")
+  foundedYear   Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  books Book[]
+
+  @@map("publishers")
+}
+
+model Author {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  nameAr    String
+  nameEn    String
+  countryAr String
+  countryEn String
+  bioAr     String
+  bioEn     String
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  books Book[]
+
+  @@map("authors")
+}
+
+model Book {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  titleAr        String
+  titleEn        String
+  descriptionAr  String
+  descriptionEn  String
+  price          Int
+  compareAtPrice Int?
+  stock          Int       @default(0)
+  pages          Int
+  publishedYear  Int
+  isbn           String    @unique
+  languageAr     String    @default("العربية")
+  languageEn     String    @default("Arabic")
+  coverType      CoverType @default(paperback)
+  weightGrams    Int
+  coverUrl       String?
+  tags           BookTag[] @default([])
+
+  /// Denormalised for the listing pages; recomputed when reviews change.
+  rating       Float @default(0)
+  reviewsCount Int   @default(0)
+
+  authorId    String
+  categoryId  String
+  publisherId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  author        Author         @relation(fields: [authorId], references: [id])
+  category      Category       @relation(fields: [categoryId], references: [id])
+  publisher     Publisher      @relation(fields: [publisherId], references: [id])
+  reviews       Review[]
+  orderItems    OrderItem[]
+  wishlistItems WishlistItem[]
+  cartItems     CartItem[]
+
+  @@index([categoryId])
+  @@index([authorId])
+  @@index([publisherId])
+  @@index([createdAt])
+  @@map("books")
+}
+
+// ------------------------------------------------------------------
+// Customers
+// ------------------------------------------------------------------
+
+model Customer {
+  id String @id @default(cuid())
+
+  /// Links to Supabase Auth (auth.users.id) once real sign-in is wired.
+  userId String? @unique
+
+  name      String
+  email     String         @unique
+  phone     String
+  /// Profile city, shown in the admin customer tables.
+  city      String?
+  birthDate DateTime?
+  status    CustomerStatus @default(active)
+  /// Grants access to /admin. Set deliberately, never on sign-up.
+  role      CustomerRole   @default(customer)
+
+  /// Marketing preferences, edited from /account.
+  newsletterOptIn Boolean @default(true)
+  offersOptIn     Boolean @default(false)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  addresses Address[]
+  orders    Order[]
+  reviews   Review[]
+  wishlist  WishlistItem[]
+  cart      CartItem[]
+
+  @@map("customers")
+}
+
+model Address {
+  id          String   @id @default(cuid())
+  customerId  String
+  label       String
+  fullName    String
+  phone       String
+  governorate String
+  city        String
+  line        String
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@map("addresses")
+}
+
+// ------------------------------------------------------------------
+// Orders
+// ------------------------------------------------------------------
+
+model Order {
+  id         String      @id @default(cuid())
+  reference  String      @unique
+  customerId String
+  status     OrderStatus @default(pending)
+
+  subtotal     Int
+  shippingCost Int @default(0)
+  discount     Int @default(0)
+  total        Int
+
+  paymentMethod  PaymentMethod
+  shippingMethod ShippingMethod
+
+  /// The delivery address is snapshotted: editing a saved address later
+  /// must not rewrite the history of an order already placed.
+  shippingName        String
+  shippingPhone       String
+  shippingGovernorate String
+  shippingCity        String
+  shippingLine        String
+  notes               String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  customer Customer     @relation(fields: [customerId], references: [id])
+  items    OrderItem[]
+  timeline OrderEvent[]
+
+  @@index([customerId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  bookId    String
+  quantity  Int    @default(1)
+  /// Price at the moment of ordering, not the current catalogue price.
+  unitPrice Int
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  book  Book  @relation(fields: [bookId], references: [id])
+
+  @@index([orderId])
+  @@index([bookId])
+  @@map("order_items")
+}
+
+model OrderEvent {
+  id         String      @id @default(cuid())
+  orderId    String
+  status     OrderStatus
+  occurredAt DateTime    @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("order_events")
+}
+
+// ------------------------------------------------------------------
+// Reviews, wishlist and cart
+// ------------------------------------------------------------------
+
+model Review {
+  id         String       @id @default(cuid())
+  bookId     String
+  customerId String
+  rating     Int
+  title      String
+  body       String
+  status     ReviewStatus @default(pending)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  book     Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  /// One review per book per reader.
+  @@unique([bookId, customerId])
+  @@index([status])
+  @@map("reviews")
+}
+
+model WishlistItem {
+  customerId String
+  bookId     String
+  createdAt  DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  book     Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@id([customerId, bookId])
+  @@map("wishlist_items")
+}
+
+model CartItem {
+  customerId String
+  bookId     String
+  quantity   Int      @default(1)
+  updatedAt  DateTime @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  book     Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@id([customerId, bookId])
+  @@map("cart_items")
+}
+
+// ------------------------------------------------------------------
+// Marketing and store operations
+// ------------------------------------------------------------------
+
+model NewsletterSubscriber {
+  email     String   @id
+  /// Which storefront language the reader signed up in.
+  locale    String   @default("ar")
+  createdAt DateTime @default(now())
+
+  @@map("newsletter_subscribers")
+}
+
+model ContactMessage {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  status    ContactStatus @default(new)
+  createdAt DateTime      @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("contact_messages")
+}
+
+model Coupon {
+  id   String     @id @default(cuid())
+  code String     @unique
+  type CouponType @default(percentage)
+  /// A percentage (1-100) or a flat amount in dinars, per `type`.
+  value       Int
+  /// Smallest cart subtotal the code applies to; 0 means no floor.
+  minSubtotal Int        @default(0)
+  active      Boolean    @default(true)
+  expiresAt   DateTime?
+  /// Null means unlimited.
+  usageLimit  Int?
+  usedCount   Int        @default(0)
+  createdAt   DateTime   @default(now())
+
+  @@map("coupons")
+}
+
+/// Free-form key/value store so the settings screen can persist without a
+/// migration every time a field is added to it.
+model StoreSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("store_settings")
+}

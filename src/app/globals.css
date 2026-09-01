@@ -1,0 +1,396 @@
+@import "tailwindcss";
+
+/* ==================================================================
+   Noqta Store — "Kinetic Heritage"
+   Neo-brutalist editorial: warm paper base, 1px ink strokes,
+   zero radius, hard offset shadows, one vibrant orange for action.
+   ================================================================== */
+
+/* ---------- Light (default) ---------- */
+:root {
+  --surface: #fff9eb;
+  --surface-dim: #dfdacc;
+  --surface-bright: #fff9eb;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f9f3e5;
+  --surface-container: #f3ede0;
+  --surface-container-high: #eee8da;
+  --surface-container-highest: #e8e2d4;
+  --surface-variant: #e8e2d4;
+  /* Raised surface for cards, header and tiles — always one step
+     *away* from the page background, in both themes. */
+  --card: #ffffff;
+
+  --on-surface: #1d1c13;
+  --on-surface-variant: #594139;
+  --muted: #7c6a62;
+
+  --inverse-surface: #333027;
+  --inverse-on-surface: #f6f0e2;
+
+  --outline: #8d7168;
+  --outline-variant: #e1bfb5;
+  /* Structural stroke — the "ink" of the whole UI. */
+  --line: #1d1c13;
+
+  --primary: #ab3500;
+  --on-primary: #ffffff;
+  --primary-container: #ff6b35;
+  --on-primary-container: #5f1900;
+  --inverse-primary: #ffb59d;
+  --primary-fixed: #ffdbd0;
+  --primary-fixed-dim: #ffb59d;
+  --on-primary-fixed: #390c00;
+  --on-primary-fixed-variant: #832600;
+
+  --secondary: #5f5e5e;
+  --on-secondary: #ffffff;
+  --secondary-container: #e2dfde;
+  --on-secondary-container: #636262;
+
+  --tertiary: #645e4b;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #a19983;
+  --on-tertiary-container: #363120;
+
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
+
+  --success: #1f7a45;
+  --warning: #a06000;
+
+  /* Anchor bands (announcement bar, footer) stay dark in both themes. */
+  --anchor: #1d1c13;
+  --on-anchor: #f6f0e2;
+  --on-anchor-variant: #b6ada0;
+
+  --hard-dir: 1;
+}
+
+/* ---------- Dark ---------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface: #121412;
+    --surface-dim: #121412;
+    --surface-bright: #383a37;
+    --surface-container-lowest: #0d0f0d;
+    --surface-container-low: #1a1c1a;
+    --surface-container: #1e201e;
+    --surface-container-high: #282a28;
+    --surface-container-highest: #333533;
+    --surface-variant: #333533;
+    --card: #1e201e;
+
+    --on-surface: #e2e3df;
+    --on-surface-variant: #e1bfb5;
+    --muted: #a1a1aa;
+
+    --inverse-surface: #e2e3df;
+    --inverse-on-surface: #2f312e;
+
+    --outline: #a98a80;
+    --outline-variant: #594139;
+    --line: #000000;
+
+    --primary: #ffb59d;
+    --on-primary: #5d1900;
+    --primary-container: #ff6b35;
+    --on-primary-container: #5f1900;
+    --inverse-primary: #ab3500;
+
+    --secondary: #c8c6c5;
+    --on-secondary: #303030;
+    --secondary-container: #474746;
+    --on-secondary-container: #b7b5b4;
+
+    --tertiary: #c8c6c5;
+    --on-tertiary: #313030;
+    --tertiary-container: #9b9999;
+    --on-tertiary-container: #323131;
+
+    --error: #ef4444;
+    --on-error: #690005;
+    --error-container: #93000a;
+    --on-error-container: #ffdad6;
+
+    --success: #4ade80;
+    --warning: #fbbf24;
+
+    --anchor: #0d0f0d;
+    --on-anchor: #e2e3df;
+    --on-anchor-variant: #a1a1aa;
+  }
+}
+
+[data-theme="dark"] {
+  --surface: #121412;
+  --surface-dim: #121412;
+  --surface-bright: #383a37;
+  --surface-container-lowest: #0d0f0d;
+  --surface-container-low: #1a1c1a;
+  --surface-container: #1e201e;
+  --surface-container-high: #282a28;
+  --surface-container-highest: #333533;
+  --surface-variant: #333533;
+  --card: #1e201e;
+
+  --on-surface: #e2e3df;
+  --on-surface-variant: #e1bfb5;
+  --muted: #a1a1aa;
+
+  --inverse-surface: #e2e3df;
+  --inverse-on-surface: #2f312e;
+
+  --outline: #a98a80;
+  --outline-variant: #594139;
+  --line: #000000;
+
+  --primary: #ffb59d;
+  --on-primary: #5d1900;
+  --primary-container: #ff6b35;
+  --on-primary-container: #5f1900;
+  --inverse-primary: #ab3500;
+
+  --secondary: #c8c6c5;
+  --on-secondary: #303030;
+  --secondary-container: #474746;
+  --on-secondary-container: #b7b5b4;
+
+  --tertiary: #c8c6c5;
+  --on-tertiary: #313030;
+  --tertiary-container: #9b9999;
+  --on-tertiary-container: #323131;
+
+  --error: #ef4444;
+  --on-error: #690005;
+  --error-container: #93000a;
+  --on-error-container: #ffdad6;
+
+  --success: #4ade80;
+  --warning: #fbbf24;
+
+  --anchor: #0d0f0d;
+  --on-anchor: #e2e3df;
+  --on-anchor-variant: #a1a1aa;
+}
+
+/* RTL flips the hard shadow so it always falls "outward". */
+[dir="rtl"] {
+  --hard-dir: -1;
+}
+
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-lowest: var(--surface-container-lowest);
+  --color-surface-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-high: var(--surface-container-high);
+  --color-surface-highest: var(--surface-container-highest);
+  --color-surface-variant: var(--surface-variant);
+  --color-card: var(--card);
+
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-muted: var(--muted);
+
+  --color-inverse-surface: var(--inverse-surface);
+  --color-inverse-on-surface: var(--inverse-on-surface);
+
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+  --color-line: var(--line);
+
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-primary-fixed: var(--primary-fixed);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-container: var(--tertiary-container);
+  --color-on-tertiary-container: var(--on-tertiary-container);
+
+  --color-error: var(--error);
+  --color-on-error: var(--on-error);
+  --color-error-container: var(--error-container);
+  --color-on-error-container: var(--on-error-container);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  --color-anchor: var(--anchor);
+  --color-on-anchor: var(--on-anchor);
+  --color-on-anchor-variant: var(--on-anchor-variant);
+}
+
+@theme {
+  /* Typography — Latin faces first, Arabic companion after. */
+  --font-display: var(--font-manrope), var(--font-plex-arabic), system-ui, sans-serif;
+  --font-sans: var(--font-work-sans), var(--font-plex-arabic), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), var(--font-plex-arabic), ui-monospace, monospace;
+
+  --text-display-lg: 3rem;
+  --text-display-lg--line-height: 3.5rem;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 800;
+
+  --text-headline-lg: 2rem;
+  --text-headline-lg--line-height: 2.5rem;
+  --text-headline-lg--font-weight: 700;
+
+  --text-headline-md: 1.5rem;
+  --text-headline-md--line-height: 2rem;
+  --text-headline-md--font-weight: 600;
+
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.75rem;
+
+  --text-body-md: 1rem;
+  --text-body-md--line-height: 1.5rem;
+
+  --text-label-md: 0.875rem;
+  --text-label-md--line-height: 1.25rem;
+  --text-label-md--letter-spacing: 0.05em;
+  --text-label-md--font-weight: 500;
+
+  --text-label-sm: 0.75rem;
+  --text-label-sm--line-height: 1rem;
+  --text-label-sm--letter-spacing: 0.05em;
+  --text-label-sm--font-weight: 500;
+
+  /* Sharp and orthogonal — no rounding anywhere. */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+
+  --container-content: 1280px;
+}
+
+/* Hard drop shadow — solid, no blur, direction aware. */
+@utility shadow-hard {
+  box-shadow: calc(var(--hard-dir) * 4px) 4px 0 0 var(--color-line);
+}
+@utility shadow-hard-sm {
+  box-shadow: calc(var(--hard-dir) * 2px) 2px 0 0 var(--color-line);
+}
+@utility shadow-hard-none {
+  box-shadow: 0 0 0 0 var(--color-line);
+}
+
+/* JetBrains Mono technical label */
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme="light"]) {
+      color-scheme: dark;
+    }
+  }
+
+  html[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    color: var(--color-on-surface);
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary-container);
+    outline-offset: 2px;
+  }
+
+  /* Technical figures keep the mono face inside Arabic copy. */
+  [data-numeric] {
+    font-family: var(--font-mono);
+    font-feature-settings: "tnum";
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Print                                                               */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Invoices are printed from the order page itself rather than a separate
+ * document: the chrome steps aside and the order stays exactly as reviewed.
+ */
+@media print {
+  header,
+  footer,
+  aside,
+  nav,
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  :root {
+    --color-surface: #ffffff;
+    --color-card: #ffffff;
+  }
+
+  body {
+    background: #ffffff;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  /* Keep every panel whole rather than split across a page break. */
+  section,
+  table {
+    break-inside: avoid;
+  }
+
+  a[href]::after {
+    content: "";
+  }
+}
