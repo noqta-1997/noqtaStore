@@ -39,25 +39,26 @@ export function TableToolbar({
   return (
     <div className={cn("flex flex-wrap items-center justify-between gap-3", className)}>
       {tabs?.length ? (
-        <nav className="flex flex-wrap gap-px">
+        <nav className="flex flex-wrap gap-1">
           {tabs.map((tab) => (
             <Link
               key={tab.value}
               href={tab.href}
               aria-current={tab.active ? "page" : undefined}
               className={cn(
-                "inline-flex items-center gap-2 border border-line px-3 py-2 text-label-md transition-colors",
+                "inline-flex items-center gap-2 rounded-md border px-3 py-1.5",
+                "text-body-md transition-colors duration-100 ease-fluent",
                 tab.active
-                  ? "bg-primary-container font-semibold text-on-primary-container"
-                  : "bg-card text-on-surface-variant hover:bg-surface-high hover:text-on-surface",
+                  ? "border-accent-stroke bg-state-selected font-semibold text-on-surface"
+                  : "border-transparent text-on-surface-variant hover:bg-state-hover hover:text-on-surface",
               )}
             >
               {tab.label}
               {typeof tab.count === "number" ? (
                 <span
                   className={cn(
-                    "border px-1.5 font-mono text-[0.625rem]",
-                    tab.active ? "border-on-primary-container" : "border-outline",
+                    "rounded-sm px-1.5 font-mono text-label-sm",
+                    tab.active ? "bg-primary-container text-on-primary-container" : "bg-surface-low text-muted",
                   )}
                   data-numeric
                 >
@@ -79,7 +80,7 @@ export function TableToolbar({
         <label htmlFor="table-search" className="sr-only">
           {searchLabel}
         </label>
-        <div className="flex h-10 min-w-0 items-center border border-line bg-card ps-3">
+        <div className="flex h-10 min-w-0 items-center rounded-md border border-line bg-card ps-3">
           <Search aria-hidden className="size-4 shrink-0 text-muted" strokeWidth={2} />
           <input
             id="table-search"

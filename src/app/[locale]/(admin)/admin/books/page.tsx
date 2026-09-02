@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { Table, Tbody, Td, Th, Thead, Tr } from "@/components/admin/data-table";
+import { SortableTh, Table, Tbody, Td, Th, Thead, Tr } from "@/components/admin/data-table";
 import { RowActions } from "@/components/admin/row-actions";
 import { deleteBook } from "@/app/actions/admin";
 import { TableToolbar, type ToolbarTab } from "@/components/admin/table-toolbar";
@@ -53,16 +53,26 @@ export default async function AdminBooksPage({
     ? rawStock
     : "all") as StockFilter;
   const page = readNumberParam(raw, "page") ?? 1;
+  const sort = readParam(raw, "sort");
 
   const [dictionary, admin, result, counts] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
-    getAdminBooks({ q: term, stock, page, perPage: 10 }),
+    getAdminBooks({ q: term, stock, page, sort, perPage: 10 }),
     getStockCounts(),
   ]);
 
   const t = admin.books;
   const base = `/${locale}/admin/books`;
+
+  /* Sorting is a query param, so a sorted table stays a shareable URL.
+     Changing the column drops the page back to the first. */
+  const sortHref = (next: string) =>
+    `${base}${buildQueryString({
+      q: term,
+      stock: stock === "all" ? undefined : stock,
+      sort: next,
+    })}`;
 
   const tabs: ToolbarTab[] = [
     { value: "all", label: admin.common.all, count: counts.all },
@@ -74,6 +84,7 @@ export default async function AdminBooksPage({
     href: `${base}${buildQueryString({
       q: term,
       stock: tab.value === "all" ? undefined : tab.value,
+      sort,
     })}`,
     active: stock === tab.value,
   }));
@@ -105,12 +116,25 @@ export default async function AdminBooksPage({
           <Table minWidth="60rem">
             <Thead>
               <Tr>
-                <Th>{t.table.book}</Th>
+                <SortableTh column="title" current={sort} buildHref={sortHref}>
+                  {t.table.book}
+                </SortableTh>
                 <Th>{t.table.author}</Th>
                 <Th>{t.table.category}</Th>
-                <Th>{t.table.price}</Th>
-                <Th>{t.table.stock}</Th>
-                <Th>{t.table.rating}</Th>
+                <SortableTh column="price" current={sort} buildHref={sortHref}>
+                  {t.table.price}
+                </SortableTh>
+                <SortableTh column="stock" current={sort} buildHref={sortHref}>
+                  {t.table.stock}
+                </SortableTh>
+                <SortableTh
+                  column="rating"
+                  current={sort}
+                  buildHref={sortHref}
+                  defaultDirection="desc"
+                >
+                  {t.table.rating}
+                </SortableTh>
                 <Th className="text-end">{admin.common.actions}</Th>
               </Tr>
             </Thead>
@@ -156,8 +180,8 @@ export default async function AdminBooksPage({
                         className={cn(
                           "label-mono inline-flex border px-2 py-1",
                           out && "border-line bg-error-container text-on-error-container",
-                          low && "border-line bg-primary-fixed text-on-primary-container",
-                          !out && !low && "border-outline bg-surface-high text-on-surface",
+                          low && "border-line bg-primary-fixed text-on-primary-fixed",
+                          !out && !low && "border-outline bg-surface-low text-on-surface",
                         )}
                         data-numeric
                       >
@@ -206,6 +230,7 @@ export default async function AdminBooksPage({
               `${base}${buildQueryString({
                 q: term,
                 stock: stock === "all" ? undefined : stock,
+                sort,
                 page: next > 1 ? next : undefined,
               })}`
             }

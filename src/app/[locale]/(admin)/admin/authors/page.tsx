@@ -146,7 +146,7 @@ export default async function AdminAuthorsPage({
           </Table>
 
           {!authors.length ? (
-            <p className="border border-line bg-card p-8 text-center text-body-md text-muted">
+            <p className="rounded-md border border-line bg-card p-8 text-center text-body-md text-muted">
               {admin.common.noResults}
             </p>
           ) : null}

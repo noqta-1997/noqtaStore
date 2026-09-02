@@ -121,11 +121,16 @@ export function AdminNav({ locale, labels, iconsOnly = false, onNavigate }: Admi
                     aria-current={active ? "page" : undefined}
                     title={item.label}
                     className={cn(
-                      "flex items-center gap-3 border px-3 py-2.5 text-body-md transition-colors",
+                      // Subtle background plus a brand bar on the leading edge,
+                      // the same pattern the account nav uses.
+                      "relative flex items-center gap-3 rounded-md px-3 py-2 text-body-md",
+                      "transition-colors duration-100 ease-fluent",
+                      "before:absolute before:inset-y-1.5 before:inset-inline-start-0",
+                      "before:w-0.5 before:rounded-full before:bg-primary before:content-['']",
                       iconsOnly && "lg:justify-start justify-center",
                       active
-                        ? "border-line bg-primary-container font-semibold text-on-primary-container"
-                        : "border-transparent text-on-surface-variant hover:border-line hover:bg-surface-high hover:text-on-surface",
+                        ? "bg-state-selected font-semibold text-on-surface before:opacity-100"
+                        : "text-on-surface-variant before:opacity-0 hover:bg-state-hover hover:text-on-surface",
                     )}
                   >
                     <item.icon aria-hidden className="size-4.5 shrink-0" strokeWidth={2} />

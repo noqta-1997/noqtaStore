@@ -131,7 +131,7 @@ export default async function AdminCustomerPage({ params }: AdminCustomerPagePro
               </p>
             </div>
 
-            <dl className="divide-y divide-outline-variant border-t border-outline-variant">
+            <dl className="divide-y divide-line-divider border-t border-line-divider">
               {contact.map((entry) => (
                 <div
                   key={entry.label}

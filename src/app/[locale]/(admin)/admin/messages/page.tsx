@@ -45,8 +45,8 @@ export async function generateMetadata({
 const statuses: ContactStatus[] = ["new", "read"];
 
 const statusTones: Record<ContactStatus, string> = {
-  new: "border-line bg-primary-fixed text-on-primary-container",
-  read: "border-line bg-surface-high text-on-surface-variant",
+  new: "border-line bg-primary-fixed text-on-primary-fixed",
+  read: "border-line bg-surface-low text-on-surface-variant",
 };
 
 export default async function AdminMessagesPage({
@@ -123,7 +123,7 @@ export default async function AdminMessagesPage({
               "border border-line px-4 py-2.5 text-label-md transition-colors",
               view.active
                 ? "bg-primary-container font-semibold text-on-primary-container"
-                : "bg-card text-on-surface-variant hover:bg-surface-high hover:text-on-surface",
+                : "bg-card text-on-surface-variant hover:bg-state-hover hover:text-on-surface",
             )}
           >
             {view.label}

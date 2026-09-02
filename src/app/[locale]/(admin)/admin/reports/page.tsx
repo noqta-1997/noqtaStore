@@ -131,7 +131,7 @@ export default async function ReportsPage({ params, searchParams }: ReportsPageP
               "border border-line px-3 py-2 text-label-md transition-colors",
               range === entry
                 ? "bg-primary-container font-semibold text-on-primary-container"
-                : "bg-card text-on-surface-variant hover:bg-surface-high hover:text-on-surface",
+                : "bg-card text-on-surface-variant hover:bg-state-hover hover:text-on-surface",
             )}
           >
             {t.ranges[entry]}
@@ -155,6 +155,7 @@ export default async function ReportsPage({ params, searchParams }: ReportsPageP
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel title={t.salesByMonth.title} subtitle={t.salesByMonth.subtitle}>
           <BarChart
+            caption={t.salesByMonth.title}
             data={series.map((point) => ({
               label: formatMonth(point.month, locale),
               value: point.revenue,
@@ -165,6 +166,7 @@ export default async function ReportsPage({ params, searchParams }: ReportsPageP
 
         <Panel title={t.ordersByMonth.title} subtitle={t.ordersByMonth.subtitle}>
           <BarChart
+            caption={t.ordersByMonth.title}
             data={series.map((point) => ({
               label: formatMonth(point.month, locale),
               value: point.orders,
@@ -181,6 +183,7 @@ export default async function ReportsPage({ params, searchParams }: ReportsPageP
           className="min-w-0 lg:col-span-5"
         >
           <ShareBars
+            caption={t.topCategories.title}
             data={shares.map((share) => ({
               label: share.category.name[locale],
               value: share.share,

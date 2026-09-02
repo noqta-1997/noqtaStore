@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { Table, Tbody, Td, Th, Thead, Tr } from "@/components/admin/data-table";
+import { SortableTh, Table, Tbody, Td, Th, Thead, Tr } from "@/components/admin/data-table";
 import { TableToolbar, type ToolbarTab } from "@/components/admin/table-toolbar";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -48,6 +48,7 @@ export default async function AdminCustomersPage({
   const raw = await searchParams;
   const term = readParam(raw, "q");
   const rawStatus = readParam(raw, "status");
+  const sort = readParam(raw, "sort");
   const status =
     rawStatus === "active" || rawStatus === "blocked" ? rawStatus : "all";
   const page = readNumberParam(raw, "page") ?? 1;
@@ -55,12 +56,16 @@ export default async function AdminCustomersPage({
   const [dictionary, admin, result, counts] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
-    getCustomers({ q: term, status, page, perPage: 10 }),
+    getCustomers({ q: term, status, page, sort, perPage: 10 }),
     getCustomerCounts(),
   ]);
 
   const t = admin.customers;
   const base = `/${locale}/admin/customers`;
+
+  /* Sorting rides in the query string, so a sorted table is a shareable URL. */
+  const sortHref = (next: string) =>
+    `${base}${buildQueryString({ q: term, status, sort: next })}`;
 
   const tabs: ToolbarTab[] = [
     { value: "all", label: admin.common.all, count: counts.all },
@@ -71,6 +76,7 @@ export default async function AdminCustomersPage({
     href: `${base}${buildQueryString({
       q: term,
       status: tab.value === "all" ? undefined : tab.value,
+      sort,
     })}`,
     active: status === tab.value,
   }));
@@ -93,12 +99,26 @@ export default async function AdminCustomersPage({
           <Table minWidth="58rem">
             <Thead>
               <Tr>
-                <Th>{t.table.customer}</Th>
+                <SortableTh
+                  column="name"
+                  current={sort}
+                  buildHref={sortHref}
+                  defaultDirection="asc"
+                >
+                  {t.table.customer}
+                </SortableTh>
                 <Th>{t.table.contact}</Th>
                 <Th>{t.table.city}</Th>
                 <Th>{t.table.orders}</Th>
                 <Th>{t.table.spent}</Th>
-                <Th>{t.table.joined}</Th>
+                <SortableTh
+                  column="created"
+                  current={sort}
+                  buildHref={sortHref}
+                  defaultDirection="desc"
+                >
+                  {t.table.joined}
+                </SortableTh>
                 <Th>{admin.common.status}</Th>
                 <Th className="text-end">{admin.common.actions}</Th>
               </Tr>
@@ -110,7 +130,7 @@ export default async function AdminCustomersPage({
                     <div className="flex items-center gap-3">
                       <span
                         aria-hidden
-                        className="flex size-9 shrink-0 items-center justify-center border border-line bg-surface-high font-display text-sm font-bold"
+                        className="flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low font-display text-sm font-bold"
                       >
                         {customer.name.slice(0, 1)}
                       </span>
@@ -160,7 +180,7 @@ export default async function AdminCustomersPage({
                         href={`${base}/${customer.id}`}
                         aria-label={admin.common.view}
                         title={admin.common.view}
-                        className="inline-flex size-9 items-center justify-center border border-transparent text-on-surface transition-colors hover:border-line hover:bg-surface-high"
+                        className="inline-flex size-9 items-center justify-center border border-transparent text-on-surface transition-colors hover:border-line hover:bg-state-hover"
                       >
                         <Eye aria-hidden className="size-4" strokeWidth={2} />
                       </Link>
@@ -187,6 +207,7 @@ export default async function AdminCustomersPage({
                 q: term,
                 status: status === "all" ? undefined : status,
                 page: next > 1 ? next : undefined,
+                sort,
               })}`
             }
             labels={{

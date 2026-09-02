@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { Table, Tbody, Td, Th, Thead, Tr } from "@/components/admin/data-table";
+import { SortableTh, Table, Tbody, Td, Th, Thead, Tr } from "@/components/admin/data-table";
 import { TableToolbar, type ToolbarTab } from "@/components/admin/table-toolbar";
 import { ReviewModeration } from "@/components/admin/review-moderation";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -40,8 +40,8 @@ export async function generateMetadata({
 const statuses: ReviewStatus[] = ["pending", "published", "rejected"];
 
 const statusTones: Record<ReviewStatus, string> = {
-  pending: "border-line bg-primary-fixed text-on-primary-container",
-  published: "border-line bg-success text-white",
+  pending: "border-line bg-primary-fixed text-on-primary-fixed",
+  published: "border-line bg-success text-on-success",
   rejected: "border-line bg-error-container text-on-error-container",
 };
 
@@ -58,18 +58,23 @@ export default async function AdminReviewsPage({
   const raw = await searchParams;
   const term = readParam(raw, "q");
   const rawStatus = readParam(raw, "status");
+  const sort = readParam(raw, "sort");
   const status = statuses.includes(rawStatus as ReviewStatus) ? rawStatus! : "all";
   const page = readNumberParam(raw, "page") ?? 1;
 
   const [dictionary, admin, result, counts] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
-    getAdminReviews({ q: term, status, page, perPage: 10 }),
+    getAdminReviews({ q: term, status, page, sort, perPage: 10 }),
     getReviewCounts(),
   ]);
 
   const t = admin.reviews;
   const base = `/${locale}/admin/reviews`;
+
+  /* Sorting rides in the query string, so a sorted table is a shareable URL. */
+  const sortHref = (next: string) =>
+    `${base}${buildQueryString({ q: term, status, sort: next })}`;
 
   const tabs: ToolbarTab[] = [
     { value: "all", label: admin.common.all, count: counts.all },
@@ -81,6 +86,7 @@ export default async function AdminReviewsPage({
     href: `${base}${buildQueryString({
       q: term,
       status: tab.value === "all" ? undefined : tab.value,
+      sort,
     })}`,
     active: status === tab.value,
   }));
@@ -105,9 +111,23 @@ export default async function AdminReviewsPage({
               <Tr>
                 <Th>{t.table.book}</Th>
                 <Th>{t.table.reviewer}</Th>
-                <Th>{t.table.rating}</Th>
+                <SortableTh
+                  column="rating"
+                  current={sort}
+                  buildHref={sortHref}
+                  defaultDirection="desc"
+                >
+                  {t.table.rating}
+                </SortableTh>
                 <Th>{t.table.review}</Th>
-                <Th>{t.table.date}</Th>
+                <SortableTh
+                  column="created"
+                  current={sort}
+                  buildHref={sortHref}
+                  defaultDirection="desc"
+                >
+                  {t.table.date}
+                </SortableTh>
                 <Th>{admin.common.status}</Th>
                 <Th className="text-end">{admin.common.actions}</Th>
               </Tr>
@@ -177,6 +197,7 @@ export default async function AdminReviewsPage({
                 q: term,
                 status: status === "all" ? undefined : status,
                 page: next > 1 ? next : undefined,
+                sort,
               })}`
             }
             labels={{

@@ -154,7 +154,7 @@ export default async function AdminBookPage({ params }: AdminBookPageProps) {
 
       <Panel title={t.recentReviews} flush>
         {reviews.length ? (
-          <ul className="divide-y divide-outline-variant">
+          <ul className="divide-y divide-line-divider">
             {reviews.map((review) => (
               <li key={review.id} className="space-y-1.5 p-5">
                 <div className="flex flex-wrap items-center justify-between gap-2">

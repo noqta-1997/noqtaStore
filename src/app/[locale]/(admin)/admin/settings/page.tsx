@@ -75,7 +75,7 @@ export default async function SettingsPage({ params, searchParams }: SettingsPag
               "border border-line px-4 py-2.5 text-label-md transition-colors",
               tab === entry
                 ? "bg-primary-container font-semibold text-on-primary-container"
-                : "bg-card text-on-surface-variant hover:bg-surface-high hover:text-on-surface",
+                : "bg-card text-on-surface-variant hover:bg-state-hover hover:text-on-surface",
             )}
           >
             {t.tabs[entry]}
@@ -255,7 +255,7 @@ export default async function SettingsPage({ params, searchParams }: SettingsPag
               title={t.payments.cod}
               note={t.payments.codNote}
               trailing={
-                <span className="label-mono border border-line bg-success px-2 py-1 text-white">
+                <span className="label-mono rounded-sm bg-success px-1.5 py-0.5 text-on-success">
                   {admin.common.active}
                 </span>
               }
@@ -268,7 +268,7 @@ export default async function SettingsPage({ params, searchParams }: SettingsPag
               title={t.payments.wallet}
               note={t.payments.walletNote}
               trailing={
-                <span className="label-mono border border-line bg-surface-high px-2 py-1 text-on-surface">
+                <span className="label-mono rounded-md border border-line bg-surface-low px-2 py-1 text-on-surface">
                   {admin.common.active}
                 </span>
               }

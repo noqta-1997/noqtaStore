@@ -118,8 +118,8 @@ export default async function AdminCouponsPage({ params }: AdminCouponsPageProps
                           className={cn(
                             "label-mono inline-flex border px-2 py-1",
                             live
-                              ? "border-line bg-success text-white"
-                              : "border-line bg-surface-high text-on-surface-variant",
+                              ? "border-line bg-success text-on-success"
+                              : "border-line bg-surface-low text-on-surface-variant",
                           )}
                         >
                           {state}

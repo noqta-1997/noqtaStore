@@ -113,6 +113,7 @@ export default async function AdminDashboardPage({ params }: DashboardPageProps)
           className="min-w-0 lg:col-span-8"
         >
           <AreaChart
+            caption={t.revenueChart.title}
             data={series.map((point) => ({
               label: formatMonth(point.month, locale),
               value: point.revenue,
@@ -127,6 +128,7 @@ export default async function AdminDashboardPage({ params }: DashboardPageProps)
           className="min-w-0 lg:col-span-4"
         >
           <ShareBars
+            caption={t.categoryShare.title}
             data={shares.map((share) => ({
               label: share.category.name[locale],
               value: share.share,
@@ -196,7 +198,7 @@ export default async function AdminDashboardPage({ params }: DashboardPageProps)
             {top.map((entry, index) => (
               <li key={entry.bookId} className="flex items-center gap-3">
                 <span
-                  className="flex size-7 shrink-0 items-center justify-center border border-line bg-surface-high font-mono text-label-sm"
+                  className="flex size-7 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low font-mono text-label-sm"
                   data-numeric
                 >
                   {index + 1}

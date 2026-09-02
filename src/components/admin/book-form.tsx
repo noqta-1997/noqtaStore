@@ -238,7 +238,7 @@ export function BookForm({
 
             <label
               htmlFor="coverImage"
-              className="flex cursor-pointer flex-col items-center gap-2 border border-dashed border-outline p-4 text-center transition-colors hover:bg-surface-high"
+              className="flex cursor-pointer flex-col items-center gap-2 border border-dashed border-outline p-4 text-center transition-colors hover:bg-state-hover"
             >
               <ImagePlus aria-hidden className="size-5 text-primary" strokeWidth={2} />
               <span className="text-label-md text-on-surface">{t.upload.button}</span>
@@ -312,7 +312,7 @@ export function BookForm({
         </Panel>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 border border-line bg-card p-4 lg:col-span-12">
+      <div className="flex flex-wrap items-center gap-3 rounded-md border border-line bg-card p-4 lg:col-span-12">
         <Button type="submit" size="lg">
           {isEdit ? admin.common.saveChanges : t.actions.publish}
         </Button>
@@ -321,7 +321,7 @@ export function BookForm({
         </Button>
         <Link
           href={cancelHref}
-          className={buttonStyles({ variant: "ghost", size: "lg" })}
+          className={buttonStyles({ variant: "subtle", size: "lg" })}
         >
           {admin.common.cancel}
         </Link>

@@ -1,18 +1,41 @@
+import { ChevronUp } from "lucide-react";
+import Link from "next/link";
 import type { ReactNode, ThHTMLAttributes, TdHTMLAttributes } from "react";
 
 import { cn } from "@/lib/utils";
+
+export type TableDensity = "compact" | "default";
 
 interface TableProps {
   children: ReactNode;
   /** Minimum width before the table starts scrolling horizontally. */
   minWidth?: string;
+  /** Fluent's row heights: 32px compact, 44px default. */
+  density?: TableDensity;
   className?: string;
 }
 
-/** Bordered, horizontally scrollable data table shell. */
-export function Table({ children, minWidth = "48rem", className }: TableProps) {
+/**
+ * Bordered, horizontally scrollable data table shell.
+ *
+ * Rows follow Fluent's named heights rather than whatever padding happened to
+ * be written at the call site, and the density is set once on the table
+ * instead of per cell.
+ */
+export function Table({
+  children,
+  minWidth = "48rem",
+  density = "default",
+  className,
+}: TableProps) {
   return (
-    <div className={cn("overflow-x-auto border border-line bg-card", className)}>
+    <div
+      data-density={density}
+      className={cn(
+        "overflow-x-auto rounded-md border border-line bg-card",
+        className,
+      )}
+    >
       <table className="w-full border-collapse text-start" style={{ minWidth }}>
         {children}
       </table>
@@ -22,12 +45,12 @@ export function Table({ children, minWidth = "48rem", className }: TableProps) {
 
 export function Thead({ children }: { children: ReactNode }) {
   return (
-    <thead className="border-b border-line bg-surface-high">{children}</thead>
+    <thead className="border-b border-line-divider bg-surface-low">{children}</thead>
   );
 }
 
 export function Tbody({ children }: { children: ReactNode }) {
-  return <tbody className="divide-y divide-outline-variant">{children}</tbody>;
+  return <tbody className="divide-y divide-line-divider">{children}</tbody>;
 }
 
 export function Tr({
@@ -38,7 +61,12 @@ export function Tr({
   className?: string;
 }) {
   return (
-    <tr className={cn("transition-colors hover:bg-surface-low", className)}>
+    <tr
+      className={cn(
+        "transition-colors duration-100 ease-fluent hover:bg-state-hover",
+        className,
+      )}
+    >
       {children}
     </tr>
   );
@@ -48,7 +76,10 @@ export function Th({ children, className, ...props }: ThHTMLAttributes<HTMLTable
   return (
     <th
       scope="col"
-      className={cn("label-mono px-4 py-3 text-start text-muted", className)}
+      className={cn(
+        "h-8 px-3 text-start align-middle text-label-md font-semibold text-on-surface-variant",
+        className,
+      )}
       {...props}
     >
       {children}
@@ -58,8 +89,94 @@ export function Th({ children, className, ...props }: ThHTMLAttributes<HTMLTable
 
 export function Td({ children, className, ...props }: TdHTMLAttributes<HTMLTableCellElement>) {
   return (
-    <td className={cn("px-4 py-3 text-start align-middle text-sm", className)} {...props}>
+    <td
+      className={cn(
+        "px-3 py-2 text-start align-middle text-body-md",
+        "group-data-[density=compact]/table:py-1.5",
+        className,
+      )}
+      {...props}
+    >
       {children}
     </td>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Sorting                                                             */
+/* ------------------------------------------------------------------ */
+
+export type SortDirection = "asc" | "desc";
+
+interface SortableThProps extends ThHTMLAttributes<HTMLTableCellElement> {
+  /** Column key, e.g. `price` — combines with a direction into `price-asc`. */
+  column: string;
+  /** The table's current `sort` param, straight from the URL. */
+  current?: string;
+  /** Builds the href for a given sort value, preserving the other filters. */
+  buildHref: (sort: string) => string;
+  /** Which way this column sorts on first click. */
+  defaultDirection?: SortDirection;
+  children: ReactNode;
+}
+
+/**
+ * A sortable column header.
+ *
+ * The control is a link, not a button: sorting lives in the query string, so
+ * every sorted view stays a shareable URL and the page stays a Server
+ * Component. `aria-sort` tells assistive technology which column is active and
+ * in which direction — the tables had no sorting at all before, and therefore
+ * no way to say so.
+ */
+export function SortableTh({
+  column,
+  current,
+  buildHref,
+  defaultDirection = "asc",
+  className,
+  children,
+  ...props
+}: SortableThProps) {
+  const activeAsc = current === `${column}-asc`;
+  const activeDesc = current === `${column}-desc`;
+  const active = activeAsc || activeDesc;
+
+  const next: SortDirection = activeAsc
+    ? "desc"
+    : activeDesc
+      ? "asc"
+      : defaultDirection;
+
+  return (
+    <th
+      scope="col"
+      aria-sort={activeAsc ? "ascending" : activeDesc ? "descending" : "none"}
+      className={cn(
+        "h-8 px-3 text-start align-middle text-label-md font-semibold text-on-surface-variant",
+        className,
+      )}
+      {...props}
+    >
+      <Link
+        href={buildHref(`${column}-${next}`)}
+        className={cn(
+          "inline-flex items-center gap-1 rounded-sm px-1 py-0.5 -mx-1",
+          "transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface",
+          active && "text-on-surface",
+        )}
+      >
+        {children}
+        <ChevronUp
+          aria-hidden
+          className={cn(
+            "size-3.5 transition-transform duration-100 ease-fluent",
+            activeDesc && "rotate-180",
+            !active && "opacity-0",
+          )}
+          strokeWidth={2.5}
+        />
+      </Link>
+    </th>
   );
 }

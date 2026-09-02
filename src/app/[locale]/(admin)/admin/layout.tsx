@@ -57,8 +57,8 @@ export default async function AdminLayout({
       </a>
 
       {/* Icon rail on tablets, full sidebar from lg up */}
-      <aside className="sticky top-0 hidden h-dvh w-16 shrink-0 flex-col overflow-y-auto border-e-2 border-line bg-card md:flex lg:w-70">
-        <div className="flex h-16 shrink-0 items-center gap-2.5 border-b-2 border-line px-3 lg:px-4">
+      <aside className="sticky top-0 hidden h-dvh w-16 shrink-0 flex-col overflow-y-auto border-e border-line-divider bg-card md:flex lg:w-70">
+        <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-line-divider px-3 lg:px-4">
           <span className="flex size-9 shrink-0 items-center justify-center border border-line bg-primary-container">
             <span className="size-2.5 rounded-full bg-on-primary-container" />
           </span>
@@ -74,7 +74,7 @@ export default async function AdminLayout({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 border-b-2 border-line bg-card">
+        <header className="sticky top-0 z-30 border-b border-line-divider bg-card">
           <div className="flex h-16 items-center gap-2 px-4 sm:px-6">
             <AdminMobileNav
               locale={locale}
@@ -104,7 +104,7 @@ export default async function AdminLayout({
             <div className="ms-auto flex items-center gap-1">
               <Link
                 href={`/${locale}`}
-                className="hidden items-center gap-2 border border-transparent px-3 py-2 text-label-md text-on-surface transition-colors hover:border-line hover:bg-surface-high lg:inline-flex"
+                className="hidden items-center gap-2 border border-transparent px-3 py-2 text-label-md text-on-surface transition-colors hover:border-line hover:bg-state-hover lg:inline-flex"
               >
                 <ExternalLink aria-hidden className="size-4 rtl:-scale-x-100" strokeWidth={2} />
                 {admin.topbar.viewStore}
@@ -124,7 +124,7 @@ export default async function AdminLayout({
                 }}
               />
 
-              <span className="ms-2 flex items-center gap-2 border-s border-outline-variant ps-3">
+              <span className="ms-2 flex items-center gap-2 border-s border-line-divider ps-3">
                 <span
                   aria-hidden
                   className="flex size-9 items-center justify-center border border-line bg-inverse-surface font-display text-sm font-bold text-inverse-on-surface"

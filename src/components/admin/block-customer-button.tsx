@@ -57,7 +57,7 @@ export function BlockCustomerButton({
       title={label}
       className={cn(
         "inline-flex size-9 shrink-0 items-center justify-center border border-transparent",
-        "text-on-surface transition-colors hover:border-line hover:bg-surface-high disabled:opacity-50",
+        "text-on-surface transition-colors hover:border-line hover:bg-state-hover disabled:opacity-50",
         className,
       )}
     >

@@ -171,7 +171,7 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
                     <span
                       className={cn(
                         "flex size-8 shrink-0 items-center justify-center border border-line",
-                        entry.done ? "bg-success text-white" : "bg-surface-high text-muted",
+                        entry.done ? "bg-success text-on-success" : "bg-surface-low text-muted",
                       )}
                     >
                       {entry.done ? (
@@ -267,7 +267,7 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
                 </div>
               </div>
 
-              <dl className="space-y-3 border-t border-outline-variant pt-4">
+              <dl className="space-y-3 border-t border-line-divider pt-4">
                 {contact.map((entry) => (
                   <div key={entry.label} className="flex items-baseline justify-between gap-3">
                     <dt className="label-mono text-muted">{entry.label}</dt>

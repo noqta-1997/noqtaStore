@@ -18,7 +18,7 @@ export function AdminPageHeader({
   return (
     <header
       className={cn(
-        "flex flex-wrap items-end justify-between gap-4 border-b-2 border-line pb-5",
+        "flex flex-wrap items-end justify-between gap-4 border-b border-line-divider pb-5",
         className,
       )}
     >

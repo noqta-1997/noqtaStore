@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { Table, Tbody, Td, Th, Thead, Tr } from "@/components/admin/data-table";
+import { SortableTh, Table, Tbody, Td, Th, Thead, Tr } from "@/components/admin/data-table";
 import { RowActions } from "@/components/admin/row-actions";
 import { TableToolbar, type ToolbarTab } from "@/components/admin/table-toolbar";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -57,18 +57,23 @@ export default async function AdminOrdersPage({
   const raw = await searchParams;
   const term = readParam(raw, "q");
   const rawStatus = readParam(raw, "status");
+  const sort = readParam(raw, "sort");
   const status = statuses.includes(rawStatus as OrderStatus) ? rawStatus! : "all";
   const page = readNumberParam(raw, "page") ?? 1;
 
   const [dictionary, admin, result, counts] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
-    getAdminOrders({ q: term, status, page, perPage: 10 }),
+    getAdminOrders({ q: term, status, page, sort, perPage: 10 }),
     getOrderCounts(),
   ]);
 
   const t = admin.orders;
   const base = `/${locale}/admin/orders`;
+
+  /* Sorting rides in the query string, so a sorted table is a shareable URL. */
+  const sortHref = (next: string) =>
+    `${base}${buildQueryString({ q: term, status, sort: next })}`;
 
   const tabs: ToolbarTab[] = [
     { value: "all", label: admin.common.all, count: counts.all },
@@ -82,6 +87,7 @@ export default async function AdminOrdersPage({
     href: `${base}${buildQueryString({
       q: term,
       status: tab.value === "all" ? undefined : tab.value,
+      sort,
     })}`,
     active: status === tab.value,
   }));
@@ -106,11 +112,32 @@ export default async function AdminOrdersPage({
               <Tr>
                 <Th>{t.table.reference}</Th>
                 <Th>{t.table.customer}</Th>
-                <Th>{t.table.date}</Th>
+                <SortableTh
+                  column="created"
+                  current={sort}
+                  buildHref={sortHref}
+                  defaultDirection="desc"
+                >
+                  {t.table.date}
+                </SortableTh>
                 <Th>{t.table.items}</Th>
                 <Th>{t.table.payment}</Th>
-                <Th>{t.table.total}</Th>
-                <Th>{admin.common.status}</Th>
+                <SortableTh
+                  column="total"
+                  current={sort}
+                  buildHref={sortHref}
+                  defaultDirection="desc"
+                >
+                  {t.table.total}
+                </SortableTh>
+                <SortableTh
+                  column="status"
+                  current={sort}
+                  buildHref={sortHref}
+                  defaultDirection="asc"
+                >
+                  {admin.common.status}
+                </SortableTh>
                 <Th className="text-end">{admin.common.actions}</Th>
               </Tr>
             </Thead>
@@ -190,6 +217,7 @@ export default async function AdminOrdersPage({
                 q: term,
                 status: status === "all" ? undefined : status,
                 page: next > 1 ? next : undefined,
+                sort,
               })}`
             }
             labels={{

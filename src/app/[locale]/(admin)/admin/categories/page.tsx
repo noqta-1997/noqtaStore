@@ -69,7 +69,7 @@ export default async function AdminCategoriesPage({
                   <Tr key={category.id}>
                     <Td>
                       <div className="flex items-center gap-3">
-                        <span className="flex size-9 shrink-0 items-center justify-center border border-line bg-surface-high text-primary">
+                        <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low text-primary">
                           <CategoryIcon name={category.icon} className="size-4" />
                         </span>
                         <span className="min-w-0">
