@@ -1,0 +1,59 @@
+{
+  "capturedAt": "2026-09-02T05:01:10.872Z",
+  "mode": "production build (npm run build)",
+  "totalClientJsFiles": 54,
+  "totalRawKB": 1239,
+  "totalGzipKB": 400.2,
+  "largestChunks": [
+    {
+      "file": "chunks\\1mkbuudhndal5.js",
+      "rawKB": 223.6,
+      "gzipKB": 69.7
+    },
+    {
+      "file": "chunks\\3lxu8_3f7_-c3.js",
+      "rawKB": 246.3,
+      "gzipKB": 64.6
+    },
+    {
+      "file": "chunks\\0cz1d0mv5g_q7.js",
+      "rawKB": 110,
+      "gzipKB": 38.6
+    },
+    {
+      "file": "chunks\\0x92b1cogv8_d.js",
+      "rawKB": 125.7,
+      "gzipKB": 33.7
+    },
+    {
+      "file": "chunks\\2i-v122p6l25a.js",
+      "rawKB": 30.5,
+      "gzipKB": 9.3
+    },
+    {
+      "file": "chunks\\2hwopof-wul-1.js",
+      "rawKB": 25,
+      "gzipKB": 8.9
+    },
+    {
+      "file": "chunks\\208rq_bc_j03u.js",
+      "rawKB": 27.2,
+      "gzipKB": 8.7
+    },
+    {
+      "file": "chunks\\0xmxp7zq4do-m.js",
+      "rawKB": 24.3,
+      "gzipKB": 8.6
+    },
+    {
+      "file": "chunks\\2mmpezlrfmbu5.js",
+      "rawKB": 33.9,
+      "gzipKB": 8.5
+    },
+    {
+      "file": "chunks\\1nm_5-xcge0-d.js",
+      "rawKB": 23.2,
+      "gzipKB": 8
+    }
+  ]
+}

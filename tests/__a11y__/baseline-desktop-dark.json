@@ -1,0 +1,243 @@
+{
+  "capturedAt": "2026-09-02T11:55:54.989Z",
+  "project": "desktop-dark",
+  "pagesScanned": 26,
+  "totalViolationNodes": 0,
+  "byRule": {},
+  "detail": [
+    {
+      "page": "home",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/ar",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "catalogue",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/ar/books",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "book-detail",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/ar/books/al-amir-al-saghir",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "categories",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/ar/categories",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "category-detail",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/ar/categories/literature",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "authors",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/ar/authors",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "author-detail",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/ar/authors/naguib-mahfouz",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "publishers",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/ar/publishers",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "offers",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/ar/offers",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "search",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/ar/search?q=1984",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "cart",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/ar/cart",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "login",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/ar/login",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "faq",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/ar/faq",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "home",
+      "locale": "en",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/en",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "catalogue",
+      "locale": "en",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/en/books",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "book-detail",
+      "locale": "en",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/en/books/al-amir-al-saghir",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "categories",
+      "locale": "en",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/en/categories",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "category-detail",
+      "locale": "en",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/en/categories/literature",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "authors",
+      "locale": "en",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/en/authors",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "author-detail",
+      "locale": "en",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/en/authors/naguib-mahfouz",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "publishers",
+      "locale": "en",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/en/publishers",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "offers",
+      "locale": "en",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/en/offers",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "search",
+      "locale": "en",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/en/search?q=1984",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "cart",
+      "locale": "en",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/en/cart",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "login",
+      "locale": "en",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/en/login",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "faq",
+      "locale": "en",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/en/faq",
+      "violations": [],
+      "total": 0
+    }
+  ]
+}

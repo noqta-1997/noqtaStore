@@ -1,0 +1,243 @@
+{
+  "capturedAt": "2026-09-02T11:54:50.301Z",
+  "project": "desktop-light",
+  "pagesScanned": 26,
+  "totalViolationNodes": 0,
+  "byRule": {},
+  "detail": [
+    {
+      "page": "home",
+      "locale": "ar",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/ar",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "catalogue",
+      "locale": "ar",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/ar/books",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "book-detail",
+      "locale": "ar",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/ar/books/al-amir-al-saghir",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "categories",
+      "locale": "ar",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/ar/categories",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "category-detail",
+      "locale": "ar",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/ar/categories/literature",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "authors",
+      "locale": "ar",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/ar/authors",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "author-detail",
+      "locale": "ar",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/ar/authors/naguib-mahfouz",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "publishers",
+      "locale": "ar",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/ar/publishers",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "offers",
+      "locale": "ar",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/ar/offers",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "search",
+      "locale": "ar",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/ar/search?q=1984",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "cart",
+      "locale": "ar",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/ar/cart",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "login",
+      "locale": "ar",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/ar/login",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "faq",
+      "locale": "ar",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/ar/faq",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "home",
+      "locale": "en",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/en",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "catalogue",
+      "locale": "en",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/en/books",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "book-detail",
+      "locale": "en",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/en/books/al-amir-al-saghir",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "categories",
+      "locale": "en",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/en/categories",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "category-detail",
+      "locale": "en",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/en/categories/literature",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "authors",
+      "locale": "en",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/en/authors",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "author-detail",
+      "locale": "en",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/en/authors/naguib-mahfouz",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "publishers",
+      "locale": "en",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/en/publishers",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "offers",
+      "locale": "en",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/en/offers",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "search",
+      "locale": "en",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/en/search?q=1984",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "cart",
+      "locale": "en",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/en/cart",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "login",
+      "locale": "en",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/en/login",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "faq",
+      "locale": "en",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/en/faq",
+      "violations": [],
+      "total": 0
+    }
+  ]
+}
