@@ -1,123 +1,127 @@
 @import "tailwindcss";
+@import "../styles/fluent-tokens.css";
 
 /* ==================================================================
-   Noqta Store — "Kinetic Heritage"
-   Neo-brutalist editorial: warm paper base, 1px ink strokes,
-   zero radius, hard offset shadows, one vibrant orange for action.
+   Noqta Store — Fluent 2
+
+   The semantic names below are unchanged: 261 call sites still say
+   `border-line`, and as many say `bg-card`. Only what they resolve to has
+   moved, from hand-picked hex values to Fluent 2 alias tokens generated
+   from the official theme (see scripts/generate-fluent-tokens.ts).
+
+   Each mapping was decided from how the token is actually used, not from
+   its name — the reasoning for every one is in docs/token-audit.md.
+
+   Light and dark are no longer written out twice here: the Fluent layer
+   already carries both, so an alias pointing at it follows the theme on
+   its own. Only the anchor bands, which have no Fluent counterpart,
+   still need a second block.
    ================================================================== */
 
-/* ---------- Light (default) ---------- */
 :root {
-  --surface: #fff9eb;
-  --surface-dim: #dfdacc;
-  --surface-bright: #fff9eb;
-  --surface-container-lowest: #ffffff;
-  --surface-container-low: #f9f3e5;
-  --surface-container: #f3ede0;
-  --surface-container-high: #eee8da;
-  --surface-container-highest: #e8e2d4;
-  --surface-variant: #e8e2d4;
-  /* Raised surface for cards, header and tiles — always one step
-     *away* from the page background, in both themes. */
-  --card: #ffffff;
+  /* ---- Surfaces ---- */
+  --surface: var(--colorNeutralBackground2);
+  --surface-container-low: var(--colorNeutralBackground3);
+  /* Used as a *hover* background in 79 of its 80 call sites, so it maps to
+     Fluent's hover token rather than to a resting surface. Mapping it by
+     name would have made hover indistinguishable from rest. */
+  --surface-container-high: var(--colorSubtleBackgroundHover);
+  --card: var(--colorNeutralBackground1);
 
-  --on-surface: #1d1c13;
-  --on-surface-variant: #594139;
-  --muted: #7c6a62;
+  /* ---- Foreground ---- */
+  --on-surface: var(--colorNeutralForeground1);
+  --on-surface-variant: var(--colorNeutralForeground2);
+  --muted: var(--colorNeutralForeground3);
 
-  --inverse-surface: #333027;
-  --inverse-on-surface: #f6f0e2;
+  /* ---- Strokes ----
+     `--line` did three jobs at once, so the three roles have their own tokens
+     and `--line` keeps the middle one. The split is only partly applied: 261
+     call sites still say `border-line`, 60 moved to `--line-divider`, and
+     `--line-strong` has 4. The rest were left rather than reassigned in bulk,
+     because telling a divider from a control border needs reading each site. */
+  --line: var(--colorNeutralStroke1);
+  --line-divider: var(--colorNeutralStroke2);
+  --line-strong: var(--colorNeutralStrokeAccessible);
+  --outline-variant: var(--colorNeutralStroke2);
+  --outline: var(--colorNeutralStrokeDisabled);
 
-  --outline: #8d7168;
-  --outline-variant: #e1bfb5;
-  /* Structural stroke — the "ink" of the whole UI. */
-  --line: #1d1c13;
+  /* ---- Brand ----
+     The ramp puts `colorBrandBackground` at #ab3500 rather than the old
+     #ff6b35: Fluent always sets white on it, and white on #ff6b35 measures
+     2.84:1. The vivid orange lives higher up the ramp as a tint now. */
+  --primary: var(--colorBrandForeground1);
+  --primary-container: var(--colorBrandBackground);
+  --on-primary-container: var(--colorNeutralForegroundOnBrand);
+  --primary-fixed: var(--colorBrandBackground2);
+  /* The tint is light in light mode, so it takes brand-coloured text, not the
+     white that goes on the solid fill. Pairing it with `--on-primary-container`
+     gave 1.11:1 — the accessibility baseline caught it. */
+  --on-primary-fixed: var(--colorBrandForeground1);
 
-  --primary: #ab3500;
-  --on-primary: #ffffff;
-  --primary-container: #ff6b35;
-  --on-primary-container: #5f1900;
-  --inverse-primary: #ffb59d;
-  --primary-fixed: #ffdbd0;
-  --primary-fixed-dim: #ffb59d;
-  --on-primary-fixed: #390c00;
-  --on-primary-fixed-variant: #832600;
+  /* ---- Inverse ---- */
+  --inverse-surface: var(--colorNeutralBackgroundInverted);
+  --inverse-on-surface: var(--colorNeutralForegroundInverted);
 
-  --secondary: #5f5e5e;
-  --on-secondary: #ffffff;
-  --secondary-container: #e2dfde;
-  --on-secondary-container: #636262;
+  /* ---- Status ---- */
+  --error: var(--colorPaletteRedForeground1);
+  --error-container: var(--colorPaletteRedBackground1);
+  --on-error-container: var(--colorPaletteRedForeground1);
+  /* Two roles again: a fill that carries white text in 10 places, and a text
+     colour in 3. The fill token fails as text on a card, so they are split. */
+  --success: var(--colorPaletteGreenBackground3);
+  --on-success: var(--colorNeutralForegroundOnBrand);
+  --success-fg: var(--colorPaletteGreenForeground1);
+  /* Fluent's yellow is too light to carry small text on white; dark orange
+     is the palette Fluent itself uses for warnings on light grounds. */
+  --warning: var(--colorPaletteDarkOrangeForeground1);
 
-  --tertiary: #645e4b;
-  --on-tertiary: #ffffff;
-  --tertiary-container: #a19983;
-  --on-tertiary-container: #363120;
+  /* ---- Neutral chips ---- */
+  --secondary-container: var(--colorNeutralBackground4);
+  --on-secondary-container: var(--colorNeutralForeground2);
+  --tertiary-container: var(--colorNeutralBackground5);
+  --on-tertiary-container: var(--colorNeutralForeground2);
 
-  --error: #ba1a1a;
-  --on-error: #ffffff;
-  --error-container: #ffdad6;
-  --on-error-container: #93000a;
+  /* ---- Interaction states ----
+     None of these existed; every hover was written by hand at the call site. */
+  --state-hover: var(--colorSubtleBackgroundHover);
+  --state-pressed: var(--colorSubtleBackgroundPressed);
+  --state-selected: var(--colorSubtleBackgroundSelected);
+  --state-disabled-bg: var(--colorNeutralBackgroundDisabled);
+  --state-disabled-fg: var(--colorNeutralForegroundDisabled);
+  --state-disabled-line: var(--colorNeutralStrokeDisabled);
 
-  --success: #1f7a45;
-  --warning: #a06000;
+  /* Per-surface state pairs, so a control can express hover and pressed
+     without either being written out at the call site. */
+  --primary-container-hover: var(--colorBrandBackgroundHover);
+  --primary-container-pressed: var(--colorBrandBackgroundPressed);
+  --card-hover: var(--colorNeutralBackground1Hover);
+  --card-pressed: var(--colorNeutralBackground1Pressed);
+  --line-hover: var(--colorNeutralStroke1Hover);
+  --line-pressed: var(--colorNeutralStroke1Pressed);
+  /* The accent Fluent grows under a focused field. */
+  --accent-stroke: var(--colorCompoundBrandStroke);
 
-  /* Anchor bands (announcement bar, footer) stay dark in both themes. */
+  /* ---- Focus ----
+     Two tones so the ring stays visible on any ground, including the brand
+     fill that used to swallow the old single-colour ring. */
+  --focus-inner: var(--colorStrokeFocus1);
+  --focus-outer: var(--colorStrokeFocus2);
+
+  /* ---- No Fluent equivalent ----
+     Bands that stay dark in *both* themes. `colorNeutralBackgroundInverted`
+     flips with the theme, which is the opposite of what these need. */
   --anchor: #1d1c13;
   --on-anchor: #f6f0e2;
   --on-anchor-variant: #b6ada0;
-
-  --hard-dir: 1;
+  /* Brand text on the anchor band. The band is dark in both themes, so this
+     cannot follow the theme-aware brand token: `colorBrandForeground1` is
+     #ab3500 in light mode and measures 2.64:1 here. Ramp step 110 is fixed
+     and clears 6.36:1 against both anchor values. */
+  --on-anchor-brand: #ec805d;
 }
 
-/* ---------- Dark ---------- */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --surface: #121412;
-    --surface-dim: #121412;
-    --surface-bright: #383a37;
-    --surface-container-lowest: #0d0f0d;
-    --surface-container-low: #1a1c1a;
-    --surface-container: #1e201e;
-    --surface-container-high: #282a28;
-    --surface-container-highest: #333533;
-    --surface-variant: #333533;
-    --card: #1e201e;
-
-    --on-surface: #e2e3df;
-    --on-surface-variant: #e1bfb5;
-    --muted: #a1a1aa;
-
-    --inverse-surface: #e2e3df;
-    --inverse-on-surface: #2f312e;
-
-    --outline: #a98a80;
-    --outline-variant: #594139;
-    --line: #000000;
-
-    --primary: #ffb59d;
-    --on-primary: #5d1900;
-    --primary-container: #ff6b35;
-    --on-primary-container: #5f1900;
-    --inverse-primary: #ab3500;
-
-    --secondary: #c8c6c5;
-    --on-secondary: #303030;
-    --secondary-container: #474746;
-    --on-secondary-container: #b7b5b4;
-
-    --tertiary: #c8c6c5;
-    --on-tertiary: #313030;
-    --tertiary-container: #9b9999;
-    --on-tertiary-container: #323131;
-
-    --error: #ef4444;
-    --on-error: #690005;
-    --error-container: #93000a;
-    --on-error-container: #ffdad6;
-
-    --success: #4ade80;
-    --warning: #fbbf24;
-
     --anchor: #0d0f0d;
     --on-anchor: #e2e3df;
     --on-anchor-variant: #a1a1aa;
@@ -125,72 +129,15 @@
 }
 
 [data-theme="dark"] {
-  --surface: #121412;
-  --surface-dim: #121412;
-  --surface-bright: #383a37;
-  --surface-container-lowest: #0d0f0d;
-  --surface-container-low: #1a1c1a;
-  --surface-container: #1e201e;
-  --surface-container-high: #282a28;
-  --surface-container-highest: #333533;
-  --surface-variant: #333533;
-  --card: #1e201e;
-
-  --on-surface: #e2e3df;
-  --on-surface-variant: #e1bfb5;
-  --muted: #a1a1aa;
-
-  --inverse-surface: #e2e3df;
-  --inverse-on-surface: #2f312e;
-
-  --outline: #a98a80;
-  --outline-variant: #594139;
-  --line: #000000;
-
-  --primary: #ffb59d;
-  --on-primary: #5d1900;
-  --primary-container: #ff6b35;
-  --on-primary-container: #5f1900;
-  --inverse-primary: #ab3500;
-
-  --secondary: #c8c6c5;
-  --on-secondary: #303030;
-  --secondary-container: #474746;
-  --on-secondary-container: #b7b5b4;
-
-  --tertiary: #c8c6c5;
-  --on-tertiary: #313030;
-  --tertiary-container: #9b9999;
-  --on-tertiary-container: #323131;
-
-  --error: #ef4444;
-  --on-error: #690005;
-  --error-container: #93000a;
-  --on-error-container: #ffdad6;
-
-  --success: #4ade80;
-  --warning: #fbbf24;
-
   --anchor: #0d0f0d;
   --on-anchor: #e2e3df;
   --on-anchor-variant: #a1a1aa;
 }
 
-/* RTL flips the hard shadow so it always falls "outward". */
-[dir="rtl"] {
-  --hard-dir: -1;
-}
-
 @theme inline {
   --color-surface: var(--surface);
-  --color-surface-dim: var(--surface-dim);
-  --color-surface-bright: var(--surface-bright);
-  --color-surface-lowest: var(--surface-container-lowest);
   --color-surface-low: var(--surface-container-low);
-  --color-surface-container: var(--surface-container);
   --color-surface-high: var(--surface-container-high);
-  --color-surface-highest: var(--surface-container-highest);
-  --color-surface-variant: var(--surface-variant);
   --color-card: var(--card);
 
   --color-on-surface: var(--on-surface);
@@ -203,99 +150,165 @@
   --color-outline: var(--outline);
   --color-outline-variant: var(--outline-variant);
   --color-line: var(--line);
+  --color-line-divider: var(--line-divider);
+  --color-line-strong: var(--line-strong);
+
+  --color-state-hover: var(--state-hover);
+  --color-state-pressed: var(--state-pressed);
+  --color-state-selected: var(--state-selected);
+  --color-state-disabled-bg: var(--state-disabled-bg);
+  --color-state-disabled-fg: var(--state-disabled-fg);
+  --color-state-disabled-line: var(--state-disabled-line);
+
+  --color-primary-container-hover: var(--primary-container-hover);
+  --color-primary-container-pressed: var(--primary-container-pressed);
+  --color-card-hover: var(--card-hover);
+  --color-card-pressed: var(--card-pressed);
+  --color-line-hover: var(--line-hover);
+  --color-line-pressed: var(--line-pressed);
+  --color-accent-stroke: var(--accent-stroke);
 
   --color-primary: var(--primary);
-  --color-on-primary: var(--on-primary);
   --color-primary-container: var(--primary-container);
   --color-on-primary-container: var(--on-primary-container);
   --color-primary-fixed: var(--primary-fixed);
+  --color-on-primary-fixed: var(--on-primary-fixed);
 
-  --color-secondary: var(--secondary);
   --color-secondary-container: var(--secondary-container);
   --color-on-secondary-container: var(--on-secondary-container);
 
-  --color-tertiary: var(--tertiary);
   --color-tertiary-container: var(--tertiary-container);
   --color-on-tertiary-container: var(--on-tertiary-container);
 
   --color-error: var(--error);
-  --color-on-error: var(--on-error);
   --color-error-container: var(--error-container);
   --color-on-error-container: var(--on-error-container);
 
   --color-success: var(--success);
+  --color-on-success: var(--on-success);
+  --color-success-fg: var(--success-fg);
   --color-warning: var(--warning);
 
   --color-anchor: var(--anchor);
   --color-on-anchor: var(--on-anchor);
   --color-on-anchor-variant: var(--on-anchor-variant);
+  --color-on-anchor-brand: var(--on-anchor-brand);
+
 }
 
 @theme {
-  /* Typography — Latin faces first, Arabic companion after. */
-  --font-display: var(--font-manrope), var(--font-plex-arabic), system-ui, sans-serif;
-  --font-sans: var(--font-work-sans), var(--font-plex-arabic), system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), var(--font-plex-arabic), ui-monospace, monospace;
+  /* Fluent's radius scale. Names kept so `rounded-md` still resolves. */
+  --radius-xs: var(--borderRadiusSmall);
+  --radius-sm: var(--borderRadiusSmall);
+  --radius-md: var(--borderRadiusMedium);
+  --radius-lg: var(--borderRadiusLarge);
+  --radius-xl: var(--borderRadiusXLarge);
+  --radius-2xl: var(--borderRadius2XLarge);
 
-  --text-display-lg: 3rem;
-  --text-display-lg--line-height: 3.5rem;
+  /* Named stroke widths instead of ad-hoc 1px / 2px. */
+  --stroke-thin: var(--strokeWidthThin);
+  --stroke-thick: var(--strokeWidthThick);
+
+  /* Motion, replacing `duration-150` written out by hand. */
+  --ease-fluent: var(--curveEasyEase);
+  --ease-decelerate: var(--curveDecelerateMid);
+
+  /* ---- Typography ----
+     Fluent builds on Segoe UI Variable, which has no Arabic. IBM Plex Sans
+     Arabic covers both scripts and is already loaded, so it leads and Fluent's
+     stack backs it up. Manrope and Work Sans are dropped: one family carrying
+     the whole ramp through weight and size is Fluent's own approach, and it
+     removes two webfont downloads. */
+  --font-sans: var(--font-plex-arabic), var(--fontFamilyBase);
+  --font-display: var(--font-plex-arabic), var(--fontFamilyBase);
+  --font-mono: var(--font-jetbrains), var(--fontFamilyMonospace);
+
+  /* The seven semantic steps keep their names and re-point at Fluent's ramp,
+     so no call site changes. Paired line heights come from Fluent too rather
+     than being chosen per step. */
+  --text-display-lg: var(--fontSizeHero900);
+  --text-display-lg--line-height: var(--lineHeightHero900);
   --text-display-lg--letter-spacing: -0.02em;
-  --text-display-lg--font-weight: 800;
+  --text-display-lg--font-weight: var(--fontWeightBold);
 
-  --text-headline-lg: 2rem;
-  --text-headline-lg--line-height: 2.5rem;
-  --text-headline-lg--font-weight: 700;
+  --text-headline-lg: var(--fontSizeBase600);
+  --text-headline-lg--line-height: var(--lineHeightBase600);
+  --text-headline-lg--font-weight: var(--fontWeightSemibold);
 
-  --text-headline-md: 1.5rem;
-  --text-headline-md--line-height: 2rem;
-  --text-headline-md--font-weight: 600;
+  --text-headline-md: var(--fontSizeBase500);
+  --text-headline-md--line-height: var(--lineHeightBase500);
+  --text-headline-md--font-weight: var(--fontWeightSemibold);
 
-  --text-body-lg: 1.125rem;
-  --text-body-lg--line-height: 1.75rem;
+  --text-body-lg: var(--fontSizeBase400);
+  --text-body-lg--line-height: var(--lineHeightBase400);
 
-  --text-body-md: 1rem;
-  --text-body-md--line-height: 1.5rem;
+  --text-body-md: var(--fontSizeBase300);
+  --text-body-md--line-height: var(--lineHeightBase300);
 
-  --text-label-md: 0.875rem;
-  --text-label-md--line-height: 1.25rem;
-  --text-label-md--letter-spacing: 0.05em;
-  --text-label-md--font-weight: 500;
+  --text-label-md: var(--fontSizeBase200);
+  --text-label-md--line-height: var(--lineHeightBase200);
+  --text-label-md--font-weight: var(--fontWeightMedium);
 
-  --text-label-sm: 0.75rem;
-  --text-label-sm--line-height: 1rem;
-  --text-label-sm--letter-spacing: 0.05em;
-  --text-label-sm--font-weight: 500;
-
-  /* Sharp and orthogonal — no rounding anywhere. */
-  --radius-xs: 0px;
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --radius-2xl: 0px;
-
+  --text-label-sm: var(--fontSizeBase100);
+  --text-label-sm--line-height: var(--lineHeightBase100);
+  --text-label-sm--font-weight: var(--fontWeightMedium);
   --container-content: 1280px;
 }
 
-/* Hard drop shadow — solid, no blur, direction aware. */
-@utility shadow-hard {
-  box-shadow: calc(var(--hard-dir) * 4px) 4px 0 0 var(--color-line);
+/* ------------------------------------------------------------------ */
+/* Elevation                                                           */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Depth is expressed with light. The design this replaced used a solid offset
+ * with no blur that had to flip direction in RTL; Fluent's shadows are
+ * symmetric, which is why `--hard-dir` no longer exists.
+ */
+@utility elevation-sm {
+  box-shadow: var(--shadow4);
 }
-@utility shadow-hard-sm {
-  box-shadow: calc(var(--hard-dir) * 2px) 2px 0 0 var(--color-line);
+@utility elevation-md {
+  box-shadow: var(--shadow8);
 }
-@utility shadow-hard-none {
-  box-shadow: 0 0 0 0 var(--color-line);
+@utility elevation-lg {
+  box-shadow: var(--shadow16);
+}
+@utility elevation-xl {
+  box-shadow: var(--shadow64);
+}
+@utility elevation-none {
+  box-shadow: none;
 }
 
-/* JetBrains Mono technical label */
+/*
+ * Micro-label. Kept as a utility because 46 files use it, but re-cut to
+ * Fluent's Base200: forced capitals do nothing to Arabic and Fluent does not
+ * use them, and the wide tracking went with them.
+ */
 @utility label-mono {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  line-height: 1rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  font-size: var(--fontSizeBase200);
+  line-height: var(--lineHeightBase200);
+  font-weight: var(--fontWeightSemibold);
+}
+
+/*
+ * Ornamental wordmark. Drawn as generated content rather than a text node:
+ * it is decoration, not reading matter, and a real text node at 20% opacity
+ * is a contrast violation no matter how it is labelled. Raising the opacity
+ * far enough to pass would have turned a watermark into a headline.
+ */
+@utility watermark {
+  &::after {
+    content: attr(data-mark);
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 3.75rem;
+    font-weight: 700;
+    line-height: 1;
+    opacity: 0.2;
+    user-select: none;
+  }
 }
 
 @utility no-scrollbar {
@@ -342,15 +355,36 @@
     color: var(--color-on-primary-container);
   }
 
+  /*
+   * Fluent's two-tone focus indicator. The old ring was a single 2px band in
+   * the brand colour, which disappeared the moment it surrounded a
+   * brand-filled control. Two contrasting strokes stay visible on any ground:
+   * the outer one dark on light themes and light on dark, the inner one its
+   * opposite.
+   */
   :focus-visible {
-    outline: 2px solid var(--color-primary-container);
-    outline-offset: 2px;
+    outline: var(--strokeWidthThick) solid var(--focus-outer);
+    outline-offset: var(--strokeWidthThin);
+    box-shadow: 0 0 0 var(--strokeWidthThin) var(--focus-inner);
+    border-radius: var(--borderRadiusSmall);
   }
 
   /* Technical figures keep the mono face inside Arabic copy. */
   [data-numeric] {
     font-family: var(--font-mono);
     font-feature-settings: "tnum";
+  }
+
+  /* Nothing in the system animates for a reader who asked it not to. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
@@ -388,6 +422,11 @@
   section,
   table {
     break-inside: avoid;
+  }
+
+  /* Elevation is a screen idea. On paper it just wastes toner. */
+  * {
+    box-shadow: none !important;
   }
 
   a[href]::after {

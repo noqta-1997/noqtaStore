@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
-import {
-  IBM_Plex_Sans_Arabic,
-  JetBrains_Mono,
-  Manrope,
-  Work_Sans,
-} from "next/font/google";
+import { IBM_Plex_Sans_Arabic, JetBrains_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { FluentShell } from "@/components/fluent/fluent-shell";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
 import { ToastProvider } from "@/components/ui/toast";
 import { getStoreIdentity } from "@/data";
@@ -17,35 +13,24 @@ import { cn } from "@/lib/utils";
 
 import "@/app/globals.css";
 
-/** Display / headlines. */
-const manrope = Manrope({
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
-  variable: "--font-manrope",
-  display: "swap",
-});
-
-/** Body copy. */
-const workSans = Work_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-work-sans",
-  display: "swap",
-});
-
-/** Technical labels and figures. */
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-jetbrains",
-  display: "swap",
-});
-
-/** Arabic companion for all three families above. */
+/**
+ * Two families, not four. Fluent carries its whole type ramp on one face and
+ * separates the steps by size and weight, so the separate display and body
+ * faces went; Plex Arabic covers both scripts and leads the stack, with
+ * Fluent's Segoe stack behind it. That is two fewer webfonts on every page.
+ */
 const plexArabic = IBM_Plex_Sans_Arabic({
   subsets: ["arabic", "latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-plex-arabic",
+  display: "swap",
+});
+
+/** Figures inside Arabic copy, via [data-numeric]. */
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-jetbrains",
   display: "swap",
 });
 
@@ -96,26 +81,30 @@ export default async function LocaleLayout({
   const dictionary = await getDictionary(locale);
 
   return (
+    /*
+     * The font variables belong on <html>, not <body>. `--font-sans` is
+     * declared on :root and contains `var(--font-plex-arabic)`; a nested
+     * var() is resolved where the custom property is computed, so with the
+     * fonts on <body> that reference was undefined at :root and the whole
+     * font-family declaration was dropped as invalid.
+     */
     <html
       lang={locale}
       dir={localeDirection[locale]}
+      className={cn(plexArabic.variable, jetbrainsMono.variable)}
       suppressHydrationWarning
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body
-        className={cn(
-          manrope.variable,
-          workSans.variable,
-          jetbrainsMono.variable,
-          plexArabic.variable,
-          "min-h-dvh antialiased",
-        )}
+        className="min-h-dvh antialiased"
       >
-        <ToastProvider dismissLabel={dictionary.common.toast.dismiss}>
-          {children}
-        </ToastProvider>
+        <FluentShell dir={localeDirection[locale]}>
+          <ToastProvider dismissLabel={dictionary.common.toast.dismiss}>
+            {children}
+          </ToastProvider>
+        </FluentShell>
       </body>
     </html>
   );
