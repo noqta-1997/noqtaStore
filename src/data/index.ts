@@ -542,7 +542,65 @@ export interface AdminListQuery {
   status?: string;
   page?: number;
   perPage?: number;
+  /** Column key from the URL. Unknown values fall back to the default. */
+  sort?: string;
 }
+
+/**
+ * Sorting for the admin tables.
+ *
+ * The key arrives from a query string, so it is looked up in a fixed map
+ * rather than passed to Prisma: an unrecognised value falls back to the
+ * table's default ordering instead of reaching the database.
+ */
+export type AdminSortDirection = "asc" | "desc";
+
+function adminOrderBy<T>(
+  map: Record<string, T>,
+  key: string | undefined,
+  fallback: T,
+): T {
+  // `Object.hasOwn`, not a plain lookup: `?sort=constructor` would otherwise
+  // reach through to Object.prototype and hand Prisma something that is not
+  // an ordering at all.
+  return key && Object.hasOwn(map, key) ? map[key] : fallback;
+}
+
+const bookAdminSort: Record<string, Prisma.BookOrderByWithRelationInput> = {
+  "title-asc": { titleAr: "asc" },
+  "title-desc": { titleAr: "desc" },
+  "price-asc": { price: "asc" },
+  "price-desc": { price: "desc" },
+  "stock-asc": { stock: "asc" },
+  "stock-desc": { stock: "desc" },
+  "rating-asc": { rating: "asc" },
+  "rating-desc": { rating: "desc" },
+  "created-asc": { createdAt: "asc" },
+  "created-desc": { createdAt: "desc" },
+};
+
+const orderAdminSort: Record<string, Prisma.OrderOrderByWithRelationInput> = {
+  "created-asc": { createdAt: "asc" },
+  "created-desc": { createdAt: "desc" },
+  "total-asc": { total: "asc" },
+  "total-desc": { total: "desc" },
+  "status-asc": { status: "asc" },
+  "status-desc": { status: "desc" },
+};
+
+const customerAdminSort: Record<string, Prisma.CustomerOrderByWithRelationInput> = {
+  "name-asc": { name: "asc" },
+  "name-desc": { name: "desc" },
+  "created-asc": { createdAt: "asc" },
+  "created-desc": { createdAt: "desc" },
+};
+
+const reviewAdminSort: Record<string, Prisma.ReviewOrderByWithRelationInput> = {
+  "created-asc": { createdAt: "asc" },
+  "created-desc": { createdAt: "desc" },
+  "rating-asc": { rating: "asc" },
+  "rating-desc": { rating: "desc" },
+};
 
 function paginationOf(total: number, query: AdminListQuery, fallback = 10) {
   const perPage = query.perPage ?? fallback;
@@ -779,7 +837,7 @@ export async function getAdminOrders(query: AdminListQuery = {}) {
   const rows = await prisma.order.findMany({
     where,
     include: { items: true, timeline: true, customer: true },
-    orderBy: { createdAt: "desc" },
+    orderBy: adminOrderBy(orderAdminSort, query.sort, { createdAt: "desc" }),
     skip,
     take: perPage,
   });
@@ -858,7 +916,12 @@ export async function getCustomers(query: AdminListQuery = {}) {
   const total = await prisma.customer.count({ where });
   const { perPage, pageCount, page, skip } = paginationOf(total, query);
 
-  const rows = await prisma.customer.findMany({ where, skip, take: perPage });
+  const rows = await prisma.customer.findMany({
+    where,
+    orderBy: adminOrderBy(customerAdminSort, query.sort, { createdAt: "desc" }),
+    skip,
+    take: perPage,
+  });
   const totals = await customerTotals(rows.map((row) => row.id));
 
   const items = rows
@@ -931,7 +994,7 @@ export async function getAdminReviews(query: AdminListQuery = {}) {
   const rows = await prisma.review.findMany({
     where,
     include: { customer: { select: { name: true } }, book: true },
-    orderBy: { createdAt: "desc" },
+    orderBy: adminOrderBy(reviewAdminSort, query.sort, { createdAt: "desc" }),
     skip,
     take: perPage,
   });
@@ -970,7 +1033,7 @@ export async function getAdminBooks(
   const rows = await prisma.book.findMany({
     where,
     include: bookInclude,
-    orderBy: { createdAt: "desc" },
+    orderBy: adminOrderBy(bookAdminSort, query.sort, { createdAt: "desc" }),
     skip,
     take: perPage,
   });
