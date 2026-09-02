@@ -56,12 +56,12 @@ export function QuantityStepper({
   };
 
   const button =
-    "inline-flex size-9 items-center justify-center text-on-surface transition-colors hover:bg-surface-high disabled:text-muted disabled:hover:bg-transparent";
+    "inline-flex size-9 items-center justify-center text-on-surface transition-colors hover:bg-state-hover disabled:text-muted disabled:hover:bg-transparent";
 
   return (
     <div
       className={cn(
-        "inline-flex items-center border border-line bg-card",
+        "inline-flex items-center rounded-md border border-line bg-card",
         className,
       )}
     >

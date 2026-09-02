@@ -1,12 +1,16 @@
 import { cn } from "@/lib/utils";
 import type { OrderStatus } from "@/types";
 
+/**
+ * Fluent expresses status with a tinted background and a matching foreground
+ * from the same palette, rather than a saturated fill under white.
+ */
 const tones: Record<OrderStatus, string> = {
-  pending: "border-line bg-surface-high text-on-surface",
-  processing: "border-line bg-primary-fixed text-on-primary-container",
-  shipped: "border-line bg-primary-container text-on-primary-container",
-  delivered: "border-line bg-success text-white",
-  cancelled: "border-line bg-error-container text-on-error-container",
+  pending: "bg-surface-low text-on-surface-variant",
+  processing: "bg-primary-fixed text-on-primary-fixed",
+  shipped: "bg-primary-container text-on-primary-container",
+  delivered: "bg-success text-on-success",
+  cancelled: "bg-error-container text-on-error-container",
 };
 
 interface StatusBadgeProps {
@@ -19,7 +23,7 @@ export function StatusBadge({ status, label, className }: StatusBadgeProps) {
   return (
     <span
       className={cn(
-        "label-mono inline-flex items-center border px-2 py-1",
+        "inline-flex h-5 items-center rounded-sm px-1.5 text-label-md font-semibold",
         tones[status],
         className,
       )}

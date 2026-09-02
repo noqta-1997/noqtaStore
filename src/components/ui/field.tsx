@@ -8,6 +8,8 @@ interface FieldProps {
   hint?: string;
   error?: string;
   optional?: string;
+  /** Renders Fluent's required marker after the label. */
+  required?: boolean;
   className?: string;
   children: ReactNode;
 }
@@ -19,27 +21,33 @@ export function Field({
   hint,
   error,
   optional,
+  required = false,
   className,
   children,
 }: FieldProps) {
   return (
-    <div className={cn("space-y-1.5", className)}>
+    <div className={cn("space-y-1", className)}>
       <label
         htmlFor={htmlFor}
-        className="flex items-baseline gap-2 text-label-md text-on-surface"
+        className="flex items-baseline gap-1 text-body-md font-semibold text-on-surface"
       >
         {label}
+        {required ? (
+          <span aria-hidden className="text-error">
+            *
+          </span>
+        ) : null}
         {optional ? (
-          <span className="text-label-sm text-muted">({optional})</span>
+          <span className="font-normal text-label-md text-muted">({optional})</span>
         ) : null}
       </label>
       {children}
       {error ? (
-        <p id={`${htmlFor}-error`} role="alert" className="text-label-sm text-error">
+        <p id={`${htmlFor}-error`} role="alert" className="text-label-md text-error">
           {error}
         </p>
       ) : hint ? (
-        <p className="text-label-sm text-muted">{hint}</p>
+        <p className="text-label-md text-muted">{hint}</p>
       ) : null}
     </div>
   );

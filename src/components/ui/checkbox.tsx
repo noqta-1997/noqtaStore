@@ -20,7 +20,15 @@ export function Checkbox({ label, hint, className, id, ...props }: CheckboxProps
       <input
         id={id}
         type="checkbox"
-        className="mt-0.5 size-4.5 shrink-0 appearance-none border border-line bg-card checked:bg-primary-container checked:shadow-[inset_0_0_0_3px_var(--card)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-container"
+        className={cn(
+          "mt-0.5 size-4 shrink-0 appearance-none rounded-xs border border-line-strong bg-card",
+          "transition-colors duration-100 ease-fluent",
+          "hover:border-accent-stroke",
+          "checked:border-primary-container checked:bg-primary-container",
+          // The tick is drawn with an inset shadow so the control stays native.
+          "checked:shadow-[inset_0_0_0_2px_var(--colorNeutralForegroundOnBrand)]",
+          "disabled:border-state-disabled-line disabled:bg-state-disabled-bg",
+        )}
         {...props}
       />
       <span className="min-w-0">

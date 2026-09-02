@@ -25,7 +25,7 @@ export function PageHeader({
   className,
 }: PageHeaderProps) {
   return (
-    <section className={cn("border-b-2 border-line bg-surface-low", className)}>
+    <section className={cn("border-b border-line-divider bg-surface-low", className)}>
       <Container className="space-y-4 py-8 lg:py-10">
         {crumbs?.length ? <Breadcrumb items={crumbs} label={crumbsLabel} /> : null}
 

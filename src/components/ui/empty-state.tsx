@@ -24,11 +24,11 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center gap-4 border border-line bg-card px-6 py-16 text-center",
+        "flex flex-col items-center gap-4 rounded-md border border-line bg-card px-6 py-12 text-center",
         className,
       )}
     >
-      <span className="flex size-14 items-center justify-center border border-line bg-surface-high">
+      <span className="flex size-12 items-center justify-center rounded-md bg-surface-low">
         <Icon aria-hidden className="size-6 text-primary" strokeWidth={2} />
       </span>
       <div className="space-y-1">

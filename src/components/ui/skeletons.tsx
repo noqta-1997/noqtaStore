@@ -6,14 +6,14 @@ export function Skeleton({ className }: { className?: string }) {
   return (
     <div
       aria-hidden
-      className={cn("animate-pulse bg-surface-high", className)}
+      className={cn("animate-pulse bg-surface-low", className)}
     />
   );
 }
 
 function CardSkeleton() {
   return (
-    <div className="flex flex-col border border-line bg-card">
+    <div className="flex flex-col rounded-md border border-line bg-card">
       <Skeleton className="aspect-[2/3] w-full border-b border-line" />
       <div className="space-y-2 p-3 sm:p-4">
         <Skeleton className="h-3 w-16" />
@@ -32,7 +32,7 @@ function CardSkeleton() {
 export function CatalogueSkeleton({ count = 8 }: { count?: number }) {
   return (
     <>
-      <div className="border-b-2 border-line bg-surface-low">
+      <div className="border-b border-line-divider bg-surface-low">
         <Container className="space-y-3 py-8 lg:py-10">
           <Skeleton className="h-3 w-40" />
           <Skeleton className="h-9 w-64" />
@@ -64,7 +64,7 @@ export function PanelListSkeleton({ rows = 3 }: { rows?: number }) {
     <div className="space-y-4">
       <Skeleton className="h-7 w-48" />
       {Array.from({ length: rows }, (_, index) => (
-        <div key={index} className="space-y-3 border border-line bg-card p-5">
+        <div key={index} className="space-y-3 rounded-md border border-line bg-card p-5">
           <Skeleton className="h-4 w-1/3" />
           <Skeleton className="h-4 w-2/3" />
           <Skeleton className="h-4 w-1/2" />
@@ -78,7 +78,7 @@ export function PanelListSkeleton({ rows = 3 }: { rows?: number }) {
 export function AdminSkeleton() {
   return (
     <>
-      <div className="space-y-2 border-b-2 border-line pb-5">
+      <div className="space-y-2 border-b border-line-divider pb-5">
         <Skeleton className="h-8 w-56" />
         <Skeleton className="h-4 w-72 max-w-full" />
       </div>
@@ -89,9 +89,9 @@ export function AdminSkeleton() {
         ))}
       </div>
 
-      <div className="border border-line bg-card">
+      <div className="rounded-md border border-line bg-card">
         <Skeleton className="h-12 w-full border-b border-line" />
-        <div className="divide-y divide-outline-variant">
+        <div className="divide-y divide-line-divider">
           {Array.from({ length: 6 }, (_, index) => (
             <div key={index} className="flex items-center gap-4 p-4">
               <Skeleton className="size-9 shrink-0" />

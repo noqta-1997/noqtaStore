@@ -23,7 +23,7 @@ export function Stepper({ steps, current, className }: StepperProps) {
               <span
                 className={cn(
                   "flex size-8 shrink-0 items-center justify-center border border-line font-mono text-label-md font-semibold",
-                  done && "bg-success text-white",
+                  done && "bg-success text-on-success",
                   active && "bg-primary-container text-on-primary-container",
                   !done && !active && "bg-card text-muted",
                 )}

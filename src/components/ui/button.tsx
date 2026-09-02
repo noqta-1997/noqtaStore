@@ -2,31 +2,47 @@ import type { ButtonHTMLAttributes } from "react";
 
 import { cn } from "@/lib/utils";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost";
+/** Fluent's five appearances. */
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "outline"
+  | "subtle"
+  | "transparent";
+
 export type ButtonSize = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-2 font-semibold " +
-  "transition-all duration-150 select-none " +
-  "disabled:pointer-events-none disabled:border-outline disabled:bg-transparent " +
-  "disabled:text-muted";
+  "inline-flex items-center justify-center gap-2 rounded-md font-semibold " +
+  "border transition-colors duration-100 ease-fluent select-none " +
+  "disabled:pointer-events-none disabled:border-state-disabled-line " +
+  "disabled:bg-state-disabled-bg disabled:text-state-disabled-fg";
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    "border border-line bg-primary-container text-on-primary-container " +
-    "hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0 active:shadow-hard-none",
+    "border-transparent bg-primary-container text-on-primary-container " +
+    "hover:bg-primary-container-hover active:bg-primary-container-pressed",
+  // Fluent's default: a neutral surface with a visible stroke.
   secondary:
-    "border border-line bg-transparent text-on-surface hover:bg-surface-high " +
-    "hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0 active:shadow-hard-none",
-  ghost:
-    "border border-transparent font-mono font-medium tracking-[0.05em] text-on-surface " +
-    "underline-offset-4 hover:underline",
+    "border-line bg-card text-on-surface " +
+    "hover:border-line-hover hover:bg-card-hover " +
+    "active:border-line-pressed active:bg-card-pressed",
+  outline:
+    "border-line bg-transparent text-on-surface " +
+    "hover:border-line-hover hover:bg-state-hover active:bg-state-pressed",
+  subtle:
+    "border-transparent bg-transparent text-on-surface-variant " +
+    "hover:bg-state-hover hover:text-on-surface active:bg-state-pressed",
+  transparent:
+    "border-transparent bg-transparent text-on-surface-variant " +
+    "hover:text-primary active:text-primary",
 };
 
+/** Fluent's 24 / 32 / 40 ramp. Touch targets opt into `lg` at the call site. */
 const sizes: Record<ButtonSize, string> = {
-  sm: "h-9 px-3 text-sm",
-  md: "h-11 px-5 text-sm",
-  lg: "h-12 px-7 text-base",
+  sm: "h-6 px-2 text-label-md",
+  md: "h-8 px-3 text-body-md",
+  lg: "h-10 px-4 text-body-lg",
 };
 
 export interface ButtonStyleOptions {

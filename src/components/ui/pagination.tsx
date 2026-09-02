@@ -41,7 +41,7 @@ export function Pagination({
             <Link
               href={buildHref(page - 1)}
               aria-label={labels.previous}
-              className={cn(box, "bg-card hover:bg-surface-high")}
+              className={cn(box, "bg-card hover:bg-state-hover")}
             >
               <ChevronRight aria-hidden className="size-4 rtl:hidden" strokeWidth={2} />
               <ChevronLeft aria-hidden className="hidden size-4 rtl:block" strokeWidth={2} />
@@ -76,7 +76,7 @@ export function Pagination({
                 <Link
                   href={buildHref(item)}
                   data-numeric
-                  className={cn(box, "bg-card hover:bg-surface-high")}
+                  className={cn(box, "bg-card hover:bg-state-hover")}
                 >
                   {item}
                 </Link>
@@ -90,7 +90,7 @@ export function Pagination({
             <Link
               href={buildHref(page + 1)}
               aria-label={labels.next}
-              className={cn(box, "bg-card hover:bg-surface-high")}
+              className={cn(box, "bg-card hover:bg-state-hover")}
             >
               <ChevronLeft aria-hidden className="size-4 rtl:hidden" strokeWidth={2} />
               <ChevronRight aria-hidden className="hidden size-4 rtl:block" strokeWidth={2} />

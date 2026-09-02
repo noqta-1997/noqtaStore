@@ -1,29 +1,30 @@
 import { ChevronDown } from "lucide-react";
 import type { SelectHTMLAttributes } from "react";
 
+import { fieldStyles } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 export type SelectProps = SelectHTMLAttributes<HTMLSelectElement>;
 
-/** Native select with the project's frame and a custom chevron. */
+/**
+ * A native `<select>` with Fluent's field frame.
+ *
+ * Deliberately not Fluent's `Select` or `Combobox`: eight of the nine call
+ * sites are Server Components, and switching would force `"use client"` on
+ * every form that submits through a Server Action.
+ */
 export function Select({ className, children, ...props }: SelectProps) {
   return (
     <div className="relative">
       <select
-        className={cn(
-          "h-11 w-full appearance-none border border-line bg-card ps-4 pe-10 text-base text-on-surface",
-          "focus:shadow-hard-sm focus:outline-none",
-          "aria-invalid:border-error aria-invalid:bg-error-container/30",
-          "disabled:cursor-not-allowed disabled:border-outline disabled:text-muted",
-          className,
-        )}
+        className={cn(fieldStyles, "h-8 appearance-none pe-8 text-body-md", className)}
         {...props}
       >
         {children}
       </select>
       <ChevronDown
         aria-hidden
-        className="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-on-surface"
+        className="pointer-events-none absolute end-2.5 top-1/2 size-4 -translate-y-1/2 text-on-surface-variant"
         strokeWidth={2}
       />
     </div>

@@ -9,7 +9,7 @@ import type { Dictionary } from "@/i18n/get-dictionary";
 export type ValidationMessages = Dictionary["common"]["validation"];
 
 interface ValidatedFieldProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "id" | "name"> {
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "id" | "name" | "size"> {
   id: string;
   name: string;
   label: string;

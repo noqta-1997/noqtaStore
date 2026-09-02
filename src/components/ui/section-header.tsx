@@ -22,7 +22,7 @@ export function SectionHeader({
   return (
     <div
       className={cn(
-        "mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b-2 border-line pb-4",
+        "mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b border-line-divider pb-4",
         className,
       )}
     >
@@ -39,7 +39,7 @@ export function SectionHeader({
           {actionLabel}
           <ArrowRight
             aria-hidden
-            className="size-4 transition-transform duration-150 group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+            className="size-4 transition-transform duration-100 ease-fluent group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
             strokeWidth={2}
           />
         </Link>

@@ -24,8 +24,9 @@ export function RadioCard({
     <label
       htmlFor={id}
       className={cn(
-        "flex cursor-pointer items-center gap-3 border border-line bg-card p-4 transition-colors",
-        "has-checked:bg-surface-high",
+        "flex cursor-pointer items-center gap-3 rounded-md border border-line bg-card p-3",
+        "transition-colors duration-100 ease-fluent hover:bg-card-hover",
+        "has-checked:border-accent-stroke has-checked:bg-state-selected",
         disabled && "cursor-not-allowed opacity-55",
         className,
       )}
@@ -34,11 +35,17 @@ export function RadioCard({
         id={id}
         type="radio"
         disabled={disabled}
-        className="size-4.5 shrink-0 appearance-none rounded-full border border-line bg-card checked:bg-primary-container checked:shadow-[inset_0_0_0_3px_var(--card)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-container"
+        className={cn(
+          "size-4 shrink-0 appearance-none rounded-full border border-line-strong bg-card",
+          "transition-colors duration-100 ease-fluent hover:border-accent-stroke",
+          "checked:border-primary-container",
+          "checked:shadow-[inset_0_0_0_3px_var(--colorNeutralBackground1),inset_0_0_0_9px_var(--colorBrandBackground)]",
+          "disabled:border-state-disabled-line disabled:bg-state-disabled-bg",
+        )}
         {...props}
       />
       {icon ? (
-        <span className="flex size-10 shrink-0 items-center justify-center border border-line bg-surface-high text-primary">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-surface-low text-primary">
           {icon}
         </span>
       ) : null}
