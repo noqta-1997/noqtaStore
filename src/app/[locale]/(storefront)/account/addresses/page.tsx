@@ -77,7 +77,7 @@ export default async function AddressesPage({
 
       <ul className="grid gap-4 sm:grid-cols-2">
         {addresses.map((address) => (
-          <li key={address.id} className="flex flex-col gap-3 border border-line bg-card p-5">
+          <li key={address.id} className="flex flex-col gap-3 rounded-md border border-line bg-card p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2">
                 <MapPin aria-hidden className="size-4 text-primary" strokeWidth={2} />
@@ -101,12 +101,12 @@ export default async function AddressesPage({
               <span className="block">{address.line[locale]}</span>
             </address>
 
-            <div className="mt-auto flex items-center gap-2 border-t border-outline-variant pt-3">
+            <div className="mt-auto flex items-center gap-2 border-t border-line-divider pt-3">
               <Link
                 href={`/${locale}/account/addresses/${address.id}/edit`}
                 aria-label={dictionary.common.edit}
                 title={dictionary.common.edit}
-                className="inline-flex size-10 items-center justify-center border border-transparent text-on-surface transition-colors hover:border-line hover:bg-surface-high"
+                className="inline-flex size-10 items-center justify-center border border-transparent text-on-surface transition-colors hover:border-line hover:bg-state-hover"
               >
                 <Pencil aria-hidden className="size-4" strokeWidth={2} />
               </Link>

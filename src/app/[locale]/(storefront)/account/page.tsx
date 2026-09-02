@@ -35,7 +35,7 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border border-line bg-card">
+    <section className="rounded-md border border-line bg-card">
       <h2 className="border-b border-line px-5 py-4 text-headline-md">{title}</h2>
       <div className="space-y-4 p-5">{children}</div>
     </section>
@@ -68,9 +68,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         {stats.map((stat) => (
           <li
             key={stat.label}
-            className="flex items-center gap-3 border border-line bg-card p-4"
+            className="flex items-center gap-3 rounded-md border border-line bg-card p-4"
           >
-            <span className="flex size-11 shrink-0 items-center justify-center border border-line bg-surface-high text-primary">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low text-primary">
               <stat.icon aria-hidden className="size-5" strokeWidth={2} />
             </span>
             <span>

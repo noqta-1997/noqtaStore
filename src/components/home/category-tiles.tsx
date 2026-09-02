@@ -37,9 +37,9 @@ export function CategoryTiles({
             <li key={category.id}>
               <Link
                 href={`/${locale}/categories/${category.slug}`}
-                className="group flex h-full flex-col gap-3 border border-line bg-card p-4 transition-all duration-150 hover:-translate-y-1 hover:shadow-hard"
+                className="group flex h-full flex-col gap-3 rounded-md border border-line bg-card p-4 transition-[box-shadow,background-color] duration-100 ease-fluent hover:bg-card-hover hover:elevation-md focus-within:elevation-md"
               >
-                <span className="flex size-11 items-center justify-center border border-line bg-surface-high transition-colors group-hover:bg-primary-container group-hover:text-on-primary-container">
+                <span className="flex size-11 items-center justify-center rounded-md border border-line bg-surface-low transition-colors group-hover:bg-primary-container group-hover:text-on-primary-container">
                   <CategoryIcon name={category.icon} className="size-5" />
                 </span>
 
@@ -51,13 +51,13 @@ export function CategoryTiles({
                   {category.description[locale]}
                 </span>
 
-                <span className="mt-auto flex items-center justify-between gap-2 border-t border-outline-variant pt-3">
+                <span className="mt-auto flex items-center justify-between gap-2 border-t border-line-divider pt-3">
                   <span className="font-mono text-xs text-muted" data-numeric>
                     {formatNumber(category.booksCount, locale)} {section.count}
                   </span>
                   <ArrowRight
                     aria-hidden
-                    className="size-4 text-on-surface transition-transform duration-150 group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+                    className="size-4 text-on-surface transition-transform duration-100 ease-fluent group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
                     strokeWidth={2}
                   />
                 </span>

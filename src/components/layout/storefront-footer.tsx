@@ -52,7 +52,7 @@ export function StorefrontFooter({
   ];
 
   return (
-    <footer className="mt-16 border-t-2 border-line bg-anchor text-on-anchor-variant">
+    <footer className="mt-16 border-t border-line-divider bg-anchor text-on-anchor-variant">
       <Container className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-12 lg:py-16">
         <div className="space-y-4 lg:col-span-4">
           <div className="flex items-center gap-2.5">
@@ -68,7 +68,7 @@ export function StorefrontFooter({
 
         {columns.map((column) => (
           <nav key={column.title} className="lg:col-span-2" aria-label={column.title}>
-            <h2 className="label-mono mb-4 text-primary-container">
+            <h2 className="label-mono mb-4 text-on-anchor-brand">
               {column.title}
             </h2>
             <ul className="space-y-2.5">
@@ -87,7 +87,7 @@ export function StorefrontFooter({
         ))}
 
         <div className="lg:col-span-2">
-          <h2 className="label-mono mb-4 text-primary-container">
+          <h2 className="label-mono mb-4 text-on-anchor-brand">
             {footer.contact.title}
           </h2>
           <ul className="space-y-3 text-sm">

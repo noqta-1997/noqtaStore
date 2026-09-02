@@ -47,7 +47,7 @@ export default async function FaqPage({ params }: FaqPageProps) {
         <div className="mx-auto max-w-3xl space-y-6">
           <Accordion items={page.items} />
 
-          <div className="flex flex-wrap items-center justify-between gap-4 border border-line bg-surface-high p-5">
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-md border border-line bg-surface-low p-5">
             <div className="flex items-center gap-3">
               <LifeBuoy aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={2} />
               <p className="text-body-md text-on-surface">

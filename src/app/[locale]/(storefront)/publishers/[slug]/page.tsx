@@ -92,7 +92,7 @@ export default async function PublisherPage({
 
   return (
     <>
-      <section className="border-b-2 border-line bg-surface-low">
+      <section className="border-b border-line-divider bg-surface-low">
         <Container className="space-y-6 py-8 lg:py-10">
           <Breadcrumb
             label={dictionary.common.menu}
@@ -107,7 +107,7 @@ export default async function PublisherPage({
             <span
               aria-hidden
               className={cn(
-                "flex size-20 shrink-0 items-center justify-center border border-line shadow-hard",
+                "flex size-20 shrink-0 items-center justify-center border border-line elevation-md",
                 publisherTone(publisher.slug),
               )}
             >
@@ -144,7 +144,7 @@ export default async function PublisherPage({
       </section>
 
       <Container className="space-y-6 py-8 lg:py-12">
-        <div className="flex items-end justify-between gap-4 border-b-2 border-line pb-4">
+        <div className="flex items-end justify-between gap-4 border-b border-line-divider pb-4">
           <h2 className="text-headline-md">{t.booksBy}</h2>
           <p className="text-label-md text-muted">
             <span className="font-semibold text-on-surface" data-numeric>

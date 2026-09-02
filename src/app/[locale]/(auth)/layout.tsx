@@ -30,7 +30,7 @@ export default async function AuthLayout({
 
   return (
     <div className="flex min-h-dvh flex-col bg-surface">
-      <header className="border-b-2 border-line bg-card">
+      <header className="border-b border-line-divider bg-card">
         <Container className="flex h-18 items-center justify-between gap-4">
           <Logo locale={locale} name={dictionary.brand.name} />
 
@@ -38,7 +38,7 @@ export default async function AuthLayout({
             <ThemeToggle labels={dictionary.common.theme} className="size-9" />
             <Link
               href={`/${locale}`}
-              className="inline-flex items-center gap-2 border border-transparent px-3 py-2 text-label-md text-on-surface transition-colors hover:border-line hover:bg-surface-high"
+              className="inline-flex items-center gap-2 border border-transparent px-3 py-2 text-label-md text-on-surface transition-colors hover:border-line hover:bg-state-hover"
             >
               <ArrowRight
                 aria-hidden

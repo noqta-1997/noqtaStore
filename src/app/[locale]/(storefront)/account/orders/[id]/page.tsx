@@ -88,7 +88,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
         {dictionary.account.orders.title}
       </Link>
 
-      <header className="flex flex-wrap items-center justify-between gap-4 border border-line bg-card p-5">
+      <header className="flex flex-wrap items-center justify-between gap-4 rounded-md border border-line bg-card p-5">
         <div className="space-y-1">
           <h2 className="font-mono text-headline-md" data-numeric>
             {order.reference}
@@ -104,7 +104,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
         />
       </header>
 
-      <section className="border border-line bg-card">
+      <section className="rounded-md border border-line bg-card">
         <h3 className="border-b border-line px-5 py-4 text-headline-md">
           {t.timeline}
         </h3>
@@ -116,8 +116,8 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
                   className={cn(
                     "flex size-8 shrink-0 items-center justify-center border border-line",
                     entry.done
-                      ? "bg-success text-white"
-                      : "bg-surface-high text-muted",
+                      ? "bg-success text-on-success"
+                      : "bg-surface-low text-muted",
                   )}
                 >
                   {entry.done ? (
@@ -156,11 +156,11 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
       </section>
 
       <div className="grid gap-6 lg:grid-cols-12">
-        <section className="border border-line bg-card lg:col-span-7">
+        <section className="rounded-md border border-line bg-card lg:col-span-7">
           <h3 className="border-b border-line px-5 py-4 text-headline-md">
             {t.itemsTitle}
           </h3>
-          <ul className="divide-y divide-outline-variant">
+          <ul className="divide-y divide-line-divider">
             {items.map((item) => (
               <li key={item.bookId} className="flex items-center gap-4 p-5">
                 <span className="w-14 shrink-0">
@@ -211,7 +211,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
             }
           />
 
-          <section className="border border-line bg-card p-5">
+          <section className="rounded-md border border-line bg-card p-5">
             <dl className="space-y-4">
               {facts.map((fact) => (
                 <div key={fact.label}>
@@ -224,7 +224,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
             </dl>
           </section>
 
-          <section className="flex items-center gap-3 border border-line bg-surface-high p-5">
+          <section className="flex items-center gap-3 rounded-md border border-line bg-surface-low p-5">
             <LifeBuoy aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={2} />
             <div className="min-w-0">
               <p className="text-body-md text-on-surface">{t.needHelp}</p>

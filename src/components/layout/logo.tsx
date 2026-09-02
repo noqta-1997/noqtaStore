@@ -18,7 +18,7 @@ export function Logo({ locale, name, tagline, className }: LogoProps) {
       className={cn("group flex items-center gap-2.5", className)}
       aria-label={name}
     >
-      <span className="flex size-9 shrink-0 items-center justify-center border border-line bg-primary-container transition-transform duration-150 group-hover:-rotate-6">
+      <span className="flex size-9 shrink-0 items-center justify-center border border-line bg-primary-container transition-transform duration-100 ease-fluent group-hover:-rotate-6">
         <span className="size-2.5 rounded-full bg-on-primary-container" />
       </span>
       <span className="flex flex-col leading-none">

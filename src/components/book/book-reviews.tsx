@@ -27,7 +27,7 @@ export function BookReviews({ book, reviews, locale, dictionary }: BookReviewsPr
   return (
     <div className="space-y-8">
       <div className="grid gap-6 sm:grid-cols-12 sm:items-center">
-        <div className="space-y-2 border border-line bg-surface-high p-5 text-center sm:col-span-4">
+        <div className="space-y-2 rounded-md border border-line bg-surface-low p-5 text-center sm:col-span-4">
           <p className="font-mono text-5xl font-bold text-on-surface" data-numeric>
             {book.rating.toFixed(1)}
           </p>
@@ -46,7 +46,7 @@ export function BookReviews({ book, reviews, locale, dictionary }: BookReviewsPr
               <span className="w-4 font-mono text-label-sm text-muted" data-numeric>
                 {row.stars}
               </span>
-              <span className="h-3 flex-1 border border-line bg-card">
+              <span className="h-3 flex-1 overflow-hidden rounded-sm bg-surface-low">
                 <span
                   className="block h-full bg-primary-container"
                   style={{ width: `${row.share}%` }}
@@ -61,14 +61,14 @@ export function BookReviews({ book, reviews, locale, dictionary }: BookReviewsPr
       </div>
 
       {reviews.length ? (
-        <ul className="divide-y divide-outline-variant border-t border-outline-variant">
+        <ul className="divide-y divide-line-divider border-t border-line-divider">
           {reviews.map((review) => (
             <li key={review.id} className="py-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-3">
                   <span
                     aria-hidden
-                    className="flex size-9 items-center justify-center border border-line bg-surface-high font-display text-sm font-bold"
+                    className="flex size-9 items-center justify-center rounded-md border border-line bg-surface-low font-display text-sm font-bold"
                   >
                     {review.authorName.slice(0, 1)}
                   </span>

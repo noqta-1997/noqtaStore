@@ -15,7 +15,7 @@ export function PromoBanner({ locale, dictionary }: PromoBannerProps) {
   return (
     <section className="py-12 lg:py-16">
       <Container>
-        <div className="relative overflow-hidden border border-line bg-primary-container text-on-primary-container shadow-hard">
+        <div className="relative overflow-hidden border border-line bg-primary-container text-on-primary-container elevation-md">
           <span
             aria-hidden
             className="pointer-events-none absolute -end-10 -bottom-16 font-mono text-[12rem] leading-none font-bold opacity-15 select-none lg:text-[18rem]"
@@ -25,7 +25,7 @@ export function PromoBanner({ locale, dictionary }: PromoBannerProps) {
 
           <div className="relative grid gap-6 p-6 sm:p-10 lg:grid-cols-12 lg:items-center">
             <div className="space-y-4 lg:col-span-8">
-              <span className="label-mono inline-block border border-line bg-card px-2 py-1 text-on-surface">
+              <span className="label-mono inline-block rounded-md border border-line bg-card px-2 py-1 text-on-surface">
                 {dictionary.eyebrow}
               </span>
               <h2 className="max-w-2xl text-headline-md text-on-primary-container sm:text-headline-lg">
@@ -41,7 +41,7 @@ export function PromoBanner({ locale, dictionary }: PromoBannerProps) {
                 href={`/${locale}/offers`}
                 className={buttonStyles({
                   size: "lg",
-                  className: "bg-card text-on-surface hover:bg-surface-low",
+                  className: "bg-card text-on-surface hover:bg-state-hover",
                 })}
               >
                 {dictionary.cta}

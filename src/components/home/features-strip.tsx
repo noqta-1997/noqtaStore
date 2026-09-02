@@ -16,7 +16,7 @@ export function FeaturesStrip({ dictionary }: FeaturesStripProps) {
   ];
 
   return (
-    <section className="border-b-2 border-line bg-card">
+    <section className="border-b border-line-divider bg-card">
       <Container>
         {/* gap-px over a stroke-coloured background draws the hairlines */}
         <div className="grid grid-cols-1 gap-px bg-outline-variant sm:grid-cols-2 lg:grid-cols-4">
@@ -25,7 +25,7 @@ export function FeaturesStrip({ dictionary }: FeaturesStripProps) {
               key={title}
               className="flex items-center gap-3 bg-card py-5 sm:px-5"
             >
-              <span className="flex size-11 shrink-0 items-center justify-center border border-line bg-surface-high">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low">
                 <Icon aria-hidden className="size-5 text-primary" strokeWidth={2} />
               </span>
               <div className="min-w-0">

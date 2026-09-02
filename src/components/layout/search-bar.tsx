@@ -26,8 +26,8 @@ export function SearchBar({
       action={action}
       role="search"
       className={cn(
-        "flex items-center gap-1 border border-line bg-surface-high p-1",
-        "focus-within:shadow-hard-sm",
+        "flex items-center gap-1 rounded-md border border-line bg-surface-low p-1",
+        "focus-within:elevation-sm",
         className,
       )}
     >

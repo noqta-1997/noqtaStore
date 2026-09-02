@@ -34,8 +34,8 @@ export function PublisherCard({
     <Link
       href={`/${locale}/publishers/${publisher.slug}`}
       className={cn(
-        "group flex h-full flex-col gap-2 border border-line bg-card p-4",
-        "transition-all duration-150 hover:-translate-y-1 hover:shadow-hard",
+        "group flex h-full flex-col gap-2 rounded-md border border-line bg-card p-4",
+        "transition-[box-shadow,background-color] duration-100 ease-fluent hover:bg-card-hover hover:elevation-md focus-within:elevation-md",
         className,
       )}
     >

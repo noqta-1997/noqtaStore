@@ -45,7 +45,7 @@ export function BookSpecs({ book, locale, dictionary }: BookSpecsProps) {
   ];
 
   return (
-    <dl className="divide-y divide-outline-variant">
+    <dl className="divide-y divide-line-divider">
       {rows.map((row) => (
         <div
           key={row.label}

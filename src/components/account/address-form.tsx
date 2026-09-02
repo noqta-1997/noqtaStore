@@ -35,7 +35,7 @@ export function AddressForm({
 
   return (
     <ActionForm
-      className="space-y-6 border border-line bg-card p-5 sm:p-6"
+      className="space-y-6 rounded-md border border-line bg-card p-5 sm:p-6"
       action={saveAddress}
       successTitle={dictionary.common.toast.addressSaved}
       fallbackError={dictionary.common.toast.actionFailed}
@@ -120,11 +120,11 @@ export function AddressForm({
         label={t.makeDefault}
       />
 
-      <div className="flex flex-wrap items-center gap-3 border-t border-outline-variant pt-5">
+      <div className="flex flex-wrap items-center gap-3 border-t border-line-divider pt-5">
         <Button type="submit" size="lg">
           {t.save}
         </Button>
-        <Link href={cancelHref} className={buttonStyles({ variant: "ghost", size: "lg" })}>
+        <Link href={cancelHref} className={buttonStyles({ variant: "subtle", size: "lg" })}>
           {dictionary.common.cancel}
         </Link>
 

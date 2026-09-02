@@ -88,8 +88,8 @@ export function RegisterForm({ locale, t, validation }: RegisterFormProps) {
 
   if (awaitingEmail) {
     return (
-      <div className="flex flex-col items-center gap-3 border border-line bg-surface-high p-6 text-center">
-        <span className="flex size-12 items-center justify-center border border-line bg-success text-white">
+      <div className="flex flex-col items-center gap-3 rounded-md border border-line bg-surface-low p-6 text-center">
+        <span className="flex size-12 items-center justify-center border border-line bg-success text-on-success">
           <MailCheck aria-hidden className="size-5" strokeWidth={2} />
         </span>
         <p className="text-body-md font-semibold text-on-surface">{t.checkEmailTitle}</p>

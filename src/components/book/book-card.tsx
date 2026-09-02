@@ -37,9 +37,8 @@ export function BookCard({
   return (
     <article
       className={cn(
-        "group relative flex h-full flex-col border border-line bg-card",
-        "transition-all duration-150 hover:-translate-y-1 hover:shadow-hard",
-        "focus-within:-translate-y-1 focus-within:shadow-hard",
+        "group relative flex h-full flex-col rounded-md border border-line bg-card",
+        "transition-[box-shadow,background-color] duration-100 ease-fluent hover:bg-card-hover hover:elevation-md focus-within:elevation-md",
         className,
       )}
     >
@@ -73,7 +72,7 @@ export function BookCard({
           removedTitle={dictionary.toast.removedFromWishlist}
           signInMessage={dictionary.toast.signInRequired}
           bookTitle={book.title[locale]}
-          className="absolute end-2 top-2 z-10 opacity-0 transition-opacity duration-150 group-hover:opacity-100 focus-visible:opacity-100 max-sm:opacity-100"
+          className="absolute end-2 top-2 z-10 opacity-0 transition-opacity duration-100 ease-fluent group-hover:opacity-100 focus-visible:opacity-100 max-sm:opacity-100"
         />
       </div>
 
@@ -99,7 +98,7 @@ export function BookCard({
           className="mt-0.5"
         />
 
-        <div className="mt-auto flex items-end justify-between gap-2 border-t border-outline-variant pt-3">
+        <div className="mt-auto flex items-end justify-between gap-2 border-t border-line-divider pt-3">
           <div className="min-w-0">
             <PriceTag
               price={book.price}

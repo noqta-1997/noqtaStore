@@ -106,7 +106,7 @@ export function ResetPasswordForm({ locale, t, validation }: ResetPasswordFormPr
 
   if (state === "checking") {
     return (
-      <p className="border border-line bg-surface-high px-4 py-3 text-body-md text-on-surface-variant">
+      <p className="rounded-md border border-line bg-surface-low px-4 py-3 text-body-md text-on-surface-variant">
         {t.resetChecking}
       </p>
     );
@@ -114,7 +114,7 @@ export function ResetPasswordForm({ locale, t, validation }: ResetPasswordFormPr
 
   if (state === "invalid") {
     return (
-      <div className="flex flex-col items-center gap-3 border border-line bg-surface-high p-6 text-center">
+      <div className="flex flex-col items-center gap-3 rounded-md border border-line bg-surface-low p-6 text-center">
         <span className="flex size-12 items-center justify-center border border-line bg-error-container text-on-error-container">
           <AlertTriangle aria-hidden className="size-5" strokeWidth={2} />
         </span>

@@ -21,7 +21,7 @@ export function LocaleSwitcher({ locale }: LocaleSwitcherProps) {
     <Link
       href={segments.join("/") || `/${target}`}
       lang={target}
-      className="inline-flex items-center gap-1.5 border border-transparent px-2 py-1.5 text-label-md text-on-surface transition-colors hover:border-line hover:bg-surface-high"
+      className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-body-md text-on-surface-variant transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface"
     >
       <Globe aria-hidden className="size-4" strokeWidth={2} />
       {localeNames[target]}

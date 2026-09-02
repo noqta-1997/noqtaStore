@@ -80,7 +80,7 @@ export default async function BookPage({ params }: BookPageProps) {
 
   return (
     <>
-      <div className="border-b border-outline-variant bg-surface-low">
+      <div className="border-b border-line-divider bg-surface-low">
         <Container className="py-4">
           <Breadcrumb
             label={dictionary.common.menu}
@@ -108,7 +108,7 @@ export default async function BookPage({ params }: BookPageProps) {
                 src={book.coverUrl}
                 priority
                 sizes="(min-width: 1024px) 24rem, 18rem"
-                className="border border-line shadow-hard"
+                className="border border-line elevation-md"
               />
               <div className="absolute start-3 top-3 flex flex-col items-start gap-2">
                 {book.compareAtPrice ? (
@@ -153,7 +153,7 @@ export default async function BookPage({ params }: BookPageProps) {
             />
           </div>
 
-          <div className="space-y-4 border border-line bg-card p-5">
+          <div className="space-y-4 rounded-md border border-line bg-card p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <PriceTag
                 price={book.price}
@@ -164,7 +164,7 @@ export default async function BookPage({ params }: BookPageProps) {
               {isSoldOut ? (
                 <Badge tone="muted">{dictionary.common.outOfStock}</Badge>
               ) : (
-                <span className="flex items-center gap-1.5 text-label-md text-success">
+                <span className="flex items-center gap-1.5 text-label-md text-success-fg">
                   <PackageCheck aria-hidden className="size-4" strokeWidth={2} />
                   <span data-numeric>{formatNumber(book.stock, locale)}</span>{" "}
                   {t.stockLeft}
@@ -206,7 +206,7 @@ export default async function BookPage({ params }: BookPageProps) {
               />
             </div>
 
-            <ul className="space-y-2 border-t border-outline-variant pt-4">
+            <ul className="space-y-2 border-t border-line-divider pt-4">
               {highlights.map((item) => (
                 <li
                   key={item.text}
@@ -233,7 +233,7 @@ export default async function BookPage({ params }: BookPageProps) {
                     <p className="text-body-lg leading-relaxed text-on-surface-variant">
                       {book.description[locale]}
                     </p>
-                    <div className="border-t border-outline-variant pt-4">
+                    <div className="border-t border-line-divider pt-4">
                       <h2 className="mb-2 font-display text-base font-bold">
                         {t.aboutAuthor}
                       </h2>
@@ -275,7 +275,7 @@ export default async function BookPage({ params }: BookPageProps) {
       </Container>
 
       {related.length ? (
-        <div className="border-t-2 border-line bg-surface-low">
+        <div className="border-t border-line-divider bg-surface-low">
           <BookShelf
             title={t.related}
             subtitle={t.relatedSubtitle}
@@ -288,7 +288,7 @@ export default async function BookPage({ params }: BookPageProps) {
       ) : null}
 
       {/* Persistent action bar on small screens */}
-      <div className="sticky bottom-0 z-30 border-t-2 border-line bg-card lg:hidden">
+      <div className="sticky bottom-0 z-30 border-t border-line-divider bg-card lg:hidden">
         <Container className="flex items-center justify-between gap-3 py-3">
           <PriceTag
             price={book.price}

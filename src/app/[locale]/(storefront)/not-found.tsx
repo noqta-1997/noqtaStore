@@ -37,7 +37,7 @@ export default function StorefrontNotFound() {
 
   return (
     <Container className="py-16 lg:py-24">
-      <div className="mx-auto max-w-lg space-y-5 border border-line bg-card p-8 text-center shadow-hard">
+      <div className="mx-auto max-w-lg space-y-5 rounded-md border border-line bg-card p-8 text-center elevation-md">
         <p className="label-mono text-primary">{t.code}</p>
         <p
           aria-hidden

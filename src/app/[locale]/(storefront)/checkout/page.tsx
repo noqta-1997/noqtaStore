@@ -46,10 +46,10 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border border-line bg-card">
+    <section className="rounded-md border border-line bg-card">
       <h2 className="flex items-center gap-3 border-b border-line px-5 py-4 text-headline-md">
         <span
-          className="flex size-8 shrink-0 items-center justify-center border border-line bg-surface-high font-mono text-label-md"
+          className="flex size-8 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low font-mono text-label-md"
           data-numeric
         >
           {index}
@@ -140,7 +140,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
 
   return (
     <>
-      <section className="border-b-2 border-line bg-surface-low">
+      <section className="border-b border-line-divider bg-surface-low">
         <Container className="space-y-5 py-8 lg:py-10">
           <h1 className="text-headline-lg">{t.title}</h1>
           <Stepper

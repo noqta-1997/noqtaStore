@@ -55,7 +55,7 @@ export function OrderSummary({
   ];
 
   return (
-    <section className={cn("border border-line bg-card", className)}>
+    <section className={cn("rounded-md border border-line bg-card", className)}>
       <h2 className="border-b border-line px-5 py-4 text-headline-md">{title}</h2>
 
       {children ? (
@@ -69,7 +69,7 @@ export function OrderSummary({
             <dd
               className={cn(
                 "font-mono text-body-md font-medium",
-                row.accent ? "text-success" : "text-on-surface",
+                row.accent ? "text-success-fg" : "text-on-surface",
               )}
               data-numeric
             >

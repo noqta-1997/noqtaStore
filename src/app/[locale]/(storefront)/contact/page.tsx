@@ -72,7 +72,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
       />
 
       <Container className="grid gap-6 py-8 lg:grid-cols-12 lg:gap-8 lg:py-12">
-        <section className="border border-line bg-card lg:col-span-7">
+        <section className="rounded-md border border-line bg-card lg:col-span-7">
           <h2 className="border-b border-line px-5 py-4 text-headline-md">
             {t.formTitle}
           </h2>
@@ -117,14 +117,14 @@ export default async function ContactPage({ params }: ContactPageProps) {
         </section>
 
         <aside className="space-y-4 lg:col-span-5">
-          <section className="border border-line bg-card">
+          <section className="rounded-md border border-line bg-card">
             <h2 className="border-b border-line px-5 py-4 text-headline-md">
               {t.channels}
             </h2>
-            <ul className="divide-y divide-outline-variant">
+            <ul className="divide-y divide-line-divider">
               {channels.map((channel) => (
                 <li key={channel.label} className="flex items-center gap-3 px-5 py-4">
-                  <span className="flex size-10 shrink-0 items-center justify-center border border-line bg-surface-high text-primary">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low text-primary">
                     <channel.icon aria-hidden className="size-4" strokeWidth={2} />
                   </span>
                   <span
@@ -138,7 +138,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
             </ul>
           </section>
 
-          <section className="flex items-center gap-3 border border-line bg-surface-high p-5">
+          <section className="flex items-center gap-3 rounded-md border border-line bg-surface-low p-5">
             <Clock aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={2} />
             <div>
               <p className="label-mono text-muted">{t.hours}</p>

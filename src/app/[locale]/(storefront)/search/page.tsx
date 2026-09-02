@@ -50,7 +50,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
 
   return (
     <>
-      <section className="border-b-2 border-line bg-surface-low">
+      <section className="border-b border-line-divider bg-surface-low">
         <Container className="space-y-4 py-8 lg:py-10">
           <h1 className="text-headline-lg">{t.title}</h1>
 
@@ -82,7 +82,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
                 <Link
                   key={category.id}
                   href={`/${locale}/search?q=${encodeURIComponent(category.name[locale])}`}
-                  className="border border-line bg-card px-3 py-1.5 text-label-md text-on-surface transition-colors hover:bg-surface-high"
+                  className="rounded-md border border-line bg-card px-3 py-1.5 text-label-md text-on-surface transition-colors hover:bg-state-hover"
                 >
                   {category.name[locale]}
                 </Link>

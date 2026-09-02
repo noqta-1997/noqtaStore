@@ -47,7 +47,7 @@ export function ReviewForm({ bookId, labels, errorMessages }: ReviewFormProps) {
 
   return (
     <ActionForm
-      className="space-y-4 border border-line bg-surface-high p-5"
+      className="space-y-4 rounded-md border border-line bg-surface-low p-5"
       action={submitReview}
       successTitle={labels.success}
       errorMessages={errorMessages}
@@ -75,7 +75,7 @@ export function ReviewForm({ bookId, labels, errorMessages }: ReviewFormProps) {
                 "flex size-9 items-center justify-center border transition-colors",
                 value <= rating
                   ? "border-line bg-primary-container text-on-primary-container"
-                  : "border-outline-variant text-muted hover:border-line",
+                  : "border-line-divider text-muted hover:border-line",
               )}
             >
               <Star
@@ -100,7 +100,7 @@ export function ReviewForm({ bookId, labels, errorMessages }: ReviewFormProps) {
 
       <div className="flex flex-wrap gap-2">
         <Button type="submit">{labels.submit}</Button>
-        <Button variant="ghost" type="button" onClick={() => setOpen(false)}>
+        <Button variant="subtle" type="button" onClick={() => setOpen(false)}>
           {labels.cancel}
         </Button>
       </div>

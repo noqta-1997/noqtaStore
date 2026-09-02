@@ -32,7 +32,7 @@ export function AccountNav({ locale, labels }: AccountNavProps) {
 
   return (
     <nav aria-label={labels.profile}>
-      <ul className="no-scrollbar flex gap-px overflow-x-auto bg-outline-variant lg:flex-col lg:overflow-visible">
+      <ul className="no-scrollbar flex overflow-x-auto lg:flex-col lg:overflow-visible">
         {items.map((item) => {
           const active = item.exact
             ? pathname === item.href
@@ -44,10 +44,15 @@ export function AccountNav({ locale, labels }: AccountNavProps) {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex items-center gap-2.5 whitespace-nowrap px-4 py-3 text-body-md transition-colors",
+                  // Fluent marks the selected item with a subtle background and
+                  // a brand bar on the leading edge, not a saturated fill.
+                  "relative flex items-center gap-2.5 whitespace-nowrap rounded-md px-3 py-2",
+                  "text-body-md transition-colors duration-100 ease-fluent",
+                  "before:absolute before:inset-y-1.5 before:inset-inline-start-0",
+                  "before:w-0.5 before:rounded-full before:bg-primary before:content-['']",
                   active
-                    ? "bg-primary-container font-semibold text-on-primary-container"
-                    : "bg-card text-on-surface-variant hover:bg-surface-high hover:text-on-surface",
+                    ? "bg-state-selected font-semibold text-on-surface before:opacity-100"
+                    : "text-on-surface-variant before:opacity-0 hover:bg-state-hover hover:text-on-surface",
                 )}
               >
                 <item.icon aria-hidden className="size-4 shrink-0" strokeWidth={2} />
@@ -60,7 +65,7 @@ export function AccountNav({ locale, labels }: AccountNavProps) {
         <li className="flex-1 lg:flex-none">
           <Link
             href={`/${locale}/login`}
-            className="flex items-center gap-2.5 whitespace-nowrap bg-card px-4 py-3 text-body-md text-error transition-colors hover:bg-error-container hover:text-on-error-container"
+            className="flex items-center gap-2.5 whitespace-nowrap rounded-md px-3 py-2 text-body-md text-error transition-colors duration-100 ease-fluent hover:bg-error-container"
           >
             <LogOut aria-hidden className="size-4 shrink-0 rtl:rotate-180" strokeWidth={2} />
             {labels.logout}

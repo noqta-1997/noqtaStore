@@ -33,7 +33,7 @@ export function Hero({ locale, dictionary, featuredBook, stats }: HeroProps) {
   ];
 
   return (
-    <section className="border-b-2 border-line bg-surface">
+    <section className="border-b border-line-divider bg-surface">
       <Container className="grid items-center gap-10 py-12 lg:grid-cols-12 lg:gap-12 lg:py-20">
         <div className="space-y-6 lg:col-span-7">
           <Badge tone="outline">{hero.eyebrow}</Badge>
@@ -70,7 +70,7 @@ export function Hero({ locale, dictionary, featuredBook, stats }: HeroProps) {
             </Link>
           </div>
 
-          <dl className="grid max-w-lg grid-cols-3 gap-4 border-t-2 border-line pt-6">
+          <dl className="grid max-w-lg grid-cols-3 gap-4 border-t border-line-divider pt-6">
             {figures.map((figure) => (
               <div key={figure.label}>
                 <dt className="sr-only">{figure.label}</dt>
@@ -94,10 +94,10 @@ export function Hero({ locale, dictionary, featuredBook, stats }: HeroProps) {
           <div className="relative mx-auto max-w-sm lg:max-w-none">
             <div
               aria-hidden
-              className="absolute inset-x-8 top-6 bottom-0 rotate-3 border border-line bg-surface-high rtl:-rotate-3"
+              className="absolute inset-x-8 top-6 bottom-0 rotate-3 rounded-md border border-line bg-surface-low rtl:-rotate-3"
             />
 
-            <article className="relative border border-line bg-card p-4 shadow-hard sm:p-5">
+            <article className="relative rounded-md border border-line bg-card p-4 elevation-md sm:p-5">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <Badge tone="primary">{hero.featuredLabel}</Badge>
                 <span className="label-mono text-muted">

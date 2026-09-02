@@ -46,7 +46,7 @@ function Group({
   children: React.ReactNode;
 }) {
   return (
-    <fieldset className="border-t border-outline-variant pt-5 first:border-t-0 first:pt-0">
+    <fieldset className="border-t border-line-divider pt-5 first:border-t-0 first:pt-0">
       <legend className="label-mono mb-3 text-muted">{title}</legend>
       {children}
     </fieldset>
@@ -75,7 +75,7 @@ export function BookFilters({
     <form
       action={action}
       method="get"
-      className={cn("space-y-5 border border-line bg-card p-5", className)}
+      className={cn("space-y-5 rounded-md border border-line bg-card p-5", className)}
     >
       {values.q ? <input type="hidden" name="q" value={values.q} /> : null}
       {values.sort ? <input type="hidden" name="sort" value={values.sort} /> : null}
@@ -159,7 +159,7 @@ export function BookFilters({
                 name="rating"
                 value={value}
                 defaultChecked={values.rating === value}
-                className="size-4.5 shrink-0 appearance-none rounded-full border border-line bg-card checked:bg-primary-container checked:shadow-[inset_0_0_0_3px_var(--card)]"
+                className="size-4.5 shrink-0 appearance-none rounded-full rounded-md border border-line bg-card checked:bg-primary-container checked:shadow-[inset_0_0_0_3px_var(--card)]"
               />
               <span className="flex items-center gap-1">
                 {Array.from({ length: value }, (_, index) => (
@@ -204,7 +204,7 @@ export function BookFilters({
         </div>
       </Group>
 
-      <div className="flex items-center gap-2 border-t border-outline-variant pt-5">
+      <div className="flex items-center gap-2 border-t border-line-divider pt-5">
         <Button type="submit" fullWidth>
           {dictionary.common.apply}
         </Button>

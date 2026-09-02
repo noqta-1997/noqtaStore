@@ -45,7 +45,7 @@ export function AuthShell({ title, subtitle, dictionary, children }: AuthShellPr
           <ul className="space-y-3">
             {points.map((point) => (
               <li key={point.text} className="flex items-center gap-3">
-                <span className="flex size-10 shrink-0 items-center justify-center border border-line bg-card text-primary">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-md border border-line bg-card text-primary">
                   <point.icon aria-hidden className="size-5" strokeWidth={2} />
                 </span>
                 <span className="text-body-md font-medium">{point.text}</span>
@@ -53,12 +53,7 @@ export function AuthShell({ title, subtitle, dictionary, children }: AuthShellPr
             ))}
           </ul>
 
-          <p
-            aria-hidden
-            className="font-mono text-6xl font-bold opacity-20 select-none"
-          >
-            {dictionary.brand.name}
-          </p>
+          <p aria-hidden className="watermark" data-mark={dictionary.brand.name} />
         </section>
       </div>
     </Container>

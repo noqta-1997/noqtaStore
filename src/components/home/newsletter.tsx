@@ -26,7 +26,7 @@ export function Newsletter({
   return (
     <section className="pb-12 lg:pb-16">
       <Container>
-        <div className="grid items-center gap-6 border border-line bg-card p-6 sm:p-10 lg:grid-cols-12">
+        <div className="grid items-center gap-6 rounded-md border border-line bg-card p-6 sm:p-10 lg:grid-cols-12">
           <div className="space-y-3 lg:col-span-7">
             <span className="flex size-11 items-center justify-center border border-line bg-primary-container text-on-primary-container">
               <Mail aria-hidden className="size-5" strokeWidth={2} />

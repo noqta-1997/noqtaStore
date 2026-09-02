@@ -85,8 +85,8 @@ export default async function OrderSuccessPage({
   return (
     <Container className="py-12 lg:py-20">
       <div className="mx-auto max-w-2xl space-y-8">
-        <div className="space-y-4 border border-line bg-card p-8 text-center shadow-hard">
-          <span className="mx-auto flex size-16 items-center justify-center border border-line bg-success text-white">
+        <div className="space-y-4 rounded-md border border-line bg-card p-8 text-center elevation-md">
+          <span className="mx-auto flex size-16 items-center justify-center border border-line bg-success text-on-success">
             <CheckCircle2 aria-hidden className="size-8" strokeWidth={2} />
           </span>
           <h1 className="text-headline-lg">{t.title}</h1>
@@ -124,15 +124,15 @@ export default async function OrderSuccessPage({
           </div>
         </div>
 
-        <section className="border border-line bg-card">
+        <section className="rounded-md border border-line bg-card">
           <h2 className="border-b border-line px-5 py-4 text-headline-md">
             {t.nextSteps}
           </h2>
-          <ol className="divide-y divide-outline-variant">
+          <ol className="divide-y divide-line-divider">
             {steps.map((step, index) => (
               <li key={step.text} className="flex items-center gap-4 p-5">
                 <span
-                  className="flex size-9 shrink-0 items-center justify-center border border-line bg-surface-high font-mono text-label-md"
+                  className="flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low font-mono text-label-md"
                   data-numeric
                 >
                   {index + 1}

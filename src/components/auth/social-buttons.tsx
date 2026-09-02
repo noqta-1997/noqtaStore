@@ -57,11 +57,11 @@ export function SocialButtons({ locale, labels, className }: SocialButtonsProps)
         type="button"
         onClick={signIn}
         disabled={pending}
-        className="flex h-11 w-full items-center justify-center gap-3 border border-line bg-card text-body-md font-medium text-on-surface transition-all hover:-translate-y-0.5 hover:shadow-hard-sm disabled:opacity-60"
+        className="flex h-11 w-full items-center justify-center gap-3 rounded-md border border-line bg-card text-body-md font-medium text-on-surface transition-all hover:-translate-y-0.5 hover:elevation-sm disabled:opacity-60"
       >
         <span
           aria-hidden
-          className="flex size-6 items-center justify-center border border-line bg-surface-high font-display text-xs font-bold"
+          className="flex size-6 items-center justify-center rounded-md border border-line bg-surface-low font-display text-xs font-bold"
         >
           G
         </span>

@@ -16,8 +16,8 @@ import { cn } from "@/lib/utils";
 import type { Category } from "@/types";
 
 const iconLinkStyles =
-  "inline-flex size-10 items-center justify-center border border-transparent text-on-surface " +
-  "transition-colors hover:border-line hover:bg-surface-high";
+  "inline-flex size-8 items-center justify-center rounded-md text-on-surface-variant " +
+  "transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface";
 
 interface StorefrontHeaderProps {
   locale: Locale;
@@ -40,7 +40,7 @@ export function StorefrontHeader({
   }));
 
   return (
-    <header className="sticky top-0 z-40 border-b-2 border-line bg-card">
+    <header className="sticky top-0 z-40 border-b border-line-divider bg-card">
       <div className="bg-anchor text-on-anchor">
         <Container className="flex h-9 items-center justify-center gap-2 text-center">
           <p className="label-mono truncate">{dictionary.announcement.text}</p>
@@ -87,7 +87,7 @@ export function StorefrontHeader({
             href={`/${locale}/cart`}
             aria-label={dictionary.common.cart}
             title={dictionary.common.cart}
-            className="relative inline-flex size-10 items-center justify-center border border-line bg-card text-on-surface transition-colors hover:bg-primary-container hover:text-on-primary-container"
+            className="relative inline-flex size-10 items-center justify-center rounded-md border border-line bg-card text-on-surface transition-colors hover:bg-primary-container hover:text-on-primary-container"
           >
             <ShoppingBag aria-hidden className="size-5" strokeWidth={2} />
             <CartBadge />
@@ -118,7 +118,7 @@ export function StorefrontHeader({
         />
       </Container>
 
-      <div className="hidden border-t border-outline-variant lg:block">
+      <div className="hidden border-t border-line-divider lg:block">
         <Container className="flex h-11 items-center justify-between">
           <nav aria-label={dictionary.common.menu}>
             <ul className="flex items-center gap-1">
@@ -126,7 +126,7 @@ export function StorefrontHeader({
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="inline-block border border-transparent px-3 py-1 text-sm font-medium text-on-surface-variant transition-colors hover:border-line hover:bg-surface-high hover:text-on-surface"
+                    className="inline-block rounded-md px-3 py-1 text-body-md text-on-surface-variant transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface"
                   >
                     {item.label}
                   </Link>

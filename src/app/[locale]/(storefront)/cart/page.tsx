@@ -78,7 +78,7 @@ export default async function CartPage({ params, searchParams }: CartPageProps) 
         {lines.length ? (
           <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
             <div className="min-w-0 space-y-4 lg:col-span-8">
-              <div className="flex items-center gap-3 border border-line bg-surface-high p-4">
+              <div className="flex items-center gap-3 rounded-md border border-line bg-surface-low p-4">
                 <Truck aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={2} />
                 <div className="min-w-0 flex-1 space-y-2">
                   <p className="text-label-md text-on-surface">
@@ -86,7 +86,7 @@ export default async function CartPage({ params, searchParams }: CartPageProps) 
                       ? t.freeShippingReached
                       : `${t.freeShippingHint} (${formatPrice(remaining, locale)})`}
                   </p>
-                  <span className="block h-2 w-full border border-line bg-card">
+                  <span className="block h-2 w-full overflow-hidden rounded-sm bg-surface-low">
                     <span
                       className="block h-full bg-primary-container"
                       style={{ width: `${progress}%` }}
@@ -95,7 +95,7 @@ export default async function CartPage({ params, searchParams }: CartPageProps) 
                 </div>
               </div>
 
-              <ul className="divide-y divide-outline-variant border border-line bg-card">
+              <ul className="divide-y divide-line-divider rounded-md border border-line bg-card">
                 {lines.map((line) => (
                   <CartLineRow
                     key={line.bookId}
@@ -154,7 +154,7 @@ export default async function CartPage({ params, searchParams }: CartPageProps) 
                         {coupon.code}
                       </span>
                     </span>
-                    <Button variant="ghost" type="submit" className="shrink-0">
+                    <Button variant="subtle" type="submit" className="shrink-0">
                       {t.couponRemove}
                     </Button>
                   </ActionForm>

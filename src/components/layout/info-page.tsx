@@ -34,11 +34,11 @@ export function InfoPage({
 
       <Container className="py-8 lg:py-12">
         <div className="mx-auto max-w-3xl">
-          <ol className="divide-y divide-outline-variant border border-line bg-card">
+          <ol className="divide-y divide-line-divider rounded-md border border-line bg-card">
             {sections.map((section, index) => (
               <li key={section.title} className="flex gap-4 p-5 sm:gap-6 sm:p-8">
                 <span
-                  className="flex size-9 shrink-0 items-center justify-center border border-line bg-surface-high font-mono text-label-md"
+                  className="flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low font-mono text-label-md"
                   data-numeric
                 >
                   {index + 1}

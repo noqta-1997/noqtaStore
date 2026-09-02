@@ -32,8 +32,8 @@ export async function generateMetadata({
 }
 
 const statusTones: Record<ReviewStatus, string> = {
-  pending: "border-line bg-primary-fixed text-on-primary-container",
-  published: "border-line bg-success text-white",
+  pending: "border-line bg-primary-fixed text-on-primary-fixed",
+  published: "border-line bg-success text-on-success",
   rejected: "border-line bg-error-container text-on-error-container",
 };
 
@@ -79,7 +79,7 @@ export default async function MyReviewsPage({
 
       <ul className="space-y-4">
         {reviews.map((review) => (
-          <li key={review.id} className="border border-line bg-card p-4 sm:p-5">
+          <li key={review.id} className="rounded-md border border-line bg-card p-4 sm:p-5">
             <div className="flex gap-4">
               <Link
                 href={`/${locale}/books/${review.book.slug}`}
@@ -134,8 +134,8 @@ export default async function MyReviewsPage({
                   </p>
                 </div>
 
-                <div className="flex items-center gap-1 border-t border-outline-variant pt-3">
-                  <IconButton variant="ghost" label={dictionary.common.edit}>
+                <div className="flex items-center gap-1 border-t border-line-divider pt-3">
+                  <IconButton variant="subtle" label={dictionary.common.edit}>
                     <Pencil aria-hidden className="size-4" strokeWidth={2} />
                   </IconButton>
                   <ConfirmDialog

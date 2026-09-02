@@ -71,7 +71,7 @@ export default async function OrdersPage({
           );
 
           return (
-            <li key={order.id} className="border border-line bg-card">
+            <li key={order.id} className="rounded-md border border-line bg-card">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                   <span className="label-mono text-muted">{t.orderNumber}</span>
@@ -113,7 +113,7 @@ export default async function OrdersPage({
                 </div>
               </dl>
 
-              <div className="flex flex-wrap gap-2 border-t border-outline-variant px-5 py-4">
+              <div className="flex flex-wrap gap-2 border-t border-line-divider px-5 py-4">
                 <Link
                   href={`/${locale}/account/orders/${order.id}`}
                   className={buttonStyles({ size: "sm" })}

@@ -1,20 +1,26 @@
 import Image from "next/image";
 
+import { noqtaBrand } from "@/theme/noqta-brand";
 import { cn, hashString } from "@/lib/utils";
 
 /**
- * Fixed heritage palette. Covers are printed objects — they keep the same
- * colours in light and dark mode instead of inverting with the UI.
+ * Derived from the brand ramp rather than hand-picked.
+ *
+ * Covers are printed objects, so they keep the same colours in light and dark
+ * instead of inverting with the UI — which is why they read from `noqtaBrand`
+ * directly and not from the theme-aware tokens. Every pair clears 4.5:1 at
+ * full strength: 5.83 at the tightest, 14.76 at the widest. The eight steps
+ * span the ramp end to end, so a shelf still reads as varied.
  */
 const coverPalette = [
-  { background: "#1d1c13", foreground: "#f6f0e2" },
-  { background: "#ff6b35", foreground: "#5f1900" },
-  { background: "#ffdbd0", foreground: "#5f1900" },
-  { background: "#a19883", foreground: "#1d1c13" },
-  { background: "#832600", foreground: "#ffdbd0" },
-  { background: "#645e4b", foreground: "#f6f0e2" },
-  { background: "#e2dfde", foreground: "#1d1c13" },
-  { background: "#333027", foreground: "#ece2c9" },
+  { background: noqtaBrand[10], foreground: noqtaBrand[150] },
+  { background: noqtaBrand[80], foreground: noqtaBrand[160] },
+  { background: noqtaBrand[150], foreground: noqtaBrand[40] },
+  { background: noqtaBrand[40], foreground: noqtaBrand[140] },
+  { background: noqtaBrand[100], foreground: noqtaBrand[10] },
+  { background: noqtaBrand[60], foreground: noqtaBrand[160] },
+  { background: noqtaBrand[130], foreground: noqtaBrand[20] },
+  { background: noqtaBrand[30], foreground: noqtaBrand[130] },
 ] as const;
 
 interface BookCoverProps {
@@ -47,7 +53,7 @@ export function BookCover({
   return (
     <div
       className={cn(
-        "relative aspect-[2/3] w-full overflow-hidden bg-surface-high",
+        "relative aspect-[2/3] w-full overflow-hidden bg-surface-low",
         className,
       )}
     >
@@ -77,8 +83,14 @@ export function BookCover({
           <p className="ms-3 line-clamp-4 font-display text-sm leading-snug font-bold text-balance sm:text-base">
             {title}
           </p>
+          {/*
+            No opacity here. At 10px this is small text and needs the full
+            4.5:1; the eight palettes all clear it at full strength, but
+            `opacity-80` dropped three of them to 3.33, 4.30 and 4.34. It was
+            the only accessibility violation left in the whole suite.
+          */}
           <p
-            className="ms-3 border-t pt-2 font-mono text-[0.625rem] opacity-80"
+            className="ms-3 border-t pt-2 font-mono text-[0.625rem]"
             style={{ borderColor: palette.foreground }}
           >
             {author}
