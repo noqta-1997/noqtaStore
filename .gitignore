@@ -13,6 +13,14 @@
 # testing
 /coverage
 
+# playwright: run output is disposable, but tests/__screenshots__ is the
+# migration baseline and must stay committed.
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/tests/.auth/
+
 # next.js
 /.next/
 /out/

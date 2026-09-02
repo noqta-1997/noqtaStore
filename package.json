@@ -6,9 +6,19 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "playwright test",
+    "test:visual": "playwright test tests/visual",
+    "test:functional": "playwright test tests/functional",
+    "test:a11y": "playwright test tests/a11y --project=desktop-light --project=desktop-dark --project=tablet-light --project=tablet-dark --project=mobile-light --project=mobile-dark",
+    "test:baseline": "playwright test tests/visual --update-snapshots",
+    "test:report": "playwright show-report",
+    "tokens": "tsx scripts/generate-fluent-tokens.ts",
+    "tokens:check": "tsx scripts/generate-fluent-tokens.ts --check"
   },
   "dependencies": {
+    "@fluentui/react-components": "^9.74.7",
+    "@fluentui/react-icons": "^2.0.339",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "7.10.0",
     "@supabase/ssr": "^0.12.5",
@@ -22,6 +32,9 @@
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@fluentui/react-theme": "^9.2.2",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/pg": "^8.23.1",
