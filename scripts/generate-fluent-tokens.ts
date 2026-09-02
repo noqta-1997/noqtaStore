@@ -93,7 +93,18 @@ ${block(dark, differs)}
 }
 `;
 
-const hash = (value: string) => createHash("sha256").update(value).digest("hex").slice(0, 12);
+/*
+ * Compared with the line endings normalised, because the comparison is about
+ * the tokens and not about how the checkout wrote them. On Windows with
+ * `core.autocrlf=true` git rewrites this file to CRLF while the generator
+ * emits LF, so a byte-for-byte hash reported a stale file on every fresh
+ * clone even when every token matched.
+ */
+const hash = (value: string) =>
+  createHash("sha256")
+    .update(value.split("\r\n").join("\n"))
+    .digest("hex")
+    .slice(0, 12);
 
 if (process.argv.includes("--check")) {
   let current = "";
