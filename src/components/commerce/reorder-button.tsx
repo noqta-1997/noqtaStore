@@ -64,7 +64,7 @@ export function ReorderButton({
       disabled={pending}
       className={buttonStyles({ variant: "secondary", size: "sm" })}
     >
-      <RotateCcw aria-hidden className="size-4" strokeWidth={2} />
+      <RotateCcw aria-hidden className="size-4" strokeWidth={1.75} />
       {label}
     </button>
   );

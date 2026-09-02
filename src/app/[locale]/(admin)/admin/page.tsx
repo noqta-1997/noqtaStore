@@ -167,14 +167,14 @@ export default async function AdminDashboardPage({ params }: DashboardPageProps)
                   <Td>
                     <Link
                       href={`/${locale}/admin/orders/${order.id}`}
-                      className="font-mono font-semibold underline-offset-4 hover:underline"
+                      className="font-semibold underline-offset-4 hover:underline"
                       data-numeric
                     >
                       {order.reference}
                     </Link>
                   </Td>
                   <Td className="text-on-surface-variant">{order.customer?.name}</Td>
-                  <Td className="font-mono" data-numeric>
+                  <Td data-numeric>
                     {formatPrice(order.total, locale)}
                   </Td>
                   <Td>
@@ -198,7 +198,7 @@ export default async function AdminDashboardPage({ params }: DashboardPageProps)
             {top.map((entry, index) => (
               <li key={entry.bookId} className="flex items-center gap-3">
                 <span
-                  className="flex size-7 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low font-mono text-label-sm"
+                  className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-label-md font-semibold text-primary"
                   data-numeric
                 >
                   {index + 1}
@@ -210,7 +210,7 @@ export default async function AdminDashboardPage({ params }: DashboardPageProps)
                     seed={entry.book.slug}
                     src={entry.book.coverUrl}
                     sizes="2.25rem"
-                    className="border border-line"
+                    className="rounded-md elevation-sm"
                   />
                 </span>
                 <span className="min-w-0 flex-1">
@@ -220,11 +220,11 @@ export default async function AdminDashboardPage({ params }: DashboardPageProps)
                   >
                     {entry.book.title[locale]}
                   </Link>
-                  <span className="block font-mono text-label-sm text-muted" data-numeric>
+                  <span className="block text-label-md text-muted" data-numeric>
                     {formatNumber(entry.sold, locale)} {t.topBooks.sold}
                   </span>
                 </span>
-                <span className="shrink-0 font-mono text-label-md text-on-surface" data-numeric>
+                <span className="shrink-0 text-label-md text-on-surface" data-numeric>
                   {formatCompactPrice(entry.revenue, locale)}
                 </span>
               </li>
@@ -255,12 +255,12 @@ export default async function AdminDashboardPage({ params }: DashboardPageProps)
                   </Link>
                 </Td>
                 <Td className="text-on-surface-variant">{book.category.name[locale]}</Td>
-                <Td className="font-mono" data-numeric>
+                <Td data-numeric>
                   {formatPrice(book.price, locale)}
                 </Td>
                 <Td>
                   <span
-                    className="label-mono inline-flex border border-line bg-error-container px-2 py-1 text-on-error-container"
+                    className="inline-flex rounded-full bg-error-container px-2.5 py-0.5 text-label-md font-semibold text-on-error-container"
                     data-numeric
                   >
                     {formatNumber(book.stock, locale)}
@@ -272,7 +272,7 @@ export default async function AdminDashboardPage({ params }: DashboardPageProps)
         </Table>
       </Panel>
 
-      <p className="text-label-sm text-muted">
+      <p className="text-label-md text-muted">
         {admin.common.today}: <span data-numeric>{formatDate("2026-08-29", locale)}</span>
       </p>
     </>

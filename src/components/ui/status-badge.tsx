@@ -23,7 +23,7 @@ export function StatusBadge({ status, label, className }: StatusBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex h-5 items-center rounded-sm px-1.5 text-label-md font-semibold",
+        "inline-flex h-5.5 items-center rounded-full px-2.5 text-label-md font-semibold",
         tones[status],
         className,
       )}

@@ -63,10 +63,10 @@ export function AdminNotifications({
     >
       <PopoverTrigger disableButtonEnhancement>
         <IconButton variant="subtle" size="md" label={labels.trigger} className="relative">
-          <Bell aria-hidden className="size-4.5" strokeWidth={2} />
+          <Bell aria-hidden className="size-4.5" strokeWidth={1.75} />
           {total > 0 ? (
             <span
-              className="absolute -end-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-primary-container font-mono text-[0.5625rem] font-semibold text-on-primary-container"
+              className="absolute -end-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-primary-container text-[0.5625rem] font-semibold text-on-primary-container"
               data-numeric
             >
               {total > 99 ? "99+" : total}
@@ -92,8 +92,8 @@ export function AdminNotifications({
                       onClick={() => setIsOpen(false)}
                       className="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-state-hover"
                     >
-                      <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low text-primary">
-                        <Icon aria-hidden className="size-4" strokeWidth={2} />
+                      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-primary">
+                        <Icon aria-hidden className="size-4" strokeWidth={1.75} />
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="label-mono block text-muted">
@@ -102,7 +102,7 @@ export function AdminNotifications({
                         <span className="block truncate text-label-md font-semibold text-on-surface">
                           {item.label}
                         </span>
-                        <span className="block truncate text-label-sm text-on-surface-variant">
+                        <span className="block truncate text-label-md text-on-surface-variant">
                           {item.kind === "stock"
                             ? `${labels.stockRemaining}: ${item.detail}`
                             : item.detail}
@@ -127,7 +127,7 @@ export function AdminNotifications({
               "text-label-md text-on-surface-variant transition-colors hover:bg-state-hover hover:text-on-surface",
             )}
           >
-            <Settings2 aria-hidden className="size-4" strokeWidth={2} />
+            <Settings2 aria-hidden className="size-4" strokeWidth={1.75} />
             {labels.settings}
           </Link>
       </PopoverSurface>

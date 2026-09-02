@@ -120,7 +120,7 @@ export default async function AdminMessagesPage({
             href={view.href}
             aria-current={view.active ? "page" : undefined}
             className={cn(
-              "border border-line px-4 py-2.5 text-label-md transition-colors",
+              "rounded-full border border-line px-4 py-2 text-label-md transition-colors duration-100 ease-fluent",
               view.active
                 ? "bg-primary-container font-semibold text-on-primary-container"
                 : "bg-card text-on-surface-variant hover:bg-state-hover hover:text-on-surface",
@@ -224,7 +224,7 @@ export default async function AdminMessagesPage({
                     <Td>
                       <span
                         className={cn(
-                          "label-mono inline-flex border px-2 py-1",
+                          "inline-flex rounded-full border px-2.5 py-0.5 text-label-md font-semibold",
                           statusTones[message.status],
                         )}
                       >

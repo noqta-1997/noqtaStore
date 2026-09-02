@@ -34,30 +34,30 @@ export function PublisherCard({
     <Link
       href={`/${locale}/publishers/${publisher.slug}`}
       className={cn(
-        "group flex h-full flex-col gap-2 rounded-md border border-line bg-card p-4",
-        "transition-[box-shadow,background-color] duration-100 ease-fluent hover:bg-card-hover hover:elevation-md focus-within:elevation-md",
+        "group flex h-full flex-col gap-2 rounded-xl border border-line bg-card p-5",
+        "transition-[box-shadow,border-color] duration-100 ease-fluent hover:border-line-hover hover:elevation-md focus-within:elevation-md",
         className,
       )}
     >
       <span
         aria-hidden
         className={cn(
-          "flex size-11 items-center justify-center border border-line",
+          "flex size-11 items-center justify-center rounded-full",
           publisherTone(publisher.slug),
         )}
       >
-        <Building2 className="size-5" strokeWidth={2} />
+        <Building2 className="size-5" strokeWidth={1.75} />
       </span>
 
-      <span className="font-display text-base leading-snug font-bold text-balance text-on-surface">
+      <span className="text-body-lg leading-snug font-bold text-balance text-on-surface">
         {publisher.name[locale]}
       </span>
 
       {publisher.country[locale] ? (
-        <span className="label-mono text-muted">{publisher.country[locale]}</span>
+        <span className="text-label-md text-muted">{publisher.country[locale]}</span>
       ) : null}
 
-      <span className="mt-auto pt-2 font-mono text-xs text-muted" data-numeric>
+      <span className="mt-auto pt-2 text-label-md text-muted" data-numeric>
         {formatNumber(publisher.booksCount, locale)} {booksLabel}
       </span>
     </Link>

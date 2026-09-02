@@ -85,7 +85,7 @@ export function AccountMenu({ locale, labels }: AccountMenuProps) {
             className: "ms-1 hidden lg:inline-flex",
           })}
         >
-          <UserRound aria-hidden className="size-4" strokeWidth={2} />
+          <UserRound aria-hidden className="size-4" strokeWidth={1.75} />
           {labels.login}
         </Link>
 
@@ -95,7 +95,7 @@ export function AccountMenu({ locale, labels }: AccountMenuProps) {
           title={labels.account}
           className="inline-flex size-10 items-center justify-center border border-transparent text-on-surface transition-colors hover:border-line hover:bg-state-hover lg:hidden"
         >
-          <UserRound aria-hidden className="size-5" strokeWidth={2} />
+          <UserRound aria-hidden className="size-5" strokeWidth={1.75} />
         </Link>
       </>
     );
@@ -144,7 +144,7 @@ export function AccountMenu({ locale, labels }: AccountMenuProps) {
           <ChevronDown
             aria-hidden
             className="hidden size-4 text-muted lg:block"
-            strokeWidth={2}
+            strokeWidth={1.75}
           />
         </button>
       </MenuTrigger>
@@ -162,7 +162,7 @@ export function AccountMenu({ locale, labels }: AccountMenuProps) {
           {items.map((item) => (
             <MenuItemLink
               key={item.href}
-              icon={<item.icon aria-hidden className="size-4" strokeWidth={2} />}
+              icon={<item.icon aria-hidden className="size-4" strokeWidth={1.75} />}
               href={item.href}
             >
               {item.label}
@@ -173,7 +173,7 @@ export function AccountMenu({ locale, labels }: AccountMenuProps) {
 
           <MenuItem
             icon={
-              <LogOut aria-hidden className="size-4 rtl:rotate-180" strokeWidth={2} />
+              <LogOut aria-hidden className="size-4 rtl:rotate-180" strokeWidth={1.75} />
             }
             onClick={signOut}
           >

@@ -32,17 +32,17 @@ export function CartLineRow({ line, locale, dictionary }: CartLineRowProps) {
           seed={book.slug}
           src={book.coverUrl}
           sizes="6rem"
-          className="border border-line"
+          className="rounded-lg elevation-sm"
         />
       </Link>
 
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 space-y-1">
-            <span className="label-mono block text-muted">
+            <span className="block text-label-md text-muted">
               {book.category.name[locale]}
             </span>
-            <h3 className="font-display text-base leading-snug font-bold">
+            <h3 className="text-body-lg leading-snug font-bold">
               <Link
                 href={`/${locale}/books/${book.slug}`}
                 className="underline-offset-4 hover:underline"
@@ -83,7 +83,7 @@ export function CartLineRow({ line, locale, dictionary }: CartLineRowProps) {
               className="justify-end"
             />
             {line.quantity > 1 ? (
-              <p className="font-mono text-label-sm text-muted" data-numeric>
+              <p className="text-label-md text-muted" data-numeric>
                 {formatPrice(book.price, locale)} × {line.quantity}
               </p>
             ) : null}

@@ -24,26 +24,26 @@ export function StatCard({
   const Trend = positive ? TrendingUp : TrendingDown;
 
   return (
-    <div className={cn("rounded-md border border-line bg-card p-5", className)}>
+    <div className={cn("rounded-xl border border-line bg-card p-5", className)}>
       <div className="flex items-start justify-between gap-3">
-        <span className="label-mono text-muted">{label}</span>
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low text-primary">
-          <Icon aria-hidden className="size-4" strokeWidth={2} />
+        <span className="text-label-md font-semibold text-muted">{label}</span>
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-primary">
+          <Icon aria-hidden className="size-4" strokeWidth={1.75} />
         </span>
       </div>
 
-      <p className="mt-3 font-mono text-2xl font-bold text-on-surface" data-numeric>
+      <p className="mt-3 font-display text-headline-xl text-on-surface" data-numeric>
         {value}
       </p>
 
       {typeof change === "number" ? (
         <p
           className={cn(
-            "mt-2 flex items-center gap-1.5 text-label-sm",
+            "mt-2 flex items-center gap-1.5 text-label-md",
             positive ? "text-success-fg" : "text-error",
           )}
         >
-          <Trend aria-hidden className="size-3.5" strokeWidth={2} />
+          <Trend aria-hidden className="size-3.5" strokeWidth={1.75} />
           <span data-numeric>
             {positive ? "+" : ""}
             {change}%

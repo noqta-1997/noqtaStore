@@ -35,7 +35,7 @@ export function AddressForm({
 
   return (
     <ActionForm
-      className="space-y-6 rounded-md border border-line bg-card p-5 sm:p-6"
+      className="space-y-6 rounded-xl border border-line bg-card p-5 sm:p-6"
       action={saveAddress}
       successTitle={dictionary.common.toast.addressSaved}
       fallbackError={dictionary.common.toast.actionFailed}
@@ -74,7 +74,7 @@ export function AddressForm({
             type="tel"
             dir="ltr"
             inputMode="tel"
-            className="font-mono"
+            data-numeric
             defaultValue={address?.phone}
             required
           />

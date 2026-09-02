@@ -11,6 +11,10 @@ interface AuthorsSpotlightProps {
   authors: Author[];
 }
 
+/**
+ * The reference runs its author chips three or four to a line rather than six,
+ * because each one is now a portrait beside a name instead of a stacked card.
+ */
 export function AuthorsSpotlight({
   locale,
   dictionary,
@@ -19,7 +23,7 @@ export function AuthorsSpotlight({
   const section = dictionary.home.authors;
 
   return (
-    <section className="pb-12 lg:pb-16">
+    <section className="pb-14 lg:pb-20">
       <Container>
         <SectionHeader
           title={section.title}
@@ -28,7 +32,7 @@ export function AuthorsSpotlight({
           actionHref={`/${locale}/authors`}
         />
 
-        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {authors.map((author) => (
             <li key={author.id}>
               <AuthorCard

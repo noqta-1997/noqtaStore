@@ -93,20 +93,20 @@ export function ConfirmDialog({
             className,
           )}
         >
-          {children ?? <Trash2 aria-hidden className="size-4" strokeWidth={2} />}
+          {children ?? <Trash2 aria-hidden className="size-4" strokeWidth={1.75} />}
         </button>
       ) : (
         <button
           type="button"
           onClick={() => setOpen(true)}
           className={cn(
-            "inline-flex items-center gap-2 border border-line bg-error-container px-4 py-2.5",
-            "text-label-md font-semibold text-on-error-container transition-all",
-            "hover:-translate-y-0.5 hover:elevation-sm",
+            "inline-flex items-center gap-2 rounded-md bg-error-container px-4 py-2.5",
+            "text-label-md font-semibold text-on-error-container",
+            "transition-shadow duration-100 ease-fluent hover:elevation-sm",
             className,
           )}
         >
-          <Trash2 aria-hidden className="size-4" strokeWidth={2} />
+          <Trash2 aria-hidden className="size-4" strokeWidth={1.75} />
           {labels.trigger}
         </button>
       )}
@@ -133,7 +133,7 @@ export function ConfirmDialog({
         }
       >
         {itemName ? (
-          <p className="border border-line bg-surface-low px-4 py-3 text-body-md text-on-surface">
+          <p className="rounded-md bg-surface-low px-4 py-3 text-body-md text-on-surface">
             {itemName}
           </p>
         ) : null}

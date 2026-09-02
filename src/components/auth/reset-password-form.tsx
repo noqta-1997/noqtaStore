@@ -106,7 +106,7 @@ export function ResetPasswordForm({ locale, t, validation }: ResetPasswordFormPr
 
   if (state === "checking") {
     return (
-      <p className="rounded-md border border-line bg-surface-low px-4 py-3 text-body-md text-on-surface-variant">
+      <p className="rounded-xl border border-line bg-surface-low px-4 py-3 text-body-md text-on-surface-variant">
         {t.resetChecking}
       </p>
     );
@@ -114,9 +114,9 @@ export function ResetPasswordForm({ locale, t, validation }: ResetPasswordFormPr
 
   if (state === "invalid") {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-md border border-line bg-surface-low p-6 text-center">
-        <span className="flex size-12 items-center justify-center border border-line bg-error-container text-on-error-container">
-          <AlertTriangle aria-hidden className="size-5" strokeWidth={2} />
+      <div className="flex flex-col items-center gap-3 rounded-xl border border-line bg-surface-low p-6 text-center">
+        <span className="flex size-12 items-center justify-center rounded-full bg-error-container text-on-error-container">
+          <AlertTriangle aria-hidden className="size-5" strokeWidth={1.75} />
         </span>
         <p className="text-body-md font-semibold text-on-surface">
           {t.resetInvalidTitle}
@@ -139,7 +139,7 @@ export function ResetPasswordForm({ locale, t, validation }: ResetPasswordFormPr
           role="alert"
           className="flex items-start gap-2 border border-line bg-error-container px-4 py-3 text-body-md text-on-error-container"
         >
-          <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={2} />
+          <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={1.75} />
           {formError}
         </p>
       ) : null}
@@ -151,6 +151,7 @@ export function ResetPasswordForm({ locale, t, validation }: ResetPasswordFormPr
         error={passwordError ?? undefined}
       >
         <PasswordInput
+          size="lg"
           id="password"
           name="password"
           autoComplete="new-password"
@@ -167,6 +168,7 @@ export function ResetPasswordForm({ locale, t, validation }: ResetPasswordFormPr
         error={confirmError ?? undefined}
       >
         <PasswordInput
+          size="lg"
           id="confirmPassword"
           name="confirmPassword"
           autoComplete="new-password"

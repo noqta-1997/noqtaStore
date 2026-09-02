@@ -43,27 +43,27 @@ export function ErrorScreen({ reset, digest }: ErrorScreenProps) {
 
   return (
     <Container className="py-16 lg:py-24">
-      <div className="mx-auto max-w-lg space-y-5 rounded-md border border-line bg-card p-8 text-center elevation-md">
+      <div className="mx-auto max-w-lg space-y-5 rounded-2xl border border-line bg-card p-8 text-center elevation-md">
         <p className="label-mono text-error">{t.code}</p>
         <h1 className="text-headline-lg">{t.title}</h1>
         <p className="text-body-md text-on-surface-variant">{t.description}</p>
 
         {digest ? (
-          <p className="border border-outline bg-surface-low px-3 py-2 font-mono text-label-sm text-muted">
+          <p className="rounded-md border border-outline bg-surface-low px-3 py-2 text-label-md text-muted">
             {digest}
           </p>
         ) : null}
 
         <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-center">
           <Button size="lg" onClick={reset}>
-            <RotateCcw aria-hidden className="size-4" strokeWidth={2} />
+            <RotateCcw aria-hidden className="size-4" strokeWidth={1.75} />
             {t.retry}
           </Button>
           <Link
             href={`/${locale}`}
             className={buttonStyles({ variant: "secondary", size: "lg" })}
           >
-            <Home aria-hidden className="size-4" strokeWidth={2} />
+            <Home aria-hidden className="size-4" strokeWidth={1.75} />
             {t.home}
           </Link>
         </div>

@@ -31,16 +31,16 @@ export default function AdminNotFound() {
   const t = copy[locale];
 
   return (
-    <div className="mx-auto max-w-lg space-y-5 rounded-md border border-line bg-card p-8 text-center elevation-md">
-      <p className="label-mono text-primary">{t.code}</p>
-      <p aria-hidden className="font-mono text-6xl font-bold text-on-surface" data-numeric>
+    <div className="mx-auto max-w-lg space-y-5 rounded-xl border border-line bg-card p-8 text-center elevation-md">
+      <p className="text-label-md font-semibold text-primary">{t.code}</p>
+      <p aria-hidden className="text-6xl font-bold text-on-surface" data-numeric>
         404
       </p>
       <h1 className="text-headline-md">{t.title}</h1>
       <p className="text-body-md text-on-surface-variant">{t.description}</p>
 
       <Link href={`/${locale}/admin`} className={buttonStyles({ size: "lg" })}>
-        <LayoutDashboard aria-hidden className="size-4" strokeWidth={2} />
+        <LayoutDashboard aria-hidden className="size-4" strokeWidth={1.75} />
         {t.action}
       </Link>
     </div>

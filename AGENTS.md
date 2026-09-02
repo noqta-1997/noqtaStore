@@ -16,14 +16,18 @@ for the default blue brand ramp.
 
 ## The three layers
 
-1. **`src/theme/noqta-brand.ts`** — the 16-step brand ramp, plain data with no
-   imports. Both layers below read from it, which is what stops them drifting.
+1. **`src/theme/noqta-brand.ts`** and **`src/theme/noqta-paper.ts`** — the
+   16-step brand ramp and the warm neutral ramp, plain data with no imports.
+   Everything below reads from them, which is what stops them drifting.
+   Fluent's own neutrals are strictly grey and this design is printed paper,
+   so `withPaper()` folds the paper ramp into the theme in both consumers:
+   the generator and `FluentShell`.
 2. **`src/styles/fluent-tokens.css`** — 459 CSS variables, **generated**.
    Never edit it. `npm run tokens` rewrites it; `npm run tokens:check` fails
    the build if it is stale.
 3. **`src/app/globals.css`** — semantic aliases (`--card`, `--line`,
    `--primary-container`) pointing at the Fluent tokens. This is the file to
-   edit when a colour decision changes.
+   edit when a colour decision changes; edit the ramps for a palette change.
 
 Every mapping and the reasoning behind it is in `docs/token-audit.md`. Read it
 before changing a token — several of them serve two roles and break if moved
@@ -55,6 +59,15 @@ must stay that way.
 - **Font variables live on `<html>`.** `--font-sans` is declared on `:root` and
   references them; on `<body>` the nested `var()` would be undefined and the
   whole declaration dropped.
+- **Radii are shifted one Fluent step.** `rounded-md` is 8px, `lg` 12, `xl` 16,
+  `2xl` 24. The names did not change, so do not "fix" a call site that looks
+  rounder than you expected.
+- **There is no monospace.** `--font-mono` resolves to the sans stack and
+  `label-mono` is a small semibold sans label. The name survives only because
+  30-odd call sites say it. `[data-numeric]` still selects tabular figures.
+- **Headings are a serif, in two faces.** Playfair Display covers Latin and
+  Noto Naskh Arabic covers Arabic; the browser picks per glyph. `font-display`
+  is for headings and the wordmark — card titles are sans.
 
 ## Before you ship a change
 

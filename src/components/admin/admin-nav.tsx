@@ -133,7 +133,7 @@ export function AdminNav({ locale, labels, iconsOnly = false, onNavigate }: Admi
                         : "text-on-surface-variant before:opacity-0 hover:bg-state-hover hover:text-on-surface",
                     )}
                   >
-                    <item.icon aria-hidden className="size-4.5 shrink-0" strokeWidth={2} />
+                    <item.icon aria-hidden className="size-4.5 shrink-0" strokeWidth={1.75} />
                     <span className={cn(iconsOnly && "hidden lg:inline")}>
                       {item.label}
                     </span>

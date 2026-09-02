@@ -69,10 +69,10 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
             <li key={category.id}>
               <Link
                 href={`/${locale}/categories/${category.slug}`}
-                className="group flex h-full flex-col gap-4 rounded-md border border-line bg-card p-5 transition-[box-shadow,background-color] duration-100 ease-fluent hover:bg-card-hover hover:elevation-md focus-within:elevation-md"
+                className="group flex h-full flex-col gap-4 rounded-xl border border-line bg-card p-5 transition-[box-shadow,background-color] duration-100 ease-fluent hover:bg-card-hover hover:elevation-md focus-within:elevation-md"
               >
                 <div className="flex items-start gap-3">
-                  <span className="flex size-12 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low transition-colors group-hover:bg-primary-container group-hover:text-on-primary-container">
+                  <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-primary transition-colors group-hover:bg-primary-container group-hover:text-on-primary-container">
                     <CategoryIcon name={category.icon} className="size-5" />
                   </span>
                   <div className="min-w-0">
@@ -101,7 +101,7 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
                 </ul>
 
                 <div className="mt-auto flex items-center justify-between gap-2 border-t border-line-divider pt-4">
-                  <span className="font-mono text-label-sm text-muted" data-numeric>
+                  <span className="text-label-sm text-muted" data-numeric>
                     {formatNumber(category.booksCount, locale)}{" "}
                     {dictionary.home.categories.count}
                   </span>
@@ -110,7 +110,7 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
                     <ArrowRight
                       aria-hidden
                       className="size-4 transition-transform duration-100 ease-fluent group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
-                      strokeWidth={2}
+                      strokeWidth={1.75}
                     />
                   </span>
                 </div>

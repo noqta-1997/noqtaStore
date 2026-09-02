@@ -43,7 +43,7 @@ export default async function AuthLayout({
               <ArrowRight
                 aria-hidden
                 className="size-4 rotate-180 rtl:rotate-0"
-                strokeWidth={2}
+                strokeWidth={1.75}
               />
               {dictionary.common.backToHome}
             </Link>

@@ -31,7 +31,7 @@ export function Pagination({
   );
 
   const box =
-    "inline-flex h-10 min-w-10 items-center justify-center border border-line px-3 text-label-md transition-colors";
+    "inline-flex h-10 min-w-10 items-center justify-center rounded-md border border-line px-3 text-label-md transition-colors";
 
   return (
     <nav aria-label={labels.page} className={cn("flex justify-center", className)}>
@@ -43,16 +43,16 @@ export function Pagination({
               aria-label={labels.previous}
               className={cn(box, "bg-card hover:bg-state-hover")}
             >
-              <ChevronRight aria-hidden className="size-4 rtl:hidden" strokeWidth={2} />
-              <ChevronLeft aria-hidden className="hidden size-4 rtl:block" strokeWidth={2} />
+              <ChevronRight aria-hidden className="size-4 rtl:hidden" strokeWidth={1.75} />
+              <ChevronLeft aria-hidden className="hidden size-4 rtl:block" strokeWidth={1.75} />
             </Link>
           ) : (
             <span
               aria-disabled
               className={cn(box, "border-outline text-muted")}
             >
-              <ChevronRight aria-hidden className="size-4 rtl:hidden" strokeWidth={2} />
-              <ChevronLeft aria-hidden className="hidden size-4 rtl:block" strokeWidth={2} />
+              <ChevronRight aria-hidden className="size-4 rtl:hidden" strokeWidth={1.75} />
+              <ChevronLeft aria-hidden className="hidden size-4 rtl:block" strokeWidth={1.75} />
             </span>
           )}
         </li>
@@ -92,13 +92,13 @@ export function Pagination({
               aria-label={labels.next}
               className={cn(box, "bg-card hover:bg-state-hover")}
             >
-              <ChevronLeft aria-hidden className="size-4 rtl:hidden" strokeWidth={2} />
-              <ChevronRight aria-hidden className="hidden size-4 rtl:block" strokeWidth={2} />
+              <ChevronLeft aria-hidden className="size-4 rtl:hidden" strokeWidth={1.75} />
+              <ChevronRight aria-hidden className="hidden size-4 rtl:block" strokeWidth={1.75} />
             </Link>
           ) : (
             <span aria-disabled className={cn(box, "border-outline text-muted")}>
-              <ChevronLeft aria-hidden className="size-4 rtl:hidden" strokeWidth={2} />
-              <ChevronRight aria-hidden className="hidden size-4 rtl:block" strokeWidth={2} />
+              <ChevronLeft aria-hidden className="size-4 rtl:hidden" strokeWidth={1.75} />
+              <ChevronRight aria-hidden className="hidden size-4 rtl:block" strokeWidth={1.75} />
             </span>
           )}
         </li>

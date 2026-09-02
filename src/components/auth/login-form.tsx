@@ -74,12 +74,13 @@ export function LoginForm({ locale, t, validation }: LoginFormProps) {
           role="alert"
           className="flex items-start gap-2 border border-line bg-error-container px-4 py-3 text-body-md text-on-error-container"
         >
-          <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={2} />
+          <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={1.75} />
           {formError ?? t.errors.generic}
         </p>
       ) : null}
 
       <ValidatedField
+        size="lg"
         id="email"
         name="email"
         type="email"
@@ -93,6 +94,7 @@ export function LoginForm({ locale, t, validation }: LoginFormProps) {
 
       <Field label={t.password} htmlFor="password" error={passwordError ?? undefined}>
         <PasswordInput
+          size="lg"
           id="password"
           name="password"
           autoComplete="current-password"

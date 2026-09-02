@@ -82,7 +82,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
                 <Link
                   key={category.id}
                   href={`/${locale}/search?q=${encodeURIComponent(category.name[locale])}`}
-                  className="rounded-md border border-line bg-card px-3 py-1.5 text-label-md text-on-surface transition-colors hover:bg-state-hover"
+                  className="rounded-xl border border-line bg-card px-3 py-1.5 text-label-md text-on-surface transition-colors hover:bg-state-hover"
                 >
                   {category.name[locale]}
                 </Link>

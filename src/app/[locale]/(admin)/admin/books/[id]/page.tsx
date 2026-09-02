@@ -71,14 +71,14 @@ export default async function AdminBookPage({ params }: AdminBookPageProps) {
               href={`/${locale}/books/${book.slug}`}
               className={buttonStyles({ variant: "secondary", size: "md" })}
             >
-              <ExternalLink aria-hidden className="size-4 rtl:-scale-x-100" strokeWidth={2} />
+              <ExternalLink aria-hidden className="size-4 rtl:-scale-x-100" strokeWidth={1.75} />
               {t.viewInStore}
             </Link>
             <Link
               href={`/${locale}/admin/books/${book.id}/edit`}
               className={buttonStyles({ size: "md" })}
             >
-              <Pencil aria-hidden className="size-4" strokeWidth={2} />
+              <Pencil aria-hidden className="size-4" strokeWidth={1.75} />
               {admin.common.edit}
             </Link>
           </>
@@ -118,7 +118,7 @@ export default async function AdminBookPage({ params }: AdminBookPageProps) {
                 seed={book.slug}
                 src={book.coverUrl}
                 sizes="8rem"
-                className="border border-line"
+                className="rounded-md elevation-sm"
               />
             </div>
 
@@ -163,7 +163,7 @@ export default async function AdminBookPage({ params }: AdminBookPageProps) {
                   </span>
                   <div className="flex items-center gap-3">
                     <Rating value={review.rating} locale={locale} />
-                    <span className="font-mono text-label-sm text-muted" data-numeric>
+                    <span className="text-label-md text-muted" data-numeric>
                       {formatDate(review.createdAt, locale)}
                     </span>
                   </div>

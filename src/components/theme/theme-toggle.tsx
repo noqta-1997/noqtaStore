@@ -30,9 +30,9 @@ export function ThemeToggle({ labels, className }: ThemeToggleProps) {
       className={className}
     >
       {theme === "dark" ? (
-        <Sun aria-hidden className="size-5" strokeWidth={2} />
+        <Sun aria-hidden className="size-5" strokeWidth={1.75} />
       ) : (
-        <Moon aria-hidden className="size-5" strokeWidth={2} />
+        <Moon aria-hidden className="size-5" strokeWidth={1.75} />
       )}
     </IconButton>
   );

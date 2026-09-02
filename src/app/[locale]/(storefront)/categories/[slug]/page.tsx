@@ -75,7 +75,7 @@ export default async function CategoryPage({
           { label: category.name[locale] },
         ]}
         actions={
-          <span className="flex size-14 items-center justify-center rounded-md border border-line bg-card text-primary">
+          <span className="flex size-14 items-center justify-center rounded-full bg-primary-fixed text-primary">
             <CategoryIcon name={category.icon} className="size-6" />
           </span>
         }

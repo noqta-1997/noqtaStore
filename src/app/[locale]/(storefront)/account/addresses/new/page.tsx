@@ -36,7 +36,7 @@ export default async function NewAddressPage({ params }: NewAddressPageProps) {
         href={`/${locale}/account/addresses`}
         className="inline-flex items-center gap-2 text-label-md text-on-surface underline-offset-4 hover:underline"
       >
-        <ArrowRight aria-hidden className="size-4 rotate-180 rtl:rotate-0" strokeWidth={2} />
+        <ArrowRight aria-hidden className="size-4 rotate-180 rtl:rotate-0" strokeWidth={1.75} />
         {dictionary.account.addresses.title}
       </Link>
 

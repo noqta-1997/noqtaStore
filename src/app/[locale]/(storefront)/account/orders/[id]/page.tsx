@@ -84,13 +84,13 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
         href={`/${locale}/account/orders`}
         className="inline-flex items-center gap-2 text-label-md text-on-surface underline-offset-4 hover:underline"
       >
-        <ArrowRight aria-hidden className="size-4 rotate-180 rtl:rotate-0" strokeWidth={2} />
+        <ArrowRight aria-hidden className="size-4 rotate-180 rtl:rotate-0" strokeWidth={1.75} />
         {dictionary.account.orders.title}
       </Link>
 
-      <header className="flex flex-wrap items-center justify-between gap-4 rounded-md border border-line bg-card p-5">
+      <header className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-line bg-card p-5">
         <div className="space-y-1">
-          <h2 className="font-mono text-headline-md" data-numeric>
+          <h2 className="text-headline-md" data-numeric>
             {order.reference}
           </h2>
           <p className="text-label-md text-muted">
@@ -104,7 +104,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
         />
       </header>
 
-      <section className="rounded-md border border-line bg-card">
+      <section className="rounded-xl border border-line bg-card">
         <h3 className="border-b border-line px-5 py-4 text-headline-md">
           {t.timeline}
         </h3>
@@ -114,7 +114,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
               <div className="flex flex-col items-center">
                 <span
                   className={cn(
-                    "flex size-8 shrink-0 items-center justify-center border border-line",
+                    "flex size-9 shrink-0 items-center justify-center rounded-full",
                     entry.done
                       ? "bg-success text-on-success"
                       : "bg-surface-low text-muted",
@@ -156,7 +156,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
       </section>
 
       <div className="grid gap-6 lg:grid-cols-12">
-        <section className="rounded-md border border-line bg-card lg:col-span-7">
+        <section className="rounded-xl border border-line bg-card lg:col-span-7">
           <h3 className="border-b border-line px-5 py-4 text-headline-md">
             {t.itemsTitle}
           </h3>
@@ -183,11 +183,11 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
                   <span className="block text-label-md text-muted">
                     {dictionary.common.by} {item.book.author.name[locale]}
                   </span>
-                  <span className="mt-1 block font-mono text-label-sm text-muted" data-numeric>
+                  <span className="mt-1 block text-label-sm text-muted" data-numeric>
                     {formatPrice(item.unitPrice, locale)} × {item.quantity}
                   </span>
                 </span>
-                <span className="shrink-0 font-mono text-body-md font-semibold" data-numeric>
+                <span className="shrink-0 text-body-md font-semibold" data-numeric>
                   {formatPrice(item.lineTotal, locale)}
                 </span>
               </li>
@@ -211,7 +211,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
             }
           />
 
-          <section className="rounded-md border border-line bg-card p-5">
+          <section className="rounded-xl border border-line bg-card p-5">
             <dl className="space-y-4">
               {facts.map((fact) => (
                 <div key={fact.label}>
@@ -224,8 +224,8 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
             </dl>
           </section>
 
-          <section className="flex items-center gap-3 rounded-md border border-line bg-surface-low p-5">
-            <LifeBuoy aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={2} />
+          <section className="flex items-center gap-3 rounded-xl border border-line bg-surface-low p-5">
+            <LifeBuoy aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={1.75} />
             <div className="min-w-0">
               <p className="text-body-md text-on-surface">{t.needHelp}</p>
               <Link

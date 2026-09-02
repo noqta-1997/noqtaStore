@@ -32,7 +32,7 @@ export function PrintButton({
       onClick={() => window.print()}
       className={buttonStyles({ variant, size, fullWidth })}
     >
-      <Icon aria-hidden className="size-4" strokeWidth={2} />
+      <Icon aria-hidden className="size-4" strokeWidth={1.75} />
       {label}
     </button>
   );

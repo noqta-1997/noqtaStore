@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans_Arabic, JetBrains_Mono } from "next/font/google";
+import { IBM_Plex_Sans_Arabic, Noto_Naskh_Arabic, Playfair_Display } from "next/font/google";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
@@ -13,12 +13,7 @@ import { cn } from "@/lib/utils";
 
 import "@/app/globals.css";
 
-/**
- * Two families, not four. Fluent carries its whole type ramp on one face and
- * separates the steps by size and weight, so the separate display and body
- * faces went; Plex Arabic covers both scripts and leads the stack, with
- * Fluent's Segoe stack behind it. That is two fewer webfonts on every page.
- */
+/** Running text, both scripts, every weight the ramp asks for. */
 const plexArabic = IBM_Plex_Sans_Arabic({
   subsets: ["arabic", "latin"],
   weight: ["400", "500", "600", "700"],
@@ -26,11 +21,26 @@ const plexArabic = IBM_Plex_Sans_Arabic({
   display: "swap",
 });
 
-/** Figures inside Arabic copy, via [data-numeric]. */
-const jetbrainsMono = JetBrains_Mono({
+/*
+ * Headings are a serif, and no serif covers both scripts, so the display
+ * stack is two faces that never meet: Playfair renders the Latin glyphs,
+ * Noto Naskh Arabic the Arabic ones, and the browser resolves the fallback
+ * per glyph. Only the two weights the headings actually use are fetched.
+ *
+ * The count of webfonts is unchanged — JetBrains Mono left with the last of
+ * the monospace figures, which the design no longer has anywhere.
+ */
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-jetbrains",
+  weight: ["500", "700"],
+  variable: "--font-playfair",
+  display: "swap",
+});
+
+const naskhArabic = Noto_Naskh_Arabic({
+  subsets: ["arabic"],
+  weight: ["500", "700"],
+  variable: "--font-naskh-arabic",
   display: "swap",
 });
 
@@ -91,7 +101,11 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       dir={localeDirection[locale]}
-      className={cn(plexArabic.variable, jetbrainsMono.variable)}
+      className={cn(
+        plexArabic.variable,
+        playfair.variable,
+        naskhArabic.variable,
+      )}
       suppressHydrationWarning
     >
       <head>

@@ -25,7 +25,7 @@ export function Select({ className, children, ...props }: SelectProps) {
       <ChevronDown
         aria-hidden
         className="pointer-events-none absolute end-2.5 top-1/2 size-4 -translate-y-1/2 text-on-surface-variant"
-        strokeWidth={2}
+        strokeWidth={1.75}
       />
     </div>
   );

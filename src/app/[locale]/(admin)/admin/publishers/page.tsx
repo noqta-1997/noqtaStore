@@ -91,17 +91,17 @@ export default async function AdminPublishersPage({
                       <span
                         aria-hidden
                         className={cn(
-                          "flex size-9 shrink-0 items-center justify-center border border-line",
+                          "flex size-9 shrink-0 items-center justify-center rounded-full",
                           publisherTone(publisher.slug),
                         )}
                       >
-                        <Building2 className="size-4" strokeWidth={2} />
+                        <Building2 className="size-4" strokeWidth={1.75} />
                       </span>
                       <span className="min-w-0">
                         <span className="block font-semibold text-on-surface">
                           {publisher.name[locale]}
                         </span>
-                        <span className="block max-w-72 truncate text-label-sm text-muted">
+                        <span className="block max-w-72 truncate text-label-md text-muted">
                           {publisher.description[locale]}
                         </span>
                       </span>
@@ -110,16 +110,16 @@ export default async function AdminPublishersPage({
                   <Td className="text-on-surface-variant">
                     {publisher.country[locale] || "—"}
                   </Td>
-                  <Td className="font-mono" data-numeric>
+                  <Td data-numeric>
                     {publisher.foundedYear
                       ? formatYear(publisher.foundedYear, locale)
                       : "—"}
                   </Td>
-                  <Td className="font-mono" data-numeric>
+                  <Td data-numeric>
                     {formatNumber(publisher.booksCount, locale)}
                   </Td>
                   <Td>
-                    <span className="font-mono text-label-md text-muted" dir="ltr">
+                    <span className="text-label-md text-muted" dir="ltr">
                       {publisher.slug}
                     </span>
                   </Td>

@@ -14,14 +14,17 @@ export type ButtonSize = "sm" | "md" | "lg";
 
 const base =
   "inline-flex items-center justify-center gap-2 rounded-md font-semibold " +
-  "border transition-colors duration-100 ease-fluent select-none " +
+  "border transition-[background-color,border-color,box-shadow] duration-100 ease-fluent select-none " +
   "disabled:pointer-events-none disabled:border-state-disabled-line " +
-  "disabled:bg-state-disabled-bg disabled:text-state-disabled-fg";
+  "disabled:bg-state-disabled-bg disabled:text-state-disabled-fg disabled:shadow-none";
 
 const variants: Record<ButtonVariant, string> = {
+  /* The reference lifts its one warm action off the page; every other
+     appearance stays flat, so the lift reads as "this is the action". */
   primary:
-    "border-transparent bg-primary-container text-on-primary-container " +
-    "hover:bg-primary-container-hover active:bg-primary-container-pressed",
+    "border-transparent bg-primary-container text-on-primary-container elevation-sm " +
+    "hover:bg-primary-container-hover hover:elevation-md " +
+    "active:bg-primary-container-pressed active:elevation-none",
   // Fluent's default: a neutral surface with a visible stroke.
   secondary:
     "border-line bg-card text-on-surface " +
@@ -38,11 +41,17 @@ const variants: Record<ButtonVariant, string> = {
     "hover:text-primary active:text-primary",
 };
 
-/** Fluent's 24 / 32 / 40 ramp. Touch targets opt into `lg` at the call site. */
+/**
+ * Fluent's 24 / 32 / 40 height ramp is unchanged — the fields are cut to the
+ * same three heights and they have to keep lining up. What grew is the
+ * horizontal padding, which is where the reference's roomier buttons actually
+ * come from. Anything that wants the reference's tall hero action asks for it
+ * at the call site.
+ */
 const sizes: Record<ButtonSize, string> = {
-  sm: "h-6 px-2 text-label-md",
-  md: "h-8 px-3 text-body-md",
-  lg: "h-10 px-4 text-body-lg",
+  sm: "h-6 px-3 text-label-md",
+  md: "h-8 px-4 text-body-md",
+  lg: "h-10 px-6 text-body-lg",
 };
 
 export interface ButtonStyleOptions {

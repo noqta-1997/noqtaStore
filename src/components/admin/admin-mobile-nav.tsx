@@ -34,7 +34,7 @@ export function AdminMobileNav({
         onClick={() => setIsOpen(true)}
         className="md:hidden"
       >
-        <Menu aria-hidden className="size-5" strokeWidth={2} />
+        <Menu aria-hidden className="size-5" strokeWidth={1.75} />
       </IconButton>
 
       <Drawer

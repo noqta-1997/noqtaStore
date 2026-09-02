@@ -79,7 +79,7 @@ export default async function MyReviewsPage({
 
       <ul className="space-y-4">
         {reviews.map((review) => (
-          <li key={review.id} className="rounded-md border border-line bg-card p-4 sm:p-5">
+          <li key={review.id} className="rounded-xl border border-line bg-card p-4 sm:p-5">
             <div className="flex gap-4">
               <Link
                 href={`/${locale}/books/${review.book.slug}`}
@@ -120,7 +120,7 @@ export default async function MyReviewsPage({
 
                 <div className="flex flex-wrap items-center gap-3">
                   <Rating value={review.rating} locale={locale} />
-                  <span className="font-mono text-label-sm text-muted" data-numeric>
+                  <span className="text-label-sm text-muted" data-numeric>
                     {formatDate(review.createdAt, locale)}
                   </span>
                 </div>
@@ -136,7 +136,7 @@ export default async function MyReviewsPage({
 
                 <div className="flex items-center gap-1 border-t border-line-divider pt-3">
                   <IconButton variant="subtle" label={dictionary.common.edit}>
-                    <Pencil aria-hidden className="size-4" strokeWidth={2} />
+                    <Pencil aria-hidden className="size-4" strokeWidth={1.75} />
                   </IconButton>
                   <ConfirmDialog
                     action={deleteOwnReview.bind(null, review.id)}

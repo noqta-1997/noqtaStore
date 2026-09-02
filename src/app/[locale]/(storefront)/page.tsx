@@ -43,7 +43,9 @@ export default async function HomePage({
   ] = await Promise.all([
     getDictionary(locale),
     getCategories(),
-    getBooksByTag("featured", 1),
+    /* Three rather than one: the hero fans the two extras out behind the
+       featured jacket. Same query, same tag — only the limit moved. */
+    getBooksByTag("featured", 3),
     getBestsellers(10),
     getNewArrivals(5),
     getAuthors(6),
@@ -56,6 +58,7 @@ export default async function HomePage({
         locale={locale}
         dictionary={dictionary}
         featuredBook={featured[0]}
+        companions={featured.slice(1)}
         stats={stats}
       />
 
@@ -86,7 +89,7 @@ export default async function HomePage({
         locale={locale}
         dictionary={dictionary.common}
         actionHref={`/${locale}/books?sort=newest`}
-        className="pt-0"
+        band
       />
 
       <AuthorsSpotlight

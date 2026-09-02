@@ -55,7 +55,7 @@ export function AccountNav({ locale, labels }: AccountNavProps) {
                     : "text-on-surface-variant before:opacity-0 hover:bg-state-hover hover:text-on-surface",
                 )}
               >
-                <item.icon aria-hidden className="size-4 shrink-0" strokeWidth={2} />
+                <item.icon aria-hidden className="size-4 shrink-0" strokeWidth={1.75} />
                 {item.label}
               </Link>
             </li>
@@ -67,7 +67,7 @@ export function AccountNav({ locale, labels }: AccountNavProps) {
             href={`/${locale}/login`}
             className="flex items-center gap-2.5 whitespace-nowrap rounded-md px-3 py-2 text-body-md text-error transition-colors duration-100 ease-fluent hover:bg-error-container"
           >
-            <LogOut aria-hidden className="size-4 shrink-0 rtl:rotate-180" strokeWidth={2} />
+            <LogOut aria-hidden className="size-4 shrink-0 rtl:rotate-180" strokeWidth={1.75} />
             {labels.logout}
           </Link>
         </li>

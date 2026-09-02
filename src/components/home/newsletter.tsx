@@ -24,17 +24,17 @@ export function Newsletter({
   fallbackError,
 }: NewsletterProps) {
   return (
-    <section className="pb-12 lg:pb-16">
+    <section className="pb-14 lg:pb-20">
       <Container>
-        <div className="grid items-center gap-6 rounded-md border border-line bg-card p-6 sm:p-10 lg:grid-cols-12">
+        <div className="grid items-center gap-8 rounded-2xl border border-line bg-card p-8 sm:p-12 lg:grid-cols-12">
           <div className="space-y-3 lg:col-span-7">
-            <span className="flex size-11 items-center justify-center border border-line bg-primary-container text-on-primary-container">
-              <Mail aria-hidden className="size-5" strokeWidth={2} />
+            <span className="flex size-12 items-center justify-center rounded-full bg-primary-container text-on-primary-container">
+              <Mail aria-hidden className="size-5" strokeWidth={1.75} />
             </span>
             <h2 className="text-headline-md sm:text-headline-lg">
               {dictionary.title}
             </h2>
-            <p className="max-w-xl text-body-md leading-relaxed text-on-surface-variant">
+            <p className="max-w-xl text-body-lg leading-relaxed text-on-surface-variant">
               {dictionary.description}
             </p>
           </div>
@@ -58,13 +58,19 @@ export function Newsletter({
                 type="email"
                 required
                 placeholder={dictionary.placeholder}
-                className="sm:flex-1"
+                size="lg"
+                className="rounded-full bg-card px-4 sm:flex-1"
               />
-              <Button type="submit" className="sm:w-auto" fullWidth>
+              <Button
+                type="submit"
+                size="lg"
+                className="rounded-full sm:w-auto"
+                fullWidth
+              >
                 {dictionary.cta}
               </Button>
             </div>
-            <p className="text-label-sm text-muted">{dictionary.note}</p>
+            <p className="text-label-md text-muted">{dictionary.note}</p>
           </ActionForm>
         </div>
       </Container>

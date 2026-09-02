@@ -56,15 +56,15 @@ export function BlockCustomerButton({
       aria-label={label}
       title={label}
       className={cn(
-        "inline-flex size-9 shrink-0 items-center justify-center border border-transparent",
-        "text-on-surface transition-colors hover:border-line hover:bg-state-hover disabled:opacity-50",
+        "inline-flex size-9 shrink-0 items-center justify-center rounded-md",
+        "text-on-surface transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-primary disabled:opacity-50",
         className,
       )}
     >
       {blocked ? (
-        <CircleCheck aria-hidden className="size-4" strokeWidth={2} />
+        <CircleCheck aria-hidden className="size-4" strokeWidth={1.75} />
       ) : (
-        <Ban aria-hidden className="size-4" strokeWidth={2} />
+        <Ban aria-hidden className="size-4" strokeWidth={1.75} />
       )}
     </button>
   );

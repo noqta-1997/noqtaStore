@@ -13,6 +13,13 @@ interface StorefrontFooterProps {
   contact: { address: string; phone: string; email: string };
 }
 
+/**
+ * The reference closes on paper rather than on ink: the footer is the same
+ * beige as the banded sections, with the wordmark in the accent and the
+ * columns in ordinary body text. That is why nothing here reads `--anchor`
+ * any more — the one band that stays dark in both themes is the announcement
+ * rail at the top of the header.
+ */
 export function StorefrontFooter({
   locale,
   dictionary,
@@ -52,23 +59,23 @@ export function StorefrontFooter({
   ];
 
   return (
-    <footer className="mt-16 border-t border-line-divider bg-anchor text-on-anchor-variant">
-      <Container className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-12 lg:py-16">
+    <footer className="mt-20 border-t border-line-divider bg-surface-low text-on-surface-variant">
+      <Container className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-12 lg:py-20">
         <div className="space-y-4 lg:col-span-4">
           <div className="flex items-center gap-2.5">
-            <span className="flex size-9 items-center justify-center border border-on-anchor bg-primary-container">
+            <span className="flex size-9 items-center justify-center rounded-full bg-primary-container">
               <span className="size-2.5 rounded-full bg-on-primary-container" />
             </span>
-            <span className="font-display text-xl font-extrabold text-on-anchor">
+            <span className="font-display text-xl font-bold text-primary">
               {brand.name}
             </span>
           </div>
-          <p className="max-w-sm text-sm leading-relaxed">{footer.about}</p>
+          <p className="max-w-sm text-body-md leading-relaxed">{footer.about}</p>
         </div>
 
         {columns.map((column) => (
           <nav key={column.title} className="lg:col-span-2" aria-label={column.title}>
-            <h2 className="label-mono mb-4 text-on-anchor-brand">
+            <h2 className="mb-4 text-label-md font-semibold tracking-wide text-on-surface">
               {column.title}
             </h2>
             <ul className="space-y-2.5">
@@ -76,7 +83,7 @@ export function StorefrontFooter({
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm underline-offset-4 transition-colors hover:text-on-anchor hover:underline"
+                    className="text-body-md underline-offset-4 transition-colors hover:text-primary hover:underline"
                   >
                     {link.label}
                   </Link>
@@ -87,31 +94,31 @@ export function StorefrontFooter({
         ))}
 
         <div className="lg:col-span-2">
-          <h2 className="label-mono mb-4 text-on-anchor-brand">
+          <h2 className="mb-4 text-label-md font-semibold tracking-wide text-on-surface">
             {footer.contact.title}
           </h2>
-          <ul className="space-y-3 text-sm">
+          <ul className="space-y-3 text-body-md">
             <li className="flex items-start gap-2">
-              <MapPin aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={2} />
+              <MapPin aria-hidden className="mt-1 size-4 shrink-0 text-primary" strokeWidth={1.75} />
               {contact.address}
             </li>
             <li className="flex items-start gap-2">
-              <Phone aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={2} />
+              <Phone aria-hidden className="mt-1 size-4 shrink-0 text-primary" strokeWidth={1.75} />
               <span dir="ltr" data-numeric>
                 {contact.phone}
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <Mail aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={2} />
+              <Mail aria-hidden className="mt-1 size-4 shrink-0 text-primary" strokeWidth={1.75} />
               <span dir="ltr">{contact.email}</span>
             </li>
           </ul>
         </div>
       </Container>
 
-      <div className="border-t border-on-anchor/20">
+      <div className="border-t border-line-divider">
         <Container className="flex flex-col items-center justify-between gap-3 py-5 sm:flex-row">
-          <p className="text-label-sm">
+          <p className="text-label-md">
             © <span data-numeric>{new Date().getFullYear()}</span> {brand.name}{" "}
             — {footer.rights}
           </p>
@@ -119,7 +126,7 @@ export function StorefrontFooter({
             <li>
               <Link
                 href={`/${locale}/privacy`}
-                className="text-label-sm underline-offset-4 hover:text-on-anchor hover:underline"
+                className="text-label-md underline-offset-4 hover:text-primary hover:underline"
               >
                 {footer.privacy}
               </Link>
@@ -127,7 +134,7 @@ export function StorefrontFooter({
             <li>
               <Link
                 href={`/${locale}/terms`}
-                className="text-label-sm underline-offset-4 hover:text-on-anchor hover:underline"
+                className="text-label-md underline-offset-4 hover:text-primary hover:underline"
               >
                 {footer.terms}
               </Link>

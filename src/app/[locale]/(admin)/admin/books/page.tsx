@@ -96,7 +96,7 @@ export default async function AdminBooksPage({
         subtitle={t.subtitle}
         actions={
           <Link href={`${base}/new`} className={buttonStyles({ size: "md" })}>
-            <Plus aria-hidden className="size-4" strokeWidth={2} />
+            <Plus aria-hidden className="size-4" strokeWidth={1.75} />
             {t.add}
           </Link>
         }
@@ -154,7 +154,7 @@ export default async function AdminBooksPage({
                             seed={book.slug}
                             src={book.coverUrl}
                             sizes="2.25rem"
-                            className="border border-line"
+                            className="rounded-md elevation-sm"
                           />
                         </span>
                         <span className="min-w-0">
@@ -164,7 +164,7 @@ export default async function AdminBooksPage({
                           >
                             {book.title[locale]}
                           </Link>
-                          <span className="block font-mono text-label-sm text-muted" data-numeric>
+                          <span className="block text-label-md text-muted" data-numeric>
                             {book.isbn}
                           </span>
                         </span>
@@ -172,13 +172,13 @@ export default async function AdminBooksPage({
                     </Td>
                     <Td className="text-on-surface-variant">{book.author.name[locale]}</Td>
                     <Td className="text-on-surface-variant">{book.category.name[locale]}</Td>
-                    <Td className="font-mono whitespace-nowrap" data-numeric>
+                    <Td className="whitespace-nowrap" data-numeric>
                       {formatPrice(book.price, locale)}
                     </Td>
                     <Td>
                       <span
                         className={cn(
-                          "label-mono inline-flex border px-2 py-1",
+                          "inline-flex rounded-full border px-2.5 py-0.5 text-label-md font-semibold",
                           out && "border-line bg-error-container text-on-error-container",
                           low && "border-line bg-primary-fixed text-on-primary-fixed",
                           !out && !low && "border-outline bg-surface-low text-on-surface",

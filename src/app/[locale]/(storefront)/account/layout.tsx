@@ -47,7 +47,7 @@ export default async function AccountLayout({
           <div className="flex flex-wrap items-center gap-4">
             <span
               aria-hidden
-              className="flex size-12 shrink-0 items-center justify-center rounded-md bg-primary-container text-headline-md font-semibold text-on-primary-container"
+              className="flex size-14 shrink-0 items-center justify-center rounded-full bg-primary-container font-display text-headline-md font-bold text-on-primary-container"
             >
               {customer.name.slice(0, 1)}
             </span>
@@ -66,7 +66,7 @@ export default async function AccountLayout({
 
       <Container className="grid gap-6 py-8 lg:grid-cols-12 lg:gap-8 lg:py-12">
         <aside className="min-w-0 lg:col-span-3">
-          <div className="rounded-md border border-line bg-card p-1.5 lg:sticky lg:top-44">
+          <div className="rounded-xl border border-line bg-card p-2 lg:sticky lg:top-44">
             <AccountNav locale={locale} labels={t.nav} />
           </div>
         </aside>

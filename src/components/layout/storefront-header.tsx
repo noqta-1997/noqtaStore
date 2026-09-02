@@ -16,8 +16,8 @@ import { cn } from "@/lib/utils";
 import type { Category } from "@/types";
 
 const iconLinkStyles =
-  "inline-flex size-8 items-center justify-center rounded-md text-on-surface-variant " +
-  "transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface";
+  "relative inline-flex size-10 items-center justify-center rounded-md text-on-surface " +
+  "transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-primary";
 
 interface StorefrontHeaderProps {
   locale: Locale;
@@ -27,6 +27,16 @@ interface StorefrontHeaderProps {
   brand: { name: string; tagline: string };
 }
 
+/**
+ * One row instead of three.
+ *
+ * The reference puts the wordmark, the links and the reader's own controls on
+ * a single line, so the separate navigation rail below the search field is
+ * gone and its two occupants — the language switch and the theme toggle —
+ * moved into the action cluster. The theme toggle stays the last
+ * `button[aria-label]` in the header: that is how the functional suite finds
+ * it, and it is the only control here the suite drives.
+ */
 export function StorefrontHeader({
   locale,
   dictionary,
@@ -40,7 +50,7 @@ export function StorefrontHeader({
   }));
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line-divider bg-card">
+    <header className="sticky top-0 z-40 border-b border-line-divider bg-surface/95 backdrop-blur">
       <div className="bg-anchor text-on-anchor">
         <Container className="flex h-9 items-center justify-center gap-2 text-center">
           <p className="label-mono truncate">{dictionary.announcement.text}</p>
@@ -66,32 +76,55 @@ export function StorefrontHeader({
 
         <Logo locale={locale} name={brand.name} tagline={brand.tagline} />
 
-        <SearchBar
-          action={`/${locale}/search`}
-          label={dictionary.common.search}
-          placeholder={dictionary.common.searchPlaceholder}
-          className="mx-auto hidden w-full max-w-xl lg:flex"
-        />
+        <nav
+          aria-label={dictionary.common.menu}
+          className="mx-auto hidden lg:block"
+        >
+          <ul className="flex items-center gap-1">
+            {navItems.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="inline-block rounded-md px-2.5 py-2 text-body-md font-medium text-on-surface-variant transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-        <div className="ms-auto flex items-center gap-1 lg:ms-0">
+        <div className="ms-auto flex items-center gap-0.5 lg:ms-0 lg:gap-1">
+          <SearchBar
+            action={`/${locale}/search`}
+            label={dictionary.common.search}
+            placeholder={dictionary.common.searchPlaceholder}
+            compact
+            className="hidden w-48 xl:flex"
+          />
+
           <Link
             href={`/${locale}/account/wishlist`}
             aria-label={dictionary.common.wishlist}
             title={dictionary.common.wishlist}
             className={cn(iconLinkStyles, "hidden sm:inline-flex")}
           >
-            <Heart aria-hidden className="size-5" strokeWidth={2} />
+            <Heart aria-hidden className="size-5" strokeWidth={1.75} />
           </Link>
 
           <Link
             href={`/${locale}/cart`}
             aria-label={dictionary.common.cart}
             title={dictionary.common.cart}
-            className="relative inline-flex size-10 items-center justify-center rounded-md border border-line bg-card text-on-surface transition-colors hover:bg-primary-container hover:text-on-primary-container"
+            className={iconLinkStyles}
           >
-            <ShoppingBag aria-hidden className="size-5" strokeWidth={2} />
+            <ShoppingBag aria-hidden className="size-5" strokeWidth={1.75} />
             <CartBadge />
           </Link>
+
+          <span className="hidden lg:inline-flex">
+            <LocaleSwitcher locale={locale} />
+          </span>
 
           <AccountMenu
             locale={locale}
@@ -107,40 +140,21 @@ export function StorefrontHeader({
               signedInAs: dictionary.auth.signedInAs,
             }}
           />
+
+          <ThemeToggle
+            labels={dictionary.common.theme}
+            className="hidden size-10 lg:inline-flex"
+          />
         </div>
       </Container>
 
-      <Container className="pb-3 lg:hidden">
+      <Container className="pb-3 xl:hidden">
         <SearchBar
           action={`/${locale}/search`}
           label={dictionary.common.search}
           placeholder={dictionary.common.searchPlaceholder}
         />
       </Container>
-
-      <div className="hidden border-t border-line-divider lg:block">
-        <Container className="flex h-11 items-center justify-between">
-          <nav aria-label={dictionary.common.menu}>
-            <ul className="flex items-center gap-1">
-              {navItems.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="inline-block rounded-md px-3 py-1 text-body-md text-on-surface-variant transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <div className="flex items-center gap-1">
-            <LocaleSwitcher locale={locale} />
-            <ThemeToggle labels={dictionary.common.theme} className="size-9" />
-          </div>
-        </Container>
-      </div>
     </header>
   );
 }

@@ -163,7 +163,7 @@ export default async function AdminReviewsPage({
                   <Td>
                     <span
                       className={cn(
-                        "label-mono inline-flex border px-2 py-1",
+                        "inline-flex rounded-full border px-2.5 py-0.5 text-label-md font-semibold",
                         statusTones[review.status],
                       )}
                     >

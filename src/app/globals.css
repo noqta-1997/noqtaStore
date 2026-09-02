@@ -2,20 +2,21 @@
 @import "../styles/fluent-tokens.css";
 
 /* ==================================================================
-   Noqta Store — Fluent 2
+   Noqta Store — Fluent 2 on paper
 
-   The semantic names below are unchanged: 261 call sites still say
-   `border-line`, and as many say `bg-card`. Only what they resolve to has
-   moved, from hand-picked hex values to Fluent 2 alias tokens generated
-   from the official theme (see scripts/generate-fluent-tokens.ts).
+   Three layers, unchanged in shape. What moved is the *ground*: the
+   reference design is a printed-paper bookshop — warm cream surfaces,
+   rounded corners, diffuse shadows, a serif display face — and Fluent's
+   neutral ramp is built for Office chrome and is strictly grey.
 
-   Each mapping was decided from how the token is actually used, not from
-   its name — the reasoning for every one is in docs/token-audit.md.
+   So the neutrals come from `src/theme/noqta-paper.ts` now. They are folded
+   into the generated token file at build time, exactly where the brand ramp
+   already was, which means the aliases below can keep pointing at Fluent
+   token names and the Fluent islands — dialogs, drawers, menus, toasts —
+   are painted from the same values as the page behind them. One source,
+   two consumers, still.
 
-   Light and dark are no longer written out twice here: the Fluent layer
-   already carries both, so an alias pointing at it follows the theme on
-   its own. Only the anchor bands, which have no Fluent counterpart,
-   still need a second block.
+   Every mapping and the reasoning behind it is in docs/token-audit.md.
    ================================================================== */
 
 :root {
@@ -48,7 +49,7 @@
   /* ---- Brand ----
      The ramp puts `colorBrandBackground` at #ab3500 rather than the old
      #ff6b35: Fluent always sets white on it, and white on #ff6b35 measures
-     2.84:1. The vivid orange lives higher up the ramp as a tint now. */
+     2.84:1. On the cream page the brand foreground measures 6.26:1. */
   --primary: var(--colorBrandForeground1);
   --primary-container: var(--colorBrandBackground);
   --on-primary-container: var(--colorNeutralForegroundOnBrand);
@@ -57,6 +58,15 @@
      white that goes on the solid fill. Pairing it with `--on-primary-container`
      gave 1.11:1 — the accessibility baseline caught it. */
   --on-primary-fixed: var(--colorBrandForeground1);
+
+  /* ---- Accent ----
+     The reference marks ratings and savings in amber, a warmer note than the
+     brand orange. Fluent's Marigold is exactly that hue, so it is borrowed
+     rather than invented. `--gold` is a *fill* (stars, distribution bars);
+     `--gold-fg` is the one to use for text, and clears 4.5:1 on both paper
+     steps. */
+  --gold: var(--colorPaletteMarigoldBackground3);
+  --gold-fg: var(--colorPaletteMarigoldForeground2);
 
   /* ---- Inverse ---- */
   --inverse-surface: var(--colorNeutralBackgroundInverted);
@@ -71,7 +81,7 @@
   --success: var(--colorPaletteGreenBackground3);
   --on-success: var(--colorNeutralForegroundOnBrand);
   --success-fg: var(--colorPaletteGreenForeground1);
-  /* Fluent's yellow is too light to carry small text on white; dark orange
+  /* Fluent's yellow is too light to carry small text on cream; dark orange
      is the palette Fluent itself uses for warnings on light grounds. */
   --warning: var(--colorPaletteDarkOrangeForeground1);
 
@@ -108,30 +118,44 @@
   --focus-outer: var(--colorStrokeFocus2);
 
   /* ---- No Fluent equivalent ----
-     Bands that stay dark in *both* themes. `colorNeutralBackgroundInverted`
-     flips with the theme, which is the opposite of what these need. */
-  --anchor: #1d1c13;
-  --on-anchor: #f6f0e2;
-  --on-anchor-variant: #b6ada0;
+     Depth, and the one band that stays dark in *both* themes.
+
+     Fluent's shadows are neutral black at a tight radius; over cream that
+     reads as grime rather than lift, so the elevation utilities below mix
+     their own, warm and further spread. `colorNeutralBackgroundInverted`
+     flips with the theme, which is the opposite of what the announcement
+     rail needs. */
+  --shade-soft: rgba(61, 47, 26, 0.06);
+  --shade-key: rgba(61, 47, 26, 0.1);
+
+  --anchor: #2a211a;
+  --on-anchor: #f7f1e4;
+  --on-anchor-variant: #c4b7a4;
   /* Brand text on the anchor band. The band is dark in both themes, so this
      cannot follow the theme-aware brand token: `colorBrandForeground1` is
      #ab3500 in light mode and measures 2.64:1 here. Ramp step 110 is fixed
-     and clears 6.36:1 against both anchor values. */
+     and clears 6:1 against both anchor values. */
   --on-anchor-brand: #ec805d;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --anchor: #0d0f0d;
-    --on-anchor: #e2e3df;
-    --on-anchor-variant: #a1a1aa;
+    --shade-soft: rgba(0, 0, 0, 0.32);
+    --shade-key: rgba(0, 0, 0, 0.45);
+
+    --anchor: #120f0c;
+    --on-anchor: #e8e1d4;
+    --on-anchor-variant: #a89d8c;
   }
 }
 
 [data-theme="dark"] {
-  --anchor: #0d0f0d;
-  --on-anchor: #e2e3df;
-  --on-anchor-variant: #a1a1aa;
+  --shade-soft: rgba(0, 0, 0, 0.32);
+  --shade-key: rgba(0, 0, 0, 0.45);
+
+  --anchor: #120f0c;
+  --on-anchor: #e8e1d4;
+  --on-anchor-variant: #a89d8c;
 }
 
 @theme inline {
@@ -174,6 +198,9 @@
   --color-primary-fixed: var(--primary-fixed);
   --color-on-primary-fixed: var(--on-primary-fixed);
 
+  --color-gold: var(--gold);
+  --color-gold-fg: var(--gold-fg);
+
   --color-secondary-container: var(--secondary-container);
   --color-on-secondary-container: var(--on-secondary-container);
 
@@ -193,17 +220,23 @@
   --color-on-anchor: var(--on-anchor);
   --color-on-anchor-variant: var(--on-anchor-variant);
   --color-on-anchor-brand: var(--on-anchor-brand);
-
 }
 
 @theme {
-  /* Fluent's radius scale. Names kept so `rounded-md` still resolves. */
-  --radius-xs: var(--borderRadiusSmall);
-  --radius-sm: var(--borderRadiusSmall);
-  --radius-md: var(--borderRadiusMedium);
-  --radius-lg: var(--borderRadiusLarge);
-  --radius-xl: var(--borderRadiusXLarge);
-  --radius-2xl: var(--borderRadius2XLarge);
+  /*
+   * Fluent's radius scale, shifted up one step.
+   *
+   * The names are kept, so `rounded-md` still resolves and no call site
+   * changes — but it now lands on 8px instead of 4px, which is what rounds
+   * all 102 `rounded-md` call sites into the reference's softer geometry in
+   * one move. The values are still Fluent's own steps, not invented numbers.
+   */
+  --radius-xs: var(--borderRadiusMedium); /* 4px */
+  --radius-sm: var(--borderRadiusLarge); /* 6px */
+  --radius-md: var(--borderRadiusXLarge); /* 8px — buttons, fields, chips */
+  --radius-lg: var(--borderRadius2XLarge); /* 12px — cards */
+  --radius-xl: var(--borderRadius3XLarge); /* 16px — panels, hero plates */
+  --radius-2xl: var(--borderRadius4XLarge); /* 24px — banded feature blocks */
 
   /* Named stroke widths instead of ad-hoc 1px / 2px. */
   --stroke-thin: var(--strokeWidthThin);
@@ -214,30 +247,48 @@
   --ease-decelerate: var(--curveDecelerateMid);
 
   /* ---- Typography ----
-     Fluent builds on Segoe UI Variable, which has no Arabic. IBM Plex Sans
-     Arabic covers both scripts and is already loaded, so it leads and Fluent's
-     stack backs it up. Manrope and Work Sans are dropped: one family carrying
-     the whole ramp through weight and size is Fluent's own approach, and it
-     removes two webfont downloads. */
-  --font-sans: var(--font-plex-arabic), var(--fontFamilyBase);
-  --font-display: var(--font-plex-arabic), var(--fontFamilyBase);
-  --font-mono: var(--font-jetbrains), var(--fontFamilyMonospace);
+     The reference sets its headings in a high-contrast serif and its running
+     text in a humanist sans. No single family covers both scripts, so the
+     display stack is Playfair Display for Latin with Noto Naskh Arabic
+     behind it — fallback is resolved per glyph, so an Arabic heading picks up
+     the Naskh face and a Latin one the didone. Body text stays on Plex
+     Arabic.
 
-  /* The seven semantic steps keep their names and re-point at Fluent's ramp,
-     so no call site changes. Paired line heights come from Fluent too rather
-     than being chosen per step. */
-  --text-display-lg: var(--fontSizeHero900);
-  --text-display-lg--line-height: var(--lineHeightHero900);
+     `--font-mono` is a misnomer now and is kept only because 30-odd call
+     sites and two utilities say `font-mono`. The reference has no monospace
+     anywhere — prices included — so the role it names is really "figures and
+     micro labels", and that is set in the sans face with tabular figures.
+     Dropping JetBrains pays for one of the two serif faces. */
+  --font-sans: var(--font-plex-arabic), var(--fontFamilyBase);
+  --font-display: var(--font-playfair), var(--font-naskh-arabic),
+    var(--font-plex-arabic), var(--fontFamilyBase);
+  --font-mono: var(--font-plex-arabic), var(--fontFamilyBase);
+
+  /* The seven semantic steps keep their names and their Fluent sizes, so no
+     call site changes. The one exception is the display step: the reference
+     headline is roughly a third of the viewport wide, which a fixed 40px
+     cannot be at both 375px and 1440px, so it interpolates between two of
+     Fluent's own hero sizes. */
+  --text-display-lg: clamp(var(--fontSizeHero800), 5.2vw, var(--fontSizeHero1000));
+  --text-display-lg--line-height: 1.12;
   --text-display-lg--letter-spacing: -0.02em;
   --text-display-lg--font-weight: var(--fontWeightBold);
 
+  /* Page titles. Fluent's Hero800 — the step between a section heading and
+     the home page's display line, which inner pages were reaching for with a
+     hardcoded 2.5rem. Registered in `cn()`'s font-size list too, or
+     tailwind-merge reads it as a colour. */
+  --text-headline-xl: var(--fontSizeHero800);
+  --text-headline-xl--line-height: var(--lineHeightHero800);
+  --text-headline-xl--font-weight: var(--fontWeightBold);
+
   --text-headline-lg: var(--fontSizeBase600);
   --text-headline-lg--line-height: var(--lineHeightBase600);
-  --text-headline-lg--font-weight: var(--fontWeightSemibold);
+  --text-headline-lg--font-weight: var(--fontWeightBold);
 
   --text-headline-md: var(--fontSizeBase500);
   --text-headline-md--line-height: var(--lineHeightBase500);
-  --text-headline-md--font-weight: var(--fontWeightSemibold);
+  --text-headline-md--font-weight: var(--fontWeightBold);
 
   --text-body-lg: var(--fontSizeBase400);
   --text-body-lg--line-height: var(--lineHeightBase400);
@@ -260,49 +311,51 @@
 /* ------------------------------------------------------------------ */
 
 /*
- * Depth is expressed with light. The design this replaced used a solid offset
- * with no blur that had to flip direction in RTL; Fluent's shadows are
- * symmetric, which is why `--hard-dir` no longer exists.
+ * Depth is expressed with light, and on paper that light is warm. Fluent's
+ * shadows are neutral black at a tight radius, which over cream reads as
+ * grime rather than lift; these keep Fluent's symmetric, direction-free
+ * shape — nothing to flip in RTL — but spread further and tint brown.
  */
 @utility elevation-sm {
-  box-shadow: var(--shadow4);
+  box-shadow: 0 1px 2px var(--shade-soft), 0 2px 6px -2px var(--shade-soft);
 }
 @utility elevation-md {
-  box-shadow: var(--shadow8);
+  box-shadow: 0 2px 6px -1px var(--shade-soft), 0 10px 24px -8px var(--shade-key);
 }
 @utility elevation-lg {
-  box-shadow: var(--shadow16);
+  box-shadow: 0 4px 12px -2px var(--shade-soft), 0 20px 40px -14px var(--shade-key);
 }
 @utility elevation-xl {
-  box-shadow: var(--shadow64);
+  box-shadow: 0 8px 24px -4px var(--shade-soft), 0 36px 64px -24px var(--shade-key);
 }
 @utility elevation-none {
   box-shadow: none;
 }
 
 /*
- * Micro-label. Kept as a utility because 46 files use it, but re-cut to
- * Fluent's Base200: forced capitals do nothing to Arabic and Fluent does not
- * use them, and the wide tracking went with them.
+ * Micro-label. Kept as a utility because 46 files use it. Now set in the
+ * sans face at Base200 with a little tracking — the reference's section
+ * eyebrows are small sans labels, not monospace. Forced capitals do nothing
+ * to Arabic, so there are none.
  */
 @utility label-mono {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--fontSizeBase200);
   line-height: var(--lineHeightBase200);
   font-weight: var(--fontWeightSemibold);
+  letter-spacing: 0.01em;
 }
 
 /*
  * Ornamental wordmark. Drawn as generated content rather than a text node:
  * it is decoration, not reading matter, and a real text node at 20% opacity
- * is a contrast violation no matter how it is labelled. Raising the opacity
- * far enough to pass would have turned a watermark into a headline.
+ * is a contrast violation no matter how it is labelled.
  */
 @utility watermark {
   &::after {
     content: attr(data-mark);
     display: block;
-    font-family: var(--font-mono);
+    font-family: var(--font-display);
     font-size: 3.75rem;
     font-weight: 700;
     line-height: 1;
@@ -344,10 +397,20 @@
   }
 
   h1, h2, h3, h4 {
-    font-family: var(--font-display);
     color: var(--color-on-surface);
     line-height: 1.2;
     text-wrap: balance;
+  }
+
+  /*
+   * The display serif carries the two levels the reference sets in it: page
+   * titles and section headings. Below that — card titles, list rows, review
+   * headings — a dense grid reads better in the running face, and a shelf of
+   * ten serif titles competes with the heading above it. Anything at h3 that
+   * wants the serif asks for `font-display` at the call site.
+   */
+  h1, h2 {
+    font-family: var(--font-display);
   }
 
   ::selection {
@@ -356,22 +419,21 @@
   }
 
   /*
-   * Fluent's two-tone focus indicator. The old ring was a single 2px band in
-   * the brand colour, which disappeared the moment it surrounded a
-   * brand-filled control. Two contrasting strokes stay visible on any ground:
-   * the outer one dark on light themes and light on dark, the inner one its
-   * opposite.
+   * Fluent's two-tone focus indicator. A single band in the brand colour
+   * disappeared the moment it surrounded a brand-filled control. Two
+   * contrasting strokes stay visible on any ground: the outer one dark on
+   * light themes and light on dark, the inner one its opposite.
    */
   :focus-visible {
     outline: var(--strokeWidthThick) solid var(--focus-outer);
     outline-offset: var(--strokeWidthThin);
     box-shadow: 0 0 0 var(--strokeWidthThin) var(--focus-inner);
-    border-radius: var(--borderRadiusSmall);
+    border-radius: var(--borderRadiusXLarge);
   }
 
-  /* Technical figures keep the mono face inside Arabic copy. */
+  /* Figures keep tabular spacing so columns of prices still line up. */
   [data-numeric] {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-feature-settings: "tnum";
   }
 

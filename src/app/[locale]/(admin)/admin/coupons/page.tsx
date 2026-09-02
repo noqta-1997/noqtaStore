@@ -88,21 +88,21 @@ export default async function AdminCouponsPage({ params }: AdminCouponsPageProps
                         >
                           {coupon.code}
                         </span>
-                        <span className="block text-label-sm text-muted">
+                        <span className="block text-label-md text-muted">
                           {t.types[coupon.type]}
                         </span>
                       </Td>
-                      <Td className="whitespace-nowrap font-mono" data-numeric>
+                      <Td className="whitespace-nowrap" data-numeric>
                         {coupon.type === "percentage"
                           ? `${formatNumber(coupon.value, locale)}%`
                           : formatPrice(coupon.value, locale)}
                       </Td>
-                      <Td className="whitespace-nowrap font-mono" data-numeric>
+                      <Td className="whitespace-nowrap" data-numeric>
                         {coupon.minSubtotal
                           ? formatPrice(coupon.minSubtotal, locale)
                           : "—"}
                       </Td>
-                      <Td className="whitespace-nowrap font-mono" data-numeric>
+                      <Td className="whitespace-nowrap" data-numeric>
                         {formatNumber(coupon.usedCount, locale)}
                         {coupon.usageLimit === null
                           ? ` / ${t.unlimited}`
@@ -116,7 +116,7 @@ export default async function AdminCouponsPage({ params }: AdminCouponsPageProps
                       <Td>
                         <span
                           className={cn(
-                            "label-mono inline-flex border px-2 py-1",
+                            "inline-flex rounded-full border px-2.5 py-0.5 text-label-md font-semibold",
                             live
                               ? "border-line bg-success text-on-success"
                               : "border-line bg-surface-low text-on-surface-variant",

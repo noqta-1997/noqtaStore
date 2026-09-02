@@ -46,7 +46,7 @@ export function TableToolbar({
               href={tab.href}
               aria-current={tab.active ? "page" : undefined}
               className={cn(
-                "inline-flex items-center gap-2 rounded-md border px-3 py-1.5",
+                "inline-flex items-center gap-2 rounded-full border px-4 py-1.5",
                 "text-body-md transition-colors duration-100 ease-fluent",
                 tab.active
                   ? "border-accent-stroke bg-state-selected font-semibold text-on-surface"
@@ -57,7 +57,7 @@ export function TableToolbar({
               {typeof tab.count === "number" ? (
                 <span
                   className={cn(
-                    "rounded-sm px-1.5 font-mono text-label-sm",
+                    "rounded-full px-2 text-label-md",
                     tab.active ? "bg-primary-container text-on-primary-container" : "bg-surface-low text-muted",
                   )}
                   data-numeric
@@ -80,8 +80,8 @@ export function TableToolbar({
         <label htmlFor="table-search" className="sr-only">
           {searchLabel}
         </label>
-        <div className="flex h-10 min-w-0 items-center rounded-md border border-line bg-card ps-3">
-          <Search aria-hidden className="size-4 shrink-0 text-muted" strokeWidth={2} />
+        <div className="flex h-10 min-w-0 items-center rounded-full border border-line bg-card ps-4">
+          <Search aria-hidden className="size-4 shrink-0 text-muted" strokeWidth={1.75} />
           <input
             id="table-search"
             name="q"
@@ -91,7 +91,7 @@ export function TableToolbar({
             className="h-full w-full min-w-0 bg-transparent px-2 text-sm text-on-surface placeholder:text-muted focus:outline-none sm:w-64"
           />
         </div>
-        <Button type="submit" variant="secondary" size="sm" className="h-10 shrink-0">
+        <Button type="submit" variant="secondary" size="sm" className="h-10 shrink-0 rounded-full">
           {searchLabel}
         </Button>
       </form>

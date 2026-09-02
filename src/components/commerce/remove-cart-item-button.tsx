@@ -51,7 +51,7 @@ export function RemoveCartItemButton({
       title={label}
       className="inline-flex size-10 shrink-0 items-center justify-center border border-transparent text-on-surface transition-colors hover:border-error hover:bg-error-container hover:text-on-error-container disabled:opacity-50"
     >
-      <Trash2 aria-hidden className="size-4" strokeWidth={2} />
+      <Trash2 aria-hidden className="size-4" strokeWidth={1.75} />
     </button>
   );
 }

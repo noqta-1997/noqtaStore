@@ -78,8 +78,8 @@ export default async function CartPage({ params, searchParams }: CartPageProps) 
         {lines.length ? (
           <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
             <div className="min-w-0 space-y-4 lg:col-span-8">
-              <div className="flex items-center gap-3 rounded-md border border-line bg-surface-low p-4">
-                <Truck aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={2} />
+              <div className="flex items-center gap-3 rounded-xl border border-line bg-surface-low p-4">
+                <Truck aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={1.75} />
                 <div className="min-w-0 flex-1 space-y-2">
                   <p className="text-label-md text-on-surface">
                     {qualifiesForFreeShipping
@@ -95,7 +95,7 @@ export default async function CartPage({ params, searchParams }: CartPageProps) 
                 </div>
               </div>
 
-              <ul className="divide-y divide-line-divider rounded-md border border-line bg-card">
+              <ul className="divide-y divide-line-divider rounded-xl border border-line bg-card">
                 {lines.map((line) => (
                   <CartLineRow
                     key={line.bookId}
@@ -110,7 +110,7 @@ export default async function CartPage({ params, searchParams }: CartPageProps) 
                 href={`/${locale}/books`}
                 className="inline-flex items-center gap-2 text-label-md text-on-surface underline-offset-4 hover:underline"
               >
-                <ArrowRight aria-hidden className="size-4 rotate-180 rtl:rotate-0" strokeWidth={2} />
+                <ArrowRight aria-hidden className="size-4 rotate-180 rtl:rotate-0" strokeWidth={1.75} />
                 {t.continueShopping}
               </Link>
             </div>

@@ -67,7 +67,7 @@ export function MobileNav({
         onClick={() => setIsOpen(true)}
         className="lg:hidden"
       >
-        <Menu aria-hidden className="size-5" strokeWidth={2} />
+        <Menu aria-hidden className="size-5" strokeWidth={1.75} />
       </IconButton>
 
       <Drawer
@@ -129,7 +129,7 @@ export function MobileNav({
                 }}
                 className="flex w-full items-center justify-center gap-2 rounded-md border border-line px-4 py-2 text-body-md font-semibold text-error transition-colors duration-100 ease-fluent hover:bg-error-container"
               >
-                <LogOut aria-hidden className="size-4 rtl:rotate-180" strokeWidth={2} />
+                <LogOut aria-hidden className="size-4 rtl:rotate-180" strokeWidth={1.75} />
                 {labels.logout}
               </button>
             </>

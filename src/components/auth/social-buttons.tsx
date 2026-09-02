@@ -46,9 +46,9 @@ export function SocialButtons({ locale, labels, className }: SocialButtonsProps)
       {error ? (
         <p
           role="alert"
-          className="flex items-start gap-2 border border-line bg-error-container px-4 py-3 text-body-md text-on-error-container"
+          className="flex items-start gap-2 rounded-xl border border-line bg-error-container px-4 py-3 text-body-md text-on-error-container"
         >
-          <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={2} />
+          <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={1.75} />
           {error}
         </p>
       ) : null}
@@ -57,11 +57,11 @@ export function SocialButtons({ locale, labels, className }: SocialButtonsProps)
         type="button"
         onClick={signIn}
         disabled={pending}
-        className="flex h-11 w-full items-center justify-center gap-3 rounded-md border border-line bg-card text-body-md font-medium text-on-surface transition-all hover:-translate-y-0.5 hover:elevation-sm disabled:opacity-60"
+        className="flex h-11 w-full items-center justify-center gap-3 rounded-md border border-line bg-card text-body-md font-medium text-on-surface transition-[box-shadow,border-color] duration-100 ease-fluent hover:border-line-hover hover:elevation-sm disabled:opacity-60"
       >
         <span
           aria-hidden
-          className="flex size-6 items-center justify-center rounded-md border border-line bg-surface-low font-display text-xs font-bold"
+          className="flex size-6 items-center justify-center rounded-full bg-surface-low font-display text-label-md font-bold"
         >
           G
         </span>
@@ -70,7 +70,7 @@ export function SocialButtons({ locale, labels, className }: SocialButtonsProps)
 
       <div className="flex items-center gap-3 pt-1">
         <span aria-hidden className="h-px flex-1 bg-outline-variant" />
-        <span className="label-mono text-muted">{labels.divider}</span>
+        <span className="text-label-md text-muted">{labels.divider}</span>
         <span aria-hidden className="h-px flex-1 bg-outline-variant" />
       </div>
     </div>

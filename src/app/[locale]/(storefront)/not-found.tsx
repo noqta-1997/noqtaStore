@@ -37,11 +37,11 @@ export default function StorefrontNotFound() {
 
   return (
     <Container className="py-16 lg:py-24">
-      <div className="mx-auto max-w-lg space-y-5 rounded-md border border-line bg-card p-8 text-center elevation-md">
+      <div className="mx-auto max-w-lg space-y-5 rounded-xl border border-line bg-card p-8 text-center elevation-md">
         <p className="label-mono text-primary">{t.code}</p>
         <p
           aria-hidden
-          className="font-mono text-7xl font-bold text-on-surface"
+          className="text-7xl font-bold text-on-surface"
           data-numeric
         >
           404
@@ -51,14 +51,14 @@ export default function StorefrontNotFound() {
 
         <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-center">
           <Link href={`/${locale}`} className={buttonStyles({ size: "lg" })}>
-            <Home aria-hidden className="size-4" strokeWidth={2} />
+            <Home aria-hidden className="size-4" strokeWidth={1.75} />
             {t.home}
           </Link>
           <Link
             href={`/${locale}/search`}
             className={buttonStyles({ variant: "secondary", size: "lg" })}
           >
-            <Search aria-hidden className="size-4" strokeWidth={2} />
+            <Search aria-hidden className="size-4" strokeWidth={1.75} />
             {t.search}
           </Link>
         </div>

@@ -70,9 +70,9 @@ export function MessageActions({
         onClick={toggle}
       >
         {status === "read" ? (
-          <Undo2 aria-hidden className="size-4" strokeWidth={2} />
+          <Undo2 aria-hidden className="size-4" strokeWidth={1.75} />
         ) : (
-          <MailOpen aria-hidden className="size-4" strokeWidth={2} />
+          <MailOpen aria-hidden className="size-4" strokeWidth={1.75} />
         )}
       </Button>
 

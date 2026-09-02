@@ -79,13 +79,13 @@ export function WishlistButton({
       aria-pressed={saved}
       title={label}
       className={cn(
-        "inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-card",
+        "inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-line bg-card",
         "text-on-surface transition-colors hover:bg-primary-container hover:text-on-primary-container",
         saved && "bg-primary-container text-on-primary-container",
         className,
       )}
     >
-      <Heart aria-hidden className={cn("size-4", saved && "fill-current")} strokeWidth={2} />
+      <Heart aria-hidden className={cn("size-4", saved && "fill-current")} strokeWidth={1.75} />
     </button>
   );
 }

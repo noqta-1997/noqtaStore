@@ -29,5 +29,5 @@ interface CategoryIconProps {
 
 export function CategoryIcon({ name, className }: CategoryIconProps) {
   const Icon = icons[name] ?? BookOpen;
-  return <Icon aria-hidden className={className} strokeWidth={2} />;
+  return <Icon aria-hidden className={className} strokeWidth={1.75} />;
 }

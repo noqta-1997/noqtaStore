@@ -90,7 +90,7 @@ export function BookCatalogue({
       </aside>
 
       <div className="space-y-6 lg:col-span-9">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-line bg-card px-4 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-card px-4 py-3">
           <p className="text-label-md text-muted">
             <span className="font-semibold text-on-surface" data-numeric>
               {formatNumber(result.total, locale)}

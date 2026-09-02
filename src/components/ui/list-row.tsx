@@ -47,7 +47,7 @@ export function List({ as: Tag = "ul", className, children }: ListProps) {
   return (
     <Tag
       className={cn(
-        "divide-y divide-line-divider overflow-hidden rounded-md border border-line bg-card",
+        "divide-y divide-line-divider overflow-hidden rounded-xl border border-line bg-card",
         className,
       )}
     >

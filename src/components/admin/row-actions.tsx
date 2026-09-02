@@ -30,18 +30,18 @@ export function RowActions({
   itemName,
 }: RowActionsProps) {
   const iconLink =
-    "inline-flex size-9 shrink-0 items-center justify-center border border-transparent text-on-surface transition-colors hover:border-line hover:bg-state-hover";
+    "inline-flex size-9 shrink-0 items-center justify-center rounded-md text-on-surface transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-primary";
 
   return (
     <div className="flex items-center justify-end gap-1">
       {viewHref ? (
         <Link href={viewHref} aria-label={labels.view} title={labels.view} className={iconLink}>
-          <Eye aria-hidden className="size-4" strokeWidth={2} />
+          <Eye aria-hidden className="size-4" strokeWidth={1.75} />
         </Link>
       ) : null}
       {editHref ? (
         <Link href={editHref} aria-label={labels.edit} title={labels.edit} className={iconLink}>
-          <Pencil aria-hidden className="size-4" strokeWidth={2} />
+          <Pencil aria-hidden className="size-4" strokeWidth={1.75} />
         </Link>
       ) : null}
       {confirm ? (

@@ -6,22 +6,25 @@ export function Skeleton({ className }: { className?: string }) {
   return (
     <div
       aria-hidden
-      className={cn("animate-pulse bg-surface-low", className)}
+      className={cn("animate-pulse rounded-md bg-surface-low", className)}
     />
   );
 }
 
 function CardSkeleton() {
   return (
-    <div className="flex flex-col rounded-md border border-line bg-card">
-      <Skeleton className="aspect-[2/3] w-full border-b border-line" />
-      <div className="space-y-2 p-3 sm:p-4">
+    <div className="flex flex-col rounded-xl border border-line-divider bg-card p-3">
+      {/* Mirrors the card: the jacket sits on its own tinted plate. */}
+      <div className="rounded-lg bg-surface-low p-3 sm:p-4">
+        <Skeleton className="aspect-[2/3] w-full" />
+      </div>
+      <div className="space-y-2 pt-3">
         <Skeleton className="h-3 w-16" />
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-2/3" />
-        <div className="flex items-center justify-between gap-2 border-t border-outline-variant pt-3">
+        <div className="flex items-center justify-between gap-2 pt-2">
           <Skeleton className="h-5 w-20" />
-          <Skeleton className="size-10" />
+          <Skeleton className="size-9 rounded-full" />
         </div>
       </div>
     </div>
@@ -42,11 +45,11 @@ export function CatalogueSkeleton({ count = 8 }: { count?: number }) {
 
       <Container className="grid gap-6 py-8 lg:grid-cols-12 lg:gap-8 lg:py-12">
         <div className="hidden lg:col-span-3 lg:block">
-          <Skeleton className="h-[28rem] w-full border border-line" />
+          <Skeleton className="h-[28rem] w-full rounded-xl" />
         </div>
 
         <div className="space-y-6 lg:col-span-9">
-          <Skeleton className="h-14 w-full border border-line" />
+          <Skeleton className="h-14 w-full rounded-xl" />
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: count }, (_, index) => (
               <CardSkeleton key={index} />
@@ -64,7 +67,7 @@ export function PanelListSkeleton({ rows = 3 }: { rows?: number }) {
     <div className="space-y-4">
       <Skeleton className="h-7 w-48" />
       {Array.from({ length: rows }, (_, index) => (
-        <div key={index} className="space-y-3 rounded-md border border-line bg-card p-5">
+        <div key={index} className="space-y-3 rounded-xl border border-line bg-card p-5">
           <Skeleton className="h-4 w-1/3" />
           <Skeleton className="h-4 w-2/3" />
           <Skeleton className="h-4 w-1/2" />
@@ -89,7 +92,7 @@ export function AdminSkeleton() {
         ))}
       </div>
 
-      <div className="rounded-md border border-line bg-card">
+      <div className="rounded-xl border border-line bg-card">
         <Skeleton className="h-12 w-full border-b border-line" />
         <div className="divide-y divide-line-divider">
           {Array.from({ length: 6 }, (_, index) => (

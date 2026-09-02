@@ -85,9 +85,9 @@ export default async function OrderSuccessPage({
   return (
     <Container className="py-12 lg:py-20">
       <div className="mx-auto max-w-2xl space-y-8">
-        <div className="space-y-4 rounded-md border border-line bg-card p-8 text-center elevation-md">
-          <span className="mx-auto flex size-16 items-center justify-center border border-line bg-success text-on-success">
-            <CheckCircle2 aria-hidden className="size-8" strokeWidth={2} />
+        <div className="space-y-4 rounded-xl border border-line bg-card p-8 text-center elevation-md">
+          <span className="mx-auto flex size-16 items-center justify-center rounded-full bg-success text-on-success">
+            <CheckCircle2 aria-hidden className="size-8" strokeWidth={1.75} />
           </span>
           <h1 className="text-headline-lg">{t.title}</h1>
           <p className="mx-auto max-w-md text-body-md text-on-surface-variant">
@@ -124,7 +124,7 @@ export default async function OrderSuccessPage({
           </div>
         </div>
 
-        <section className="rounded-md border border-line bg-card">
+        <section className="rounded-xl border border-line bg-card">
           <h2 className="border-b border-line px-5 py-4 text-headline-md">
             {t.nextSteps}
           </h2>
@@ -132,12 +132,12 @@ export default async function OrderSuccessPage({
             {steps.map((step, index) => (
               <li key={step.text} className="flex items-center gap-4 p-5">
                 <span
-                  className="flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low font-mono text-label-md"
+                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-label-md font-semibold text-primary"
                   data-numeric
                 >
                   {index + 1}
                 </span>
-                <step.icon aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={2} />
+                <step.icon aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={1.75} />
                 <p className="text-body-md text-on-surface">{step.text}</p>
               </li>
             ))}

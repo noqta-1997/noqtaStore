@@ -61,7 +61,7 @@ export function ReviewModeration({
         title={labels.approve}
         onClick={() => moderate("published")}
       >
-        <Check aria-hidden className="size-4" strokeWidth={2} />
+        <Check aria-hidden className="size-4" strokeWidth={1.75} />
       </Button>
       <Button
         variant="secondary"
@@ -72,7 +72,7 @@ export function ReviewModeration({
         title={labels.reject}
         onClick={() => moderate("rejected")}
       >
-        <X aria-hidden className="size-4" strokeWidth={2} />
+        <X aria-hidden className="size-4" strokeWidth={1.75} />
       </Button>
     </div>
   );

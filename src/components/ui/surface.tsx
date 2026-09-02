@@ -14,7 +14,7 @@ export type SurfaceAppearance = "filled" | "filled-alternative" | "outline" | "s
 export type SurfacePadding = "none" | "sm" | "md" | "lg";
 
 const appearances: Record<SurfaceAppearance, string> = {
-  filled: "border-transparent bg-card shadow-[var(--shadow4)]",
+  filled: "border-transparent bg-card elevation-sm",
   "filled-alternative": "border-line bg-surface-low",
   outline: "border-line bg-card",
   subtle: "border-transparent bg-transparent",
@@ -48,12 +48,12 @@ export function Surface({
   return (
     <Tag
       className={cn(
-        "min-w-0 rounded-md border",
+        "min-w-0 rounded-xl border",
         appearances[appearance],
         paddings[padding],
         interactive &&
           "transition-shadow duration-100 ease-fluent " +
-            "hover:shadow-[var(--shadow8)] focus-within:shadow-[var(--shadow8)]",
+            "hover:elevation-md focus-within:elevation-md",
         className,
       )}
     >

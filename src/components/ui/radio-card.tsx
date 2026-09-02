@@ -24,7 +24,7 @@ export function RadioCard({
     <label
       htmlFor={id}
       className={cn(
-        "flex cursor-pointer items-center gap-3 rounded-md border border-line bg-card p-3",
+        "flex cursor-pointer items-center gap-3 rounded-xl border border-line bg-card p-4",
         "transition-colors duration-100 ease-fluent hover:bg-card-hover",
         "has-checked:border-accent-stroke has-checked:bg-state-selected",
         disabled && "cursor-not-allowed opacity-55",
@@ -45,7 +45,7 @@ export function RadioCard({
         {...props}
       />
       {icon ? (
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-surface-low text-primary">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-primary">
           {icon}
         </span>
       ) : null}

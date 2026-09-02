@@ -72,7 +72,7 @@ export function QuantityStepper({
         onClick={() => change(Math.max(min, value - 1))}
         className={button}
       >
-        <Minus aria-hidden className="size-4" strokeWidth={2} />
+        <Minus aria-hidden className="size-4" strokeWidth={1.75} />
       </button>
       <input
         type="text"
@@ -90,7 +90,7 @@ export function QuantityStepper({
         onClick={() => change(Math.min(max, value + 1))}
         className={button}
       >
-        <Plus aria-hidden className="size-4" strokeWidth={2} />
+        <Plus aria-hidden className="size-4" strokeWidth={1.75} />
       </button>
     </div>
   );

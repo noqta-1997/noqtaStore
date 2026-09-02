@@ -15,18 +15,18 @@ export function PasswordInput({ labels, ...props }: PasswordInputProps) {
 
   return (
     <div className="relative">
-      <Input type={visible ? "text" : "password"} className="pe-12" {...props} />
+      <Input type={visible ? "text" : "password"} className="pe-11" {...props} />
       <button
         type="button"
         onClick={() => setVisible((current) => !current)}
         aria-label={visible ? labels.hide : labels.show}
         title={visible ? labels.hide : labels.show}
-        className="absolute end-0 top-0 flex h-11 w-11 items-center justify-center text-on-surface-variant hover:text-on-surface"
+        className="absolute inset-y-0 end-0 flex w-11 items-center justify-center rounded-e-md text-on-surface-variant transition-colors hover:text-primary"
       >
         {visible ? (
-          <EyeOff aria-hidden className="size-4" strokeWidth={2} />
+          <EyeOff aria-hidden className="size-4" strokeWidth={1.75} />
         ) : (
-          <Eye aria-hidden className="size-4" strokeWidth={2} />
+          <Eye aria-hidden className="size-4" strokeWidth={1.75} />
         )}
       </button>
     </div>

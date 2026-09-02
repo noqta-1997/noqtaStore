@@ -153,7 +153,7 @@ export default async function AdminOrdersPage({
                     <Td>
                       <Link
                         href={`${base}/${order.id}`}
-                        className="font-mono font-semibold text-on-surface underline-offset-4 hover:underline"
+                        className="font-semibold text-on-surface underline-offset-4 hover:underline"
                         data-numeric
                       >
                         {order.reference}
@@ -164,7 +164,7 @@ export default async function AdminOrdersPage({
                         {order.customer?.name}
                       </span>
                       <span
-                        className="block font-mono text-label-sm text-muted"
+                        className="block text-label-md text-muted"
                         dir="ltr"
                         data-numeric
                       >
@@ -174,7 +174,7 @@ export default async function AdminOrdersPage({
                     <Td className="whitespace-nowrap text-on-surface-variant" data-numeric>
                       {formatDate(order.createdAt, locale)}
                     </Td>
-                    <Td className="font-mono" data-numeric>
+                    <Td data-numeric>
                       {formatNumber(itemsCount, locale)}
                     </Td>
                     <Td className="text-on-surface-variant">
@@ -184,7 +184,7 @@ export default async function AdminOrdersPage({
                           ? dictionary.checkout.paymentOptions.walletTitle
                           : dictionary.checkout.paymentOptions.cardTitle}
                     </Td>
-                    <Td className="font-mono whitespace-nowrap font-semibold" data-numeric>
+                    <Td className="whitespace-nowrap font-semibold" data-numeric>
                       {formatPrice(order.total, locale)}
                     </Td>
                     <Td>

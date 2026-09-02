@@ -107,7 +107,7 @@ export default async function PublisherPage({
             <span
               aria-hidden
               className={cn(
-                "flex size-20 shrink-0 items-center justify-center border border-line elevation-md",
+                "flex size-20 shrink-0 items-center justify-center rounded-full elevation-md",
                 publisherTone(publisher.slug),
               )}
             >
@@ -115,7 +115,7 @@ export default async function PublisherPage({
             </span>
 
             <div className="space-y-3">
-              <h1 className="text-headline-lg sm:text-[2.5rem] sm:leading-tight">
+              <h1 className="text-headline-lg sm:text-headline-xl">
                 {publisher.name[locale]}
               </h1>
 

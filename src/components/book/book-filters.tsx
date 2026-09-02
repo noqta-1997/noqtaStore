@@ -75,7 +75,7 @@ export function BookFilters({
     <form
       action={action}
       method="get"
-      className={cn("space-y-5 rounded-md border border-line bg-card p-5", className)}
+      className={cn("space-y-5 rounded-xl border border-line bg-card p-5", className)}
     >
       {values.q ? <input type="hidden" name="q" value={values.q} /> : null}
       {values.sort ? <input type="hidden" name="sort" value={values.sort} /> : null}
@@ -117,7 +117,7 @@ export function BookFilters({
       <Group title={t.priceRange}>
         <div className="flex items-end gap-3">
           <label className="flex-1 space-y-1.5">
-            <span className="block text-label-sm text-muted">{t.minPrice}</span>
+            <span className="block text-label-md text-muted">{t.minPrice}</span>
             <Input
               type="number"
               name="minPrice"
@@ -127,11 +127,11 @@ export function BookFilters({
               step={1000}
               defaultValue={values.minPrice ?? ""}
               placeholder={formatNumber(bounds.min, locale)}
-              className="font-mono"
+              data-numeric
             />
           </label>
           <label className="flex-1 space-y-1.5">
-            <span className="block text-label-sm text-muted">{t.maxPrice}</span>
+            <span className="block text-label-md text-muted">{t.maxPrice}</span>
             <Input
               type="number"
               name="maxPrice"
@@ -141,7 +141,7 @@ export function BookFilters({
               step={1000}
               defaultValue={values.maxPrice ?? ""}
               placeholder={formatNumber(bounds.max, locale)}
-              className="font-mono"
+              data-numeric
             />
           </label>
         </div>
@@ -159,19 +159,19 @@ export function BookFilters({
                 name="rating"
                 value={value}
                 defaultChecked={values.rating === value}
-                className="size-4.5 shrink-0 appearance-none rounded-full rounded-md border border-line bg-card checked:bg-primary-container checked:shadow-[inset_0_0_0_3px_var(--card)]"
+                className="size-4.5 shrink-0 appearance-none rounded-full border border-line-strong bg-card checked:border-primary-container checked:bg-primary-container checked:shadow-[inset_0_0_0_3px_var(--card)]"
               />
               <span className="flex items-center gap-1">
                 {Array.from({ length: value }, (_, index) => (
                   <Star
                     key={index}
                     aria-hidden
-                    className="size-3.5 fill-primary-container text-line"
-                    strokeWidth={2}
+                    className="size-3.5 fill-gold text-gold"
+                    strokeWidth={0}
                   />
                 ))}
               </span>
-              <span className="text-label-sm text-muted">{t.ratingAndUp}</span>
+              <span className="text-label-md text-muted">{t.ratingAndUp}</span>
             </label>
           ))}
         </div>

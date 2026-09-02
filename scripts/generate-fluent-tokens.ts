@@ -18,13 +18,30 @@ import path from "node:path";
 import { createDarkTheme, createLightTheme } from "@fluentui/react-theme";
 
 import { noqtaBrand } from "../src/theme/noqta-brand";
+import {
+  noqtaPaperDark,
+  noqtaPaperLight,
+  withPaper,
+} from "../src/theme/noqta-paper";
 
 const OUT = path.join(process.cwd(), "src", "styles", "fluent-tokens.css");
 
 type Theme = Record<string, string | number>;
 
-const light = createLightTheme(noqtaBrand) as unknown as Theme;
-const dark = createDarkTheme(noqtaBrand) as unknown as Theme;
+/*
+ * The brand ramp is a parameter of Fluent's theme builders; the neutral ramp
+ * is not — it is baked into them as grey. So the paper neutrals are folded in
+ * afterwards, by the same function `FluentShell` calls on the runtime theme.
+ * That is what keeps a dialog the same colour as the page behind it.
+ */
+const light = withPaper(
+  createLightTheme(noqtaBrand) as unknown as Theme,
+  noqtaPaperLight,
+);
+const dark = withPaper(
+  createDarkTheme(noqtaBrand) as unknown as Theme,
+  noqtaPaperDark,
+);
 
 /** Fluent's own provider emits `--colorNeutralBackground1`; match it exactly. */
 const declaration = (name: string, value: string | number) =>
@@ -47,6 +64,7 @@ const css = `/*
  * GENERATED — do not edit.
  *
  * Source: @fluentui/react-theme + src/theme/noqta-brand.ts
+ *         + src/theme/noqta-paper.ts (the warm neutral ramp)
  * Rebuild: npm run tokens
  * Verify:  npm run tokens:check
  *

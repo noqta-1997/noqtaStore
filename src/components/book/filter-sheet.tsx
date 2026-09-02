@@ -18,7 +18,7 @@ export function FilterSheet({ labels, children }: FilterSheetProps) {
   return (
     <div className="lg:hidden">
       <Button variant="secondary" size="lg" onClick={() => setIsOpen(true)} fullWidth>
-        <SlidersHorizontal aria-hidden className="size-4" strokeWidth={2} />
+        <SlidersHorizontal aria-hidden className="size-4" strokeWidth={1.75} />
         {labels.open}
       </Button>
 

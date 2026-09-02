@@ -49,9 +49,9 @@ export function ForgotPasswordForm({ locale, t }: ForgotPasswordFormProps) {
 
   if (sent) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-md border border-line bg-surface-low p-6 text-center">
-        <span className="flex size-12 items-center justify-center border border-line bg-success text-on-success">
-          <MailCheck aria-hidden className="size-5" strokeWidth={2} />
+      <div className="flex flex-col items-center gap-3 rounded-xl border border-line bg-surface-low p-6 text-center">
+        <span className="flex size-12 items-center justify-center rounded-full bg-success text-on-success">
+          <MailCheck aria-hidden className="size-5" strokeWidth={1.75} />
         </span>
         <p className="text-body-md text-on-surface">{t.linkSent}</p>
         <p className="text-label-sm text-muted">{t.forgotHint}</p>
@@ -66,7 +66,7 @@ export function ForgotPasswordForm({ locale, t }: ForgotPasswordFormProps) {
           role="alert"
           className="flex items-start gap-2 border border-line bg-error-container px-4 py-3 text-body-md text-on-error-container"
         >
-          <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={2} />
+          <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={1.75} />
           {error}
         </p>
       ) : null}
@@ -75,6 +75,7 @@ export function ForgotPasswordForm({ locale, t }: ForgotPasswordFormProps) {
         <Input
           id="email"
           name="email"
+          size="lg"
           type="email"
           dir="ltr"
           autoComplete="email"

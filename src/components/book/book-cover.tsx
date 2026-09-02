@@ -53,7 +53,7 @@ export function BookCover({
   return (
     <div
       className={cn(
-        "relative aspect-[2/3] w-full overflow-hidden bg-surface-low",
+        "relative aspect-[2/3] w-full overflow-hidden rounded-md bg-surface-low",
         className,
       )}
     >
@@ -90,7 +90,7 @@ export function BookCover({
             the only accessibility violation left in the whole suite.
           */}
           <p
-            className="ms-3 border-t pt-2 font-mono text-[0.625rem]"
+            className="ms-3 border-t pt-2 text-[0.625rem] font-medium"
             style={{ borderColor: palette.foreground }}
           >
             {author}

@@ -7,6 +7,10 @@ interface FeaturesStripProps {
   dictionary: Dictionary["home"]["features"];
 }
 
+/**
+ * The reference's services row: four promises, each an icon in a soft round
+ * plate with two lines beside it, separated by space rather than by rules.
+ */
 export function FeaturesStrip({ dictionary }: FeaturesStripProps) {
   const features = [
     { icon: Truck, ...dictionary.shipping },
@@ -16,21 +20,17 @@ export function FeaturesStrip({ dictionary }: FeaturesStripProps) {
   ];
 
   return (
-    <section className="border-b border-line-divider bg-card">
+    <section className="border-y border-line-divider bg-card py-10">
       <Container>
-        {/* gap-px over a stroke-coloured background draws the hairlines */}
-        <div className="grid grid-cols-1 gap-px bg-outline-variant sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           {features.map(({ icon: Icon, title, description }) => (
-            <div
-              key={title}
-              className="flex items-center gap-3 bg-card py-5 sm:px-5"
-            >
-              <span className="flex size-11 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low">
-                <Icon aria-hidden className="size-5 text-primary" strokeWidth={2} />
+            <div key={title} className="flex items-center gap-4">
+              <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary-fixed">
+                <Icon aria-hidden className="size-5 text-primary" strokeWidth={1.75} />
               </span>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-on-surface">{title}</p>
-                <p className="truncate text-sm text-muted">{description}</p>
+                <p className="text-body-md font-semibold text-on-surface">{title}</p>
+                <p className="truncate text-body-md text-muted">{description}</p>
               </div>
             </div>
           ))}

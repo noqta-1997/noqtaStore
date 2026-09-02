@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 import { CategoryIcon } from "@/components/ui/category-icon";
@@ -15,6 +15,12 @@ interface CategoryTilesProps {
   categories: Category[];
 }
 
+/**
+ * The reference reduces its category row to chips: a round icon, a name, a
+ * chevron. This keeps that shape but lets the tile grow a second line, so the
+ * description and the title count that were already here stay on the page
+ * instead of being dropped to match a picture.
+ */
 export function CategoryTiles({
   locale,
   dictionary,
@@ -23,7 +29,7 @@ export function CategoryTiles({
   const section = dictionary.home.categories;
 
   return (
-    <section className="border-y-2 border-line bg-surface-low py-12 lg:py-16">
+    <section className="bg-surface-low py-14 lg:py-20">
       <Container>
         <SectionHeader
           title={section.title}
@@ -32,35 +38,34 @@ export function CategoryTiles({
           actionHref={`/${locale}/categories`}
         />
 
-        <ul className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {categories.map((category) => (
             <li key={category.id}>
               <Link
                 href={`/${locale}/categories/${category.slug}`}
-                className="group flex h-full flex-col gap-3 rounded-md border border-line bg-card p-4 transition-[box-shadow,background-color] duration-100 ease-fluent hover:bg-card-hover hover:elevation-md focus-within:elevation-md"
+                className="group flex h-full items-start gap-3 rounded-xl border border-line bg-card p-4 transition-[box-shadow,border-color] duration-100 ease-fluent hover:border-line-hover hover:elevation-md focus-within:elevation-md"
               >
-                <span className="flex size-11 items-center justify-center rounded-md border border-line bg-surface-low transition-colors group-hover:bg-primary-container group-hover:text-on-primary-container">
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-primary transition-colors duration-100 ease-fluent group-hover:bg-primary-container group-hover:text-on-primary-container">
                   <CategoryIcon name={category.icon} className="size-5" />
                 </span>
 
-                <span className="font-display text-base font-bold text-on-surface">
-                  {category.name[locale]}
-                </span>
-
-                <span className="line-clamp-2 text-sm leading-relaxed text-muted">
-                  {category.description[locale]}
-                </span>
-
-                <span className="mt-auto flex items-center justify-between gap-2 border-t border-line-divider pt-3">
-                  <span className="font-mono text-xs text-muted" data-numeric>
+                <span className="flex min-w-0 flex-col gap-1">
+                  <span className="text-body-lg font-bold text-on-surface">
+                    {category.name[locale]}
+                  </span>
+                  <span className="line-clamp-2 text-body-md leading-relaxed text-muted">
+                    {category.description[locale]}
+                  </span>
+                  <span className="text-label-md text-muted" data-numeric>
                     {formatNumber(category.booksCount, locale)} {section.count}
                   </span>
-                  <ArrowRight
-                    aria-hidden
-                    className="size-4 text-on-surface transition-transform duration-100 ease-fluent group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
-                    strokeWidth={2}
-                  />
                 </span>
+
+                <ChevronRight
+                  aria-hidden
+                  className="ms-auto size-4 shrink-0 text-muted transition-transform duration-100 ease-fluent group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+                  strokeWidth={1.75}
+                />
               </Link>
             </li>
           ))}

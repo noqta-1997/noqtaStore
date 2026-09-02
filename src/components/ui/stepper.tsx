@@ -22,7 +22,7 @@ export function Stepper({ steps, current, className }: StepperProps) {
             <span className="flex items-center gap-2">
               <span
                 className={cn(
-                  "flex size-8 shrink-0 items-center justify-center border border-line font-mono text-label-md font-semibold",
+                  "flex size-9 shrink-0 items-center justify-center rounded-full border border-line text-label-md font-semibold",
                   done && "bg-success text-on-success",
                   active && "bg-primary-container text-on-primary-container",
                   !done && !active && "bg-card text-muted",

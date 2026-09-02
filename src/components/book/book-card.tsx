@@ -22,6 +22,15 @@ interface BookCardProps {
   className?: string;
 }
 
+/**
+ * The reference's shelf card: the jacket sits on its own tinted plate, and
+ * everything below it is one column of running text — title and price on the
+ * first line, author and the two controls on the last.
+ *
+ * Nothing was removed to get there. The discount and tag badges, the
+ * out-of-stock and low-stock notes, the wishlist heart and the cart button
+ * are all still here; they are just placed the way the reference places them.
+ */
 export function BookCard({
   book,
   locale,
@@ -37,18 +46,20 @@ export function BookCard({
   return (
     <article
       className={cn(
-        "group relative flex h-full flex-col rounded-md border border-line bg-card",
-        "transition-[box-shadow,background-color] duration-100 ease-fluent hover:bg-card-hover hover:elevation-md focus-within:elevation-md",
+        "group relative flex h-full flex-col rounded-xl border border-line-divider bg-card p-3",
+        "transition-[box-shadow,border-color] duration-100 ease-fluent",
+        "hover:border-line-hover hover:elevation-md focus-within:border-line-hover focus-within:elevation-md",
         className,
       )}
     >
-      <div className="relative border-b border-line">
+      <div className="relative mb-3 rounded-lg bg-surface-low p-3 sm:p-4">
         <BookCover
           title={book.title[locale]}
           author={book.author.name[locale]}
           seed={book.slug}
           src={book.coverUrl}
           priority={priority}
+          className="elevation-sm transition-transform duration-100 ease-fluent group-hover:-translate-y-1"
         />
 
         <div className="absolute start-2 top-2 flex flex-col items-start gap-1.5">
@@ -59,7 +70,7 @@ export function BookCard({
             </Badge>
           ) : null}
           {primaryTag ? (
-            <Badge tone="ink">{dictionary.tags[primaryTag]}</Badge>
+            <Badge tone="gold">{dictionary.tags[primaryTag]}</Badge>
           ) : null}
           {isSoldOut ? <Badge tone="muted">{dictionary.outOfStock}</Badge> : null}
         </div>
@@ -76,41 +87,35 @@ export function BookCard({
         />
       </div>
 
-      <div className="flex flex-1 flex-col gap-1.5 p-3 sm:p-4">
-        <span className="label-mono text-muted">
-          {book.category.name[locale]}
-        </span>
+      <span className="text-label-md text-muted">{book.category.name[locale]}</span>
 
-        <h3 className="font-display text-base leading-snug font-bold text-balance">
+      <div className="mt-1 flex items-start justify-between gap-2">
+        <h3 className="text-body-lg leading-snug font-bold text-balance">
           <Link href={href} className="after:absolute after:inset-0 after:content-['']">
             <span className="line-clamp-2">{book.title[locale]}</span>
           </Link>
         </h3>
 
-        <p className="truncate text-sm text-on-surface-variant">
+        <PriceTag
+          price={book.price}
+          compareAtPrice={book.compareAtPrice}
+          locale={locale}
+          size="sm"
+          className="shrink-0 flex-col items-end gap-0"
+        />
+      </div>
+
+      {isLowStock ? (
+        <p className="mt-1 text-label-md text-warning">{dictionary.lowStock}</p>
+      ) : null}
+
+      <div className="mt-auto flex items-center justify-between gap-2 pt-3">
+        <p className="min-w-0 truncate text-body-md text-muted">
           {dictionary.by} {book.author.name[locale]}
         </p>
 
-        <Rating
-          value={book.rating}
-          count={book.reviewsCount}
-          locale={locale}
-          className="mt-0.5"
-        />
-
-        <div className="mt-auto flex items-end justify-between gap-2 border-t border-line-divider pt-3">
-          <div className="min-w-0">
-            <PriceTag
-              price={book.price}
-              compareAtPrice={book.compareAtPrice}
-              locale={locale}
-            />
-            {isLowStock ? (
-              <p className="mt-0.5 font-mono text-[0.625rem] text-warning">
-                {dictionary.lowStock}
-              </p>
-            ) : null}
-          </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <Rating value={book.rating} locale={locale} compact />
 
           <AddToCartButton
             bookId={book.id}
@@ -124,7 +129,7 @@ export function BookCard({
             signInMessage={dictionary.toast.signInRequired}
             outOfStockMessage={dictionary.outOfStock}
             failureMessage={dictionary.toast.actionFailed}
-            className="relative z-10 size-10 shrink-0"
+            className="relative z-10 size-9 rounded-full px-0"
           />
         </div>
       </div>

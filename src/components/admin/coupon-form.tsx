@@ -39,7 +39,7 @@ export function CouponForm({ admin, dictionary, coupon }: CouponFormProps) {
           dir="ltr"
           required
           maxLength={32}
-          className="font-mono uppercase"
+          className="uppercase"
           defaultValue={coupon?.code}
         />
       </Field>
@@ -63,7 +63,7 @@ export function CouponForm({ admin, dictionary, coupon }: CouponFormProps) {
           dir="ltr"
           min={1}
           required
-          className="font-mono"
+          data-numeric
           defaultValue={coupon?.value}
         />
       </Field>
@@ -76,7 +76,7 @@ export function CouponForm({ admin, dictionary, coupon }: CouponFormProps) {
           dir="ltr"
           min={0}
           step={1000}
-          className="font-mono"
+          data-numeric
           defaultValue={coupon?.minSubtotal ?? 0}
         />
       </Field>
@@ -93,7 +93,7 @@ export function CouponForm({ admin, dictionary, coupon }: CouponFormProps) {
           type="number"
           dir="ltr"
           min={1}
-          className="font-mono"
+          data-numeric
           defaultValue={coupon?.usageLimit ?? ""}
         />
       </Field>

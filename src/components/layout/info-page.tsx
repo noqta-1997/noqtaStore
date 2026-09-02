@@ -34,17 +34,17 @@ export function InfoPage({
 
       <Container className="py-8 lg:py-12">
         <div className="mx-auto max-w-3xl">
-          <ol className="divide-y divide-line-divider rounded-md border border-line bg-card">
+          <ol className="divide-y divide-line-divider rounded-xl border border-line bg-card">
             {sections.map((section, index) => (
               <li key={section.title} className="flex gap-4 p-5 sm:gap-6 sm:p-8">
                 <span
-                  className="flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low font-mono text-label-md"
+                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-label-md font-semibold text-primary"
                   data-numeric
                 >
                   {index + 1}
                 </span>
                 <div className="min-w-0 space-y-2">
-                  <h2 className="font-display text-lg font-bold">{section.title}</h2>
+                  <h2 className="text-body-lg font-bold">{section.title}</h2>
                   <p className="text-body-md leading-relaxed text-on-surface-variant">
                     {section.body}
                   </p>

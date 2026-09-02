@@ -130,7 +130,7 @@ export default async function AdminCustomersPage({
                     <div className="flex items-center gap-3">
                       <span
                         aria-hidden
-                        className="flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low font-display text-sm font-bold"
+                        className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-fixed font-display text-label-md font-bold text-primary"
                       >
                         {customer.name.slice(0, 1)}
                       </span>
@@ -144,13 +144,13 @@ export default async function AdminCustomersPage({
                   </Td>
                   <Td>
                     <span
-                      className="block max-w-48 truncate font-mono text-label-md text-on-surface-variant"
+                      className="block max-w-48 truncate text-label-md text-on-surface-variant"
                       dir="ltr"
                     >
                       {customer.email}
                     </span>
                     <span
-                      className="block font-mono text-label-sm text-muted"
+                      className="block text-label-md text-muted"
                       dir="ltr"
                       data-numeric
                     >
@@ -158,10 +158,10 @@ export default async function AdminCustomersPage({
                     </span>
                   </Td>
                   <Td className="text-on-surface-variant">{customer.city[locale]}</Td>
-                  <Td className="font-mono" data-numeric>
+                  <Td data-numeric>
                     {formatNumber(customer.ordersCount, locale)}
                   </Td>
-                  <Td className="font-mono whitespace-nowrap font-semibold" data-numeric>
+                  <Td className="whitespace-nowrap font-semibold" data-numeric>
                     {formatPrice(customer.totalSpent, locale)}
                   </Td>
                   <Td className="whitespace-nowrap text-on-surface-variant" data-numeric>
@@ -182,7 +182,7 @@ export default async function AdminCustomersPage({
                         title={admin.common.view}
                         className="inline-flex size-9 items-center justify-center border border-transparent text-on-surface transition-colors hover:border-line hover:bg-state-hover"
                       >
-                        <Eye aria-hidden className="size-4" strokeWidth={2} />
+                        <Eye aria-hidden className="size-4" strokeWidth={1.75} />
                       </Link>
                       <BlockCustomerButton
                         customerId={customer.id}

@@ -3,7 +3,7 @@
 import { useState, type InputHTMLAttributes } from "react";
 
 import { Field } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { Input, type InputSize } from "@/components/ui/input";
 import type { Dictionary } from "@/i18n/get-dictionary";
 
 export type ValidationMessages = Dictionary["common"]["validation"];
@@ -13,6 +13,8 @@ interface ValidatedFieldProps
   id: string;
   name: string;
   label: string;
+  /** Forwarded to the control, so a form can ask for a taller field. */
+  size?: InputSize;
   messages: ValidationMessages;
   hint?: string;
   optional?: string;
@@ -36,6 +38,7 @@ export function ValidatedField({
   hint,
   optional,
   matchWith,
+  size,
   className,
   ...props
 }: ValidatedFieldProps) {
@@ -79,6 +82,7 @@ export function ValidatedField({
       <Input
         id={id}
         name={name}
+        size={size}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : undefined}
         onBlur={(event) => setError(validate(event.target.value))}

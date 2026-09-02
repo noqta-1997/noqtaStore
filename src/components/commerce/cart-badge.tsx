@@ -42,7 +42,7 @@ export function CartBadge() {
 
   return (
     <span
-      className="absolute -end-2 -top-2 flex size-5 items-center justify-center border border-line bg-primary-container font-mono text-[0.625rem] font-semibold text-on-primary-container"
+      className="absolute -end-1 -top-1 flex size-5 items-center justify-center rounded-full border-2 border-surface bg-primary-container text-[0.625rem] font-semibold text-on-primary-container"
       data-numeric
     >
       {count > 99 ? "99+" : count}

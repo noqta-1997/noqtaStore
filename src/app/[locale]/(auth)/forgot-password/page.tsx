@@ -39,7 +39,7 @@ export default async function ForgotPasswordPage({ params }: ForgotPasswordPageP
         href={`/${locale}/login`}
         className="flex items-center justify-center gap-2 text-label-md text-on-surface underline-offset-4 hover:underline"
       >
-        <ArrowRight aria-hidden className="size-4 rotate-180 rtl:rotate-0" strokeWidth={2} />
+        <ArrowRight aria-hidden className="size-4 rotate-180 rtl:rotate-0" strokeWidth={1.75} />
         {t.backToLogin}
       </Link>
     </AuthShell>

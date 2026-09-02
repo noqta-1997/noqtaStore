@@ -93,7 +93,7 @@ export function BookForm({
                 id="slug"
                 name="slug"
                 dir="ltr"
-                className="font-mono"
+                data-numeric
                 defaultValue={book?.slug}
               />
             </Field>
@@ -174,7 +174,7 @@ export function BookForm({
                 name="publishedYear"
                 type="number"
                 dir="ltr"
-                className="font-mono"
+                data-numeric
                 defaultValue={book?.publishedYear}
               />
             </Field>
@@ -184,7 +184,7 @@ export function BookForm({
                 name="isbn"
                 dir="ltr"
                 inputMode="numeric"
-                className="font-mono"
+                data-numeric
                 defaultValue={book?.isbn}
               />
             </Field>
@@ -194,7 +194,7 @@ export function BookForm({
                 name="pages"
                 type="number"
                 dir="ltr"
-                className="font-mono"
+                data-numeric
                 defaultValue={book?.pages}
               />
             </Field>
@@ -214,7 +214,7 @@ export function BookForm({
                 name="weightGrams"
                 type="number"
                 dir="ltr"
-                className="font-mono"
+                data-numeric
                 defaultValue={book?.weightGrams}
               />
             </Field>
@@ -225,28 +225,28 @@ export function BookForm({
       <div className="space-y-4 lg:col-span-4">
         <Panel title={t.sections.media}>
           <div className="space-y-3">
-            <div className="mx-auto w-32">
+            <div className="mx-auto w-full max-w-40 rounded-xl bg-surface-low p-4">
               <BookCover
                 title={book?.title[locale] ?? admin.books.title}
                 author={book?.author.name[locale] ?? admin.brand.name}
                 seed={book?.slug ?? "new-book"}
                 src={book?.coverUrl}
                 sizes="8rem"
-                className="border border-line"
+                className="rounded-lg elevation-sm"
               />
             </div>
 
             <label
               htmlFor="coverImage"
-              className="flex cursor-pointer flex-col items-center gap-2 border border-dashed border-outline p-4 text-center transition-colors hover:bg-state-hover"
+              className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed border-outline p-5 text-center transition-colors duration-100 ease-fluent hover:border-line-hover hover:bg-state-hover"
             >
-              <ImagePlus aria-hidden className="size-5 text-primary" strokeWidth={2} />
+              <ImagePlus aria-hidden className="size-5 text-primary" strokeWidth={1.75} />
               <span className="text-label-md text-on-surface">{t.upload.button}</span>
-              <span className="text-label-sm text-muted">{t.upload.hint}</span>
+              <span className="text-label-md text-muted">{t.upload.hint}</span>
               <input id="coverImage" name="coverImage" type="file" accept="image/*" className="sr-only" />
             </label>
 
-            <p className="text-label-sm text-muted">{t.upload.placeholder}</p>
+            <p className="text-label-md text-muted">{t.upload.placeholder}</p>
           </div>
         </Panel>
 
@@ -259,7 +259,7 @@ export function BookForm({
                 type="number"
                 dir="ltr"
                 step={500}
-                className="font-mono"
+                data-numeric
                 defaultValue={book?.price}
                 required
               />
@@ -275,7 +275,7 @@ export function BookForm({
                 type="number"
                 dir="ltr"
                 step={500}
-                className="font-mono"
+                data-numeric
                 defaultValue={book?.compareAtPrice}
               />
             </Field>
@@ -290,7 +290,7 @@ export function BookForm({
               type="number"
               dir="ltr"
               min={0}
-              className="font-mono"
+              data-numeric
               defaultValue={book?.stock}
             />
           </Field>
@@ -312,7 +312,7 @@ export function BookForm({
         </Panel>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 rounded-md border border-line bg-card p-4 lg:col-span-12">
+      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-card p-4 lg:col-span-12">
         <Button type="submit" size="lg">
           {isEdit ? admin.common.saveChanges : t.actions.publish}
         </Button>

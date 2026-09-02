@@ -72,7 +72,7 @@ export default async function SettingsPage({ params, searchParams }: SettingsPag
             href={`${base}${entry === "store" ? "" : `?tab=${entry}`}`}
             aria-current={tab === entry ? "page" : undefined}
             className={cn(
-              "border border-line px-4 py-2.5 text-label-md transition-colors",
+              "rounded-full border border-line px-4 py-2 text-label-md transition-colors duration-100 ease-fluent",
               tab === entry
                 ? "bg-primary-container font-semibold text-on-primary-container"
                 : "bg-card text-on-surface-variant hover:bg-state-hover hover:text-on-surface",
@@ -134,7 +134,7 @@ export default async function SettingsPage({ params, searchParams }: SettingsPag
                 name="phone"
                 type="tel"
                 dir="ltr"
-                className="font-mono"
+                data-numeric
                 defaultValue={saved("phone", dictionary.footer.contact.phone)}
               />
             </Field>
@@ -188,7 +188,7 @@ export default async function SettingsPage({ params, searchParams }: SettingsPag
                 type="number"
                 dir="ltr"
                 step={500}
-                className="font-mono"
+                data-numeric
                 defaultValue={shippingRules.standardCost}
               />
             </Field>
@@ -199,7 +199,7 @@ export default async function SettingsPage({ params, searchParams }: SettingsPag
                 type="number"
                 dir="ltr"
                 step={500}
-                className="font-mono"
+                data-numeric
                 defaultValue={shippingRules.expressCost}
               />
             </Field>
@@ -210,7 +210,7 @@ export default async function SettingsPage({ params, searchParams }: SettingsPag
                 type="number"
                 dir="ltr"
                 step={1000}
-                className="font-mono"
+                data-numeric
                 defaultValue={shippingRules.freeThreshold}
               />
             </Field>
@@ -219,7 +219,7 @@ export default async function SettingsPage({ params, searchParams }: SettingsPag
                 id="estimatedDays"
                 name="estimatedDays"
                 dir="ltr"
-                className="font-mono"
+                data-numeric
                 defaultValue={shippingRules.estimatedDays}
               />
             </Field>
@@ -255,7 +255,7 @@ export default async function SettingsPage({ params, searchParams }: SettingsPag
               title={t.payments.cod}
               note={t.payments.codNote}
               trailing={
-                <span className="label-mono rounded-sm bg-success px-1.5 py-0.5 text-on-success">
+                <span className="inline-flex rounded-full bg-success px-2.5 py-0.5 text-label-md font-semibold text-on-success">
                   {admin.common.active}
                 </span>
               }
@@ -268,7 +268,7 @@ export default async function SettingsPage({ params, searchParams }: SettingsPag
               title={t.payments.wallet}
               note={t.payments.walletNote}
               trailing={
-                <span className="label-mono rounded-md border border-line bg-surface-low px-2 py-1 text-on-surface">
+                <span className="inline-flex rounded-full border border-line bg-surface-low px-2.5 py-0.5 text-label-md font-semibold text-on-surface">
                   {admin.common.active}
                 </span>
               }
@@ -281,7 +281,7 @@ export default async function SettingsPage({ params, searchParams }: SettingsPag
               title={t.payments.card}
               note={t.payments.cardNote}
               trailing={
-                <span className="label-mono border border-outline px-2 py-1 text-muted">
+                <span className="inline-flex rounded-full border border-outline px-2.5 py-0.5 text-label-md font-semibold text-muted">
                   {admin.common.inactive}
                 </span>
               }
@@ -325,7 +325,7 @@ export default async function SettingsPage({ params, searchParams }: SettingsPag
                   name="adminPhone"
                   type="tel"
                   dir="ltr"
-                  className="font-mono"
+                  data-numeric
                   defaultValue={saved("adminPhone", "+964 770 000 0000")}
                 />
               </Field>

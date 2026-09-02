@@ -65,7 +65,7 @@ export function CategoryForm({ admin, dictionary, category }: CategoryFormProps)
           id="slug"
           name="slug"
           dir="ltr"
-          className="font-mono"
+          data-numeric
           defaultValue={category?.slug}
         />
       </Field>

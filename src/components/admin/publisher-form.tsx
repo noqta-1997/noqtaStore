@@ -50,7 +50,7 @@ export function PublisherForm({ admin, dictionary, publisher }: PublisherFormPro
           id="slug"
           name="slug"
           dir="ltr"
-          className="font-mono"
+          data-numeric
           defaultValue={publisher?.slug}
         />
       </Field>
@@ -87,7 +87,7 @@ export function PublisherForm({ admin, dictionary, publisher }: PublisherFormPro
             dir="ltr"
             min={1400}
             max={new Date().getFullYear()}
-            className="font-mono"
+            data-numeric
             defaultValue={publisher?.foundedYear ?? ""}
           />
         </Field>

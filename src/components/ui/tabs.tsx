@@ -51,7 +51,7 @@ export function Tabs({ items, className }: TabsProps) {
           id={`${base}-panel-${item.id}`}
           aria-labelledby={`${base}-tab-${item.id}`}
           hidden={item.id !== active}
-          className="rounded-b-md border border-t-0 border-line bg-card p-4 sm:p-6"
+          className="rounded-b-xl border border-t-0 border-line bg-card p-4 sm:p-6"
         >
           {item.content}
         </div>

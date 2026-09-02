@@ -13,6 +13,11 @@ import { useMemo, useRef, useState, type ReactNode } from "react";
 
 import { useTheme } from "@/components/theme/use-theme";
 import { noqtaBrand } from "@/theme/noqta-brand";
+import {
+  noqtaPaperDark,
+  noqtaPaperLight,
+  withPaper,
+} from "@/theme/noqta-paper";
 
 /**
  * The single client boundary for the Fluent islands.
@@ -22,12 +27,14 @@ import { noqtaBrand } from "@/theme/noqta-brand";
  * Phase 0 spike proved that: a `server-only` child rendered inside this shell
  * never appeared in any client chunk.
  *
- * The theme is built from the same brand ramp the build-time token generator
- * uses, so the Tailwind layer and the Fluent islands cannot drift apart.
+ * The theme is built from the same two ramps the build-time token generator
+ * uses — brand and paper — so the Tailwind layer and the Fluent islands
+ * cannot drift apart. Without the paper half a dialog opened cold grey on a
+ * cream page, and in dark mode it was grey #292929 against brown #211c16.
  */
 
-const lightTheme = createLightTheme(noqtaBrand);
-const darkTheme = createDarkTheme(noqtaBrand);
+const lightTheme = withPaper(createLightTheme(noqtaBrand), noqtaPaperLight);
+const darkTheme = withPaper(createDarkTheme(noqtaBrand), noqtaPaperDark);
 
 interface FluentShellProps {
   dir: "rtl" | "ltr";

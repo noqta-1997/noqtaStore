@@ -72,7 +72,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
       />
 
       <Container className="grid gap-6 py-8 lg:grid-cols-12 lg:gap-8 lg:py-12">
-        <section className="rounded-md border border-line bg-card lg:col-span-7">
+        <section className="rounded-xl border border-line bg-card lg:col-span-7">
           <h2 className="border-b border-line px-5 py-4 text-headline-md">
             {t.formTitle}
           </h2>
@@ -117,15 +117,15 @@ export default async function ContactPage({ params }: ContactPageProps) {
         </section>
 
         <aside className="space-y-4 lg:col-span-5">
-          <section className="rounded-md border border-line bg-card">
+          <section className="rounded-xl border border-line bg-card">
             <h2 className="border-b border-line px-5 py-4 text-headline-md">
               {t.channels}
             </h2>
             <ul className="divide-y divide-line-divider">
               {channels.map((channel) => (
                 <li key={channel.label} className="flex items-center gap-3 px-5 py-4">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low text-primary">
-                    <channel.icon aria-hidden className="size-4" strokeWidth={2} />
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-primary">
+                    <channel.icon aria-hidden className="size-4" strokeWidth={1.75} />
                   </span>
                   <span
                     className="text-body-md text-on-surface"
@@ -138,8 +138,8 @@ export default async function ContactPage({ params }: ContactPageProps) {
             </ul>
           </section>
 
-          <section className="flex items-center gap-3 rounded-md border border-line bg-surface-low p-5">
-            <Clock aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={2} />
+          <section className="flex items-center gap-3 rounded-xl border border-line bg-surface-low p-5">
+            <Clock aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={1.75} />
             <div>
               <p className="label-mono text-muted">{t.hours}</p>
               <p className="text-body-md text-on-surface">{t.hoursValue}</p>

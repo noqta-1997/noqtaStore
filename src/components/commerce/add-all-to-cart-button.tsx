@@ -47,7 +47,7 @@ export function AddAllToCartButton({
       onClick={onClick}
       disabled={pending}
     >
-      <ShoppingBag aria-hidden className="size-4" strokeWidth={2} />
+      <ShoppingBag aria-hidden className="size-4" strokeWidth={1.75} />
       {label}
     </Button>
   );

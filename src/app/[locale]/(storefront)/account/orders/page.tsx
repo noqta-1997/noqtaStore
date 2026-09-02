@@ -71,12 +71,12 @@ export default async function OrdersPage({
           );
 
           return (
-            <li key={order.id} className="rounded-md border border-line bg-card">
+            <li key={order.id} className="rounded-xl border border-line bg-card">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                   <span className="label-mono text-muted">{t.orderNumber}</span>
                   <span
-                    className="font-mono text-body-md font-semibold text-on-surface"
+                    className="text-body-md font-semibold text-on-surface"
                     data-numeric
                   >
                     {order.reference}
@@ -105,7 +105,7 @@ export default async function OrdersPage({
                 <div>
                   <dt className="label-mono text-muted">{t.totalLabel}</dt>
                   <dd
-                    className="mt-1 font-mono text-body-md font-semibold text-on-surface"
+                    className="mt-1 text-body-md font-semibold text-on-surface"
                     data-numeric
                   >
                     {formatPrice(order.total, locale)}

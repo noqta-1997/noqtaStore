@@ -39,7 +39,7 @@ function DataTable({ data, caption }: { data: ChartPoint[]; caption: string }) {
 
 function Empty({ label }: { label: string }) {
   return (
-    <p className="flex h-40 items-center justify-center rounded-md bg-surface-low text-body-md text-muted">
+    <p className="flex h-40 items-center justify-center rounded-xl bg-surface-low text-body-md text-muted">
       {label}
     </p>
   );
@@ -64,12 +64,12 @@ export function BarChart({ data, caption, emptyLabel, className }: ChartProps) {
           <div key={point.label} className="flex min-w-0 flex-1 flex-col items-center gap-2">
             <div className="flex w-full flex-1 items-end">
               <div
-                className="w-full rounded-sm bg-primary-container transition-colors duration-100 ease-fluent hover:bg-primary-container-hover"
+                className="w-full rounded-t-md bg-primary-container transition-colors duration-100 ease-fluent hover:bg-primary-container-hover"
                 style={{ height: `${Math.max((point.value / max) * 100, 2)}%` }}
                 title={`${point.label}: ${point.display ?? point.value}`}
               />
             </div>
-            <span className="truncate font-mono text-label-sm text-muted" data-numeric>
+            <span className="truncate text-label-md text-muted" data-numeric>
               {point.label}
             </span>
           </div>
@@ -101,7 +101,7 @@ export function AreaChart({ data, caption, emptyLabel, className }: ChartProps) 
         <svg
           viewBox="0 0 100 40"
           preserveAspectRatio="none"
-          className="h-40 w-full rounded-md bg-surface-low"
+          className="h-40 w-full rounded-xl bg-surface-low"
         >
           <polygon points={area} fill="var(--colorBrandBackground)" opacity="0.16" />
           <polyline
@@ -129,7 +129,7 @@ export function AreaChart({ data, caption, emptyLabel, className }: ChartProps) 
             <span
               key={point.label}
               className={cn(
-                "font-mono text-label-sm text-muted",
+                "text-label-md text-muted",
                 index % 2 === 1 && "max-sm:hidden",
               )}
               data-numeric
@@ -157,13 +157,13 @@ export function ShareBars({ data, caption, emptyLabel, className }: ChartProps) 
           <li key={point.label} className="space-y-1.5">
             <div className="flex items-baseline justify-between gap-3">
               <span className="truncate text-body-md text-on-surface">{point.label}</span>
-              <span className="font-mono text-label-md text-muted" data-numeric>
+              <span className="text-label-md text-muted" data-numeric>
                 {point.display ?? `${point.value}%`}
               </span>
             </div>
-            <span className="block h-2 w-full overflow-hidden rounded-sm bg-surface-low">
+            <span className="block h-2.5 w-full overflow-hidden rounded-full bg-surface-low">
               <span
-                className="block h-full rounded-sm bg-primary-container"
+                className="block h-full rounded-full bg-primary-container"
                 style={{ width: `${(point.value / max) * 100}%` }}
               />
             </span>

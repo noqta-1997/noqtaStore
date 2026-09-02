@@ -46,10 +46,10 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-md border border-line bg-card">
+    <section className="rounded-xl border border-line bg-card">
       <h2 className="flex items-center gap-3 border-b border-line px-5 py-4 text-headline-md">
         <span
-          className="flex size-8 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low font-mono text-label-md"
+          className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-label-md font-semibold text-primary"
           data-numeric
         >
           {index}
@@ -87,7 +87,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   const shippingOptions = [
     {
       id: "standard",
-      icon: <Truck aria-hidden className="size-5" strokeWidth={2} />,
+      icon: <Truck aria-hidden className="size-5" strokeWidth={1.75} />,
       title: t.shippingOptions.standardTitle,
       note: t.shippingOptions.standardNote,
       price: shipping,
@@ -95,7 +95,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     },
     {
       id: "express",
-      icon: <Zap aria-hidden className="size-5" strokeWidth={2} />,
+      icon: <Zap aria-hidden className="size-5" strokeWidth={1.75} />,
       title: t.shippingOptions.expressTitle,
       note: t.shippingOptions.expressNote,
       price: shippingRules.expressCost,
@@ -103,7 +103,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     },
     ...(shippingRules.enablePickup ? [{
       id: "pickup",
-      icon: <Store aria-hidden className="size-5" strokeWidth={2} />,
+      icon: <Store aria-hidden className="size-5" strokeWidth={1.75} />,
       title: t.shippingOptions.pickupTitle,
       note: t.shippingOptions.pickupNote,
       price: 0,
@@ -114,7 +114,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   const paymentOptions = [
     {
       id: "cod",
-      icon: <Banknote aria-hidden className="size-5" strokeWidth={2} />,
+      icon: <Banknote aria-hidden className="size-5" strokeWidth={1.75} />,
       title: t.paymentOptions.codTitle,
       note: t.paymentOptions.codNote,
       defaultChecked: paymentDefault !== "wallet",
@@ -122,7 +122,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     },
     {
       id: "wallet",
-      icon: <Wallet aria-hidden className="size-5" strokeWidth={2} />,
+      icon: <Wallet aria-hidden className="size-5" strokeWidth={1.75} />,
       title: t.paymentOptions.walletTitle,
       note: t.paymentOptions.walletNote,
       defaultChecked: paymentDefault === "wallet",
@@ -130,7 +130,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     },
     {
       id: "card",
-      icon: <CreditCard aria-hidden className="size-5" strokeWidth={2} />,
+      icon: <CreditCard aria-hidden className="size-5" strokeWidth={1.75} />,
       title: t.paymentOptions.cardTitle,
       note: t.paymentOptions.cardNote,
       defaultChecked: false,
@@ -253,7 +253,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
                   note={option.note}
                   trailing={
                     <span
-                      className="shrink-0 font-mono text-label-md font-semibold text-on-surface"
+                      className="shrink-0 text-label-md font-semibold text-on-surface"
                       data-numeric
                     >
                       {option.price === 0
@@ -326,11 +326,11 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
                     <span className="block truncate text-label-md text-on-surface">
                       {line.book.title[locale]}
                     </span>
-                    <span className="block font-mono text-label-sm text-muted" data-numeric>
+                    <span className="block text-label-sm text-muted" data-numeric>
                       × {line.quantity}
                     </span>
                   </span>
-                  <span className="shrink-0 font-mono text-label-md" data-numeric>
+                  <span className="shrink-0 text-label-md" data-numeric>
                     {formatPrice(line.lineTotal, locale)}
                   </span>
                 </li>

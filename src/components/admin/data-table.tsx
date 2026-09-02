@@ -32,7 +32,7 @@ export function Table({
     <div
       data-density={density}
       className={cn(
-        "overflow-x-auto rounded-md border border-line bg-card",
+        "overflow-x-auto rounded-xl border border-line bg-card",
         className,
       )}
     >
@@ -77,7 +77,7 @@ export function Th({ children, className, ...props }: ThHTMLAttributes<HTMLTable
     <th
       scope="col"
       className={cn(
-        "h-8 px-3 text-start align-middle text-label-md font-semibold text-on-surface-variant",
+        "h-10 px-3 text-start align-middle text-label-md font-semibold text-on-surface-variant",
         className,
       )}
       {...props}
@@ -153,7 +153,7 @@ export function SortableTh({
       scope="col"
       aria-sort={activeAsc ? "ascending" : activeDesc ? "descending" : "none"}
       className={cn(
-        "h-8 px-3 text-start align-middle text-label-md font-semibold text-on-surface-variant",
+        "h-10 px-3 text-start align-middle text-label-md font-semibold text-on-surface-variant",
         className,
       )}
       {...props}
@@ -161,7 +161,7 @@ export function SortableTh({
       <Link
         href={buildHref(`${column}-${next}`)}
         className={cn(
-          "inline-flex items-center gap-1 rounded-sm px-1 py-0.5 -mx-1",
+          "inline-flex items-center gap-1 rounded-md px-1 py-0.5 -mx-1",
           "transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface",
           active && "text-on-surface",
         )}

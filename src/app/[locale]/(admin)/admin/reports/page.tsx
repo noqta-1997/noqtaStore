@@ -115,7 +115,7 @@ export default async function ReportsPage({ params, searchParams }: ReportsPageP
             download
             className={buttonStyles({ variant: "secondary", size: "md" })}
           >
-            <Download aria-hidden className="size-4" strokeWidth={2} />
+            <Download aria-hidden className="size-4" strokeWidth={1.75} />
             {t.exportCsv}
           </a>
         }
@@ -128,7 +128,7 @@ export default async function ReportsPage({ params, searchParams }: ReportsPageP
             href={`${base}${entry === "year" ? "" : `?range=${entry}`}`}
             aria-current={range === entry ? "page" : undefined}
             className={cn(
-              "border border-line px-3 py-2 text-label-md transition-colors",
+              "rounded-full border border-line px-4 py-2 text-label-md transition-colors duration-100 ease-fluent",
               range === entry
                 ? "bg-primary-container font-semibold text-on-primary-container"
                 : "bg-card text-on-surface-variant hover:bg-state-hover hover:text-on-surface",
@@ -215,14 +215,14 @@ export default async function ReportsPage({ params, searchParams }: ReportsPageP
                     >
                       {entry.book.title[locale]}
                     </Link>
-                    <span className="block text-label-sm text-muted">
+                    <span className="block text-label-md text-muted">
                       {entry.book.category.name[locale]}
                     </span>
                   </Td>
-                  <Td className="font-mono" data-numeric>
+                  <Td data-numeric>
                     {formatNumber(entry.sold, locale)}
                   </Td>
-                  <Td className="font-mono whitespace-nowrap font-semibold" data-numeric>
+                  <Td className="whitespace-nowrap font-semibold" data-numeric>
                     {formatPrice(entry.revenue, locale)}
                   </Td>
                 </Tr>

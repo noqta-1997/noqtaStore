@@ -59,7 +59,7 @@ export function CouponToggle({
       title={label}
       onClick={onClick}
     >
-      <Power aria-hidden className="size-4" strokeWidth={2} />
+      <Power aria-hidden className="size-4" strokeWidth={1.75} />
     </Button>
   );
 }

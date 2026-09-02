@@ -83,7 +83,7 @@ export default async function AuthorPage({ params, searchParams }: AuthorPagePro
             <span
               aria-hidden
               className={cn(
-                "flex size-20 shrink-0 items-center justify-center border border-line font-display text-2xl font-extrabold elevation-md",
+                "flex size-20 shrink-0 items-center justify-center rounded-full font-display text-2xl font-bold elevation-md",
                 authorTone(author.slug),
               )}
             >
@@ -91,7 +91,7 @@ export default async function AuthorPage({ params, searchParams }: AuthorPagePro
             </span>
 
             <div className="space-y-3">
-              <h1 className="text-headline-lg sm:text-[2.5rem] sm:leading-tight">
+              <h1 className="text-headline-lg sm:text-headline-xl">
                 {author.name[locale]}
               </h1>
               <p className="max-w-2xl text-body-lg text-on-surface-variant">

@@ -100,7 +100,9 @@ export default async function BookPage({ params }: BookPageProps) {
       <Container className="grid gap-8 py-8 lg:grid-cols-12 lg:gap-12 lg:py-12">
         <div className="lg:col-span-5">
           <div className="mx-auto max-w-xs lg:sticky lg:top-44 lg:max-w-sm">
-            <div className="relative">
+            {/* The jacket sits on a tinted plate, the same way it does on
+                every shelf card — the detail page is the shelf card enlarged. */}
+            <div className="relative rounded-2xl bg-surface-low p-5 sm:p-7">
               <BookCover
                 title={book.title[locale]}
                 author={book.author.name[locale]}
@@ -108,7 +110,7 @@ export default async function BookPage({ params }: BookPageProps) {
                 src={book.coverUrl}
                 priority
                 sizes="(min-width: 1024px) 24rem, 18rem"
-                className="border border-line elevation-md"
+                className="rounded-lg elevation-lg"
               />
               <div className="absolute start-3 top-3 flex flex-col items-start gap-2">
                 {book.compareAtPrice ? (
@@ -129,11 +131,11 @@ export default async function BookPage({ params }: BookPageProps) {
           <div className="space-y-3">
             <Link
               href={`/${locale}/categories/${book.category.slug}`}
-              className="label-mono text-primary underline-offset-4 hover:underline"
+              className="text-label-md font-semibold text-primary underline-offset-4 hover:underline"
             >
               {book.category.name[locale]}
             </Link>
-            <h1 className="text-headline-lg sm:text-[2.5rem] sm:leading-tight">
+            <h1 className="text-headline-lg sm:text-headline-xl">
               {book.title[locale]}
             </h1>
             <p className="text-body-lg text-on-surface-variant">
@@ -153,7 +155,7 @@ export default async function BookPage({ params }: BookPageProps) {
             />
           </div>
 
-          <div className="space-y-4 rounded-md border border-line bg-card p-5">
+          <div className="space-y-4 rounded-xl border border-line bg-card p-5 elevation-sm">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <PriceTag
                 price={book.price}
@@ -165,7 +167,7 @@ export default async function BookPage({ params }: BookPageProps) {
                 <Badge tone="muted">{dictionary.common.outOfStock}</Badge>
               ) : (
                 <span className="flex items-center gap-1.5 text-label-md text-success-fg">
-                  <PackageCheck aria-hidden className="size-4" strokeWidth={2} />
+                  <PackageCheck aria-hidden className="size-4" strokeWidth={1.75} />
                   <span data-numeric>{formatNumber(book.stock, locale)}</span>{" "}
                   {t.stockLeft}
                 </span>
@@ -215,7 +217,7 @@ export default async function BookPage({ params }: BookPageProps) {
                   <item.icon
                     aria-hidden
                     className="mt-0.5 size-4 shrink-0 text-primary"
-                    strokeWidth={2}
+                    strokeWidth={1.75}
                   />
                   {item.text}
                 </li>

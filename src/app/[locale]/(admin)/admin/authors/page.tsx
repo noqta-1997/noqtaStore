@@ -89,7 +89,7 @@ export default async function AdminAuthorsPage({
                       <span
                         aria-hidden
                         className={cn(
-                          "flex size-9 shrink-0 items-center justify-center border border-line font-display text-sm font-bold",
+                          "flex size-9 shrink-0 items-center justify-center rounded-full font-display text-label-md font-bold",
                           authorTone(author.slug),
                         )}
                       >
@@ -99,18 +99,18 @@ export default async function AdminAuthorsPage({
                         <span className="block font-semibold text-on-surface">
                           {author.name[locale]}
                         </span>
-                        <span className="block max-w-72 truncate text-label-sm text-muted">
+                        <span className="block max-w-72 truncate text-label-md text-muted">
                           {author.bio[locale]}
                         </span>
                       </span>
                     </div>
                   </Td>
                   <Td className="text-on-surface-variant">{author.country[locale]}</Td>
-                  <Td className="font-mono" data-numeric>
+                  <Td data-numeric>
                     {formatNumber(author.booksCount, locale)}
                   </Td>
                   <Td>
-                    <span className="font-mono text-label-md text-muted" dir="ltr">
+                    <span className="text-label-md text-muted" dir="ltr">
                       {author.slug}
                     </span>
                   </Td>
@@ -146,7 +146,7 @@ export default async function AdminAuthorsPage({
           </Table>
 
           {!authors.length ? (
-            <p className="rounded-md border border-line bg-card p-8 text-center text-body-md text-muted">
+            <p className="rounded-xl border border-line bg-card p-8 text-center text-body-md text-muted">
               {admin.common.noResults}
             </p>
           ) : null}

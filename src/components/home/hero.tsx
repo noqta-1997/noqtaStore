@@ -10,12 +10,19 @@ import { Rating } from "@/components/ui/rating";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { formatNumber } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import type { BookWithRelations } from "@/types";
 
 interface HeroProps {
   locale: Locale;
   dictionary: Dictionary;
   featuredBook: BookWithRelations;
+  /**
+   * Jackets shown fanned out behind the featured one. Optional, because the
+   * hero has always needed exactly one book to render and still does — these
+   * are decoration drawn from real rows, never a second data requirement.
+   */
+  companions?: BookWithRelations[];
   stats: {
     booksCount: number;
     authorsCount: number;
@@ -23,7 +30,22 @@ interface HeroProps {
   };
 }
 
-export function Hero({ locale, dictionary, featuredBook, stats }: HeroProps) {
+/**
+ * The reference's opening: a serif headline holding the left half, and on the
+ * right three jackets on tinted plates with the middle one raised.
+ *
+ * The featured book keeps everything it carried before — its category, title,
+ * author, rating, price and the link through to its page — but that detail
+ * now sits under the fan as a caption instead of inside a bordered card, so
+ * the jackets are what the eye lands on.
+ */
+export function Hero({
+  locale,
+  dictionary,
+  featuredBook,
+  companions = [],
+  stats,
+}: HeroProps) {
   const { hero } = dictionary.home;
 
   const figures = [
@@ -32,40 +54,44 @@ export function Hero({ locale, dictionary, featuredBook, stats }: HeroProps) {
     { value: stats.publishersCount, label: hero.stats.publishers },
   ];
 
-  return (
-    <section className="border-b border-line-divider bg-surface">
-      <Container className="grid items-center gap-10 py-12 lg:grid-cols-12 lg:gap-12 lg:py-20">
-        <div className="space-y-6 lg:col-span-7">
-          <Badge tone="outline">{hero.eyebrow}</Badge>
+  /* Two side jackets at most; fewer if the catalogue has fewer to give. */
+  const [beforeBook, afterBook] = companions.slice(0, 2);
 
-          <h1 className="text-headline-lg sm:text-[2.75rem] sm:leading-[1.15] lg:text-display-lg">
+  return (
+    <section className="bg-surface">
+      <Container className="grid items-center gap-12 py-14 lg:grid-cols-12 lg:gap-10 lg:py-24">
+        <div className="space-y-6 lg:col-span-6">
+          <Badge tone="gold">{hero.eyebrow}</Badge>
+
+          <h1 className="text-display-lg">
             {hero.title}{" "}
-            <span className="border-b-4 border-primary-container text-primary">
-              {hero.titleHighlight}
-            </span>
+            <span className="text-primary">{hero.titleHighlight}</span>
           </h1>
 
-          <p className="max-w-xl text-body-md text-on-surface-variant sm:text-body-lg">
+          <p className="max-w-xl text-body-lg leading-relaxed text-on-surface-variant">
             {hero.subtitle}
           </p>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <Link
               href={`/${locale}/books`}
-              className={buttonStyles({ size: "lg", className: "max-sm:w-full" })}
+              className={buttonStyles({
+                size: "lg",
+                className: "h-12 rounded-full max-sm:w-full",
+              })}
             >
               {hero.primaryCta}
-              <ArrowRight aria-hidden className="size-4 rtl:rotate-180" strokeWidth={2} />
+              <ArrowRight aria-hidden className="size-4 rtl:rotate-180" strokeWidth={1.75} />
             </Link>
             <Link
               href={`/${locale}/categories`}
               className={buttonStyles({
                 variant: "secondary",
                 size: "lg",
-                className: "max-sm:w-full",
+                className: "h-12 rounded-full max-sm:w-full",
               })}
             >
-              <LayoutGrid aria-hidden className="size-4" strokeWidth={2} />
+              <LayoutGrid aria-hidden className="size-4" strokeWidth={1.75} />
               {hero.secondaryCta}
             </Link>
           </div>
@@ -76,12 +102,12 @@ export function Hero({ locale, dictionary, featuredBook, stats }: HeroProps) {
                 <dt className="sr-only">{figure.label}</dt>
                 <dd>
                   <span
-                    className="block font-mono text-2xl font-semibold text-on-surface sm:text-3xl"
+                    className="block font-display text-2xl font-bold text-on-surface sm:text-3xl"
                     data-numeric
                   >
                     {formatNumber(figure.value, locale)}+
                   </span>
-                  <span className="mt-1 block text-label-sm text-muted">
+                  <span className="mt-1 block text-label-md text-muted">
                     {figure.label}
                   </span>
                 </dd>
@@ -90,74 +116,112 @@ export function Hero({ locale, dictionary, featuredBook, stats }: HeroProps) {
           </dl>
         </div>
 
-        <div className="lg:col-span-5">
-          <div className="relative mx-auto max-w-sm lg:max-w-none">
-            <div
-              aria-hidden
-              className="absolute inset-x-8 top-6 bottom-0 rotate-3 rounded-md border border-line bg-surface-low rtl:-rotate-3"
-            />
-
-            <article className="relative rounded-md border border-line bg-card p-4 elevation-md sm:p-5">
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <Badge tone="primary">{hero.featuredLabel}</Badge>
-                <span className="label-mono text-muted">
-                  {featuredBook.category.name[locale]}
-                </span>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="w-28 shrink-0 sm:w-32">
+        <div className="lg:col-span-6">
+          <div className="mx-auto max-w-lg lg:max-w-none">
+            {/*
+              The featured jacket comes first in the source and is placed in
+              the middle with `order`. Reading order has to match what is
+              actually on screen: the two side jackets are hidden below `sm`,
+              so with them first in the source the page's first book link was
+              an invisible one on a phone.
+            */}
+            <div className="flex items-end justify-center gap-3 sm:gap-5">
+              <div className="order-2 w-40 shrink-0 rounded-2xl bg-primary-fixed p-4 elevation-lg sm:w-52 sm:p-5">
+                <Link
+                  href={`/${locale}/books/${featuredBook.slug}`}
+                  aria-label={featuredBook.title[locale]}
+                  className="block"
+                >
                   <BookCover
                     title={featuredBook.title[locale]}
                     author={featuredBook.author.name[locale]}
                     seed={featuredBook.slug}
                     src={featuredBook.coverUrl}
                     priority
-                    sizes="(min-width: 640px) 8rem, 7rem"
-                    className="border border-line"
+                    sizes="(min-width: 640px) 13rem, 10rem"
+                    className="rounded-lg elevation-md"
                   />
-                </div>
-
-                <div className="flex min-w-0 flex-col gap-2">
-                  <h2 className="font-display text-xl leading-snug font-bold text-balance">
-                    <Link
-                      href={`/${locale}/books/${featuredBook.slug}`}
-                      className="hover:underline hover:underline-offset-4"
-                    >
-                      {featuredBook.title[locale]}
-                    </Link>
-                  </h2>
-                  <p className="text-sm text-on-surface-variant">
-                    {dictionary.common.by} {featuredBook.author.name[locale]}
-                  </p>
-                  <Rating
-                    value={featuredBook.rating}
-                    count={featuredBook.reviewsCount}
-                    locale={locale}
-                  />
-                  <p className="line-clamp-3 text-sm leading-relaxed text-muted">
-                    {featuredBook.description[locale]}
-                  </p>
-                  <PriceTag
-                    price={featuredBook.price}
-                    compareAtPrice={featuredBook.compareAtPrice}
-                    locale={locale}
-                    size="lg"
-                    className="mt-auto pt-2"
-                  />
-                </div>
+                </Link>
               </div>
 
-              <Link
-                href={`/${locale}/books/${featuredBook.slug}`}
-                className={buttonStyles({ fullWidth: true, className: "mt-5" })}
-              >
-                {dictionary.common.addToCart}
-              </Link>
-            </article>
+              {beforeBook ? (
+                <FannedJacket book={beforeBook} locale={locale} className="order-1" />
+              ) : null}
+
+              {afterBook ? (
+                <FannedJacket book={afterBook} locale={locale} className="order-3" />
+              ) : null}
+            </div>
+
+            <div className="mx-auto mt-8 max-w-sm space-y-2 text-center">
+              <span className="block text-label-md text-muted">
+                {hero.featuredLabel} · {featuredBook.category.name[locale]}
+              </span>
+
+              <h2 className="text-headline-md">
+                <Link
+                  href={`/${locale}/books/${featuredBook.slug}`}
+                  className="hover:text-primary hover:underline hover:underline-offset-4"
+                >
+                  {featuredBook.title[locale]}
+                </Link>
+              </h2>
+
+              <p className="text-body-md text-on-surface-variant">
+                {dictionary.common.by} {featuredBook.author.name[locale]}
+              </p>
+
+              <div className="flex items-center justify-center gap-4">
+                <Rating
+                  value={featuredBook.rating}
+                  count={featuredBook.reviewsCount}
+                  locale={locale}
+                />
+                <PriceTag
+                  price={featuredBook.price}
+                  compareAtPrice={featuredBook.compareAtPrice}
+                  locale={locale}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </Container>
     </section>
+  );
+}
+
+/** A side jacket in the fan: smaller, dimmed, and linked like any other. */
+function FannedJacket({
+  book,
+  locale,
+  className,
+}: {
+  book: BookWithRelations;
+  locale: Locale;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "hidden w-28 shrink-0 rounded-xl bg-surface-low p-3 elevation-sm sm:block sm:w-36",
+        className,
+      )}
+    >
+      <Link
+        href={`/${locale}/books/${book.slug}`}
+        aria-label={book.title[locale]}
+        className="block"
+      >
+        <BookCover
+          title={book.title[locale]}
+          author={book.author.name[locale]}
+          seed={book.slug}
+          src={book.coverUrl}
+          sizes="9rem"
+          className="rounded-md elevation-sm"
+        />
+      </Link>
+    </div>
   );
 }

@@ -24,7 +24,7 @@ export function BookGrid({
   className,
 }: BookGridProps) {
   return (
-    <ul className={cn("grid gap-4 xl:gap-5", columns, className)}>
+    <ul className={cn("grid gap-4 sm:gap-5 xl:gap-6", columns, className)}>
       {books.map((book, index) => (
         <li key={book.id} className="flex">
           <BookCard

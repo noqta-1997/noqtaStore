@@ -23,7 +23,7 @@ export function LocaleSwitcher({ locale }: LocaleSwitcherProps) {
       lang={target}
       className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-body-md text-on-surface-variant transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface"
     >
-      <Globe aria-hidden className="size-4" strokeWidth={2} />
+      <Globe aria-hidden className="size-4" strokeWidth={1.75} />
       {localeNames[target]}
     </Link>
   );

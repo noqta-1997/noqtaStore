@@ -568,3 +568,86 @@ than an omission:**
 **And one gap that is not a decision:** the admin panel and the account pages
 have no visual or accessibility coverage, because the suite will not create an
 account or type a password. A saved session closes it in one command.
+
+---
+
+## The paper pass — neutrals leave Fluent, everything else stays
+
+The reference design the storefront was re-cut against is a printed-paper
+bookshop: cream ground, beige bands, rounded corners, diffuse warm shadows,
+a serif display face. Fluent's neutral ramp is built for Office chrome and is
+strictly grey, so the neutrals had to be replaced.
+
+They live in **`src/theme/noqta-paper.ts`**, beside the brand ramp and with
+the same shape: plain data, no imports, two consumers. The generator folds
+them into the emitted theme (`withPaper`), and `FluentShell` folds the same
+values into the runtime theme, so the aliases in `globals.css` still point at
+Fluent token names and **the islands are painted from the same values as the
+page behind them**.
+
+Doing it any other way was tried first and was wrong: with the ramp written
+straight into `globals.css`, the Tailwind layer went warm and the Fluent layer
+did not. In dark mode a dialog opened at Fluent's grey `#292929` on top of a
+brown `#211c16` page. That is the whole reason the ramp is a TypeScript module
+and not a block of CSS.
+
+Only the tokens the design actually paints with are replaced — 22 of the 125
+neutrals. The rest keep Fluent's values because nothing reads them.
+`npm run tokens:check` is unchanged and still passes at 459 tokens.
+
+### The ramp
+
+| Step | Light | Dark | Role |
+| --- | --- | --- | --- |
+| `--paper-0` | `#ffffff` | `#211c16` | cards |
+| `--paper-50` | `#fdfbf6` | `#16130f` | the page |
+| `--paper-100` | `#f8f4e9` | `#1c1811` | banded sections, footer |
+| `--paper-150` | `#f2ecdd` | `#2a241c` | hover |
+| `--paper-200` | `#eae2ce` | `#332c22` | pressed, dividers |
+| `--paper-300` | `#e2d8c0` | `#3a3227` | hairlines |
+| `--paper-400` | `#cfc2a4` | `#6a5e4a` | control strokes |
+| `--ink-900` | `#221e17` | `#f2ece0` | body text |
+| `--ink-600` | `#5a5348` | `#cdc4b4` | secondary text |
+| `--ink-400` | `#6f6658` | `#a2988a` | muted text |
+
+The ramp is declared once per theme in the module and reaches CSS through the
+generated file, so nothing is repeated by hand. Measured on the light page:
+`--ink-900` 15.4:1, `--ink-600` 7.35:1, `--ink-400` 5.46:1 — and 6.74:1 and
+5.01:1 respectively on the beige band, which is the tighter of the two grounds
+and the one that decided `--ink-400`. A first cut at `#857c6d` measured 3.98:1
+there and was rejected.
+
+### Three changes that touch every call site at once
+
+**Radii shift up one Fluent step.** `--radius-md` lands on
+`borderRadiusXLarge` (8px) instead of `borderRadiusMedium` (4px), and
+`lg`/`xl`/`2xl` follow to 12/16/24. The names are unchanged, so all 102
+`rounded-md` call sites round themselves. The values are still Fluent's own
+steps.
+
+**Elevation is warm.** Fluent's shadows are neutral black at a tight radius;
+over cream that reads as grime rather than lift. The four `elevation-*`
+utilities keep Fluent's symmetric, direction-free shape — there is still
+nothing to flip in RTL — but spread further and tint brown through
+`--shade-soft` / `--shade-key`.
+
+**There is no monospace any more.** The reference has none, prices included.
+`--font-mono` is kept as a name because 30-odd call sites and the `label-mono`
+utility say it, but it resolves to the sans stack; `[data-numeric]` keeps
+`font-feature-settings: "tnum"`, so cart columns and invoices still align.
+JetBrains Mono is no longer downloaded, which pays for one of the two serif
+faces the display stack added — Playfair Display for Latin, Noto Naskh Arabic
+for Arabic, resolved per glyph. The webfont count is unchanged at three.
+
+### One token added, and one heading rule
+
+`--gold` / `--gold-fg`, from Fluent's Marigold palette. Star ratings were
+drawn in the brand orange, which made the rating compete with the call to
+action on every card. Amber is what the reference uses and it is a hue Fluent
+already ships, so it is borrowed rather than invented.
+
+The display serif is scoped to `h1` and `h2`. The reference sets page titles
+and section headings in its serif and everything below in the running face; a
+shelf of ten serif card titles competes with the heading above it. Anything at
+`h3` that wants the serif asks for `font-display` at the call site — the book
+jacket placeholder does.

@@ -32,11 +32,9 @@ export function PageHeader({
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-2">
             {eyebrow ? (
-              <p className="label-mono text-primary">{eyebrow}</p>
+              <p className="text-label-md font-semibold text-primary">{eyebrow}</p>
             ) : null}
-            <h1 className="text-headline-lg sm:text-[2.5rem] sm:leading-tight">
-              {title}
-            </h1>
+            <h1 className="text-headline-lg sm:text-headline-xl">{title}</h1>
             {subtitle ? (
               <p className="max-w-2xl text-body-md text-on-surface-variant">
                 {subtitle}

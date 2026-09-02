@@ -84,7 +84,7 @@ export function AddToCartButton({
       onClick={onClick}
       className={cn(iconOnly && "px-0", className)}
     >
-      <ShoppingBag aria-hidden className="size-4" strokeWidth={2} />
+      <ShoppingBag aria-hidden className="size-4" strokeWidth={1.75} />
       {iconOnly ? null : label}
     </Button>
   );

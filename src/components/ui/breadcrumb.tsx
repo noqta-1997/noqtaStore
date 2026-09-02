@@ -18,7 +18,7 @@ interface BreadcrumbProps {
 export function Breadcrumb({ items, label, className }: BreadcrumbProps) {
   return (
     <nav aria-label={label} className={cn("min-w-0", className)}>
-      <ol className="flex flex-wrap items-center gap-1.5 text-label-sm text-muted">
+      <ol className="flex flex-wrap items-center gap-1.5 text-label-md text-muted">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
 
@@ -32,7 +32,7 @@ export function Breadcrumb({ items, label, className }: BreadcrumbProps) {
                   {item.label}
                 </Link>
               ) : (
-                <span aria-current={isLast ? "page" : undefined} className="text-on-surface">
+                <span aria-current={isLast ? "page" : undefined} className="font-medium text-on-surface">
                   {item.label}
                 </span>
               )}
@@ -40,7 +40,7 @@ export function Breadcrumb({ items, label, className }: BreadcrumbProps) {
                 <ChevronLeft
                   aria-hidden
                   className="size-3.5 shrink-0 rtl:rotate-180"
-                  strokeWidth={2}
+                  strokeWidth={1.75}
                 />
               ) : null}
             </li>

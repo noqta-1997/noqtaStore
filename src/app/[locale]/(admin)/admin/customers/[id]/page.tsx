@@ -74,7 +74,7 @@ export default async function AdminCustomerPage({ params }: AdminCustomerPagePro
         href={`/${locale}/admin/customers`}
         className="inline-flex items-center gap-2 text-label-md text-on-surface underline-offset-4 hover:underline"
       >
-        <ArrowRight aria-hidden className="size-4 rotate-180 rtl:rotate-0" strokeWidth={2} />
+        <ArrowRight aria-hidden className="size-4 rotate-180 rtl:rotate-0" strokeWidth={1.75} />
         {t.backToList}
       </Link>
 
@@ -89,7 +89,7 @@ export default async function AdminCustomerPage({ params }: AdminCustomerPagePro
                 : admin.customers.statuses.blocked}
             </Badge>
             <Button variant="secondary" size="md">
-              <Ban aria-hidden className="size-4" strokeWidth={2} />
+              <Ban aria-hidden className="size-4" strokeWidth={1.75} />
               {customer.status === "active"
                 ? admin.customers.block
                 : admin.customers.unblock}
@@ -122,7 +122,7 @@ export default async function AdminCustomerPage({ params }: AdminCustomerPagePro
             <div className="flex items-center gap-3">
               <span
                 aria-hidden
-                className="flex size-12 shrink-0 items-center justify-center border border-line bg-inverse-surface font-display text-lg font-bold text-inverse-on-surface"
+                className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary-container font-display text-body-lg font-bold text-on-primary-container"
               >
                 {customer.name.slice(0, 1)}
               </span>
@@ -167,7 +167,7 @@ export default async function AdminCustomerPage({ params }: AdminCustomerPagePro
                     <Td>
                       <Link
                         href={`/${locale}/admin/orders/${order.id}`}
-                        className="font-mono font-semibold underline-offset-4 hover:underline"
+                        className="font-semibold underline-offset-4 hover:underline"
                         data-numeric
                       >
                         {order.reference}
@@ -176,7 +176,7 @@ export default async function AdminCustomerPage({ params }: AdminCustomerPagePro
                     <Td className="whitespace-nowrap text-on-surface-variant" data-numeric>
                       {formatDate(order.createdAt, locale)}
                     </Td>
-                    <Td className="font-mono whitespace-nowrap font-semibold" data-numeric>
+                    <Td className="whitespace-nowrap font-semibold" data-numeric>
                       {formatPrice(order.total, locale)}
                     </Td>
                     <Td>

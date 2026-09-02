@@ -9,13 +9,47 @@ interface RatingProps {
   count?: number;
   locale: Locale;
   size?: "sm" | "md";
+  /** The reference's card form: one amber star and the figure beside it. */
+  compact?: boolean;
   className?: string;
 }
 
-/** Five-star display with an optional review count. Read-only. */
-export function Rating({ value, count, locale, size = "sm", className }: RatingProps) {
+/**
+ * Five-star display with an optional review count. Read-only.
+ *
+ * The stars are amber now rather than brand orange — in the reference the
+ * rating is the one thing on a card that is *not* the call to action, and
+ * giving it the action colour was making every card compete with itself.
+ */
+export function Rating({
+  value,
+  count,
+  locale,
+  size = "sm",
+  compact = false,
+  className,
+}: RatingProps) {
   const rounded = Math.round(value);
   const starSize = size === "sm" ? "size-3.5" : "size-4";
+
+  if (compact) {
+    return (
+      <span
+        className={cn("inline-flex items-center gap-1", className)}
+        role="img"
+        aria-label={`${value} / 5`}
+      >
+        <Star
+          aria-hidden
+          className={cn(starSize, "fill-gold text-gold")}
+          strokeWidth={0}
+        />
+        <span className="text-label-md font-semibold text-on-surface" data-numeric>
+          {value}
+        </span>
+      </span>
+    );
+  }
 
   return (
     <div className={cn("flex items-center gap-1.5", className)}>
@@ -31,15 +65,15 @@ export function Rating({ value, count, locale, size = "sm", className }: RatingP
             className={cn(
               starSize,
               index < rounded
-                ? "fill-primary-container text-line"
+                ? "fill-gold text-gold"
                 : "fill-transparent text-outline",
             )}
-            strokeWidth={2}
+            strokeWidth={index < rounded ? 0 : 1.75}
           />
         ))}
       </div>
       {typeof count === "number" ? (
-        <span className="font-mono text-xs text-muted" data-numeric>
+        <span className="text-label-md text-muted" data-numeric>
           ({formatCompactNumber(count, locale)})
         </span>
       ) : null}

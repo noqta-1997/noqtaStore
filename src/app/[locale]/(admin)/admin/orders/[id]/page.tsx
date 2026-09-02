@@ -89,7 +89,7 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
         href={`/${locale}/admin/orders`}
         className="inline-flex items-center gap-2 text-label-md text-on-surface underline-offset-4 hover:underline"
       >
-        <ArrowRight aria-hidden className="size-4 rotate-180 rtl:rotate-0" strokeWidth={2} />
+        <ArrowRight aria-hidden className="size-4 rotate-180 rtl:rotate-0" strokeWidth={1.75} />
         {admin.orders.title}
       </Link>
 
@@ -132,7 +132,7 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
                             seed={item.book.slug}
                             src={item.book.coverUrl}
                             sizes="2.25rem"
-                            className="border border-line"
+                            className="rounded-md elevation-sm"
                           />
                         </span>
                         <span className="min-w-0">
@@ -142,19 +142,19 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
                           >
                             {item.book.title[locale]}
                           </Link>
-                          <span className="block text-label-sm text-muted">
+                          <span className="block text-label-md text-muted">
                             {item.book.author.name[locale]}
                           </span>
                         </span>
                       </div>
                     </Td>
-                    <Td className="font-mono whitespace-nowrap" data-numeric>
+                    <Td className="whitespace-nowrap" data-numeric>
                       {formatPrice(item.unitPrice, locale)}
                     </Td>
-                    <Td className="font-mono" data-numeric>
+                    <Td data-numeric>
                       {formatNumber(item.quantity, locale)}
                     </Td>
-                    <Td className="font-mono whitespace-nowrap font-semibold" data-numeric>
+                    <Td className="whitespace-nowrap font-semibold" data-numeric>
                       {formatPrice(item.lineTotal, locale)}
                     </Td>
                   </Tr>
@@ -170,7 +170,7 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
                   <div className="flex flex-col items-center">
                     <span
                       className={cn(
-                        "flex size-8 shrink-0 items-center justify-center border border-line",
+                        "flex size-9 shrink-0 items-center justify-center rounded-full",
                         entry.done ? "bg-success text-on-success" : "bg-surface-low text-muted",
                       )}
                     >
@@ -200,7 +200,7 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
                     >
                       {dictionary.orderStatus[entry.status]}
                     </p>
-                    <p className="text-label-sm text-muted" data-numeric>
+                    <p className="text-label-md text-muted" data-numeric>
                       {formatDate(entry.date, locale)}
                     </p>
                   </div>
@@ -236,7 +236,7 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
               <Button type="submit" fullWidth>
                 {admin.common.saveChanges}
               </Button>
-              <p className="text-label-sm text-muted">{t.statusHint}</p>
+              <p className="text-label-md text-muted">{t.statusHint}</p>
             </ActionForm>
           </Panel>
 
@@ -255,13 +255,13 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
               <div className="flex items-center gap-3">
                 <span
                   aria-hidden
-                  className="flex size-11 shrink-0 items-center justify-center border border-line bg-inverse-surface font-display text-base font-bold text-inverse-on-surface"
+                  className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary-container font-display text-body-lg font-bold text-on-primary-container"
                 >
                   {order.customer?.name.slice(0, 1) ?? <User className="size-4" />}
                 </span>
                 <div className="min-w-0">
                   <p className="font-semibold text-on-surface">{order.customer?.name}</p>
-                  <p className="text-label-sm text-muted">
+                  <p className="text-label-md text-muted">
                     {order.customer?.city[locale]}
                   </p>
                 </div>
@@ -292,7 +292,7 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
                 {order.address.governorate[locale]}، {order.address.city[locale]}
               </span>
               <span className="block">{order.address.line[locale]}</span>
-              <span className="block font-mono" dir="ltr" data-numeric>
+              <span className="block" dir="ltr" data-numeric>
                 {order.address.phone}
               </span>
             </address>

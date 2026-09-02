@@ -9,16 +9,23 @@ interface SearchBarProps {
   defaultValue?: string;
   /** Larger variant used on the search results page. */
   size?: "md" | "lg";
+  /**
+   * Header variant: a pill with the magnifier as the only affordance. The
+   * submit button is dropped because the form still submits on Enter — the
+   * action, the field name and the method are untouched.
+   */
+  compact?: boolean;
   className?: string;
 }
 
-/** Header search — a bordered well with a single orange action. */
+/** Header search — a rounded well with a single warm action. */
 export function SearchBar({
   placeholder,
   label,
   action,
   defaultValue,
   size = "md",
+  compact = false,
   className,
 }: SearchBarProps) {
   return (
@@ -26,8 +33,9 @@ export function SearchBar({
       action={action}
       role="search"
       className={cn(
-        "flex items-center gap-1 rounded-md border border-line bg-surface-low p-1",
-        "focus-within:elevation-sm",
+        "flex items-center gap-1 rounded-full border border-line bg-card ps-3 pe-1",
+        "transition-shadow duration-100 ease-fluent focus-within:elevation-sm",
+        compact ? "py-0.5" : "p-1 ps-3",
         className,
       )}
     >
@@ -36,8 +44,8 @@ export function SearchBar({
       </label>
       <Search
         aria-hidden
-        className="ms-2 size-4 shrink-0 text-on-surface"
-        strokeWidth={2}
+        className="size-4 shrink-0 text-muted"
+        strokeWidth={1.75}
       />
       <input
         id="site-search"
@@ -47,19 +55,22 @@ export function SearchBar({
         autoComplete="off"
         defaultValue={defaultValue}
         className={cn(
-          "w-full min-w-0 bg-transparent px-1 text-base text-on-surface placeholder:text-muted focus:outline-none",
-          size === "lg" ? "h-12" : "h-9",
+          "w-full min-w-0 bg-transparent px-1 text-body-md text-on-surface placeholder:text-muted focus:outline-none",
+          size === "lg" ? "h-12" : compact ? "h-9" : "h-10",
         )}
       />
-      <button
-        type="submit"
-        className={cn(
-          "hidden shrink-0 border border-line bg-primary-container px-4 text-label-md font-semibold text-on-primary-container transition-colors hover:brightness-105 sm:block",
-          size === "lg" ? "h-12" : "h-9",
-        )}
-      >
-        {label}
-      </button>
+      {compact ? null : (
+        <button
+          type="submit"
+          className={cn(
+            "hidden shrink-0 rounded-full bg-primary-container px-5 text-label-md font-semibold text-on-primary-container",
+            "transition-colors duration-100 ease-fluent hover:bg-primary-container-hover sm:block",
+            size === "lg" ? "h-12" : "h-9",
+          )}
+        >
+          {label}
+        </button>
+      )}
     </form>
   );
 }

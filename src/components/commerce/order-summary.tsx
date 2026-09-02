@@ -55,7 +55,7 @@ export function OrderSummary({
   ];
 
   return (
-    <section className={cn("rounded-md border border-line bg-card", className)}>
+    <section className={cn("rounded-xl border border-line bg-card", className)}>
       <h2 className="border-b border-line px-5 py-4 text-headline-md">{title}</h2>
 
       {children ? (
@@ -68,7 +68,7 @@ export function OrderSummary({
             <dt className="text-body-md text-on-surface-variant">{row.label}</dt>
             <dd
               className={cn(
-                "font-mono text-body-md font-medium",
+                "text-body-md font-medium",
                 row.accent ? "text-success-fg" : "text-on-surface",
               )}
               data-numeric
@@ -83,7 +83,7 @@ export function OrderSummary({
         <span className="text-body-lg font-semibold text-on-surface">
           {dictionary.total}
         </span>
-        <span className="font-mono text-xl font-bold text-on-surface" data-numeric>
+        <span className="text-headline-md font-bold text-on-surface" data-numeric>
           {formatPrice(totals.total, locale)}
         </span>
       </div>

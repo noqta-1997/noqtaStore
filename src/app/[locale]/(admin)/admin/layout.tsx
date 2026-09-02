@@ -51,7 +51,7 @@ export default async function AdminLayout({
     <div className="flex min-h-dvh bg-surface">
       <a
         href="#admin-main"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:start-2 focus:z-50 focus:border focus:border-line focus:bg-primary-container focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-on-primary-container"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:start-2 focus:z-50 focus:rounded-md focus:bg-primary-container focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-on-primary-container"
       >
         {dictionary.common.skipToContent}
       </a>
@@ -59,14 +59,14 @@ export default async function AdminLayout({
       {/* Icon rail on tablets, full sidebar from lg up */}
       <aside className="sticky top-0 hidden h-dvh w-16 shrink-0 flex-col overflow-y-auto border-e border-line-divider bg-card md:flex lg:w-70">
         <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-line-divider px-3 lg:px-4">
-          <span className="flex size-9 shrink-0 items-center justify-center border border-line bg-primary-container">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-container">
             <span className="size-2.5 rounded-full bg-on-primary-container" />
           </span>
           <span className="hidden min-w-0 flex-col leading-none lg:flex">
-            <span className="font-display text-lg font-extrabold text-on-surface">
+            <span className="font-display text-lg font-bold text-primary">
               {admin.brand.name}
             </span>
-            <span className="label-mono mt-1 text-muted">{admin.brand.panel}</span>
+            <span className="mt-1 text-label-md text-muted">{admin.brand.panel}</span>
           </span>
         </div>
 
@@ -86,9 +86,9 @@ export default async function AdminLayout({
 
             <form
               action={`/${locale}/admin/books`}
-              className="hidden h-10 min-w-0 max-w-md flex-1 items-center border border-line bg-surface-low ps-3 sm:flex"
+              className="hidden h-10 min-w-0 max-w-md flex-1 items-center rounded-full border border-line bg-card ps-4 sm:flex"
             >
-              <Search aria-hidden className="size-4 shrink-0 text-muted" strokeWidth={2} />
+              <Search aria-hidden className="size-4 shrink-0 text-muted" strokeWidth={1.75} />
               <label htmlFor="admin-search" className="sr-only">
                 {admin.topbar.search}
               </label>
@@ -104,9 +104,9 @@ export default async function AdminLayout({
             <div className="ms-auto flex items-center gap-1">
               <Link
                 href={`/${locale}`}
-                className="hidden items-center gap-2 border border-transparent px-3 py-2 text-label-md text-on-surface transition-colors hover:border-line hover:bg-state-hover lg:inline-flex"
+                className="hidden items-center gap-2 rounded-md px-3 py-2 text-label-md text-on-surface transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-primary lg:inline-flex"
               >
-                <ExternalLink aria-hidden className="size-4 rtl:-scale-x-100" strokeWidth={2} />
+                <ExternalLink aria-hidden className="size-4 rtl:-scale-x-100" strokeWidth={1.75} />
                 {admin.topbar.viewStore}
               </Link>
 
@@ -127,7 +127,7 @@ export default async function AdminLayout({
               <span className="ms-2 flex items-center gap-2 border-s border-line-divider ps-3">
                 <span
                   aria-hidden
-                  className="flex size-9 items-center justify-center border border-line bg-inverse-surface font-display text-sm font-bold text-inverse-on-surface"
+                  className="flex size-9 items-center justify-center rounded-full bg-primary-container font-display text-body-md font-bold text-on-primary-container"
                 >
                   {manager.name.slice(0, 1)}
                 </span>
@@ -135,7 +135,7 @@ export default async function AdminLayout({
                   <span className="max-w-32 truncate text-label-md font-semibold text-on-surface">
                     {manager.name}
                   </span>
-                  <span className="label-mono text-muted">{admin.topbar.role}</span>
+                  <span className="text-label-md text-muted">{admin.topbar.role}</span>
                 </span>
 
                 <AdminSignOut locale={locale} label={admin.topbar.signOut} />

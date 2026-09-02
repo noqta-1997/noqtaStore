@@ -47,7 +47,7 @@ export function ReviewForm({ bookId, labels, errorMessages }: ReviewFormProps) {
 
   return (
     <ActionForm
-      className="space-y-4 rounded-md border border-line bg-surface-low p-5"
+      className="space-y-4 rounded-xl border border-line bg-surface-low p-5"
       action={submitReview}
       successTitle={labels.success}
       errorMessages={errorMessages}
@@ -71,17 +71,20 @@ export function ReviewForm({ bookId, labels, errorMessages }: ReviewFormProps) {
               onClick={() => setRating(value)}
               aria-label={String(value)}
               aria-pressed={rating === value}
+              /* `--gold` is one of the few fills that does not flip with the
+                 theme, so it takes the fixed dark ink rather than a
+                 theme-aware foreground. */
               className={cn(
-                "flex size-9 items-center justify-center border transition-colors",
+                "flex size-10 items-center justify-center rounded-full border transition-colors duration-100 ease-fluent",
                 value <= rating
-                  ? "border-line bg-primary-container text-on-primary-container"
+                  ? "border-transparent bg-gold text-anchor"
                   : "border-line-divider text-muted hover:border-line",
               )}
             >
               <Star
                 aria-hidden
                 className="size-4"
-                strokeWidth={2}
+                strokeWidth={1.75}
                 fill={value <= rating ? "currentColor" : "none"}
               />
             </button>
