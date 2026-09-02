@@ -1,8 +1,7 @@
 "use client";
 
+import { Tab, TabList } from "@fluentui/react-components";
 import { useId, useState, type ReactNode } from "react";
-
-import { cn } from "@/lib/utils";
 
 export interface TabItem {
   id: string;
@@ -15,41 +14,35 @@ interface TabsProps {
   className?: string;
 }
 
-/** Accessible tab list; panels are rendered by the server and passed in. */
+/**
+ * Fluent's TabList. Panels stay server-rendered and arrive as props, so the
+ * page using this is still a Server Component.
+ *
+ * The hand-rolled version had correct ARIA but no keyboard navigation: arrow
+ * keys did nothing and every tab was a separate tab stop. Fluent brings the
+ * roving tabindex that `role="tablist"` implies.
+ */
 export function Tabs({ items, className }: TabsProps) {
   const [active, setActive] = useState(items[0]?.id);
   const base = useId();
 
   return (
     <div className={className}>
-      <div
-        role="tablist"
-        className="flex flex-wrap gap-px border-b-2 border-line"
+      <TabList
+        selectedValue={active}
+        onTabSelect={(_, data) => setActive(String(data.value))}
       >
-        {items.map((item) => {
-          const selected = item.id === active;
-
-          return (
-            <button
-              key={item.id}
-              type="button"
-              role="tab"
-              id={`${base}-tab-${item.id}`}
-              aria-selected={selected}
-              aria-controls={`${base}-panel-${item.id}`}
-              onClick={() => setActive(item.id)}
-              className={cn(
-                "px-4 py-3 text-label-md transition-colors sm:px-6",
-                selected
-                  ? "bg-primary-container font-semibold text-on-primary-container"
-                  : "bg-card text-on-surface-variant hover:bg-surface-high hover:text-on-surface",
-              )}
-            >
-              {item.label}
-            </button>
-          );
-        })}
-      </div>
+        {items.map((item) => (
+          <Tab
+            key={item.id}
+            value={item.id}
+            id={`${base}-tab-${item.id}`}
+            aria-controls={`${base}-panel-${item.id}`}
+          >
+            {item.label}
+          </Tab>
+        ))}
+      </TabList>
 
       {items.map((item) => (
         <div
@@ -58,7 +51,7 @@ export function Tabs({ items, className }: TabsProps) {
           id={`${base}-panel-${item.id}`}
           aria-labelledby={`${base}-tab-${item.id}`}
           hidden={item.id !== active}
-          className="border border-t-0 border-line bg-card p-5 sm:p-8"
+          className="rounded-b-md border border-t-0 border-line bg-card p-4 sm:p-6"
         >
           {item.content}
         </div>

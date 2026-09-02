@@ -102,7 +102,7 @@ export function ConfirmDialog({
           className={cn(
             "inline-flex items-center gap-2 border border-line bg-error-container px-4 py-2.5",
             "text-label-md font-semibold text-on-error-container transition-all",
-            "hover:-translate-y-0.5 hover:shadow-hard-sm",
+            "hover:-translate-y-0.5 hover:elevation-sm",
             className,
           )}
         >
@@ -119,7 +119,7 @@ export function ConfirmDialog({
         closeLabel={labels.cancel}
         footer={
           <>
-            <Button variant="ghost" onClick={() => setOpen(false)}>
+            <Button variant="subtle" onClick={() => setOpen(false)}>
               {labels.cancel}
             </Button>
             <Button
@@ -133,7 +133,7 @@ export function ConfirmDialog({
         }
       >
         {itemName ? (
-          <p className="border border-line bg-surface-high px-4 py-3 text-body-md text-on-surface">
+          <p className="border border-line bg-surface-low px-4 py-3 text-body-md text-on-surface">
             {itemName}
           </p>
         ) : null}

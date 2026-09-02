@@ -1,6 +1,15 @@
 "use client";
 
 import {
+  Menu,
+  MenuDivider,
+  MenuItem,
+  MenuItemLink,
+  MenuList,
+  MenuPopover,
+  MenuTrigger,
+} from "@fluentui/react-components";
+import {
   ChevronDown,
   Heart,
   LogOut,
@@ -11,7 +20,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { buttonStyles } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -40,8 +49,6 @@ interface AccountMenuProps {
 export function AccountMenu({ locale, labels }: AccountMenuProps) {
   const router = useRouter();
   const [displayName, setDisplayName] = useState<string | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -67,25 +74,6 @@ export function AccountMenu({ locale, labels }: AccountMenuProps) {
     };
   }, []);
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const onPointerDown = (event: PointerEvent) => {
-      if (!container.current?.contains(event.target as Node)) setIsOpen(false);
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsOpen(false);
-    };
-
-    document.addEventListener("pointerdown", onPointerDown);
-    document.addEventListener("keydown", onKeyDown);
-
-    return () => {
-      document.removeEventListener("pointerdown", onPointerDown);
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [isOpen]);
-
   if (!displayName) {
     return (
       <>
@@ -105,7 +93,7 @@ export function AccountMenu({ locale, labels }: AccountMenuProps) {
           href={`/${locale}/login`}
           aria-label={labels.account}
           title={labels.account}
-          className="inline-flex size-10 items-center justify-center border border-transparent text-on-surface transition-colors hover:border-line hover:bg-surface-high lg:hidden"
+          className="inline-flex size-10 items-center justify-center border border-transparent text-on-surface transition-colors hover:border-line hover:bg-state-hover lg:hidden"
         >
           <UserRound aria-hidden className="size-5" strokeWidth={2} />
         </Link>
@@ -124,83 +112,75 @@ export function AccountMenu({ locale, labels }: AccountMenuProps) {
   const signOut = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    setIsOpen(false);
     router.replace(`/${locale}`);
     router.refresh();
   };
 
   return (
-    <div ref={container} className="relative">
-      <button
-        type="button"
-        onClick={() => setIsOpen((open) => !open)}
-        aria-expanded={isOpen}
-        aria-haspopup="menu"
-        className={cn(
-          "flex items-center gap-2 border px-2 py-1.5 transition-colors",
-          isOpen
-            ? "border-line bg-surface-high"
-            : "border-transparent hover:border-line hover:bg-surface-high",
-        )}
-      >
-        <span
-          aria-hidden
-          className="flex size-8 shrink-0 items-center justify-center border border-line bg-primary-container font-display text-sm font-bold text-on-primary-container"
-        >
-          {displayName.slice(0, 1)}
-        </span>
-        <span className="hidden max-w-28 truncate text-label-md text-on-surface lg:inline">
-          {displayName}
-        </span>
-        <ChevronDown
-          aria-hidden
+    /*
+     * Fluent's Menu. The hand-rolled dropdown had `role="menu"` but none of the
+     * behaviour that role promises: no arrow-key navigation, no typeahead, no
+     * focus return to the trigger, and its outside-click and Escape handling
+     * were written by hand. All of that now comes from the component.
+     */
+    <Menu positioning="below-end">
+      <MenuTrigger disableButtonEnhancement>
+        <button
+          type="button"
           className={cn(
-            "hidden size-4 text-muted transition-transform lg:block",
-            isOpen && "rotate-180",
+            "flex items-center gap-2 rounded-md border border-transparent px-2 py-1",
+            "transition-colors duration-100 ease-fluent hover:bg-state-hover",
           )}
-          strokeWidth={2}
-        />
-      </button>
-
-      {isOpen ? (
-        <div
-          role="menu"
-          className="absolute end-0 top-[calc(100%+0.5rem)] z-50 w-60 border-2 border-line bg-card shadow-hard"
         >
-          <div className="border-b border-line px-4 py-3">
-            <p className="label-mono text-muted">{labels.signedInAs}</p>
-            <p className="truncate text-body-md font-semibold text-on-surface">
-              {displayName}
-            </p>
-          </div>
-
-          <ul className="py-1">
-            {items.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  role="menuitem"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2.5 px-4 py-2.5 text-body-md text-on-surface-variant transition-colors hover:bg-surface-high hover:text-on-surface"
-                >
-                  <item.icon aria-hidden className="size-4 shrink-0" strokeWidth={2} />
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          <button
-            type="button"
-            role="menuitem"
-            onClick={signOut}
-            className="flex w-full items-center gap-2.5 border-t border-line px-4 py-2.5 text-body-md text-error transition-colors hover:bg-error-container hover:text-on-error-container"
+          <span
+            aria-hidden
+            className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary-container text-label-md font-semibold text-on-primary-container"
           >
-            <LogOut aria-hidden className="size-4 shrink-0 rtl:rotate-180" strokeWidth={2} />
-            {labels.logout}
-          </button>
+            {displayName.slice(0, 1)}
+          </span>
+          <span className="hidden max-w-28 truncate text-body-md text-on-surface lg:inline">
+            {displayName}
+          </span>
+          <ChevronDown
+            aria-hidden
+            className="hidden size-4 text-muted lg:block"
+            strokeWidth={2}
+          />
+        </button>
+      </MenuTrigger>
+
+      <MenuPopover>
+        <div className="px-3 py-2">
+          <p className="label-mono text-muted">{labels.signedInAs}</p>
+          <p className="truncate text-body-md font-semibold text-on-surface">
+            {displayName}
+          </p>
         </div>
-      ) : null}
-    </div>
+        <MenuDivider />
+
+        <MenuList>
+          {items.map((item) => (
+            <MenuItemLink
+              key={item.href}
+              icon={<item.icon aria-hidden className="size-4" strokeWidth={2} />}
+              href={item.href}
+            >
+              {item.label}
+            </MenuItemLink>
+          ))}
+
+          <MenuDivider />
+
+          <MenuItem
+            icon={
+              <LogOut aria-hidden className="size-4 rtl:rotate-180" strokeWidth={2} />
+            }
+            onClick={signOut}
+          >
+            {labels.logout}
+          </MenuItem>
+        </MenuList>
+      </MenuPopover>
+    </Menu>
   );
 }

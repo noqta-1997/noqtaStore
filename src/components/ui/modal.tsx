@@ -1,9 +1,19 @@
 "use client";
 
-import { X } from "lucide-react";
-import { useEffect, type ReactNode } from "react";
+import {
+  Dialog,
+  DialogActions,
+  DialogBody,
+  DialogContent,
+  DialogSurface,
+  DialogTitle,
+  DialogTrigger,
+} from "@fluentui/react-components";
+import { Dismiss24Regular } from "@fluentui/react-icons";
+import type { ReactNode } from "react";
 
 import { IconButton } from "@/components/ui/icon-button";
+import { useRestoreFocus } from "@/components/ui/use-restore-focus";
 import { cn } from "@/lib/utils";
 
 interface ModalProps {
@@ -17,7 +27,17 @@ interface ModalProps {
   className?: string;
 }
 
-/** Centred dialog: hard frame, hard shadow, no blur — same language as the cards. */
+/**
+ * Fluent's Dialog, behind the props this component already had — so every
+ * caller, `ConfirmDialog` included, is untouched.
+ *
+ * The hand-rolled version had no focus trap, never restored focus on close,
+ * and used an unlabelled full-screen `<button>` as its backdrop. Fluent brings
+ * all of that: focus moves in on open, `Tab` cycles inside the surface, `Esc`
+ * closes, focus returns to whatever opened it, and the rest of the page is
+ * made inert. That is the whole reason this island exists rather than being
+ * another Tailwind component.
+ */
 export function Modal({
   open,
   onClose,
@@ -28,62 +48,39 @@ export function Modal({
   footer,
   className,
 }: ModalProps) {
-  useEffect(() => {
-    if (!open) return;
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-
-    document.addEventListener("keydown", onKeyDown);
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = "";
-    };
-  }, [open, onClose]);
-
-  if (!open) return null;
+  useRestoreFocus(open);
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-      <button
-        type="button"
-        aria-label={closeLabel}
-        onClick={onClose}
-        className="absolute inset-0 bg-inverse-surface/70"
-      />
-
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        className={cn(
-          "relative w-full max-w-md border-2 border-line bg-card shadow-hard",
-          className,
-        )}
-      >
-        <div className="flex items-start justify-between gap-4 border-b border-line p-5">
-          <div className="min-w-0 space-y-1">
-            <h2 className="font-display text-lg font-bold text-on-surface">{title}</h2>
+    <Dialog
+      open={open}
+      onOpenChange={(_, data) => {
+        if (!data.open) onClose();
+      }}
+    >
+      <DialogSurface className={cn("max-w-md", className)}>
+        <DialogBody>
+          <DialogTitle
+            action={
+              <DialogTrigger action="close" disableButtonEnhancement>
+                <IconButton variant="subtle" label={closeLabel}>
+                  <Dismiss24Regular aria-hidden className="size-5" />
+                </IconButton>
+              </DialogTrigger>
+            }
+          >
+            <span className="text-headline-md">{title}</span>
             {description ? (
-              <p className="text-body-md text-on-surface-variant">{description}</p>
+              <span className="mt-1 block text-body-md font-normal text-on-surface-variant">
+                {description}
+              </span>
             ) : null}
-          </div>
-          <IconButton variant="ghost" label={closeLabel} onClick={onClose}>
-            <X aria-hidden className="size-5" strokeWidth={2} />
-          </IconButton>
-        </div>
+          </DialogTitle>
 
-        {children ? <div className="p-5">{children}</div> : null}
+          {children ? <DialogContent>{children}</DialogContent> : null}
 
-        {footer ? (
-          <div className="flex flex-wrap items-center justify-end gap-2 border-t border-line p-5">
-            {footer}
-          </div>
-        ) : null}
-      </div>
-    </div>
+          {footer ? <DialogActions>{footer}</DialogActions> : null}
+        </DialogBody>
+      </DialogSurface>
+    </Dialog>
   );
 }

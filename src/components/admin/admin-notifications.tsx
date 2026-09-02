@@ -1,9 +1,11 @@
 "use client";
 
+import { Popover, PopoverSurface, PopoverTrigger } from "@fluentui/react-components";
 import { Bell, PackageX, Settings2, ShoppingBag, Star } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
+import { IconButton } from "@/components/ui/icon-button";
 import { cn } from "@/lib/utils";
 import type { AdminNotification, AdminNotificationKind } from "@/types";
 
@@ -47,56 +49,39 @@ export function AdminNotifications({
   labels,
 }: AdminNotificationsProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const container = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const onPointerDown = (event: PointerEvent) => {
-      if (!container.current?.contains(event.target as Node)) setIsOpen(false);
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsOpen(false);
-    };
-
-    document.addEventListener("pointerdown", onPointerDown);
-    document.addEventListener("keydown", onKeyDown);
-
-    return () => {
-      document.removeEventListener("pointerdown", onPointerDown);
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [isOpen]);
 
   return (
-    <div ref={container} className="relative">
-      <button
-        type="button"
-        onClick={() => setIsOpen((open) => !open)}
-        aria-label={labels.trigger}
-        title={labels.trigger}
-        aria-expanded={isOpen}
-        className="relative inline-flex size-9 items-center justify-center border border-transparent text-on-surface transition-colors hover:border-line hover:bg-surface-high"
-      >
-        <Bell aria-hidden className="size-4.5" strokeWidth={2} />
-        {total > 0 ? (
-          <span
-            className="absolute -end-1 -top-1 flex size-4 items-center justify-center border border-line bg-primary-container font-mono text-[0.5625rem] font-semibold text-on-primary-container"
-            data-numeric
-          >
-            {total > 99 ? "99+" : total}
-          </span>
-        ) : null}
-      </button>
+    /*
+     * The last hand-rolled floating layer. It had its own outside-click and
+     * escape listeners and no focus management; Fluent's Popover brings both,
+     * and dismissal now behaves the same as every other overlay in the app.
+     */
+    <Popover
+      open={isOpen}
+      onOpenChange={(_, data) => setIsOpen(data.open)}
+      positioning="below-end"
+    >
+      <PopoverTrigger disableButtonEnhancement>
+        <IconButton variant="subtle" size="md" label={labels.trigger} className="relative">
+          <Bell aria-hidden className="size-4.5" strokeWidth={2} />
+          {total > 0 ? (
+            <span
+              className="absolute -end-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-primary-container font-mono text-[0.5625rem] font-semibold text-on-primary-container"
+              data-numeric
+            >
+              {total > 99 ? "99+" : total}
+            </span>
+          ) : null}
+        </IconButton>
+      </PopoverTrigger>
 
-      {isOpen ? (
-        <div className="absolute end-0 top-full z-40 mt-1 w-80 max-w-[calc(100vw-2rem)] border border-line bg-card shadow-hard">
-          <p className="border-b border-line px-4 py-3 text-label-md font-semibold text-on-surface">
+      <PopoverSurface className="w-80 max-w-[calc(100vw-2rem)] p-0">
+          <p className="border-b border-line-divider px-4 py-3 text-label-md font-semibold text-on-surface">
             {labels.title}
           </p>
 
           {items.length ? (
-            <ul className="max-h-96 divide-y divide-outline-variant overflow-y-auto">
+            <ul className="max-h-96 divide-y divide-line-divider overflow-y-auto">
               {items.map((item) => {
                 const Icon = icons[item.kind];
 
@@ -105,9 +90,9 @@ export function AdminNotifications({
                     <Link
                       href={item.href}
                       onClick={() => setIsOpen(false)}
-                      className="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-surface-high"
+                      className="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-state-hover"
                     >
-                      <span className="flex size-8 shrink-0 items-center justify-center border border-line bg-surface-high text-primary">
+                      <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-line bg-surface-low text-primary">
                         <Icon aria-hidden className="size-4" strokeWidth={2} />
                       </span>
                       <span className="min-w-0 flex-1">
@@ -138,15 +123,14 @@ export function AdminNotifications({
             href={settingsHref}
             onClick={() => setIsOpen(false)}
             className={cn(
-              "flex items-center gap-2 border-t border-line px-4 py-3",
-              "text-label-md text-on-surface-variant transition-colors hover:bg-surface-high hover:text-on-surface",
+              "flex items-center gap-2 border-t border-line-divider px-4 py-3",
+              "text-label-md text-on-surface-variant transition-colors hover:bg-state-hover hover:text-on-surface",
             )}
           >
             <Settings2 aria-hidden className="size-4" strokeWidth={2} />
             {labels.settings}
           </Link>
-        </div>
-      ) : null}
-    </div>
+      </PopoverSurface>
+    </Popover>
   );
 }
