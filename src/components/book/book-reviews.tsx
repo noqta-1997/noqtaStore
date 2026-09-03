@@ -2,6 +2,7 @@ import { MessageSquareQuote } from "lucide-react";
 
 import { ReviewForm } from "@/components/book/review-form";
 import { Rating } from "@/components/ui/rating";
+import { Surface } from "@/components/ui/surface";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { formatDate, formatNumber } from "@/lib/format";
@@ -27,7 +28,10 @@ export function BookReviews({ book, reviews, locale, dictionary }: BookReviewsPr
   return (
     <div className="space-y-8">
       <div className="grid gap-6 sm:grid-cols-12 sm:items-center">
-        <div className="space-y-2 rounded-xl border border-line bg-surface-low p-6 text-center sm:col-span-4">
+        <Surface
+          appearance="filled-alternative"
+          className="space-y-2 p-6 text-center sm:col-span-4"
+        >
           <p className="font-display text-5xl font-bold text-on-surface" data-numeric>
             {book.rating.toFixed(1)}
           </p>
@@ -38,7 +42,7 @@ export function BookReviews({ book, reviews, locale, dictionary }: BookReviewsPr
             <span data-numeric>{formatNumber(book.reviewsCount, locale)}</span>{" "}
             {dictionary.common.reviews}
           </p>
-        </div>
+        </Surface>
 
         <ul className="space-y-2 sm:col-span-8">
           {distribution.map((row) => (

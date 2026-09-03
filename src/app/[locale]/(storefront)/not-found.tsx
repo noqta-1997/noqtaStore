@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 
 import { buttonStyles } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { Surface } from "@/components/ui/surface";
 
 /**
  * `not-found.tsx` receives no route params, so the locale is read from the
@@ -37,7 +38,7 @@ export default function StorefrontNotFound() {
 
   return (
     <Container className="py-16 lg:py-24">
-      <div className="mx-auto max-w-lg space-y-5 rounded-xl border border-line bg-card p-8 text-center elevation-md">
+      <Surface className="mx-auto max-w-lg space-y-5 p-8 text-center elevation-md">
         <p className="label-mono text-primary">{t.code}</p>
         <p
           aria-hidden
@@ -62,7 +63,7 @@ export default function StorefrontNotFound() {
             {t.search}
           </Link>
         </div>
-      </div>
+      </Surface>
     </Container>
   );
 }

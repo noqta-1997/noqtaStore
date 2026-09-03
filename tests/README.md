@@ -83,8 +83,18 @@ account and admin pages, sign in once by hand and save the session:
 npx playwright open --save-storage=tests/.auth/user.json http://localhost:3000/ar/login
 ```
 
-`tests/.auth/` is gitignored. Until that file exists, `visual/gated.spec.ts`
-skips, so those four pages stay a visible gap rather than a silent one.
+Two things the command does not say out loud. The path is **relative to where
+you run it**, so run it from the repository root or the file lands somewhere
+else entirely. And the state is written when the **browser window is closed**,
+not when the sign-in succeeds — closing the terminal instead leaves no file.
+Check with `ls tests/.auth/` before assuming it worked.
+
+`tests/.auth/` is gitignored. Until that file exists both `visual/gated.spec.ts`
+and `a11y/gated.spec.ts` skip, so the six pages stay a visible gap rather than a
+silent one. The accessibility report for them is written separately, as
+`__a11y__/gated-<project>.json`: two spec files cannot write one file without
+clobbering each other, and keeping them apart also keeps the public numbers
+comparable across the runs where no session exists.
 
 ## What is committed
 
