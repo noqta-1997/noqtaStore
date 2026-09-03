@@ -90,8 +90,18 @@ not when the sign-in succeeds — closing the terminal instead leaves no file.
 Check with `ls tests/.auth/` before assuming it worked.
 
 `tests/.auth/` is gitignored. Until that file exists both `visual/gated.spec.ts`
-and `a11y/gated.spec.ts` skip, so the six pages stay a visible gap rather than a
-silent one. The accessibility report for them is written separately, as
+and `a11y/gated.spec.ts` skip, so the fourteen pages stay a visible gap rather
+than a silent one. What does *not* wait for a session is the functional check:
+every gated page is asserted to redirect an anonymous visitor to /login, and
+that runs today.
+
+Two of the fourteen are marked `volatile` and are scanned for accessibility
+only. `getAdminStats` measures against the first of the current month and
+`getSalesSeries` walks the last twelve, so the dashboard and the report page
+re-bucket every month: a screenshot of either expires on the first, and a
+baseline that has to be re-captured monthly stops being a baseline. Everything
+time-invariant about them — the shell, the navigation, the panel chrome — is
+still covered by the other admin pages. The accessibility report for them is written separately, as
 `__a11y__/gated-<project>.json`: two spec files cannot write one file without
 clobbering each other, and keeping them apart also keeps the public numbers
 comparable across the runs where no session exists.

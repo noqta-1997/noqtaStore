@@ -35,6 +35,11 @@ test.describe("visual · authenticated", () => {
   for (const locale of LOCALES) {
     for (const pageCase of GATED_PAGES) {
       test(`${pageCase.id} · ${locale}`, async ({ page }, testInfo) => {
+        test.skip(
+          pageCase.volatile === true,
+          "content is derived from the current date — accessibility only",
+        );
+
         const theme: Theme = testInfo.project.name.endsWith("-dark")
           ? "dark"
           : "light";

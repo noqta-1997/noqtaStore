@@ -17,6 +17,15 @@ export interface PageCase {
   path: (locale: Locale) => string;
   /** Requires an authenticated session. */
   gated?: boolean;
+
+  /**
+   * The page derives its content from the current date, so a screenshot of
+   * it expires. `getAdminStats` measures against the first of this month and
+   * `getSalesSeries` walks the last twelve, so both re-bucket every month.
+   * These are scanned for accessibility, which is time-invariant, and left
+   * out of the visual baseline rather than re-captured every month.
+   */
+  volatile?: boolean;
   /** A selector that must be present before the page counts as settled. */
   ready?: string;
 }
@@ -80,7 +89,12 @@ export const PAGES: PageCase[] = [
     gated: true,
     ready: "main",
   },
-  { id: "admin-dashboard", path: (l) => `/${l}/admin`, gated: true },
+  {
+    id: "admin-dashboard",
+    path: (l) => `/${l}/admin`,
+    gated: true,
+    volatile: true,
+  },
   { id: "admin-books", path: (l) => `/${l}/admin/books`, gated: true },
   { id: "checkout", path: (l) => `/${l}/checkout`, gated: true, ready: "main" },
   {
@@ -88,6 +102,46 @@ export const PAGES: PageCase[] = [
     path: (l) => `/${l}/checkout/success`,
     gated: true,
     ready: "main",
+  },
+
+  // The account half: every list shape the reader can reach, plus the one
+  // detail page. Order o1 is seeded with a timeline that is entirely in the
+  // past, so the "done" marks mappers.ts recomputes against now cannot move.
+  {
+    id: "account-addresses",
+    path: (l) => `/${l}/account/addresses`,
+    gated: true,
+    ready: "main",
+  },
+  {
+    id: "account-reviews",
+    path: (l) => `/${l}/account/reviews`,
+    gated: true,
+    ready: "main",
+  },
+  {
+    id: "account-wishlist",
+    path: (l) => `/${l}/account/wishlist`,
+    gated: true,
+    ready: "main",
+  },
+  {
+    id: "account-order-detail",
+    path: (l) => `/${l}/account/orders/o1`,
+    gated: true,
+    ready: "main",
+  },
+
+  // The admin half: the table page, the list-beside-a-form page, the long
+  // form, and the report. admin-books already covers the plain table.
+  { id: "admin-orders", path: (l) => `/${l}/admin/orders`, gated: true },
+  { id: "admin-authors", path: (l) => `/${l}/admin/authors`, gated: true },
+  { id: "admin-book-new", path: (l) => `/${l}/admin/books/new`, gated: true },
+  {
+    id: "admin-reports",
+    path: (l) => `/${l}/admin/reports`,
+    gated: true,
+    volatile: true,
   },
 ];
 
