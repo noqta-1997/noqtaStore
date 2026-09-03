@@ -62,6 +62,14 @@ wrong diagnoses during the Phase 0 spike. Also allow for exit animations: a
 dialog stays in the DOM for a moment after it is logically closed, so assert on
 what the user can see, not on whether a node still exists.
 
+**The ratio is blind to small text.** `maxDiffPixelRatio` is 0.002 of a
+**full-page** capture, which on a 1440-wide page is several thousand pixels —
+more than a line of placeholder text occupies. Rewording the header search
+placeholder changed 180 of the 228 baselines and the suite passed on every one
+of them. If a change is copy rather than layout, re-capture with
+`--update-snapshots=all` and read `git status`: `--update-snapshots` on its own
+only rewrites snapshots that already failed, so it will do nothing.
+
 **Capture mode must stay constant.** These baselines were taken against
 `next dev`. Comparing them to a production build would report differences that
 belong to the build, not to the migration.

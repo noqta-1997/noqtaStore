@@ -5,7 +5,7 @@
   },
   "common": {
     "search": "Search",
-    "searchPlaceholder": "Search for a book, author or publisher…",
+    "searchPlaceholder": "Book or author…",
     "cart": "Cart",
     "wishlist": "Wishlist",
     "account": "Account",
