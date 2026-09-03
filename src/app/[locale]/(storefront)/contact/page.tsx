@@ -8,6 +8,7 @@ import { Field } from "@/components/ui/field";
 import { ValidatedField } from "@/components/ui/validated-field";
 import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/ui/page-header";
+import { Surface, surfaceTitleStyles } from "@/components/ui/surface";
 import { Textarea } from "@/components/ui/textarea";
 import { sendContactMessage } from "@/app/actions/marketing";
 import { ActionForm } from "@/components/ui/action-form";
@@ -72,10 +73,8 @@ export default async function ContactPage({ params }: ContactPageProps) {
       />
 
       <Container className="grid gap-6 py-8 lg:grid-cols-12 lg:gap-8 lg:py-12">
-        <section className="rounded-xl border border-line bg-card lg:col-span-7">
-          <h2 className="border-b border-line px-5 py-4 text-headline-md">
-            {t.formTitle}
-          </h2>
+        <Surface as="section" className="lg:col-span-7">
+          <h2 className={surfaceTitleStyles()}>{t.formTitle}</h2>
           <ActionForm
             className="space-y-4 p-5"
             action={sendContactMessage}
@@ -114,13 +113,11 @@ export default async function ContactPage({ params }: ContactPageProps) {
               {t.send}
             </Button>
           </ActionForm>
-        </section>
+        </Surface>
 
         <aside className="space-y-4 lg:col-span-5">
-          <section className="rounded-xl border border-line bg-card">
-            <h2 className="border-b border-line px-5 py-4 text-headline-md">
-              {t.channels}
-            </h2>
+          <Surface as="section">
+            <h2 className={surfaceTitleStyles()}>{t.channels}</h2>
             <ul className="divide-y divide-line-divider">
               {channels.map((channel) => (
                 <li key={channel.label} className="flex items-center gap-3 px-5 py-4">
@@ -136,15 +133,19 @@ export default async function ContactPage({ params }: ContactPageProps) {
                 </li>
               ))}
             </ul>
-          </section>
+          </Surface>
 
-          <section className="flex items-center gap-3 rounded-xl border border-line bg-surface-low p-5">
+          <Surface
+            as="section"
+            appearance="filled-alternative"
+            className="flex items-center gap-3 p-5"
+          >
             <Clock aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={1.75} />
             <div>
               <p className="label-mono text-muted">{t.hours}</p>
               <p className="text-body-md text-on-surface">{t.hoursValue}</p>
             </div>
-          </section>
+          </Surface>
         </aside>
       </Container>
     </>

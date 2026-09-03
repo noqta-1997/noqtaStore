@@ -9,7 +9,9 @@ import { Button, buttonStyles } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
+import { List } from "@/components/ui/list-row";
 import { PageHeader } from "@/components/ui/page-header";
+import { Surface } from "@/components/ui/surface";
 import { getCart, getShippingRules } from "@/data";
 import { applyCoupon, clearCoupon } from "@/app/actions/cart";
 import { ActionForm } from "@/components/ui/action-form";
@@ -78,7 +80,10 @@ export default async function CartPage({ params, searchParams }: CartPageProps) 
         {lines.length ? (
           <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
             <div className="min-w-0 space-y-4 lg:col-span-8">
-              <div className="flex items-center gap-3 rounded-xl border border-line bg-surface-low p-4">
+              <Surface
+                appearance="filled-alternative"
+                className="flex items-center gap-3 p-4"
+              >
                 <Truck aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={1.75} />
                 <div className="min-w-0 flex-1 space-y-2">
                   <p className="text-label-md text-on-surface">
@@ -93,9 +98,9 @@ export default async function CartPage({ params, searchParams }: CartPageProps) 
                     />
                   </span>
                 </div>
-              </div>
+              </Surface>
 
-              <ul className="divide-y divide-line-divider rounded-xl border border-line bg-card">
+              <List>
                 {lines.map((line) => (
                   <CartLineRow
                     key={line.bookId}
@@ -104,7 +109,7 @@ export default async function CartPage({ params, searchParams }: CartPageProps) 
                     dictionary={dictionary.common}
                   />
                 ))}
-              </ul>
+              </List>
 
               <Link
                 href={`/${locale}/books`}

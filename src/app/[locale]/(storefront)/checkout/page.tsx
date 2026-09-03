@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { RadioCard } from "@/components/ui/radio-card";
 import { Select } from "@/components/ui/select";
 import { Stepper } from "@/components/ui/stepper";
+import { Surface, surfaceTitleStyles } from "@/components/ui/surface";
 import { Textarea } from "@/components/ui/textarea";
 import { getCart, getDefaultPaymentMethod, getShippingRules } from "@/data";
 import { isLocale } from "@/i18n/config";
@@ -46,8 +47,8 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-line bg-card">
-      <h2 className="flex items-center gap-3 border-b border-line px-5 py-4 text-headline-md">
+    <Surface as="section">
+      <h2 className={surfaceTitleStyles("flex items-center gap-3")}>
         <span
           className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-label-md font-semibold text-primary"
           data-numeric
@@ -57,7 +58,7 @@ function SectionCard({
         {title}
       </h2>
       <div className="space-y-4 p-5">{children}</div>
-    </section>
+    </Surface>
   );
 }
 

@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { BookCover } from "@/components/book/book-cover";
 import { OrderSummary } from "@/components/commerce/order-summary";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { Surface, surfaceTitleStyles } from "@/components/ui/surface";
 import { getOrderById, getOrderItems } from "@/data";
 import { PrintButton } from "@/components/ui/print-button";
 import { isLocale } from "@/i18n/config";
@@ -88,7 +89,10 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
         {dictionary.account.orders.title}
       </Link>
 
-      <header className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-line bg-card p-5">
+      <Surface
+        as="header"
+        className="flex flex-wrap items-center justify-between gap-4 p-5"
+      >
         <div className="space-y-1">
           <h2 className="text-headline-md" data-numeric>
             {order.reference}
@@ -102,12 +106,10 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
           status={order.status}
           label={dictionary.orderStatus[order.status]}
         />
-      </header>
+      </Surface>
 
-      <section className="rounded-xl border border-line bg-card">
-        <h3 className="border-b border-line px-5 py-4 text-headline-md">
-          {t.timeline}
-        </h3>
+      <Surface as="section">
+        <h3 className={surfaceTitleStyles()}>{t.timeline}</h3>
         <ol className="space-y-0 p-5">
           {order.timeline.map((entry, index) => (
             <li key={entry.status} className="flex gap-4">
@@ -153,13 +155,11 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
             </li>
           ))}
         </ol>
-      </section>
+      </Surface>
 
       <div className="grid gap-6 lg:grid-cols-12">
-        <section className="rounded-xl border border-line bg-card lg:col-span-7">
-          <h3 className="border-b border-line px-5 py-4 text-headline-md">
-            {t.itemsTitle}
-          </h3>
+        <Surface as="section" className="lg:col-span-7">
+          <h3 className={surfaceTitleStyles()}>{t.itemsTitle}</h3>
           <ul className="divide-y divide-line-divider">
             {items.map((item) => (
               <li key={item.bookId} className="flex items-center gap-4 p-5">
@@ -193,7 +193,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
               </li>
             ))}
           </ul>
-        </section>
+        </Surface>
 
         <div className="space-y-6 lg:col-span-5">
           <OrderSummary
@@ -211,7 +211,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
             }
           />
 
-          <section className="rounded-xl border border-line bg-card p-5">
+          <Surface as="section" className="p-5">
             <dl className="space-y-4">
               {facts.map((fact) => (
                 <div key={fact.label}>
@@ -222,9 +222,13 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
                 </div>
               ))}
             </dl>
-          </section>
+          </Surface>
 
-          <section className="flex items-center gap-3 rounded-xl border border-line bg-surface-low p-5">
+          <Surface
+            as="section"
+            appearance="filled-alternative"
+            className="flex items-center gap-3 p-5"
+          >
             <LifeBuoy aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={1.75} />
             <div className="min-w-0">
               <p className="text-body-md text-on-surface">{t.needHelp}</p>
@@ -235,7 +239,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
                 {t.contactSupport}
               </Link>
             </div>
-          </section>
+          </Surface>
         </div>
       </div>
     </div>

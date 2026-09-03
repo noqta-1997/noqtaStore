@@ -14,6 +14,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Prisma Client is generated code, not source.
     "src/generated/**",
+    // Playwright writes both of these; neither is source.
+    "playwright-report/**",
+    "test-results/**",
   ]),
 ]);
 

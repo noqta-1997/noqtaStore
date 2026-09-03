@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Surface } from "@/components/ui/surface";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { createClient } from "@/utils/supabase/client";
 
@@ -49,13 +50,16 @@ export function ForgotPasswordForm({ locale, t }: ForgotPasswordFormProps) {
 
   if (sent) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-xl border border-line bg-surface-low p-6 text-center">
+      <Surface
+        appearance="filled-alternative"
+        className="flex flex-col items-center gap-3 p-6 text-center"
+      >
         <span className="flex size-12 items-center justify-center rounded-full bg-success text-on-success">
           <MailCheck aria-hidden className="size-5" strokeWidth={1.75} />
         </span>
         <p className="text-body-md text-on-surface">{t.linkSent}</p>
         <p className="text-label-sm text-muted">{t.forgotHint}</p>
-      </div>
+      </Surface>
     );
   }
 

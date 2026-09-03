@@ -563,11 +563,14 @@ than an omission:**
 
 2. **`Surface` and `ListRow` adoption.** ~23 and ~2–3 sites. Pure
    maintainability — the visual result is already correct — so it is best done
-   as its own pass rather than bolted onto a phase.
+   as its own pass rather than bolted onto a phase. *Done for the storefront;
+   see "The adoption pass" below for what is left and why.*
 
 **And one gap that is not a decision:** the admin panel and the account pages
 have no visual or accessibility coverage, because the suite will not create an
-account or type a password. A saved session closes it in one command.
+account or type a password. A saved session closes it in one command. *The
+public half of that gap is now closed — six layouts that were never captured
+are in the baseline. The gated half still needs the one command.*
 
 ---
 
@@ -651,3 +654,77 @@ and section headings in its serif and everything below in the running face; a
 shelf of ten serif card titles competes with the heading above it. Anything at
 `h3` that wants the serif asks for `font-display` at the call site — the book
 jacket placeholder does.
+
+---
+
+## The adoption pass — the storefront's panels stop being hand-written
+
+`Surface` was written in Phase 3 and the admin adopted it immediately, through
+`Panel`. The storefront never did: it kept writing
+`rounded-xl border border-line bg-card` at 38 call sites and
+`border-b border-line px-5 py-4 text-headline-md` at eight more, once per
+panel that has a title.
+
+That is now down to 28 and zero.
+
+### What moved, and what deliberately did not
+
+| Family | Sites | Moved to |
+| --- | --- | --- |
+| Titled panel frame | 10 | `Surface` |
+| Panel title | 8 | `surfaceTitleStyles()` |
+| Tinted aside | 5 | `Surface appearance="filled-alternative"` |
+| Framed divided list | 2 | `List` |
+
+What stayed hand-written, and why:
+
+- **The primitives themselves** — `EmptyState`, `RadioCard`, `Accordion`,
+  `DataTable`, the skeletons. They *are* the frame; wrapping a primitive in a
+  primitive buys nothing.
+- **The three interactive entity cards** — the category tile, the category
+  card and the publisher card. Each carries a bespoke hover treatment that is
+  not `Surface`'s (`hover:border-line-hover` on one, `hover:bg-card-hover` on
+  another), and folding them into `interactive` would either change what they
+  do on hover or add a third appearance for two call sites.
+- **Three `<form>` elements.** `Surface` renders a tag, not a form: it has no
+  `action` or `method`. Giving it arbitrary props to reach three sites is a
+  worse trade than three literal strings.
+- **The account and admin frames.** Not a judgement — those pages have no
+  screenshot, so a change there cannot be shown to be invisible. They are the
+  first thing to finish once a session exists.
+
+### Why `surfaceTitleStyles` and not `SurfaceHeader`
+
+`SurfaceHeader` already existed and was the obvious answer, and it was the
+wrong one. It is the *admin's* header: `px-4 py-3`, `text-body-lg`
+semibold, divided with `--line-divider`, and wrapped in a flex row that carries
+a subtitle and an action. The storefront's is `px-5 py-4`, `text-headline-md`,
+divided with `--line`, and carries a heading and nothing else.
+
+Those are not an inconsistency to reconcile — they are two densities, and the
+admin is meant to be the dense one. So the storefront got the styles rather
+than the component, in the shape `buttonStyles` already established here, and
+the heading level stays at the call site: a page's own panels are `h2`, a panel
+nested under one is `h3`.
+
+### How it was verified
+
+The pass is meant to be invisible, so "invisible" had to be measurable rather
+than asserted.
+
+Every call site was first run through the app's own `cn()` before it was
+touched, comparing the string it renders today against the string the
+primitive would render. Across all 12 frame swaps the difference was one class:
+`min-w-0`, which `Surface` adds by design, plus `overflow-hidden` on the two
+lists. Nothing was dropped and nothing else was added — which matters, because
+`cn()` is tailwind-merge, and tailwind-merge silently drops what it thinks
+conflicts. That check is what makes the swap on the four pages behind a login
+defensible rather than hopeful.
+
+Then the suite: 228 screenshots and 228 accessibility scans, all unchanged.
+
+`min-w-0` is a no-op on a block child and only bites on a flex or grid item,
+where it stops the item refusing to shrink below its content. Two of the sites
+are grid items — the contact form panel and the order items panel — and that
+is the behaviour this codebase wants there anyway: a grid column holding a
+table needs `min-w-0` or it overflows horizontally on mobile.

@@ -1,4 +1,5 @@
 import { Container } from "@/components/ui/container";
+import { List } from "@/components/ui/list-row";
 import { PageHeader } from "@/components/ui/page-header";
 import type { Crumb } from "@/components/ui/breadcrumb";
 
@@ -34,7 +35,7 @@ export function InfoPage({
 
       <Container className="py-8 lg:py-12">
         <div className="mx-auto max-w-3xl">
-          <ol className="divide-y divide-line-divider rounded-xl border border-line bg-card">
+          <List as="ol">
             {sections.map((section, index) => (
               <li key={section.title} className="flex gap-4 p-5 sm:gap-6 sm:p-8">
                 <span
@@ -51,7 +52,7 @@ export function InfoPage({
                 </div>
               </li>
             ))}
-          </ol>
+          </List>
         </div>
       </Container>
     </>

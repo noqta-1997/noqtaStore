@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Surface, surfaceTitleStyles } from "@/components/ui/surface";
 import { getCustomer } from "@/data";
 import { ChangePasswordForm } from "@/components/account/change-password-form";
 import { ActionForm } from "@/components/ui/action-form";
@@ -35,10 +36,10 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-line bg-card">
-      <h2 className="border-b border-line px-5 py-4 text-headline-md">{title}</h2>
+    <Surface as="section">
+      <h2 className={surfaceTitleStyles()}>{title}</h2>
       <div className="space-y-4 p-5">{children}</div>
-    </section>
+    </Surface>
   );
 }
 

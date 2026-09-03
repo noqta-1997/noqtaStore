@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import { buttonStyles } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { Surface, surfaceTitleStyles } from "@/components/ui/surface";
 import { getOrderById, getOrders } from "@/data";
 import { isLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
@@ -124,10 +125,8 @@ export default async function OrderSuccessPage({
           </div>
         </div>
 
-        <section className="rounded-xl border border-line bg-card">
-          <h2 className="border-b border-line px-5 py-4 text-headline-md">
-            {t.nextSteps}
-          </h2>
+        <Surface as="section">
+          <h2 className={surfaceTitleStyles()}>{t.nextSteps}</h2>
           <ol className="divide-y divide-line-divider">
             {steps.map((step, index) => (
               <li key={step.text} className="flex items-center gap-4 p-5">
@@ -142,7 +141,7 @@ export default async function OrderSuccessPage({
               </li>
             ))}
           </ol>
-        </section>
+        </Surface>
       </div>
     </Container>
   );

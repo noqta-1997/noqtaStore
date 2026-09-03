@@ -7,6 +7,7 @@ import { Accordion } from "@/components/ui/accordion";
 import { buttonStyles } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
+import { Surface } from "@/components/ui/surface";
 import { isLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 
@@ -47,7 +48,10 @@ export default async function FaqPage({ params }: FaqPageProps) {
         <div className="mx-auto max-w-3xl space-y-6">
           <Accordion items={page.items} />
 
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-line bg-surface-low p-5">
+          <Surface
+            appearance="filled-alternative"
+            className="flex flex-wrap items-center justify-between gap-4 p-5"
+          >
             <div className="flex items-center gap-3">
               <LifeBuoy aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={1.75} />
               <p className="text-body-md text-on-surface">
@@ -60,7 +64,7 @@ export default async function FaqPage({ params }: FaqPageProps) {
             >
               {dictionary.info.contact.title}
             </Link>
-          </div>
+          </Surface>
         </div>
       </Container>
     </>

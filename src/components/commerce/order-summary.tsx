@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/get-dictionary";
+import { Surface, surfaceTitleStyles } from "@/components/ui/surface";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -55,8 +56,8 @@ export function OrderSummary({
   ];
 
   return (
-    <section className={cn("rounded-xl border border-line bg-card", className)}>
-      <h2 className="border-b border-line px-5 py-4 text-headline-md">{title}</h2>
+    <Surface as="section" className={className}>
+      <h2 className={surfaceTitleStyles()}>{title}</h2>
 
       {children ? (
         <div className="border-b border-line px-5 py-4">{children}</div>
@@ -89,6 +90,6 @@ export function OrderSummary({
       </div>
 
       {footer ? <div className="px-5 pb-5">{footer}</div> : null}
-    </section>
+    </Surface>
   );
 }

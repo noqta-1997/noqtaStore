@@ -15,6 +15,7 @@ import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Container } from "@/components/ui/container";
 import { QuantityStepper } from "@/components/ui/quantity-stepper";
 import { Rating } from "@/components/ui/rating";
+import { Surface } from "@/components/ui/surface";
 import { Tabs } from "@/components/ui/tabs";
 import {
   getBookBySlug,
@@ -155,7 +156,7 @@ export default async function BookPage({ params }: BookPageProps) {
             />
           </div>
 
-          <div className="space-y-4 rounded-xl border border-line bg-card p-5 elevation-sm">
+          <Surface className="space-y-4 p-5 elevation-sm">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <PriceTag
                 price={book.price}
@@ -223,7 +224,7 @@ export default async function BookPage({ params }: BookPageProps) {
                 </li>
               ))}
             </ul>
-          </div>
+          </Surface>
 
           <Tabs
             items={[

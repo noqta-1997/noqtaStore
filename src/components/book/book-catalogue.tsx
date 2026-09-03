@@ -7,6 +7,7 @@ import { SortSelect } from "@/components/book/sort-select";
 import { Container } from "@/components/ui/container";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
+import { Surface } from "@/components/ui/surface";
 import type { BookQueryResult, SortKey } from "@/data";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/get-dictionary";
@@ -90,7 +91,7 @@ export function BookCatalogue({
       </aside>
 
       <div className="space-y-6 lg:col-span-9">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-card px-4 py-3">
+        <Surface className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
           <p className="text-label-md text-muted">
             <span className="font-semibold text-on-surface" data-numeric>
               {formatNumber(result.total, locale)}
@@ -102,7 +103,7 @@ export function BookCatalogue({
             label={dictionary.common.sort}
             options={sortOptions}
           />
-        </div>
+        </Surface>
 
         <FilterSheet
           labels={{

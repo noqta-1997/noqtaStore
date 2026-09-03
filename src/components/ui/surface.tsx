@@ -91,3 +91,18 @@ export function SurfaceHeader({
     </div>
   );
 }
+
+/**
+ * The storefront panel title — a heading that draws the panel's own first
+ * divider.
+ *
+ * `SurfaceHeader` is the admin's header bar: denser, and built to carry a
+ * subtitle and an action alongside the title. The storefront panels are
+ * roomier and carry nothing but the heading, and eight of them had written
+ * the same string by hand. Exported as styles rather than as a component
+ * because the call sites choose their own heading level — a page's own panels
+ * are `h2`, a panel nested under one is `h3`.
+ */
+export function surfaceTitleStyles(className?: string) {
+  return cn("border-b border-line px-5 py-4 text-headline-md", className);
+}
