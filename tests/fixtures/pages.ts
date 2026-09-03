@@ -47,6 +47,30 @@ export const PAGES: PageCase[] = [
   { id: "cart", path: (l) => `/${l}/cart`, ready: "main" },
   { id: "login", path: (l) => `/${l}/login`, ready: "main form" },
   { id: "faq", path: (l) => `/${l}/faq`, ready: "main" },
+  { id: "contact", path: (l) => `/${l}/contact`, ready: "main form" },
+  {
+    id: "publisher-detail",
+    path: (l) => `/${l}/publishers/dar-el-shorouk`,
+    ready: "main",
+  },
+  { id: "register", path: (l) => `/${l}/register`, ready: "main form" },
+  {
+    id: "forgot-password",
+    path: (l) => `/${l}/forgot-password`,
+    ready: "main form",
+  },
+
+  // Reached without a recovery token, which is the state a reader lands in
+  // when the link has expired. It renders the error panel, not the form.
+  { id: "reset-password", path: (l) => `/${l}/reset-password`, ready: "main" },
+
+  // A real miss inside the storefront group, so the 404 renders under the
+  // site chrome rather than the bare root shell.
+  {
+    id: "not-found",
+    path: (l) => `/${l}/books/no-such-book`,
+    ready: "main",
+  },
 
   // Behind auth — infrastructure is ready, capture is skipped without a session.
   { id: "account", path: (l) => `/${l}/account`, gated: true, ready: "main" },
@@ -58,6 +82,13 @@ export const PAGES: PageCase[] = [
   },
   { id: "admin-dashboard", path: (l) => `/${l}/admin`, gated: true },
   { id: "admin-books", path: (l) => `/${l}/admin/books`, gated: true },
+  { id: "checkout", path: (l) => `/${l}/checkout`, gated: true, ready: "main" },
+  {
+    id: "checkout-success",
+    path: (l) => `/${l}/checkout/success`,
+    gated: true,
+    ready: "main",
+  },
 ];
 
 export const PUBLIC_PAGES = PAGES.filter((page) => !page.gated);

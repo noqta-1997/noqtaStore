@@ -43,7 +43,7 @@ turns the whole suite into decoration.
 
 ## The matrix
 
-13 public pages × 2 locales × 2 themes × 3 viewports = **156 screenshots**.
+19 public pages × 2 locales × 2 themes × 3 viewports = **228 screenshots**.
 
 Viewports are mobile 375×812, tablet 768×1024 and desktop 1440×900. Themes are
 seeded through `localStorage`, the same key the app's own pre-paint script
