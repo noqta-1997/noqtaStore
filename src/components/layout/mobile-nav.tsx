@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Menu } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -11,6 +11,7 @@ import { buttonStyles } from "@/components/ui/button";
 import { Drawer } from "@/components/ui/drawer";
 import { IconButton } from "@/components/ui/icon-button";
 import type { NavItem } from "@/lib/navigation";
+import { isOwner } from "@/lib/owner";
 
 interface MobileNavProps {
   items: NavItem[];
@@ -23,9 +24,12 @@ interface MobileNavProps {
     theme: { toggle: string; light: string; dark: string };
     account: string;
     logout: string;
+    adminPanel: string;
   };
   loginHref: string;
   accountHref: string;
+  /** Only rendered for the owner; the server still guards the route. */
+  adminHref: string;
 }
 
 /** Slide-in navigation drawer for small screens. */
@@ -35,9 +39,12 @@ export function MobileNav({
   labels,
   loginHref,
   accountHref,
+  adminHref,
 }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
+  /* Display only — the server decides who may actually open the panel. */
+  const [email, setEmail] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -45,11 +52,15 @@ export function MobileNav({
     let active = true;
 
     supabase.auth.getUser().then(({ data }) => {
-      if (active) setIsSignedIn(Boolean(data.user));
+      if (!active) return;
+      setIsSignedIn(Boolean(data.user));
+      setEmail(data.user?.email ?? null);
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (active) setIsSignedIn(Boolean(session?.user));
+      if (!active) return;
+      setIsSignedIn(Boolean(session?.user));
+      setEmail(session?.user?.email ?? null);
     });
 
     return () => {
@@ -112,6 +123,21 @@ export function MobileNav({
         <div className="mt-6 space-y-2 border-t border-line-divider pt-4">
           {isSignedIn ? (
             <>
+              {isOwner(email) ? (
+                <Link
+                  href={adminHref}
+                  onClick={() => setIsOpen(false)}
+                  className={buttonStyles({
+                    variant: "secondary",
+                    size: "lg",
+                    fullWidth: true,
+                  })}
+                >
+                  <LayoutDashboard aria-hidden className="size-4" strokeWidth={1.75} />
+                  {labels.adminPanel}
+                </Link>
+              ) : null}
+
               <Link
                 href={accountHref}
                 onClick={() => setIsOpen(false)}

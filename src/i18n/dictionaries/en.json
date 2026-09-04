@@ -428,7 +428,8 @@
       "wishlist": "Wishlist",
       "addresses": "Addresses",
       "logout": "Sign out",
-      "reviews": "My reviews"
+      "reviews": "My reviews",
+      "adminPanel": "Admin panel"
     },
     "profile": {
       "title": "Profile",

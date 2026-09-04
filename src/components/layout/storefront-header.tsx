@@ -63,6 +63,7 @@ export function StorefrontHeader({
           categories={categoryItems}
           loginHref={`/${locale}/login`}
           accountHref={`/${locale}/account`}
+          adminHref={`/${locale}/admin`}
           labels={{
             menu: dictionary.common.menu,
             close: dictionary.common.close,
@@ -71,6 +72,7 @@ export function StorefrontHeader({
             theme: dictionary.common.theme,
             account: dictionary.common.account,
             logout: dictionary.account.nav.logout,
+            adminPanel: dictionary.account.nav.adminPanel,
           }}
         />
 
@@ -138,6 +140,7 @@ export function StorefrontHeader({
               reviews: dictionary.account.nav.reviews,
               logout: dictionary.account.nav.logout,
               signedInAs: dictionary.auth.signedInAs,
+              adminPanel: dictionary.account.nav.adminPanel,
             }}
           />
 

@@ -12,6 +12,7 @@ import {
 import {
   ChevronDown,
   Heart,
+  LayoutDashboard,
   LogOut,
   MapPin,
   Package,
@@ -23,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { buttonStyles } from "@/components/ui/button";
+import { isOwner } from "@/lib/owner";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 
@@ -38,6 +40,7 @@ interface AccountMenuProps {
     reviews: string;
     logout: string;
     signedInAs: string;
+    adminPanel: string;
   };
 }
 
@@ -49,6 +52,15 @@ interface AccountMenuProps {
 export function AccountMenu({ locale, labels }: AccountMenuProps) {
   const router = useRouter();
   const [displayName, setDisplayName] = useState<string | null>(null);
+  /*
+   * The header reads the session in the browser so the storefront can stay
+   * statically rendered, and the browser cannot see `Customer.role` — that
+   * lives behind Prisma. But the owner is decided by a literal address, so
+   * the same question can be asked here. This only decides whether the link
+   * is drawn; `proxy.ts` and the admin layout still do the deciding that
+   * matters, and neither of them trusts anything sent from here.
+   */
+  const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -61,11 +73,15 @@ export function AccountMenu({ locale, labels }: AccountMenuProps) {
     };
 
     supabase.auth.getUser().then(({ data }) => {
-      if (active) setDisplayName(nameOf(data.user));
+      if (!active) return;
+      setDisplayName(nameOf(data.user));
+      setEmail(data.user?.email ?? null);
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (active) setDisplayName(nameOf(session?.user ?? null));
+      if (!active) return;
+      setDisplayName(nameOf(session?.user ?? null));
+      setEmail(session?.user?.email ?? null);
     });
 
     return () => {
@@ -159,6 +175,20 @@ export function AccountMenu({ locale, labels }: AccountMenuProps) {
         <MenuDivider />
 
         <MenuList>
+          {isOwner(email) ? (
+            <>
+              <MenuItemLink
+                icon={
+                  <LayoutDashboard aria-hidden className="size-4" strokeWidth={1.75} />
+                }
+                href={`/${locale}/admin`}
+              >
+                {labels.adminPanel}
+              </MenuItemLink>
+              <MenuDivider />
+            </>
+          ) : null}
+
           {items.map((item) => (
             <MenuItemLink
               key={item.href}

@@ -428,7 +428,8 @@
       "wishlist": "المفضلة",
       "addresses": "العناوين",
       "logout": "تسجيل الخروج",
-      "reviews": "مراجعاتي"
+      "reviews": "مراجعاتي",
+      "adminPanel": "لوحة الإدارة"
     },
     "profile": {
       "title": "الملف الشخصي",
