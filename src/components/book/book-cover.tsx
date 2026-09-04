@@ -1,27 +1,7 @@
 import Image from "next/image";
 
-import { noqtaBrand } from "@/theme/noqta-brand";
+import { noqtaCovers } from "@/theme/noqta-covers";
 import { cn, hashString } from "@/lib/utils";
-
-/**
- * Derived from the brand ramp rather than hand-picked.
- *
- * Covers are printed objects, so they keep the same colours in light and dark
- * instead of inverting with the UI — which is why they read from `noqtaBrand`
- * directly and not from the theme-aware tokens. Every pair clears 4.5:1 at
- * full strength: 5.83 at the tightest, 14.76 at the widest. The eight steps
- * span the ramp end to end, so a shelf still reads as varied.
- */
-const coverPalette = [
-  { background: noqtaBrand[10], foreground: noqtaBrand[150] },
-  { background: noqtaBrand[80], foreground: noqtaBrand[160] },
-  { background: noqtaBrand[150], foreground: noqtaBrand[40] },
-  { background: noqtaBrand[40], foreground: noqtaBrand[140] },
-  { background: noqtaBrand[100], foreground: noqtaBrand[10] },
-  { background: noqtaBrand[60], foreground: noqtaBrand[160] },
-  { background: noqtaBrand[130], foreground: noqtaBrand[20] },
-  { background: noqtaBrand[30], foreground: noqtaBrand[130] },
-] as const;
 
 interface BookCoverProps {
   title: string;
@@ -48,7 +28,7 @@ export function BookCover({
   priority = false,
   className,
 }: BookCoverProps) {
-  const palette = coverPalette[hashString(seed) % coverPalette.length];
+  const palette = noqtaCovers[hashString(seed) % noqtaCovers.length];
 
   return (
     <div
