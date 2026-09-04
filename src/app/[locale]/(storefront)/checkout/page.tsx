@@ -321,6 +321,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
                       src={line.book.coverUrl}
                       sizes="2.5rem"
                       className="border border-line"
+                      compact
                     />
                   </span>
                   <span className="min-w-0 flex-1">

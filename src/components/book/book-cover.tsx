@@ -11,6 +11,15 @@ interface BookCoverProps {
   src?: string;
   /** `sizes` for the real image; ignored by the placeholder. */
   sizes?: string;
+  /**
+   * Drops the lettering, keeping the jacket and its spine.
+   *
+   * Under about 60px the title sets two or three characters to a line and
+   * the author rule becomes a smudge: it reads as damage rather than as
+   * type. Every place that wants a cover that small — a table row, a line
+   * in an order — is already printing the title beside it in full.
+   */
+  compact?: boolean;
   priority?: boolean;
   className?: string;
 }
@@ -25,6 +34,7 @@ export function BookCover({
   seed,
   src,
   sizes = "(min-width: 1024px) 20vw, (min-width: 640px) 30vw, 45vw",
+  compact = false,
   priority = false,
   className,
 }: BookCoverProps) {
@@ -60,21 +70,25 @@ export function BookCover({
               borderColor: palette.background,
             }}
           />
-          <p className="ms-3 line-clamp-4 font-display text-sm leading-snug font-bold text-balance sm:text-base">
-            {title}
-          </p>
-          {/*
-            No opacity here. At 10px this is small text and needs the full
-            4.5:1; the eight palettes all clear it at full strength, but
-            `opacity-80` dropped three of them to 3.33, 4.30 and 4.34. It was
-            the only accessibility violation left in the whole suite.
-          */}
-          <p
-            className="ms-3 border-t pt-2 text-[0.625rem] font-medium"
-            style={{ borderColor: palette.foreground }}
-          >
-            {author}
-          </p>
+          {compact ? null : (
+            <>
+              <p className="ms-3 line-clamp-4 font-display text-sm leading-snug font-bold text-balance sm:text-base">
+                {title}
+              </p>
+              {/*
+                No opacity here. At 10px this is small text and needs the full
+                4.5:1; all twelve palettes clear it at full strength, but
+                `opacity-80` dropped three of them to 3.33, 4.30 and 4.34. It
+                was the only accessibility violation left in the whole suite.
+              */}
+              <p
+                className="ms-3 border-t pt-2 text-[0.625rem] font-medium"
+                style={{ borderColor: palette.foreground }}
+              >
+                {author}
+              </p>
+            </>
+          )}
         </div>
       )}
     </div>

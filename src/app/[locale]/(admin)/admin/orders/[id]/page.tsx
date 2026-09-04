@@ -133,6 +133,7 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
                             src={item.book.coverUrl}
                             sizes="2.25rem"
                             className="rounded-md elevation-sm"
+                            compact
                           />
                         </span>
                         <span className="min-w-0">

@@ -95,6 +95,7 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
                         src={book.coverUrl}
                         sizes="4rem"
                         className="border border-line"
+                        compact
                       />
                     </li>
                   ))}

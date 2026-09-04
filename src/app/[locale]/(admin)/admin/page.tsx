@@ -211,6 +211,7 @@ export default async function AdminDashboardPage({ params }: DashboardPageProps)
                     src={entry.book.coverUrl}
                     sizes="2.25rem"
                     className="rounded-md elevation-sm"
+                    compact
                   />
                 </span>
                 <span className="min-w-0 flex-1">

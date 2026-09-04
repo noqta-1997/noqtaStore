@@ -171,6 +171,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
                     src={item.book.coverUrl}
                     sizes="3.5rem"
                     className="border border-line"
+                    compact
                   />
                 </span>
                 <span className="min-w-0 flex-1">
