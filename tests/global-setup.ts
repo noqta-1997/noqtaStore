@@ -1,8 +1,12 @@
-import { mkdirSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { config as loadEnv } from "dotenv";
-import { chromium, type Browser, type FullConfig } from "@playwright/test";
+import { chromium, type FullConfig } from "@playwright/test";
+
+import { OWNER_EMAIL } from "../src/lib/owner";
 
 import { GATED_PAGES, LOCALES, PUBLIC_PAGES } from "./fixtures/pages";
 import { STORAGE_STATE } from "./fixtures/harness";
@@ -10,74 +14,118 @@ import { STORAGE_STATE } from "./fixtures/harness";
 loadEnv({ path: ".env.local" });
 
 /**
- * Signs in once, if the machine has been told how.
+ * Mints a session for the owner, if the machine has been told how.
  *
- * The suite reads `E2E_EMAIL` and `E2E_PASSWORD` from `.env.local` — which is
- * gitignored, is the same file the app already keeps its Supabase keys in, and
- * never reaches this repository. Without both, this step is skipped and the
- * gated specs skip with it; the run stays green and the gap stays visible.
+ * The suite reads `SUPABASE_SERVICE_ROLE_KEY` from `.env.local` — gitignored,
+ * the same file the app already keeps its database credentials in, and it
+ * never reaches this repository. Without it this step is skipped, the gated
+ * specs skip with it, the run stays green and the gap stays visible.
  *
- * It drives the real login form rather than writing a cookie by hand. Auth is
- * a hosted Supabase project, so a forged session would prove the forgery
- * works, not that signing in does.
+ * It used to drive the login form. That form is gone: sign-in is Google only
+ * now, and Google refuses to authenticate inside an automation-controlled
+ * browser — which is the whole reason this goes around the browser instead.
+ * Nor can the session be lifted out of a real Chrome profile: since Chrome
+ * 127 the cookie jar is sealed with an app-bound key that only Chrome itself
+ * can open.
  *
- * One thing worth knowing before setting these: `src/lib/owner.ts` pins the
- * admin role to a single literal address, and `pinOwnerRole` demotes anyone
- * else on every sign-in. Any account but that one reaches the account pages
- * and is redirected away from `/admin`, so the admin captures need the owner.
+ * So the session is issued the way Supabase issues one for a custom email
+ * provider: `generateLink` produces a single-use token for the address, and
+ * `verifyOtp` exchanges it. That is a real token from the real auth server —
+ * not a forged cookie — which is what makes the captures worth looking at.
+ *
+ * The cookie is written by `@supabase/ssr` rather than by hand. Its wire
+ * format is an implementation detail of that package (a `base64-` prefix,
+ * and chunking across numbered cookies once the session outgrows one), and
+ * hand-rolling it would work until the day the package changed it. Letting
+ * the same version the app runs do the writing means the two cannot disagree.
+ *
+ * The address comes from `src/lib/owner.ts`, not from an environment
+ * variable, because `pinOwnerRole` demotes anyone else on sight: a session
+ * for any other account would reach the storefront and be redirected away
+ * from `/admin`, and the admin half of the baseline would capture redirects.
  */
-async function saveSession(browser: Browser, baseURL: string) {
-  const email = process.env.E2E_EMAIL;
-  const password = process.env.E2E_PASSWORD;
+async function saveSession() {
+  const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-  if (!email || !password) {
+  if (!service || !url || !anon) {
     console.log(
-      "  no E2E_EMAIL / E2E_PASSWORD in .env.local — gated pages will skip",
+      "  no SUPABASE_SERVICE_ROLE_KEY in .env.local — gated pages will skip",
     );
     return false;
   }
 
-  const context = await browser.newContext();
-  const page = await context.newPage();
-
   try {
-    await page.goto(`${baseURL}/ar/login`, { waitUntil: "domcontentloaded" });
-    await page.fill("#email", email);
-    await page.fill("#password", password);
-    await page.click('button[type="submit"]');
-
-    // Supabase answers, the app redirects through /auth/after-sign-in, and the
-    // reader lands on a page that is not the login form.
-    await page.waitForURL((url) => !url.pathname.includes("/login"), {
-      timeout: 30_000,
+    const admin = createSupabaseClient(url, service, {
+      auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    // Whether this account is the owner decides whether the admin half of the
-    // baseline is capturable at all, so find out now rather than one screenshot
-    // at a time.
-    await page.goto(`${baseURL}/ar/admin`, { waitUntil: "domcontentloaded" });
-    const isAdmin = page.url().includes("/admin");
+    const { data: link, error: linkError } = await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email: OWNER_EMAIL,
+    });
+
+    if (linkError) throw linkError;
+
+    const tokenHash = link.properties?.hashed_token;
+    if (!tokenHash) throw new Error("generateLink returned no hashed_token");
+
+    /*
+     * An in-memory cookie jar standing in for the browser's. The client
+     * writes the session into it in exactly the shape the app reads back.
+     */
+    const jar = new Map<string, { value: string; options: CookieOptions }>();
+
+    const client = createServerClient(url, anon, {
+      cookies: {
+        getAll: () =>
+          [...jar].map(([name, { value }]) => ({ name, value })),
+        setAll: (cookiesToSet) => {
+          for (const { name, value, options } of cookiesToSet) {
+            jar.set(name, { value, options: options ?? {} });
+          }
+        },
+      },
+    });
+
+    const { data, error } = await client.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: "magiclink",
+    });
+
+    if (error) throw error;
+    if (!data.session) throw new Error("verifyOtp returned no session");
+
+    const cookies = [...jar].map(([name, { value, options }]) => ({
+      name,
+      value,
+      domain: "localhost",
+      path: options.path ?? "/",
+      // Playwright wants seconds since the epoch; -1 means a session cookie.
+      expires: data.session!.expires_at ?? -1,
+      httpOnly: options.httpOnly ?? false,
+      secure: options.secure ?? false,
+      sameSite: "Lax" as const,
+    }));
 
     mkdirSync(path.dirname(STORAGE_STATE), { recursive: true });
-    await context.storageState({ path: STORAGE_STATE });
-
-    console.log(
-      isAdmin
-        ? "  signed in as the owner — account and admin pages both captured"
-        : "  signed in, but this account is not the owner: admin pages will\n" +
-          "  redirect to the storefront and their captures would be wrong",
+    writeFileSync(
+      STORAGE_STATE,
+      JSON.stringify({ cookies, origins: [] }, null, 2),
+      "utf8",
     );
 
+    console.log(
+      `  minted a session for ${data.session.user.email} — account and admin pages captured`,
+    );
     return true;
   } catch (error) {
-    // A wrong password should not take the other 594 tests down with it.
-    console.log(
-      `  sign-in failed (${error instanceof Error ? error.message.split("\n")[0] : "unknown"})` +
-        " — gated pages will skip",
-    );
+    // A bad key should not take the other 522 tests down with it.
+    const reason =
+      error instanceof Error ? error.message.split("\n")[0] : "unknown";
+    console.log(`  could not mint a session (${reason}) — gated pages will skip`);
     return false;
-  } finally {
-    await context.close();
   }
 }
 
@@ -94,8 +142,8 @@ async function saveSession(browser: Browser, baseURL: string) {
 async function globalSetup(config: FullConfig) {
   const baseURL = config.projects[0]?.use?.baseURL ?? "http://localhost:3000";
 
+  const signedIn = await saveSession();
   const browser = await chromium.launch();
-  const signedIn = await saveSession(browser, baseURL);
 
   // Signed out, a gated route compiles only the redirect, so warming those
   // pages is worth doing only once there is a session to reach them with.

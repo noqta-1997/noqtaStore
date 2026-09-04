@@ -143,6 +143,14 @@ export function AccountMenu({ locale, labels }: AccountMenuProps) {
       <MenuTrigger disableButtonEnhancement>
         <button
           type="button"
+          /*
+           * The name and the chevron are hidden below `lg`, which left the
+           * avatar — and the avatar is aria-hidden, so the button had no
+           * accessible name at all on a phone. It went unseen because the
+           * public pages are scanned signed out, where this branch does not
+           * render.
+           */
+          aria-label={labels.account}
           className={cn(
             "flex items-center gap-2 rounded-md border border-transparent px-2 py-1",
             "transition-colors duration-100 ease-fluent hover:bg-state-hover",

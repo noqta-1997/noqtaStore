@@ -51,7 +51,11 @@ export function RadioCard({
       ) : null}
       <span className="min-w-0 flex-1">
         <span className="block text-body-md font-semibold text-on-surface">{title}</span>
-        {note ? <span className="block text-label-sm text-muted">{note}</span> : null}
+        {note ? (
+          /* `--muted` on the selected fill measures 4.38:1, and this is small
+             text. The variant ink clears it at 5.89:1. */
+          <span className="block text-label-md text-on-surface-variant">{note}</span>
+        ) : null}
       </span>
       {trailing}
     </label>

@@ -1,0 +1,261 @@
+{
+  "capturedAt": "2026-09-04T10:58:38.983Z",
+  "project": "tablet-dark",
+  "pagesScanned": 28,
+  "totalViolationNodes": 0,
+  "byRule": {},
+  "detail": [
+    {
+      "page": "account",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/ar/account",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-orders",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/ar/account/orders",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-dashboard",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/ar/admin",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-books",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/ar/admin/books",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "checkout",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/ar/checkout",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "checkout-success",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/ar/checkout/success",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-addresses",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/ar/account/addresses",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-reviews",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/ar/account/reviews",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-wishlist",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/ar/account/wishlist",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-order-detail",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/ar/account/orders/o1",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-orders",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/ar/admin/orders",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-authors",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/ar/admin/authors",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-book-new",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/ar/admin/books/new",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-reports",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/ar/admin/reports",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account",
+      "locale": "en",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/en/account",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-orders",
+      "locale": "en",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/en/account/orders",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-dashboard",
+      "locale": "en",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/en/admin",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-books",
+      "locale": "en",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/en/admin/books",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "checkout",
+      "locale": "en",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/en/checkout",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "checkout-success",
+      "locale": "en",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/en/checkout/success",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-addresses",
+      "locale": "en",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/en/account/addresses",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-reviews",
+      "locale": "en",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/en/account/reviews",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-wishlist",
+      "locale": "en",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/en/account/wishlist",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-order-detail",
+      "locale": "en",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/en/account/orders/o1",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-orders",
+      "locale": "en",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/en/admin/orders",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-authors",
+      "locale": "en",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/en/admin/authors",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-book-new",
+      "locale": "en",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/en/admin/books/new",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-reports",
+      "locale": "en",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/en/admin/reports",
+      "violations": [],
+      "total": 0
+    }
+  ]
+}

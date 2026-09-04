@@ -1,0 +1,261 @@
+{
+  "capturedAt": "2026-09-04T10:44:52.957Z",
+  "project": "mobile-light",
+  "pagesScanned": 28,
+  "totalViolationNodes": 0,
+  "byRule": {},
+  "detail": [
+    {
+      "page": "account",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/ar/account",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-orders",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/ar/account/orders",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-dashboard",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/ar/admin",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-books",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/ar/admin/books",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "checkout",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/ar/checkout",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "checkout-success",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/ar/checkout/success",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-addresses",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/ar/account/addresses",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-reviews",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/ar/account/reviews",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-wishlist",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/ar/account/wishlist",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-order-detail",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/ar/account/orders/o1",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-orders",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/ar/admin/orders",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-authors",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/ar/admin/authors",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-book-new",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/ar/admin/books/new",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-reports",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/ar/admin/reports",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account",
+      "locale": "en",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/en/account",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-orders",
+      "locale": "en",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/en/account/orders",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-dashboard",
+      "locale": "en",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/en/admin",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-books",
+      "locale": "en",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/en/admin/books",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "checkout",
+      "locale": "en",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/en/checkout",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "checkout-success",
+      "locale": "en",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/en/checkout/success",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-addresses",
+      "locale": "en",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/en/account/addresses",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-reviews",
+      "locale": "en",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/en/account/reviews",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-wishlist",
+      "locale": "en",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/en/account/wishlist",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "account-order-detail",
+      "locale": "en",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/en/account/orders/o1",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-orders",
+      "locale": "en",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/en/admin/orders",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-authors",
+      "locale": "en",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/en/admin/authors",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-book-new",
+      "locale": "en",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/en/admin/books/new",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-reports",
+      "locale": "en",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/en/admin/reports",
+      "violations": [],
+      "total": 0
+    }
+  ]
+}
