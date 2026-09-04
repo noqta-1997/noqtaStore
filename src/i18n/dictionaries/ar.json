@@ -124,7 +124,8 @@
       "missingReview": "اكتب عنوانًا ونصًّا للمراجعة",
       "missingCode": "أدخل كود الخصم",
       "invalidValue": "قيمة الخصم غير صالحة",
-      "ownerProtected": "لا يمكن حظر حساب مالك المتجر"
+      "ownerProtected": "لا يمكن حظر حساب مالك المتجر",
+      "deliveredProtected": "لا يمكن حذف طلب مُسلّم"
     }
   },
   "nav": {

@@ -278,6 +278,17 @@ const orderStatuses: OrderStatus[] = [
   "cancelled",
 ];
 
+/**
+ * Statuses whose copies are still on the shelf.
+ *
+ * `placeOrder` decrements stock at checkout, so an order that falls through
+ * before dispatch has to put the copies back or the count drifts down every
+ * time a delivery is called off. Once an order ships the books have physically
+ * left, so cancelling it afterwards records the outcome without inventing
+ * stock — goods actually coming back are a new arrival, not an undo of a sale.
+ */
+const beforeDispatch: OrderStatus[] = ["pending", "processing"];
+
 export async function updateOrderStatus(formData: FormData): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
@@ -288,16 +299,100 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
 
   const order = await prisma.order.findUnique({
     where: { id: orderId },
-    select: { status: true },
+    select: {
+      status: true,
+      items: { select: { bookId: true, quantity: true } },
+    },
   });
   if (!order) return fail("notFound");
   if (order.status === status) return ok();
 
+  // Leaving `cancelled` makes the order live again and takes the copies back
+  // off the shelf; cancelling one that never shipped returns them.
+  const reclaiming = order.status === "cancelled";
+  const releasing =
+    status === "cancelled" && beforeDispatch.includes(order.status);
+
+  if (reclaiming) {
+    const books = await prisma.book.findMany({
+      where: { id: { in: order.items.map((item) => item.bookId) } },
+      select: { id: true, stock: true },
+    });
+    const onShelf = new Map(books.map((book) => [book.id, book.stock]));
+
+    const short = order.items.some(
+      (item) => (onShelf.get(item.bookId) ?? 0) < item.quantity,
+    );
+    if (short) return fail("outOfStock");
+  }
+
+  const stockMoves =
+    reclaiming || releasing
+      ? order.items.map((item) =>
+          prisma.book.update({
+            where: { id: item.bookId },
+            data: {
+              stock: reclaiming
+                ? { decrement: item.quantity }
+                : { increment: item.quantity },
+            },
+          }),
+        )
+      : [];
+
   await prisma.$transaction([
     prisma.order.update({ where: { id: orderId }, data: { status } }),
     prisma.orderEvent.create({ data: { orderId, status } }),
+    ...stockMoves,
   ]);
 
+  if (stockMoves.length) revalidateCatalogue();
+  revalidatePath("/[locale]/admin/orders", "page");
+  revalidatePath("/[locale]/account/orders", "page");
+  return ok();
+}
+
+/**
+ * Removes an order and everything hanging off it.
+ *
+ * Cancelling is the tool for an order that fell through; this is for a record
+ * that should not exist at all. `OrderItem` and `OrderEvent` cascade with the
+ * row, and copies from an order that never shipped go back on the shelf under
+ * the same rule `updateOrderStatus` follows.
+ *
+ * A delivered order is refused outright: money changed hands and the books
+ * left the shop, so the row is the only remaining evidence of the sale and the
+ * reports are built from it. The table hides the control on those rows, but
+ * the check lives here because that is the half a caller cannot skip.
+ */
+export async function deleteOrder(orderId: string): Promise<ActionResult> {
+  if (!(await requireManager())) return fail("forbidden");
+
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    select: {
+      status: true,
+      items: { select: { bookId: true, quantity: true } },
+    },
+  });
+  if (!order) return fail("notFound");
+  if (order.status === "delivered") return fail("deliveredProtected");
+
+  const releasing = beforeDispatch.includes(order.status);
+
+  await prisma.$transaction([
+    prisma.order.delete({ where: { id: orderId } }),
+    ...(releasing
+      ? order.items.map((item) =>
+          prisma.book.update({
+            where: { id: item.bookId },
+            data: { stock: { increment: item.quantity } },
+          }),
+        )
+      : []),
+  ]);
+
+  if (releasing) revalidateCatalogue();
   revalidatePath("/[locale]/admin/orders", "page");
   revalidatePath("/[locale]/account/orders", "page");
   return ok();

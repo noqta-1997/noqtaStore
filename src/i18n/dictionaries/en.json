@@ -124,7 +124,8 @@
       "missingReview": "Add a title and a body",
       "missingCode": "Enter a discount code",
       "invalidValue": "That discount value is not valid",
-      "ownerProtected": "The store owner's account cannot be blocked"
+      "ownerProtected": "The store owner's account cannot be blocked",
+      "deliveredProtected": "A delivered order cannot be deleted"
     }
   },
   "nav": {

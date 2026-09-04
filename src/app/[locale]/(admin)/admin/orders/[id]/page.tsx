@@ -221,6 +221,9 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
               errorMessages={{
                 forbidden: dictionary.common.actionErrors.forbidden,
                 notFound: dictionary.common.actionErrors.notFound,
+                // Reviving a cancelled order takes the copies back off the
+                // shelf, and the shelf may no longer have them.
+                outOfStock: dictionary.common.outOfStock,
               }}
             >
               <input type="hidden" name="orderId" value={order.id} />

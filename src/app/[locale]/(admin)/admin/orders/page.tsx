@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { SortableTh, Table, Tbody, Td, Th, Thead, Tr } from "@/components/admin/data-table";
 import { RowActions } from "@/components/admin/row-actions";
+import { deleteOrder } from "@/app/actions/admin";
 import { TableToolbar, type ToolbarTab } from "@/components/admin/table-toolbar";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
@@ -196,11 +197,38 @@ export default async function AdminOrdersPage({
                     <Td>
                       <RowActions
                         viewHref={`${base}/${order.id}`}
+                        itemName={order.reference}
                         labels={{
                           view: admin.common.view,
                           edit: admin.common.edit,
                           delete: admin.common.delete,
                         }}
+                        fallbackError={dictionary.common.toast.actionFailed}
+                        errorMessages={{
+                          forbidden: dictionary.common.actionErrors.forbidden,
+                          notFound: dictionary.common.actionErrors.notFound,
+                          deliveredProtected:
+                            dictionary.common.actionErrors.deliveredProtected,
+                        }}
+                        deleteAction={deleteOrder.bind(null, order.id)}
+                        /*
+                         * A delivered order is a sales record, so it carries no
+                         * delete control at all — `deleteOrder` refuses it too,
+                         * and omitting `confirm` is what hides the button.
+                         */
+                        confirm={
+                          order.status === "delivered"
+                            ? undefined
+                            : {
+                                title: dictionary.common.confirm.deleteTitle,
+                                description:
+                                  dictionary.common.confirm.deleteDescription,
+                                confirm: dictionary.common.confirm.confirm,
+                                cancel: dictionary.common.confirm.cancel,
+                                done: dictionary.common.toast.deleted,
+                                trigger: admin.common.delete,
+                              }
+                        }
                       />
                     </Td>
                   </Tr>
