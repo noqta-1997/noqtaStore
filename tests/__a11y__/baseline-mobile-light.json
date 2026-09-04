@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-04T06:18:29.571Z",
+  "capturedAt": "2026-09-04T07:51:36.930Z",
   "project": "mobile-light",
-  "pagesScanned": 38,
+  "pagesScanned": 32,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -137,33 +137,6 @@
       "theme": "light",
       "project": "mobile-light",
       "url": "/ar/publishers/dar-el-shorouk",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "register",
-      "locale": "ar",
-      "theme": "light",
-      "project": "mobile-light",
-      "url": "/ar/register",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "forgot-password",
-      "locale": "ar",
-      "theme": "light",
-      "project": "mobile-light",
-      "url": "/ar/forgot-password",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "reset-password",
-      "locale": "ar",
-      "theme": "light",
-      "project": "mobile-light",
-      "url": "/ar/reset-password",
       "violations": [],
       "total": 0
     },
@@ -308,33 +281,6 @@
       "theme": "light",
       "project": "mobile-light",
       "url": "/en/publishers/dar-el-shorouk",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "register",
-      "locale": "en",
-      "theme": "light",
-      "project": "mobile-light",
-      "url": "/en/register",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "forgot-password",
-      "locale": "en",
-      "theme": "light",
-      "project": "mobile-light",
-      "url": "/en/forgot-password",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "reset-password",
-      "locale": "en",
-      "theme": "light",
-      "project": "mobile-light",
-      "url": "/en/reset-password",
       "violations": [],
       "total": 0
     },

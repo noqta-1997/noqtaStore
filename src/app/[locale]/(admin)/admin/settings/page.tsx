@@ -16,7 +16,6 @@ import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 import { readParam, type SearchParamsRecord } from "@/lib/search-params";
 import { cn } from "@/lib/utils";
 import { ActionForm } from "@/components/ui/action-form";
-import { ChangePasswordForm } from "@/components/account/change-password-form";
 import { saveSettings } from "@/app/actions/admin";
 
 interface SettingsPageProps {
@@ -332,18 +331,6 @@ export default async function SettingsPage({ params, searchParams }: SettingsPag
               <Button type="submit">{admin.common.saveChanges}</Button>
             </ActionForm>
 
-            <div className="border-t border-line pt-4">
-              <ChangePasswordForm
-                labels={{
-                  current: t.account.currentPassword,
-                  next: t.account.newPassword,
-                  submit: t.account.changePassword,
-                  success: dictionary.common.toast.saved,
-                  tooShort: dictionary.common.validation.minLength.replace("{n}", "8"),
-                  failure: dictionary.common.toast.actionFailed,
-                }}
-              />
-            </div>
           </Panel>
 
           <Panel title={t.account.notifications} subtitle={t.saved}>

@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-04T06:33:08.952Z",
+  "capturedAt": "2026-09-04T08:04:45.408Z",
   "project": "desktop-dark",
-  "pagesScanned": 38,
+  "pagesScanned": 32,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -137,33 +137,6 @@
       "theme": "dark",
       "project": "desktop-dark",
       "url": "/ar/publishers/dar-el-shorouk",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "register",
-      "locale": "ar",
-      "theme": "dark",
-      "project": "desktop-dark",
-      "url": "/ar/register",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "forgot-password",
-      "locale": "ar",
-      "theme": "dark",
-      "project": "desktop-dark",
-      "url": "/ar/forgot-password",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "reset-password",
-      "locale": "ar",
-      "theme": "dark",
-      "project": "desktop-dark",
-      "url": "/ar/reset-password",
       "violations": [],
       "total": 0
     },
@@ -308,33 +281,6 @@
       "theme": "dark",
       "project": "desktop-dark",
       "url": "/en/publishers/dar-el-shorouk",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "register",
-      "locale": "en",
-      "theme": "dark",
-      "project": "desktop-dark",
-      "url": "/en/register",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "forgot-password",
-      "locale": "en",
-      "theme": "dark",
-      "project": "desktop-dark",
-      "url": "/en/forgot-password",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "reset-password",
-      "locale": "en",
-      "theme": "dark",
-      "project": "desktop-dark",
-      "url": "/en/reset-password",
       "violations": [],
       "total": 0
     },

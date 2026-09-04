@@ -54,7 +54,8 @@ export const PAGES: PageCase[] = [
   { id: "offers", path: (l) => `/${l}/offers`, ready: "main" },
   { id: "search", path: (l) => `/${l}/search?q=1984`, ready: "main" },
   { id: "cart", path: (l) => `/${l}/cart`, ready: "main" },
-  { id: "login", path: (l) => `/${l}/login`, ready: "main form" },
+  // Sign-in is a single Google button now; the page carries no form.
+  { id: "login", path: (l) => `/${l}/login`, ready: "main button" },
   { id: "faq", path: (l) => `/${l}/faq`, ready: "main" },
   { id: "contact", path: (l) => `/${l}/contact`, ready: "main form" },
   {
@@ -62,16 +63,6 @@ export const PAGES: PageCase[] = [
     path: (l) => `/${l}/publishers/dar-el-shorouk`,
     ready: "main",
   },
-  { id: "register", path: (l) => `/${l}/register`, ready: "main form" },
-  {
-    id: "forgot-password",
-    path: (l) => `/${l}/forgot-password`,
-    ready: "main form",
-  },
-
-  // Reached without a recovery token, which is the state a reader lands in
-  // when the link has expired. It renders the error panel, not the form.
-  { id: "reset-password", path: (l) => `/${l}/reset-password`, ready: "main" },
 
   // A real miss inside the storefront group, so the 404 renders under the
   // site chrome rather than the bare root shell.

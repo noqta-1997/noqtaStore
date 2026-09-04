@@ -8,7 +8,6 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Surface, surfaceTitleStyles } from "@/components/ui/surface";
 import { getCustomer } from "@/data";
-import { ChangePasswordForm } from "@/components/account/change-password-form";
 import { ActionForm } from "@/components/ui/action-form";
 import { savePreferences, updateProfile } from "@/app/actions/account";
 import { isLocale } from "@/i18n/config";
@@ -134,18 +133,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         </ActionForm>
       </Panel>
 
-      <Panel title={t.security}>
-        <ChangePasswordForm
-          labels={{
-            current: t.currentPassword,
-            next: t.newPassword,
-            submit: t.changePassword,
-            success: dictionary.common.toast.saved,
-            tooShort: dictionary.common.validation.minLength.replace("{n}", "8"),
-            failure: dictionary.common.toast.actionFailed,
-          }}
-        />
-      </Panel>
 
       <Panel title={t.preferences}>
         <ActionForm

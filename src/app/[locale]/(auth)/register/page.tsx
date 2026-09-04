@@ -1,66 +1,25 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 
-import { AuthShell } from "@/components/auth/auth-shell";
-import { RegisterForm } from "@/components/auth/register-form";
-import { SocialButtons } from "@/components/auth/social-buttons";
-import { isLocale } from "@/i18n/config";
-import { getDictionary } from "@/i18n/get-dictionary";
+import { defaultLocale, isLocale } from "@/i18n/config";
 
-interface RegisterPageProps {
-  params: Promise<{ locale: string }>;
-}
-
-export async function generateMetadata({
+/**
+ * There is no separate sign-up any more.
+ *
+ * Google creates the account on the first round trip and `getCurrentCustomer`
+ * adopts the seeded customer that already carries the same address, so a
+ * returning reader lands on their own history without anything being asked of
+ * them. A second page could only have offered the same single button.
+ *
+ * The route survives as a redirect rather than a 404 because it was public,
+ * and anything already pointing at it — a bookmark, a link in a message —
+ * should still arrive somewhere useful.
+ */
+export default async function RegisterPage({
   params,
-}: RegisterPageProps): Promise<Metadata> {
-  const { locale } = await params;
-  const dictionary = await getDictionary(isLocale(locale) ? locale : "ar");
-
-  return { title: dictionary.auth.registerTitle };
-}
-
-export default async function RegisterPage({ params }: RegisterPageProps) {
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
 
-  if (!isLocale(locale)) {
-    notFound();
-  }
-
-  const dictionary = await getDictionary(locale);
-  const t = dictionary.auth;
-
-  return (
-    <AuthShell
-      title={t.registerTitle}
-      subtitle={t.registerSubtitle}
-      dictionary={dictionary}
-    >
-      <SocialButtons
-        locale={locale}
-        labels={{
-          google: t.google,
-          divider: t.orContinue,
-          failure: t.errors.generic,
-        }}
-      />
-
-      <RegisterForm
-        locale={locale}
-        t={t}
-        validation={dictionary.common.validation}
-      />
-
-      <p className="text-center text-body-md text-on-surface-variant">
-        {t.hasAccount}{" "}
-        <Link
-          href={`/${locale}/login`}
-          className="font-semibold text-on-surface underline underline-offset-4"
-        >
-          {t.signIn}
-        </Link>
-      </p>
-    </AuthShell>
-  );
+  permanentRedirect(`/${isLocale(locale) ? locale : defaultLocale}/login`);
 }
