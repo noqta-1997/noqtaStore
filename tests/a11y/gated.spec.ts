@@ -17,10 +17,10 @@ import {
 /**
  * The accessibility half of the gated baseline.
  *
- * `axe.spec.ts` scans the pages anyone can reach; this scans the six behind a
- * login. The split exists because the suite never signs itself in — see
- * `visual/gated.spec.ts` for the one command that provides a session — so
- * these have to be able to skip on their own.
+ * `axe.spec.ts` scans the pages anyone can reach; this scans the fourteen
+ * behind a login. The split exists because the session is optional —
+ * `global-setup.ts` mints one only when `.env.local` carries the two E2E
+ * variables — so these have to be able to skip on their own.
  *
  * The report is written beside the public one under a `gated-` prefix rather
  * than merged into it. Two spec files cannot write the same file without one
@@ -94,10 +94,12 @@ test.describe("a11y · authenticated", () => {
         await seedTheme(page, theme);
         await page.goto(pageCase.path(locale), { waitUntil: "domcontentloaded" });
 
-        // A stale session lands on /login, and scanning that page instead
-        // would quietly report the login form's numbers as the admin's.
-        expect(page.url(), "session expired — regenerate tests/.auth/user.json")
-          .not.toContain("/login");
+        // Scanning a redirect target instead would quietly file the login
+        // form's numbers, or the storefront's, under the admin's.
+        expect(
+          new URL(page.url()).pathname,
+          "landed on another page — see the sign-in note in global-setup.ts",
+        ).toBe(pageCase.path(locale));
 
         await assertTheme(page, theme);
         await settle(page, pageCase.ready);

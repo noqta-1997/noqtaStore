@@ -76,18 +76,32 @@ belong to the build, not to the migration.
 
 ## Pages behind a login
 
-The suite never creates an account and never types a password. To include the
-account and admin pages, sign in once by hand and save the session:
+`global-setup.ts` signs in for you, once per run, if the machine has been told
+how. Add two lines to `.env.local` — the same gitignored file the app already
+keeps its Supabase keys in:
 
-```bash
-npx playwright open --save-storage=tests/.auth/user.json http://localhost:3000/ar/login
+```
+E2E_EMAIL=<the account to capture as>
+E2E_PASSWORD=<its password>
 ```
 
-Two things the command does not say out loud. The path is **relative to where
-you run it**, so run it from the repository root or the file lands somewhere
-else entirely. And the state is written when the **browser window is closed**,
-not when the sign-in succeeds — closing the terminal instead leaves no file.
-Check with `ls tests/.auth/` before assuming it worked.
+Nothing else is needed: the session is minted at the start of every run and
+saved to `tests/.auth/user.json`, so an expired one repairs itself instead of
+failing the suite a month later. Without both variables the step is skipped
+and says so.
+
+It drives the real login form rather than writing a cookie by hand. Auth is a
+hosted Supabase project, and a forged session would prove the forgery works,
+not that signing in does.
+
+**Which account matters.** `src/lib/owner.ts` pins the admin role to one
+literal address, and `pinOwnerRole` demotes everyone else on every sign-in —
+by design, so a stray admin from a seed or a restored backup cannot survive a
+single visit. A second account therefore cannot be made an admin, and the
+admin half of the baseline can only be captured as the owner. Setup checks
+this once and says which half you are getting, and both gated specs assert
+the page they landed on is the page they asked for, so a non-owner session
+fails loudly instead of quietly baselining the storefront as `/admin`.
 
 `tests/.auth/` is gitignored. Until that file exists both `visual/gated.spec.ts`
 and `a11y/gated.spec.ts` skip, so the fourteen pages stay a visible gap rather

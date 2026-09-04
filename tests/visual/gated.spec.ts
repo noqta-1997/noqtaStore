@@ -13,15 +13,11 @@ import {
 /**
  * Baselines for the pages behind a login.
  *
- * The suite never creates an account or types a password. To include these
- * pages, sign in once by hand and save the browser state to
- * `tests/.auth/user.json`:
- *
- *   npx playwright open --save-storage=tests/.auth/user.json http://localhost:3000/ar/login
- *
- * The file is gitignored. Until it exists these tests skip, so the account and
- * admin halves of the baseline stay an explicit, visible gap rather than a
- * silent one.
+ * `global-setup.ts` signs in once per run when `.env.local` carries
+ * `E2E_EMAIL` and `E2E_PASSWORD`, and saves the state to
+ * `tests/.auth/user.json`. Without them there is no session and these tests
+ * skip, so the account and admin halves of the baseline stay an explicit,
+ * visible gap rather than a silent one.
  */
 
 test.describe("visual · authenticated", () => {
@@ -47,9 +43,14 @@ test.describe("visual · authenticated", () => {
         await seedTheme(page, theme);
         await page.goto(pageCase.path(locale), { waitUntil: "domcontentloaded" });
 
-        // A stale session lands on /login; that is a setup problem, not a diff.
-        expect(page.url(), "session expired — regenerate tests/.auth/user.json")
-          .not.toContain("/login");
+        // Two ways to land somewhere else: an expired session redirects to
+        // /login, and an account that is not the owner is redirected off
+        // /admin to the storefront. Both would be captured as a baseline of
+        // the wrong page, so check the path rather than just the first case.
+        expect(
+          new URL(page.url()).pathname,
+          "landed on another page — see the sign-in note in global-setup.ts",
+        ).toBe(pageCase.path(locale));
 
         await assertTheme(page, theme);
         await settle(page, pageCase.ready);
