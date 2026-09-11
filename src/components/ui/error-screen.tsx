@@ -2,32 +2,23 @@
 
 import { Home, RotateCcw } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 import { Button, buttonStyles } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 
 /**
- * `error.tsx` boundaries receive no route params, so the locale comes from
- * the path and the handful of strings live here rather than the dictionary.
+ * `error.tsx` boundaries are client components with no route params, so they
+ * cannot load the dictionary; the handful of strings live here instead. They
+ * used to come in two languages picked by sniffing the path for `/en` — the
+ * English half went with the English site.
  */
-const copy = {
-  ar: {
-    code: "خطأ في التطبيق",
-    title: "حدث خطأ غير متوقع",
-    description:
-      "تعذّر عرض هذا الجزء. جرّب إعادة المحاولة، وإن استمرت المشكلة عد إلى الرئيسية.",
-    retry: "إعادة المحاولة",
-    home: "العودة إلى الرئيسية",
-  },
-  en: {
-    code: "Application error",
-    title: "Something went wrong",
-    description:
-      "This section could not be rendered. Try again, and head home if the problem persists.",
-    retry: "Try again",
-    home: "Back to home",
-  },
+const t = {
+  code: "خطأ في التطبيق",
+  title: "حدث خطأ غير متوقع",
+  description:
+    "تعذّر عرض هذا الجزء. جرّب إعادة المحاولة، وإن استمرت المشكلة عد إلى الرئيسية.",
+  retry: "إعادة المحاولة",
+  home: "العودة إلى الرئيسية",
 } as const;
 
 interface ErrorScreenProps {
@@ -37,10 +28,6 @@ interface ErrorScreenProps {
 }
 
 export function ErrorScreen({ reset, digest }: ErrorScreenProps) {
-  const pathname = usePathname();
-  const locale = pathname.startsWith("/en") ? "en" : "ar";
-  const t = copy[locale];
-
   return (
     <Container className="py-16 lg:py-24">
       <div className="mx-auto max-w-lg space-y-5 rounded-2xl border border-line bg-card p-8 text-center elevation-md">
@@ -60,7 +47,7 @@ export function ErrorScreen({ reset, digest }: ErrorScreenProps) {
             {t.retry}
           </Button>
           <Link
-            href={`/${locale}`}
+            href={"/"}
             className={buttonStyles({ variant: "secondary", size: "lg" })}
           >
             <Home aria-hidden className="size-4" strokeWidth={1.75} />

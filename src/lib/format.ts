@@ -6,12 +6,10 @@ import type { Locale } from "@/i18n/config";
  */
 const numberLocale: Record<Locale, string> = {
   ar: "ar-IQ-u-nu-latn",
-  en: "en-US",
 };
 
 const currencySuffix: Record<Locale, string> = {
   ar: "د.ع",
-  en: "IQD",
 };
 
 export function formatNumber(value: number, locale: Locale): string {

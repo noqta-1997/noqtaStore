@@ -39,41 +39,8 @@ export function AuthorForm({ admin, dictionary, author }: AuthorFormProps) {
       <Field label={t.nameAr} htmlFor="nameAr">
         <Input id="nameAr" name="nameAr" defaultValue={author?.name.ar} required />
       </Field>
-      <Field label={t.nameEn} htmlFor="nameEn">
-        <Input
-          id="nameEn"
-          name="nameEn"
-          dir="ltr"
-          defaultValue={author?.name.en}
-          required
-        />
-      </Field>
-      <Field label={t.countryAr} htmlFor="countryAr">
-        <Input id="countryAr" name="countryAr" defaultValue={author?.country.ar} />
-      </Field>
-      <Field
-        label={t.countryEn}
-        htmlFor="countryEn"
-        optional={dictionary.common.optional}
-      >
-        <Input
-          id="countryEn"
-          name="countryEn"
-          dir="ltr"
-          defaultValue={author?.country.en}
-        />
-      </Field>
       <Field label={t.bioAr} htmlFor="bioAr">
         <Textarea id="bioAr" name="bioAr" rows={3} defaultValue={author?.bio.ar} />
-      </Field>
-      <Field label={t.bioEn} htmlFor="bioEn" optional={dictionary.common.optional}>
-        <Textarea
-          id="bioEn"
-          name="bioEn"
-          rows={3}
-          dir="ltr"
-          defaultValue={author?.bio.en}
-        />
       </Field>
 
       <Button type="submit" fullWidth>

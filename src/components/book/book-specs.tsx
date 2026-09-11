@@ -24,7 +24,7 @@ export function BookSpecs({ book, locale, dictionary }: BookSpecsProps) {
     {
       label: t.publisher,
       value: book.publisher.name[locale],
-      href: `/${locale}/publishers/${book.publisher.slug}`,
+      href: `/publishers/${book.publisher.slug}`,
     },
     { label: t.publishedYear, value: String(book.publishedYear), numeric: true },
     { label: t.pages, value: formatNumber(book.pages, locale), numeric: true },

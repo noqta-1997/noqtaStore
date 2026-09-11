@@ -38,7 +38,7 @@ export function BookCard({
   priority = false,
   className,
 }: BookCardProps) {
-  const href = `/${locale}/books/${book.slug}`;
+  const href = `/books/${book.slug}`;
   const isSoldOut = book.stock === 0;
   const isLowStock = !isSoldOut && book.stock <= LOW_STOCK_THRESHOLD;
   const primaryTag = book.tags[0];
@@ -64,20 +64,19 @@ export function BookCard({
 
         <div className="absolute start-2 top-2 flex flex-col items-start gap-1.5">
           {book.compareAtPrice ? (
-            <Badge tone="primary">
+            <Badge tone="tint">
               {formatDiscount(book.price, book.compareAtPrice, locale)}{" "}
               {dictionary.off}
             </Badge>
           ) : null}
           {primaryTag ? (
-            <Badge tone="gold">{dictionary.tags[primaryTag]}</Badge>
+            <Badge tone="muted">{dictionary.tags[primaryTag]}</Badge>
           ) : null}
           {isSoldOut ? <Badge tone="muted">{dictionary.outOfStock}</Badge> : null}
         </div>
 
         <WishlistButton
           bookId={book.id}
-          locale={locale}
           label={dictionary.wishlist}
           addedTitle={dictionary.toast.addedToWishlist}
           removedTitle={dictionary.toast.removedFromWishlist}
@@ -119,7 +118,6 @@ export function BookCard({
 
           <AddToCartButton
             bookId={book.id}
-            locale={locale}
             size="sm"
             iconOnly
             disabled={isSoldOut}

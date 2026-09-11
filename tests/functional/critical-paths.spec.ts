@@ -20,16 +20,16 @@ const isMobile = (name: string) => name.startsWith("mobile");
 
 test.describe("storefront renders real data", () => {
   test("home lists books and categories", async ({ page }) => {
-    await page.goto("/ar", { waitUntil: "domcontentloaded" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await settle(page, "main h1");
 
     await expect(page.locator("article")).not.toHaveCount(0);
-    await expect(page.locator('a[href^="/ar/books/"]').first()).toBeVisible();
-    await expect(page.locator('a[href^="/ar/categories/"]').first()).toBeVisible();
+    await expect(page.locator('a[href^="/books/"]').first()).toBeVisible();
+    await expect(page.locator('a[href^="/categories/"]').first()).toBeVisible();
   });
 
   test("book detail shows title, price and a cart control", async ({ page }) => {
-    await page.goto("/ar/books/al-amir-al-saghir", { waitUntil: "domcontentloaded" });
+    await page.goto("/books/al-amir-al-saghir", { waitUntil: "domcontentloaded" });
     await settle(page, "main h1");
 
     await expect(page.locator("main h1")).not.toBeEmpty();
@@ -38,14 +38,14 @@ test.describe("storefront renders real data", () => {
   });
 
   test("search returns results for a seeded title", async ({ page }) => {
-    await page.goto("/ar/search?q=1984", { waitUntil: "domcontentloaded" });
+    await page.goto("/search?q=1984", { waitUntil: "domcontentloaded" });
     await settle(page, "main");
 
     await expect(page.locator("main")).toContainText(/1984/);
   });
 
   test("catalogue sort is URL-driven and survives a reload", async ({ page }) => {
-    await page.goto("/ar/books?sort=newest", { waitUntil: "domcontentloaded" });
+    await page.goto("/books?sort=newest", { waitUntil: "domcontentloaded" });
     await settle(page, "main");
 
     const before = await page.locator("main").innerText();
@@ -58,18 +58,25 @@ test.describe("storefront renders real data", () => {
   });
 
   test("cart page renders for an anonymous visitor", async ({ page }) => {
-    await page.goto("/ar/cart", { waitUntil: "domcontentloaded" });
+    await page.goto("/cart", { waitUntil: "domcontentloaded" });
     await settle(page, "main");
     await expect(page.locator("main")).toBeVisible();
   });
 
   test("unknown route renders the not-found page", async ({ page }) => {
-    const response = await page.goto("/ar/this-route-does-not-exist", {
+    const response = await page.goto("/this-route-does-not-exist", {
       waitUntil: "domcontentloaded",
     });
 
     expect(response?.status()).toBe(404);
-    await expect(page.locator("main, body")).toContainText(/./);
+
+    /*
+     * `main`, not the old `main, body` hedge. That selector existed because
+     * the root not-found boundary rendered its own bare document with no main
+     * landmark; it renders inside the real layout now and has one, so the
+     * hedge started matching both elements and failing on strict mode.
+     */
+    await expect(page.locator("main")).toContainText(/./);
   });
 });
 
@@ -77,27 +84,29 @@ test.describe("authorisation", () => {
   for (const gated of GATED_PAGES) {
     test(`${gated.id} redirects an anonymous visitor to login`, async ({ page }) => {
       await page.goto(gated.path("ar"), { waitUntil: "domcontentloaded" });
-      await expect(page).toHaveURL(/\/ar\/login/);
+      await expect(page).toHaveURL(/\/login/);
     });
   }
 });
 
 test.describe("locale", () => {
-  test("switching language keeps the reader on the same page", async ({ page }, info) => {
-    test.skip(!isDesktop(info.project.name), "switcher is desktop-only chrome");
-
-    await page.goto("/ar/books", { waitUntil: "domcontentloaded" });
+  /*
+   * There was a third test here that clicked the English link and asserted the
+   * reader stayed on the same page in the other language. Both the switcher
+   * and the language are gone, so it was asserting the behaviour of a control
+   * that no longer exists. What is worth guarding now is the opposite: that
+   * nothing reintroduces a second language by accident.
+   */
+  test("the site offers no second language", async ({ page }) => {
+    await page.goto("/books", { waitUntil: "domcontentloaded" });
     await settle(page, "main");
 
-    await page.getByRole("link", { name: "English" }).click();
-    await page.waitForURL(/\/en\/books/);
-
-    await expect(page.locator("html")).toHaveAttribute("lang", "en");
-    await expect(page.locator("html")).toHaveAttribute("dir", "ltr");
+    await expect(page.getByRole("link", { name: "English" })).toHaveCount(0);
+    await expect(page.locator('a[href^="/en"]')).toHaveCount(0);
   });
 
   test("arabic renders right-to-left", async ({ page }) => {
-    await page.goto("/ar", { waitUntil: "domcontentloaded" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
     await expect(page.locator("html")).toHaveAttribute("lang", "ar");
   });
@@ -111,7 +120,7 @@ test.describe("theme", () => {
 
     // Deliberately not `seedTheme`: that re-seeds on every navigation and
     // would overwrite the very persistence this test is checking.
-    await page.goto("/ar", { waitUntil: "domcontentloaded" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await setThemeInPage(page, "light");
     await page.reload({ waitUntil: "domcontentloaded" });
     await settle(page, "main h1");
@@ -131,7 +140,7 @@ test.describe("navigation", () => {
   test("mobile drawer opens and lists the main links", async ({ page }, info) => {
     test.skip(!isMobile(info.project.name), "drawer is mobile-only");
 
-    await page.goto("/ar", { waitUntil: "domcontentloaded" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await settle(page, "main h1");
 
     await page.locator("header button[aria-expanded]").first().click();
@@ -142,7 +151,7 @@ test.describe("navigation", () => {
   });
 
   test("skip link reaches the main landmark by keyboard", async ({ page }) => {
-    await page.goto("/ar", { waitUntil: "domcontentloaded" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await settle(page, "main h1");
 
     await page.keyboard.press("Tab");

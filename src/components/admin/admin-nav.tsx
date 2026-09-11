@@ -40,7 +40,6 @@ export interface AdminNavLabels {
 }
 
 interface AdminNavProps {
-  locale: string;
   labels: AdminNavLabels;
   /** Hides the labels so the nav collapses to an icon rail. */
   iconsOnly?: boolean;
@@ -54,9 +53,9 @@ interface NavEntry {
   exact?: boolean;
 }
 
-export function AdminNav({ locale, labels, iconsOnly = false, onNavigate }: AdminNavProps) {
+export function AdminNav({ labels, iconsOnly = false, onNavigate }: AdminNavProps) {
   const pathname = usePathname();
-  const base = `/${locale}/admin`;
+  const base = `/admin`;
 
   const sections: { title: string; items: NavEntry[] }[] = [
     {
@@ -121,16 +120,17 @@ export function AdminNav({ locale, labels, iconsOnly = false, onNavigate }: Admi
                     aria-current={active ? "page" : undefined}
                     title={item.label}
                     className={cn(
-                      // Subtle background plus a brand bar on the leading edge,
-                      // the same pattern the account nav uses.
-                      "relative flex items-center gap-3 rounded-md px-3 py-2 text-body-md",
+                      // The selected item is marked by its background and its
+                      // weight. There was also a brand bar on the leading edge,
+                      // drawn as a `before:` pseudo-element — a second marker
+                      // saying what the fill already said, and in RTL it landed
+                      // hard against the right rule of the rail.
+                      "flex items-center gap-3 rounded-md px-3 py-2 text-body-md",
                       "transition-colors duration-100 ease-fluent",
-                      "before:absolute before:inset-y-1.5 before:inset-inline-start-0",
-                      "before:w-0.5 before:rounded-full before:bg-primary before:content-['']",
                       iconsOnly && "lg:justify-start justify-center",
                       active
-                        ? "bg-state-selected font-semibold text-on-surface before:opacity-100"
-                        : "text-on-surface-variant before:opacity-0 hover:bg-state-hover hover:text-on-surface",
+                        ? "bg-state-selected font-semibold text-on-surface"
+                        : "text-on-surface-variant hover:bg-state-hover hover:text-on-surface",
                     )}
                   >
                     <item.icon aria-hidden className="size-4.5 shrink-0" strokeWidth={1.75} />

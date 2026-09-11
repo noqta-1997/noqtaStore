@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
-// The bare "/" redirect lives in app/page.tsx so it can follow the default
-// language chosen in the admin settings instead of being frozen at build time.
+// Nothing to configure. There used to be a note here about the bare "/"
+// redirect living in app/page.tsx so it could follow the default language
+// chosen in the admin settings; the store is Arabic only now, "/" is the home
+// page itself, and that setting is gone.
 const nextConfig: NextConfig = {};
 
 export default nextConfig;

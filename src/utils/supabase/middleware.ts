@@ -4,15 +4,22 @@ import { NextResponse, type NextRequest } from "next/server";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-/** Paths that require a session, matched after the locale segment. */
+/** Paths that require a session, matched on the first path segment. */
 const protectedSegments = ["account", "admin"];
 
 function isProtected(pathname: string) {
-  // Route handlers carry no locale segment and answer with a status of their
-  // own, so a redirect here would send them to a page that cannot exist.
+  // Route handlers answer with a status of their own, so a redirect here would
+  // send them to a page that cannot exist.
   if (pathname.startsWith("/api/")) return false;
 
-  const [, , segment] = pathname.split("/");
+  /*
+   * The first segment, not the second. This read `[, , segment]` while every
+   * URL carried a locale — `/ar/account` split to ["", "ar", "account"]. With
+   * the locale segment gone `/account` splits to ["", "account"], and reading
+   * the third element returned undefined: every protected route matched
+   * nothing and the whole account and admin half stopped being gated.
+   */
+  const [, segment] = pathname.split("/");
   return protectedSegments.includes(segment ?? "");
 }
 
@@ -52,9 +59,8 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!user && isProtected(pathname)) {
-    const locale = pathname.split("/")[1] || "ar";
     const login = request.nextUrl.clone();
-    login.pathname = `/${locale}/login`;
+    login.pathname = `/login`;
     login.search = `?next=${encodeURIComponent(pathname)}`;
 
     return NextResponse.redirect(login);

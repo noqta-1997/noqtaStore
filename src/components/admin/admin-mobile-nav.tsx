@@ -8,7 +8,6 @@ import { Drawer } from "@/components/ui/drawer";
 import { IconButton } from "@/components/ui/icon-button";
 
 interface AdminMobileNavProps {
-  locale: string;
   labels: AdminNavLabels;
   panelLabel: string;
   menuLabel: string;
@@ -17,7 +16,6 @@ interface AdminMobileNavProps {
 
 /** The admin navigation as a drawer on phones. */
 export function AdminMobileNav({
-  locale,
   labels,
   panelLabel,
   menuLabel,
@@ -44,7 +42,7 @@ export function AdminMobileNav({
         closeLabel={closeLabel}
         position="start"
       >
-        <AdminNav locale={locale} labels={labels} onNavigate={() => setIsOpen(false)} />
+        <AdminNav labels={labels} onNavigate={() => setIsOpen(false)} />
       </Drawer>
     </>
   );

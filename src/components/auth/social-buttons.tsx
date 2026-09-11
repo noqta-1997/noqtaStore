@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 
 interface SocialButtonsProps {
-  locale: string;
   labels: { google: string; failure: string };
   className?: string;
 }
@@ -25,13 +24,13 @@ interface SocialButtonsProps {
  * both are load-bearing:
  *
  * - `?next=` has to survive the round trip. A reader sent here from the
- *   checkout arrives at `/login?next=/ar/checkout`, and without forwarding it
+ *   checkout arrives at `/login?next=/checkout`, and without forwarding it
  *   to the callback they would come back signed in but on the home page,
  *   having lost what they were doing.
  * - `?error=oauth` is where the callback route parks a failed round trip.
  *   Nothing else on the page would say why the sign-in did not take.
  */
-export function SocialButtons({ locale, labels, className }: SocialButtonsProps) {
+export function SocialButtons({ labels, className }: SocialButtonsProps) {
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -46,7 +45,6 @@ export function SocialButtons({ locale, labels, className }: SocialButtonsProps)
     // Google returns to the callback route, which exchanges the code for a
     // session cookie before handing the reader on to where they were going.
     const callback = new URL("/auth/callback", window.location.origin);
-    callback.searchParams.set("locale", locale);
 
     const next = searchParams.get("next");
     if (next) callback.searchParams.set("next", next);

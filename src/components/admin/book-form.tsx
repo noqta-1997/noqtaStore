@@ -74,29 +74,6 @@ export function BookForm({
             <Field label={t.fields.titleAr} htmlFor="titleAr">
               <Input id="titleAr" name="titleAr" defaultValue={book?.title.ar} required />
             </Field>
-            <Field label={t.fields.titleEn} htmlFor="titleEn">
-              <Input
-                id="titleEn"
-                name="titleEn"
-                dir="ltr"
-                defaultValue={book?.title.en}
-                required
-              />
-            </Field>
-            <Field
-              label={t.fields.slug}
-              htmlFor="slug"
-              hint={t.hints.slug}
-              className="sm:col-span-2"
-            >
-              <Input
-                id="slug"
-                name="slug"
-                dir="ltr"
-                data-numeric
-                defaultValue={book?.slug}
-              />
-            </Field>
             <Field label={t.fields.author} htmlFor="authorId">
               <Select id="authorId" name="authorId" defaultValue={book?.authorId ?? ""}>
                 <option value="" disabled>
@@ -138,15 +115,6 @@ export function BookForm({
                 defaultValue={book?.description.ar}
               />
             </Field>
-            <Field label={t.fields.descriptionEn} htmlFor="descriptionEn">
-              <Textarea
-                id="descriptionEn"
-                name="descriptionEn"
-                rows={4}
-                dir="ltr"
-                defaultValue={book?.description.en}
-              />
-            </Field>
           </div>
         </Panel>
 
@@ -178,16 +146,6 @@ export function BookForm({
                 defaultValue={book?.publishedYear}
               />
             </Field>
-            <Field label={t.fields.isbn} htmlFor="isbn" hint={t.hints.isbn}>
-              <Input
-                id="isbn"
-                name="isbn"
-                dir="ltr"
-                inputMode="numeric"
-                data-numeric
-                defaultValue={book?.isbn}
-              />
-            </Field>
             <Field label={t.fields.pages} htmlFor="pages">
               <Input
                 id="pages"
@@ -196,26 +154,6 @@ export function BookForm({
                 dir="ltr"
                 data-numeric
                 defaultValue={book?.pages}
-              />
-            </Field>
-            <Field label={t.fields.coverType} htmlFor="coverType">
-              <Select
-                id="coverType"
-                name="coverType"
-                defaultValue={book?.coverType ?? "paperback"}
-              >
-                <option value="paperback">{dictionary.books.paperback}</option>
-                <option value="hardcover">{dictionary.books.hardcover}</option>
-              </Select>
-            </Field>
-            <Field label={t.fields.weight} htmlFor="weightGrams">
-              <Input
-                id="weightGrams"
-                name="weightGrams"
-                type="number"
-                dir="ltr"
-                data-numeric
-                defaultValue={book?.weightGrams}
               />
             </Field>
           </div>

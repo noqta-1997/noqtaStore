@@ -51,24 +51,6 @@ export function CategoryForm({ admin, dictionary, category }: CategoryFormProps)
       <Field label={t.nameAr} htmlFor="nameAr">
         <Input id="nameAr" name="nameAr" defaultValue={category?.name.ar} required />
       </Field>
-      <Field label={t.nameEn} htmlFor="nameEn">
-        <Input
-          id="nameEn"
-          name="nameEn"
-          dir="ltr"
-          defaultValue={category?.name.en}
-          required
-        />
-      </Field>
-      <Field label={t.slug} htmlFor="slug">
-        <Input
-          id="slug"
-          name="slug"
-          dir="ltr"
-          data-numeric
-          defaultValue={category?.slug}
-        />
-      </Field>
       <Field label={t.icon} htmlFor="icon">
         <Select id="icon" name="icon" defaultValue={category?.icon ?? categoryIcons[0]}>
           {categoryIcons.map((icon) => (
@@ -84,19 +66,6 @@ export function CategoryForm({ admin, dictionary, category }: CategoryFormProps)
           name="descriptionAr"
           rows={3}
           defaultValue={category?.description.ar}
-        />
-      </Field>
-      <Field
-        label={t.descriptionEn}
-        htmlFor="descriptionEn"
-        optional={dictionary.common.optional}
-      >
-        <Textarea
-          id="descriptionEn"
-          name="descriptionEn"
-          rows={3}
-          dir="ltr"
-          defaultValue={category?.description.en}
         />
       </Field>
 

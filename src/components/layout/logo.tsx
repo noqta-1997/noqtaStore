@@ -1,32 +1,33 @@
 import Link from "next/link";
 
-import type { Locale } from "@/i18n/config";
+import { LogoMark } from "@/components/layout/logo-mark";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
-  locale: Locale;
   name: string;
   tagline?: string;
   className?: string;
 }
 
 /**
- * The mark is literally a dot — "نُقطة".
+ * The wordmark: the store's mark beside its name.
  *
- * The reference sets its wordmark in the display serif and in the warm accent
- * rather than in ink, so the name carries the brand colour and the dot beside
- * it is now a filled disc instead of a framed square.
+ * The mark used to be drawn in CSS — a filled disc inside a brand-coloured
+ * circle, standing in for the dot the name means. It is the real artwork now.
+ * The name keeps its own colour rather than being baked into the image, so it
+ * still answers to the theme and to the type scale.
  */
-export function Logo({ locale, name, tagline, className }: LogoProps) {
+export function Logo({ name, tagline, className }: LogoProps) {
   return (
     <Link
-      href={`/${locale}`}
+      href={"/"}
       className={cn("group flex shrink-0 items-center gap-2.5", className)}
       aria-label={name}
     >
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-container transition-transform duration-100 ease-fluent group-hover:scale-110">
-        <span className="size-2.5 rounded-full bg-on-primary-container" />
-      </span>
+      <LogoMark
+        size={36}
+        className="transition-transform duration-100 ease-fluent group-hover:scale-110"
+      />
       <span className="flex flex-col leading-none">
         <span className="font-display text-xl font-bold text-primary">
           {name}

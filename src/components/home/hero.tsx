@@ -61,7 +61,7 @@ export function Hero({
     <section className="bg-surface">
       <Container className="grid items-center gap-12 py-14 lg:grid-cols-12 lg:gap-10 lg:py-24">
         <div className="space-y-6 lg:col-span-6">
-          <Badge tone="gold">{hero.eyebrow}</Badge>
+          <Badge tone="muted">{hero.eyebrow}</Badge>
 
           <h1 className="text-display-lg">
             {hero.title}{" "}
@@ -74,7 +74,7 @@ export function Hero({
 
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <Link
-              href={`/${locale}/books`}
+              href={`/books`}
               className={buttonStyles({
                 size: "lg",
                 className: "h-12 rounded-full max-sm:w-full",
@@ -84,7 +84,7 @@ export function Hero({
               <ArrowRight aria-hidden className="size-4 rtl:rotate-180" strokeWidth={1.75} />
             </Link>
             <Link
-              href={`/${locale}/categories`}
+              href={`/categories`}
               className={buttonStyles({
                 variant: "secondary",
                 size: "lg",
@@ -128,7 +128,7 @@ export function Hero({
             <div className="flex items-end justify-center gap-3 sm:gap-5">
               <div className="order-2 w-40 shrink-0 rounded-2xl bg-primary-fixed p-4 elevation-lg sm:w-52 sm:p-5">
                 <Link
-                  href={`/${locale}/books/${featuredBook.slug}`}
+                  href={`/books/${featuredBook.slug}`}
                   aria-label={featuredBook.title[locale]}
                   className="block"
                 >
@@ -160,7 +160,7 @@ export function Hero({
 
               <h2 className="text-headline-md">
                 <Link
-                  href={`/${locale}/books/${featuredBook.slug}`}
+                  href={`/books/${featuredBook.slug}`}
                   className="hover:text-primary hover:underline hover:underline-offset-4"
                 >
                   {featuredBook.title[locale]}
@@ -209,7 +209,7 @@ function FannedJacket({
       )}
     >
       <Link
-        href={`/${locale}/books/${book.slug}`}
+        href={`/books/${book.slug}`}
         aria-label={book.title[locale]}
         className="block"
       >

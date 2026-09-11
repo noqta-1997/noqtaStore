@@ -8,7 +8,6 @@ import { placeOrder } from "@/app/actions/checkout";
 import { useToast } from "@/components/ui/toast";
 
 interface CheckoutFormProps {
-  locale: string;
   messages: {
     placed: string;
     emptyCart: string;
@@ -26,7 +25,6 @@ interface CheckoutFormProps {
  * reaches it through `form="checkout-form"`.
  */
 export function CheckoutForm({
-  locale,
   messages,
   className,
   children,
@@ -43,7 +41,7 @@ export function CheckoutForm({
 
     if (result.ok) {
       toast({ title: messages.placed, description: result.message });
-      router.push(`/${locale}/checkout/success?order=${result.message}`);
+      router.push(`/checkout/success?order=${result.message}`);
       router.refresh();
       return;
     }
@@ -63,7 +61,7 @@ export function CheckoutForm({
     toast({ title: text, tone: "error" });
 
     if (result.error === "unauthenticated") {
-      router.push(`/${locale}/login?next=/${locale}/checkout`);
+      router.push(`/login?next=/checkout`);
     }
   };
 

@@ -3,11 +3,9 @@ import Link from "next/link";
 
 import { buttonStyles } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
-import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/get-dictionary";
 
 interface PromoBannerProps {
-  locale: Locale;
   dictionary: Dictionary["home"]["promo"];
 }
 
@@ -17,7 +15,7 @@ interface PromoBannerProps {
  * the button. That also fixes the contrast — the copy is ink on a tint now
  * rather than white on the brand fill.
  */
-export function PromoBanner({ locale, dictionary }: PromoBannerProps) {
+export function PromoBanner({ dictionary }: PromoBannerProps) {
   return (
     <section className="py-14 lg:py-20">
       <Container>
@@ -44,7 +42,7 @@ export function PromoBanner({ locale, dictionary }: PromoBannerProps) {
 
             <div className="lg:col-span-4 lg:justify-self-end">
               <Link
-                href={`/${locale}/offers`}
+                href={`/offers`}
                 className={buttonStyles({
                   size: "lg",
                   className: "h-12 rounded-full",

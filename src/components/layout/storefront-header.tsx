@@ -2,7 +2,6 @@ import { Heart, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 
 import { AccountMenu } from "@/components/layout/account-menu";
-import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { Logo } from "@/components/layout/logo";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { SearchBar } from "@/components/layout/search-bar";
@@ -32,10 +31,11 @@ interface StorefrontHeaderProps {
  *
  * The reference puts the wordmark, the links and the reader's own controls on
  * a single line, so the separate navigation rail below the search field is
- * gone and its two occupants — the language switch and the theme toggle —
- * moved into the action cluster. The theme toggle stays the last
- * `button[aria-label]` in the header: that is how the functional suite finds
- * it, and it is the only control here the suite drives.
+ * gone and its occupant, the theme toggle, moved into the action cluster. The
+ * language switch that used to sit beside it went with the English site. The
+ * theme toggle stays the last `button[aria-label]` in the header: that is how
+ * the functional suite finds it, and it is the only control here the suite
+ * drives.
  */
 export function StorefrontHeader({
   locale,
@@ -43,9 +43,9 @@ export function StorefrontHeader({
   categories,
   brand,
 }: StorefrontHeaderProps) {
-  const navItems = getMainNav(locale, dictionary.nav);
+  const navItems = getMainNav(dictionary.nav);
   const categoryItems = categories.map((category) => ({
-    href: `/${locale}/categories/${category.slug}`,
+    href: `/categories/${category.slug}`,
     label: category.name[locale],
   }));
 
@@ -61,9 +61,9 @@ export function StorefrontHeader({
         <MobileNav
           items={navItems}
           categories={categoryItems}
-          loginHref={`/${locale}/login`}
-          accountHref={`/${locale}/account`}
-          adminHref={`/${locale}/admin`}
+          loginHref={`/login`}
+          accountHref={`/account`}
+          adminHref={`/admin`}
           labels={{
             menu: dictionary.common.menu,
             close: dictionary.common.close,
@@ -76,7 +76,7 @@ export function StorefrontHeader({
           }}
         />
 
-        <Logo locale={locale} name={brand.name} tagline={brand.tagline} />
+        <Logo name={brand.name} tagline={brand.tagline} />
 
         <nav
           aria-label={dictionary.common.menu}
@@ -98,7 +98,7 @@ export function StorefrontHeader({
 
         <div className="ms-auto flex items-center gap-0.5 lg:ms-0 lg:gap-1">
           <SearchBar
-            action={`/${locale}/search`}
+            action={`/search`}
             label={dictionary.common.search}
             placeholder={dictionary.common.searchPlaceholder}
             compact
@@ -106,7 +106,7 @@ export function StorefrontHeader({
           />
 
           <Link
-            href={`/${locale}/account/wishlist`}
+            href={`/account/wishlist`}
             aria-label={dictionary.common.wishlist}
             title={dictionary.common.wishlist}
             className={cn(iconLinkStyles, "hidden sm:inline-flex")}
@@ -115,7 +115,7 @@ export function StorefrontHeader({
           </Link>
 
           <Link
-            href={`/${locale}/cart`}
+            href={`/cart`}
             aria-label={dictionary.common.cart}
             title={dictionary.common.cart}
             className={iconLinkStyles}
@@ -124,12 +124,7 @@ export function StorefrontHeader({
             <CartBadge />
           </Link>
 
-          <span className="hidden lg:inline-flex">
-            <LocaleSwitcher locale={locale} />
-          </span>
-
           <AccountMenu
-            locale={locale}
             labels={{
               login: dictionary.common.login,
               account: dictionary.common.account,
@@ -153,7 +148,7 @@ export function StorefrontHeader({
 
       <Container className="pb-3 xl:hidden">
         <SearchBar
-          action={`/${locale}/search`}
+          action={`/search`}
           label={dictionary.common.search}
           placeholder={dictionary.common.searchPlaceholder}
         />

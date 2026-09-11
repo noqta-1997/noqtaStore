@@ -84,15 +84,15 @@ export function AddressForm({
           <Select
             id="governorate"
             name="governorate"
-            defaultValue={address?.governorate.en ?? ""}
+            defaultValue={address?.governorate.ar ?? ""}
             required
           >
             <option value="" disabled>
               {checkout.selectGovernorate}
             </option>
-            {governorates.map((item) => (
-              <option key={item.en} value={item.en}>
-                {item[locale]}
+            {governorates.map((name) => (
+              <option key={name} value={name}>
+                {name}
               </option>
             ))}
           </Select>

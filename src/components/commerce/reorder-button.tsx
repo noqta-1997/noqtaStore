@@ -11,7 +11,6 @@ import { notifyCartChanged } from "@/lib/cart-signal";
 
 interface ReorderButtonProps {
   orderId: string;
-  locale: string;
   label: string;
   successTitle: string;
   signInMessage: string;
@@ -22,7 +21,6 @@ interface ReorderButtonProps {
 /** Refills the cart from a past order and sends the reader straight to it. */
 export function ReorderButton({
   orderId,
-  locale,
   label,
   successTitle,
   signInMessage,
@@ -41,7 +39,7 @@ export function ReorderButton({
     if (!result.ok) {
       if (result.error === "unauthenticated") {
         toast({ title: signInMessage, tone: "info" });
-        router.push(`/${locale}/login?next=/${locale}/account/orders`);
+        router.push(`/login?next=/account/orders`);
         return;
       }
 
@@ -54,7 +52,7 @@ export function ReorderButton({
 
     notifyCartChanged();
     toast({ title: successTitle, tone: "success" });
-    router.push(`/${locale}/cart`);
+    router.push(`/cart`);
   };
 
   return (

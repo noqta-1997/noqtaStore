@@ -4,10 +4,9 @@ export const categories: Category[] = [
   {
     id: "c1",
     slug: "literature",
-    name: { ar: "أدب وروايات", en: "Literature & Fiction" },
+    name: { ar: "أدب وروايات" },
     description: {
       ar: "روايات ومجموعات قصصية عربية ومترجمة",
-      en: "Arabic and translated novels and short stories",
     },
     icon: "BookOpen",
     booksCount: 428,
@@ -15,10 +14,9 @@ export const categories: Category[] = [
   {
     id: "c2",
     slug: "history",
-    name: { ar: "تاريخ", en: "History" },
+    name: { ar: "تاريخ" },
     description: {
       ar: "تاريخ الحضارات والأمم والمدن",
-      en: "Histories of civilizations, nations and cities",
     },
     icon: "Landmark",
     booksCount: 176,
@@ -26,10 +24,9 @@ export const categories: Category[] = [
   {
     id: "c3",
     slug: "self-development",
-    name: { ar: "تنمية ذاتية", en: "Self Development" },
+    name: { ar: "تنمية ذاتية" },
     description: {
       ar: "مهارات وعادات وأدوات لتطوير الذات",
-      en: "Habits, skills and tools for personal growth",
     },
     icon: "Sprout",
     booksCount: 214,
@@ -37,10 +34,9 @@ export const categories: Category[] = [
   {
     id: "c4",
     slug: "philosophy",
-    name: { ar: "فلسفة وفكر", en: "Philosophy & Thought" },
+    name: { ar: "فلسفة وفكر" },
     description: {
       ar: "الفلسفة والمنطق والفكر النقدي",
-      en: "Philosophy, logic and critical thought",
     },
     icon: "BrainCircuit",
     booksCount: 132,
@@ -48,10 +44,9 @@ export const categories: Category[] = [
   {
     id: "c5",
     slug: "children",
-    name: { ar: "أطفال وناشئة", en: "Children & YA" },
+    name: { ar: "أطفال وناشئة" },
     description: {
       ar: "قصص مصوّرة وكتب للأطفال واليافعين",
-      en: "Picture books and reads for young readers",
     },
     icon: "ToyBrick",
     booksCount: 189,
@@ -59,10 +54,9 @@ export const categories: Category[] = [
   {
     id: "c6",
     slug: "science",
-    name: { ar: "علوم وتكنولوجيا", en: "Science & Tech" },
+    name: { ar: "علوم وتكنولوجيا" },
     description: {
       ar: "الفيزياء والفلك والتقنية المبسّطة",
-      en: "Physics, astronomy and accessible tech",
     },
     icon: "Atom",
     booksCount: 154,
@@ -70,10 +64,9 @@ export const categories: Category[] = [
   {
     id: "c7",
     slug: "biographies",
-    name: { ar: "سير وتراجم", en: "Biographies" },
+    name: { ar: "سير وتراجم" },
     description: {
       ar: "سير ذاتية وشهادات ومذكرات",
-      en: "Memoirs, testimonies and life stories",
     },
     icon: "UserRound",
     booksCount: 98,
@@ -81,10 +74,9 @@ export const categories: Category[] = [
   {
     id: "c8",
     slug: "poetry",
-    name: { ar: "شعر", en: "Poetry" },
+    name: { ar: "شعر" },
     description: {
       ar: "دواوين شعرية كلاسيكية وحديثة",
-      en: "Classical and modern poetry collections",
     },
     icon: "Feather",
     booksCount: 76,

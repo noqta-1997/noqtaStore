@@ -125,17 +125,17 @@ export async function getCurrentCustomer() {
  * For pages that only make sense when signed in. The proxy already redirects
  * anonymous visitors; this closes the gap if a route is ever reached directly.
  */
-export async function requireCustomer(locale: string) {
+export async function requireCustomer() {
   const customer = await getCurrentCustomer();
-  if (!customer) redirect(`/${locale}/login`);
+  if (!customer) redirect(`/login`);
 
   return customer;
 }
 
 /** Admin pages additionally require the `admin` role. */
-export async function requireAdmin(locale: string) {
-  const customer = await requireCustomer(locale);
-  if (customer.role !== "admin") redirect(`/${locale}`);
+export async function requireAdmin() {
+  const customer = await requireCustomer();
+  if (customer.role !== "admin") redirect("/");
 
   return customer;
 }

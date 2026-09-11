@@ -7,14 +7,18 @@
  * is what stops those two from drifting apart.
  *
  * Step 80 is the load-bearing one — Fluent turns it into
- * `colorBrandBackground` and always puts white on it. That fixes the value:
- * white on the old `#ff6b35` measures 2.84:1 and fails, white on `#ab3500`
- * measures 6.48:1 and passes. So the vivid orange moves up the ramp to around
- * step 100, where it is used as a tint rather than as a text-bearing fill.
+ * `colorBrandBackground` and always puts white on it, which fixes the value:
+ * white on `#3b5bfd` measures 5.12:1 and passes. The vivid tints live from
+ * step 90 up, where they are used as fills behind dark text rather than as
+ * text-bearing backgrounds.
  *
  * The rest of the ramp keeps the lightness profile of Fluent's own reference
  * ramp — that profile is what makes the derived alias tokens land at usable
- * contrasts — re-anchored at step 80 and re-hued to Noqta's orange in OKLCH.
+ * contrasts — re-anchored at step 80 and re-hued to the indigo.
+ *
+ * It was Noqta's orange (`#ab3500`) until the store was recut on a neutral
+ * dashboard reference. The ramp shape did not change; only the hue did, which
+ * is the whole reason the ramp is a separate file from the tokens it feeds.
  */
 
 /** Matches `BrandVariants` from `@fluentui/react-theme`. */
@@ -26,20 +30,20 @@ export interface BrandRamp {
 }
 
 export const noqtaBrand: BrandRamp = {
-  10: "#1b0703",
-  20: "#2d0e04",
-  30: "#3f1406",
-  40: "#521d0a",
-  50: "#68230b",
-  60: "#7d2a0c",
-  70: "#922e04",
-  80: "#ab3500", // colorBrandBackground — white on this is 6.48:1
-  90: "#ce4e21",
-  100: "#e86a41",
-  110: "#ec805d",
-  120: "#f19273",
-  130: "#f6aa91",
-  140: "#f9c3b1",
-  150: "#fbd9ce",
-  160: "#fef0ec",
+  10: "#090f28",
+  20: "#101944",
+  30: "#162360",
+  40: "#1c2c79",
+  50: "#24389a",
+  60: "#2b42b9",
+  70: "#324dd7",
+  80: "#3b5bfd", // colorBrandBackground — white on this is 5.12:1
+  90: "#5a75ff",
+  100: "#7a8fff",
+  110: "#94a4ff",
+  120: "#a9b5ff",
+  130: "#c0c8ff",
+  140: "#d3d9ff",
+  150: "#e4e8ff",
+  160: "#f2f4ff",
 };

@@ -1,6 +1,6 @@
 import type { Book, Localized } from "@/types";
 
-const ARABIC: Localized = { ar: "العربية", en: "Arabic" };
+const ARABIC: Localized = { ar: "العربية" };
 
 /**
  * Seed input, not an app shape: the publisher is still a name here because
@@ -17,7 +17,7 @@ export const books: SeedBook[] = [
   {
     id: "b1",
     slug: "mawsim-al-hijra",
-    title: { ar: "موسم الهجرة إلى الشمال", en: "Season of Migration to the North" },
+    title: { ar: "موسم الهجرة إلى الشمال" },
     authorId: "a2",
     categoryId: "c1",
     price: 15000,
@@ -26,7 +26,7 @@ export const books: SeedBook[] = [
     reviewsCount: 1240,
     stock: 34,
     pages: 176,
-    publisher: { ar: "دار العودة", en: "Dar Al-Awda" },
+    publisher: { ar: "دار العودة" },
     publishedYear: 1966,
     isbn: "9789953217123",
     language: ARABIC,
@@ -34,7 +34,6 @@ export const books: SeedBook[] = [
     weightGrams: 240,
     description: {
       ar: "رواية عن الصدام بين الشرق والغرب، يرويها راوٍ عائد من أوروبا إلى قريته على ضفاف النيل.",
-      en: "A novel of East and West colliding, told by a narrator returning from Europe to his village on the Nile.",
     },
     tags: ["bestseller", "featured"],
     createdAt: "2025-11-02",
@@ -42,7 +41,7 @@ export const books: SeedBook[] = [
   {
     id: "b2",
     slug: "awlad-haretna",
-    title: { ar: "أولاد حارتنا", en: "Children of the Alley" },
+    title: { ar: "أولاد حارتنا" },
     authorId: "a1",
     categoryId: "c1",
     price: 18000,
@@ -50,7 +49,7 @@ export const books: SeedBook[] = [
     reviewsCount: 862,
     stock: 21,
     pages: 552,
-    publisher: { ar: "دار الشروق", en: "Dar El Shorouk" },
+    publisher: { ar: "دار الشروق" },
     publishedYear: 1959,
     isbn: "9789770926512",
     language: ARABIC,
@@ -58,7 +57,6 @@ export const books: SeedBook[] = [
     weightGrams: 560,
     description: {
       ar: "ملحمة روائية عن حارة مصرية تختصر في أجيالها رحلة الإنسان مع السلطة والإيمان.",
-      en: "An epic of one Cairo alley whose generations retell humanity's struggle with power and faith.",
     },
     tags: ["bestseller"],
     createdAt: "2025-09-14",
@@ -66,7 +64,7 @@ export const books: SeedBook[] = [
   {
     id: "b3",
     slug: "zuqaq-al-midaq",
-    title: { ar: "زقاق المدق", en: "Midaq Alley" },
+    title: { ar: "زقاق المدق" },
     authorId: "a1",
     categoryId: "c1",
     price: 12000,
@@ -74,7 +72,7 @@ export const books: SeedBook[] = [
     reviewsCount: 543,
     stock: 48,
     pages: 288,
-    publisher: { ar: "دار الشروق", en: "Dar El Shorouk" },
+    publisher: { ar: "دار الشروق" },
     publishedYear: 1947,
     isbn: "9789770927311",
     language: ARABIC,
@@ -82,7 +80,6 @@ export const books: SeedBook[] = [
     weightGrams: 320,
     description: {
       ar: "لوحة اجتماعية نابضة لزقاق قاهري صغير في سنوات الحرب.",
-      en: "A vivid social portrait of a small Cairo alley during the war years.",
     },
     tags: [],
     createdAt: "2025-07-20",
@@ -90,7 +87,7 @@ export const books: SeedBook[] = [
   {
     id: "b4",
     slug: "rijal-fi-al-shams",
-    title: { ar: "رجال في الشمس", en: "Men in the Sun" },
+    title: { ar: "رجال في الشمس" },
     authorId: "a3",
     categoryId: "c1",
     price: 9000,
@@ -98,7 +95,7 @@ export const books: SeedBook[] = [
     reviewsCount: 731,
     stock: 62,
     pages: 112,
-    publisher: { ar: "مؤسسة الأبحاث العربية", en: "Arab Research Institute" },
+    publisher: { ar: "مؤسسة الأبحاث العربية" },
     publishedYear: 1963,
     isbn: "9789953362114",
     language: ARABIC,
@@ -106,7 +103,6 @@ export const books: SeedBook[] = [
     weightGrams: 160,
     description: {
       ar: "ثلاثة رجال يعبرون الصحراء بحثًا عن حياة أخرى، في واحدة من أشهر روايات الأدب الفلسطيني.",
-      en: "Three men cross the desert in search of another life, in a landmark of Palestinian fiction.",
     },
     tags: ["bestseller"],
     createdAt: "2025-06-11",
@@ -114,7 +110,7 @@ export const books: SeedBook[] = [
   {
     id: "b5",
     slug: "thulathiyat-gharnata",
-    title: { ar: "ثلاثية غرناطة", en: "The Granada Trilogy" },
+    title: { ar: "ثلاثية غرناطة" },
     authorId: "a4",
     categoryId: "c1",
     price: 26000,
@@ -123,7 +119,7 @@ export const books: SeedBook[] = [
     reviewsCount: 968,
     stock: 17,
     pages: 512,
-    publisher: { ar: "دار الشروق", en: "Dar El Shorouk" },
+    publisher: { ar: "دار الشروق" },
     publishedYear: 1994,
     isbn: "9789770928417",
     language: ARABIC,
@@ -131,7 +127,6 @@ export const books: SeedBook[] = [
     weightGrams: 720,
     description: {
       ar: "ثلاث روايات تتابع مصائر عائلة أندلسية بعد سقوط غرناطة.",
-      en: "Three novels following an Andalusian family through the fall of Granada.",
     },
     tags: ["featured", "award"],
     createdAt: "2026-01-08",
@@ -139,7 +134,7 @@ export const books: SeedBook[] = [
   {
     id: "b6",
     slug: "al-tantouriya",
-    title: { ar: "الطنطورية", en: "The Woman from Tantoura" },
+    title: { ar: "الطنطورية" },
     authorId: "a4",
     categoryId: "c1",
     price: 22000,
@@ -147,7 +142,7 @@ export const books: SeedBook[] = [
     reviewsCount: 412,
     stock: 26,
     pages: 400,
-    publisher: { ar: "دار الشروق", en: "Dar El Shorouk" },
+    publisher: { ar: "دار الشروق" },
     publishedYear: 2010,
     isbn: "9789770932018",
     language: ARABIC,
@@ -155,7 +150,6 @@ export const books: SeedBook[] = [
     weightGrams: 470,
     description: {
       ar: "سيرة امرأة فلسطينية تحمل ذاكرة قريتها من الساحل إلى المنافي.",
-      en: "The life of a Palestinian woman carrying her village's memory into exile.",
     },
     tags: [],
     createdAt: "2025-12-19",
@@ -163,7 +157,7 @@ export const books: SeedBook[] = [
   {
     id: "b7",
     slug: "mudun-al-milh",
-    title: { ar: "مدن الملح", en: "Cities of Salt" },
+    title: { ar: "مدن الملح" },
     authorId: "a5",
     categoryId: "c1",
     price: 35000,
@@ -173,7 +167,6 @@ export const books: SeedBook[] = [
     pages: 640,
     publisher: {
       ar: "المؤسسة العربية للدراسات والنشر",
-      en: "Arab Institute for Research and Publishing",
     },
     publishedYear: 1984,
     isbn: "9789953361208",
@@ -182,7 +175,6 @@ export const books: SeedBook[] = [
     weightGrams: 880,
     description: {
       ar: "ملحمة عن اكتشاف النفط وتحوّل الصحراء ومجتمعاتها تحوّلًا لا رجعة فيه.",
-      en: "An epic of oil's discovery and the irreversible transformation of desert society.",
     },
     tags: ["featured"],
     createdAt: "2025-05-30",
@@ -190,7 +182,7 @@ export const books: SeedBook[] = [
   {
     id: "b8",
     slug: "dhakirat-al-jasad",
-    title: { ar: "ذاكرة الجسد", en: "The Bridges of Constantine" },
+    title: { ar: "ذاكرة الجسد" },
     authorId: "a6",
     categoryId: "c1",
     price: 17000,
@@ -198,7 +190,7 @@ export const books: SeedBook[] = [
     reviewsCount: 1502,
     stock: 41,
     pages: 408,
-    publisher: { ar: "دار الآداب", en: "Dar Al-Adab" },
+    publisher: { ar: "دار الآداب" },
     publishedYear: 1993,
     isbn: "9789953891026",
     language: ARABIC,
@@ -206,7 +198,6 @@ export const books: SeedBook[] = [
     weightGrams: 450,
     description: {
       ar: "رسّام جزائري يستعيد وطنه وحبه الأول عبر لغة شعرية كثيفة.",
-      en: "An Algerian painter revisits his homeland and first love in dense, poetic prose.",
     },
     tags: ["bestseller"],
     createdAt: "2025-08-03",
@@ -214,7 +205,7 @@ export const books: SeedBook[] = [
   {
     id: "b9",
     slug: "frankenstein-fi-baghdad",
-    title: { ar: "فرانكشتاين في بغداد", en: "Frankenstein in Baghdad" },
+    title: { ar: "فرانكشتاين في بغداد" },
     authorId: "a7",
     categoryId: "c1",
     price: 19000,
@@ -223,7 +214,7 @@ export const books: SeedBook[] = [
     reviewsCount: 689,
     stock: 30,
     pages: 352,
-    publisher: { ar: "منشورات الجمل", en: "Al-Kamel Verlag" },
+    publisher: { ar: "منشورات الجمل" },
     publishedYear: 2013,
     isbn: "9789933351014",
     language: ARABIC,
@@ -231,7 +222,6 @@ export const books: SeedBook[] = [
     weightGrams: 400,
     description: {
       ar: "في بغداد ما بعد 2003، يجمع بائع عاديات أشلاء الضحايا فيصنع منها كائنًا يطالب بالثأر.",
-      en: "In post-2003 Baghdad a junk dealer stitches victims' remains into a creature bent on revenge.",
     },
     tags: ["award", "featured"],
     createdAt: "2026-02-11",
@@ -239,7 +229,7 @@ export const books: SeedBook[] = [
   {
     id: "b10",
     slug: "saq-al-bambu",
-    title: { ar: "ساق البامبو", en: "The Bamboo Stalk" },
+    title: { ar: "ساق البامبو" },
     authorId: "a8",
     categoryId: "c1",
     price: 21000,
@@ -249,7 +239,6 @@ export const books: SeedBook[] = [
     pages: 400,
     publisher: {
       ar: "الدار العربية للعلوم ناشرون",
-      en: "Arab Scientific Publishers",
     },
     publishedYear: 2012,
     isbn: "9786140112094",
@@ -258,7 +247,6 @@ export const books: SeedBook[] = [
     weightGrams: 460,
     description: {
       ar: "شاب من أم فلبينية وأب كويتي يبحث عن مكانه بين هويتين.",
-      en: "A young man born to a Filipina mother and a Kuwaiti father searches for a place between two identities.",
     },
     tags: ["award"],
     createdAt: "2025-10-25",
@@ -266,7 +254,7 @@ export const books: SeedBook[] = [
   {
     id: "b11",
     slug: "azazeel",
-    title: { ar: "عزازيل", en: "Azazeel" },
+    title: { ar: "عزازيل" },
     authorId: "a9",
     categoryId: "c1",
     price: 20000,
@@ -274,7 +262,7 @@ export const books: SeedBook[] = [
     reviewsCount: 596,
     stock: 28,
     pages: 380,
-    publisher: { ar: "دار الشروق", en: "Dar El Shorouk" },
+    publisher: { ar: "دار الشروق" },
     publishedYear: 2008,
     isbn: "9789770929315",
     language: ARABIC,
@@ -282,7 +270,6 @@ export const books: SeedBook[] = [
     weightGrams: 430,
     description: {
       ar: "مخطوطات راهب مصري في القرن الخامس تكشف صراع الإيمان والشك.",
-      en: "The fifth-century scrolls of an Egyptian monk torn between faith and doubt.",
     },
     tags: ["award"],
     createdAt: "2025-04-16",
@@ -290,7 +277,7 @@ export const books: SeedBook[] = [
   {
     id: "b12",
     slug: "miat-am-min-al-uzla",
-    title: { ar: "مئة عام من العزلة", en: "One Hundred Years of Solitude" },
+    title: { ar: "مئة عام من العزلة" },
     authorId: "a10",
     categoryId: "c1",
     price: 24000,
@@ -299,7 +286,7 @@ export const books: SeedBook[] = [
     reviewsCount: 2130,
     stock: 15,
     pages: 432,
-    publisher: { ar: "دار المدى", en: "Dar Al-Mada" },
+    publisher: { ar: "دار المدى" },
     publishedYear: 1967,
     isbn: "9789933106114",
     language: ARABIC,
@@ -307,7 +294,6 @@ export const books: SeedBook[] = [
     weightGrams: 610,
     description: {
       ar: "سبعة أجيال من عائلة بوينديا في قرية ماكوندو، تحفة الواقعية السحرية.",
-      en: "Seven generations of the Buendía family in Macondo — the masterwork of magical realism.",
     },
     tags: ["bestseller", "featured"],
     createdAt: "2026-01-27",
@@ -315,7 +301,7 @@ export const books: SeedBook[] = [
   {
     id: "b13",
     slug: "1984",
-    title: { ar: "1984", en: "Nineteen Eighty-Four" },
+    title: { ar: "1984" },
     authorId: "a11",
     categoryId: "c1",
     price: 14000,
@@ -323,7 +309,7 @@ export const books: SeedBook[] = [
     reviewsCount: 1811,
     stock: 55,
     pages: 336,
-    publisher: { ar: "دار الرافدين", en: "Dar Al-Rafidain" },
+    publisher: { ar: "دار الرافدين" },
     publishedYear: 1949,
     isbn: "9789922620114",
     language: ARABIC,
@@ -331,7 +317,6 @@ export const books: SeedBook[] = [
     weightGrams: 380,
     description: {
       ar: "ديستوبيا كلاسيكية عن الرقابة الشاملة وإعادة صياغة الحقيقة.",
-      en: "The classic dystopia of total surveillance and rewritten truth.",
     },
     tags: ["bestseller"],
     createdAt: "2025-11-29",
@@ -339,7 +324,7 @@ export const books: SeedBook[] = [
   {
     id: "b14",
     slug: "al-khimiyai",
-    title: { ar: "الخيميائي", en: "The Alchemist" },
+    title: { ar: "الخيميائي" },
     authorId: "a12",
     categoryId: "c3",
     price: 13000,
@@ -349,7 +334,6 @@ export const books: SeedBook[] = [
     pages: 208,
     publisher: {
       ar: "الدار العربية للعلوم ناشرون",
-      en: "Arab Scientific Publishers",
     },
     publishedYear: 1988,
     isbn: "9786140110113",
@@ -358,7 +342,6 @@ export const books: SeedBook[] = [
     weightGrams: 250,
     description: {
       ar: "راعٍ أندلسي يقطع الصحراء بحثًا عن كنز، فيجد معنى رحلته.",
-      en: "An Andalusian shepherd crosses the desert after a treasure and finds the meaning of the journey.",
     },
     tags: ["bestseller"],
     createdAt: "2025-03-09",
@@ -366,7 +349,7 @@ export const books: SeedBook[] = [
   {
     id: "b15",
     slug: "al-khubz-al-hafi",
-    title: { ar: "الخبز الحافي", en: "For Bread Alone" },
+    title: { ar: "الخبز الحافي" },
     authorId: "a13",
     categoryId: "c7",
     price: 16000,
@@ -374,7 +357,7 @@ export const books: SeedBook[] = [
     reviewsCount: 502,
     stock: 33,
     pages: 240,
-    publisher: { ar: "دار الساقي", en: "Dar Al Saqi" },
+    publisher: { ar: "دار الساقي" },
     publishedYear: 1982,
     isbn: "9781855162013",
     language: ARABIC,
@@ -382,7 +365,6 @@ export const books: SeedBook[] = [
     weightGrams: 290,
     description: {
       ar: "سيرة ذاتية صادمة عن الفقر والتشرد والطريق إلى الكتابة.",
-      en: "A raw memoir of poverty, the streets, and the road to writing.",
     },
     tags: [],
     createdAt: "2025-02-14",
@@ -390,7 +372,7 @@ export const books: SeedBook[] = [
   {
     id: "b16",
     slug: "al-amir-al-saghir",
-    title: { ar: "الأمير الصغير", en: "The Little Prince" },
+    title: { ar: "الأمير الصغير" },
     authorId: "a14",
     categoryId: "c5",
     price: 10000,
@@ -399,7 +381,7 @@ export const books: SeedBook[] = [
     reviewsCount: 2440,
     stock: 88,
     pages: 120,
-    publisher: { ar: "دار المدى", en: "Dar Al-Mada" },
+    publisher: { ar: "دار المدى" },
     publishedYear: 1943,
     isbn: "9789933107112",
     language: ARABIC,
@@ -407,7 +389,6 @@ export const books: SeedBook[] = [
     weightGrams: 210,
     description: {
       ar: "حكاية أمير صغير يزور الكواكب ويعلّمنا ما لا تراه العين.",
-      en: "A small prince visits the planets and teaches us what the eye cannot see.",
     },
     tags: ["bestseller", "featured"],
     createdAt: "2026-02-02",
@@ -415,7 +396,7 @@ export const books: SeedBook[] = [
   {
     id: "b17",
     slug: "tarikh-mujaz-lilzaman",
-    title: { ar: "تاريخ موجز للزمن", en: "A Brief History of Time" },
+    title: { ar: "تاريخ موجز للزمن" },
     authorId: "a15",
     categoryId: "c6",
     price: 23000,
@@ -423,7 +404,7 @@ export const books: SeedBook[] = [
     reviewsCount: 711,
     stock: 19,
     pages: 256,
-    publisher: { ar: "مؤسسة هنداوي", en: "Hindawi Foundation" },
+    publisher: { ar: "مؤسسة هنداوي" },
     publishedYear: 1988,
     isbn: "9781527310117",
     language: ARABIC,
@@ -431,7 +412,6 @@ export const books: SeedBook[] = [
     weightGrams: 330,
     description: {
       ar: "من الانفجار الكبير إلى الثقوب السوداء، شرح مبسّط لأسئلة الكون الكبرى.",
-      en: "From the Big Bang to black holes — the universe's biggest questions, plainly told.",
     },
     tags: ["featured"],
     createdAt: "2025-12-05",
@@ -439,7 +419,7 @@ export const books: SeedBook[] = [
   {
     id: "b18",
     slug: "imarat-yacoubian",
-    title: { ar: "عمارة يعقوبيان", en: "The Yacoubian Building" },
+    title: { ar: "عمارة يعقوبيان" },
     authorId: "a16",
     categoryId: "c1",
     price: 15000,
@@ -447,7 +427,7 @@ export const books: SeedBook[] = [
     reviewsCount: 934,
     stock: 37,
     pages: 352,
-    publisher: { ar: "دار الشروق", en: "Dar El Shorouk" },
+    publisher: { ar: "دار الشروق" },
     publishedYear: 2002,
     isbn: "9789770930113",
     language: ARABIC,
@@ -455,7 +435,6 @@ export const books: SeedBook[] = [
     weightGrams: 400,
     description: {
       ar: "عمارة واحدة في وسط القاهرة تختصر طبقات مجتمع بأكمله.",
-      en: "A single downtown Cairo building holds every layer of a society.",
     },
     tags: [],
     createdAt: "2025-01-22",
@@ -463,7 +442,7 @@ export const books: SeedBook[] = [
   {
     id: "b19",
     slug: "al-fil-al-azraq",
-    title: { ar: "الفيل الأزرق", en: "The Blue Elephant" },
+    title: { ar: "الفيل الأزرق" },
     authorId: "a17",
     categoryId: "c1",
     price: 18000,
@@ -471,7 +450,7 @@ export const books: SeedBook[] = [
     reviewsCount: 1288,
     stock: 44,
     pages: 480,
-    publisher: { ar: "دار الشروق", en: "Dar El Shorouk" },
+    publisher: { ar: "دار الشروق" },
     publishedYear: 2012,
     isbn: "9789770931110",
     language: ARABIC,
@@ -479,7 +458,6 @@ export const books: SeedBook[] = [
     weightGrams: 520,
     description: {
       ar: "طبيب نفسي يعود إلى العمل فيواجه قضية تقلب حياته رأسًا على عقب.",
-      en: "A psychiatrist returns to work and meets a case that upends his life.",
     },
     tags: ["bestseller"],
     createdAt: "2026-02-20",
@@ -487,7 +465,7 @@ export const books: SeedBook[] = [
   {
     id: "b20",
     slug: "hadith-al-sabah-wal-masaa",
-    title: { ar: "حديث الصباح والمساء", en: "Morning and Evening Talk" },
+    title: { ar: "حديث الصباح والمساء" },
     authorId: "a1",
     categoryId: "c1",
     price: 16000,
@@ -495,7 +473,7 @@ export const books: SeedBook[] = [
     reviewsCount: 288,
     stock: 25,
     pages: 300,
-    publisher: { ar: "دار الشروق", en: "Dar El Shorouk" },
+    publisher: { ar: "دار الشروق" },
     publishedYear: 1987,
     isbn: "9789770926819",
     language: ARABIC,
@@ -503,7 +481,6 @@ export const books: SeedBook[] = [
     weightGrams: 340,
     description: {
       ar: "خمسة أجيال مصرية تُروى في مداخل أبجدية قصيرة ومكثفة.",
-      en: "Five Egyptian generations told in short, alphabetically ordered entries.",
     },
     tags: [],
     createdAt: "2025-06-28",
@@ -511,7 +488,7 @@ export const books: SeedBook[] = [
   {
     id: "b21",
     slug: "raaytu-ramallah",
-    title: { ar: "رأيت رام الله", en: "I Saw Ramallah" },
+    title: { ar: "رأيت رام الله" },
     authorId: "a18",
     categoryId: "c7",
     price: 14000,
@@ -519,7 +496,7 @@ export const books: SeedBook[] = [
     reviewsCount: 366,
     stock: 31,
     pages: 220,
-    publisher: { ar: "دار الشروق", en: "Dar El Shorouk" },
+    publisher: { ar: "دار الشروق" },
     publishedYear: 1997,
     isbn: "9789770929117",
     language: ARABIC,
@@ -527,7 +504,6 @@ export const books: SeedBook[] = [
     weightGrams: 270,
     description: {
       ar: "شهادة شاعر يعود إلى وطنه بعد ثلاثين عامًا من الغياب.",
-      en: "A poet's testimony on returning home after thirty years away.",
     },
     tags: [],
     createdAt: "2025-09-01",
@@ -535,7 +511,7 @@ export const books: SeedBook[] = [
   {
     id: "b22",
     slug: "tawq-al-hamam",
-    title: { ar: "طوق الحمام", en: "The Dove's Necklace" },
+    title: { ar: "طوق الحمام" },
     authorId: "a19",
     categoryId: "c1",
     price: 25000,
@@ -543,7 +519,7 @@ export const books: SeedBook[] = [
     reviewsCount: 214,
     stock: 12,
     pages: 560,
-    publisher: { ar: "المركز الثقافي العربي", en: "Arab Cultural Center" },
+    publisher: { ar: "المركز الثقافي العربي" },
     publishedYear: 2011,
     isbn: "9789953685113",
     language: ARABIC,
@@ -551,7 +527,6 @@ export const books: SeedBook[] = [
     weightGrams: 690,
     description: {
       ar: "جريمة في أزقة مكة تفتح بابًا على تاريخ المدينة وأسرارها.",
-      en: "A crime in Mecca's alleys opens onto the city's history and secrets.",
     },
     tags: ["award"],
     createdAt: "2025-05-07",
@@ -559,7 +534,7 @@ export const books: SeedBook[] = [
   {
     id: "b23",
     slug: "diwan-mahmoud-darwish",
-    title: { ar: "الأعمال الشعرية الكاملة", en: "Collected Poems" },
+    title: { ar: "الأعمال الشعرية الكاملة" },
     authorId: "a20",
     categoryId: "c8",
     price: 30000,
@@ -568,7 +543,7 @@ export const books: SeedBook[] = [
     reviewsCount: 645,
     stock: 14,
     pages: 800,
-    publisher: { ar: "رياض الريس للكتب والنشر", en: "Riad El-Rayyes Books" },
+    publisher: { ar: "رياض الريس للكتب والنشر" },
     publishedYear: 2009,
     isbn: "9789953215112",
     language: ARABIC,
@@ -576,7 +551,6 @@ export const books: SeedBook[] = [
     weightGrams: 1050,
     description: {
       ar: "الأعمال الشعرية الكاملة في مجلد واحد يجمع مسيرة شاعر بأكملها.",
-      en: "A single volume gathering the poet's complete verse.",
     },
     tags: ["featured", "bestseller"],
     createdAt: "2026-01-15",
@@ -584,7 +558,7 @@ export const books: SeedBook[] = [
   {
     id: "b24",
     slug: "muqaddimat-ibn-khaldun",
-    title: { ar: "مقدمة ابن خلدون", en: "The Muqaddimah" },
+    title: { ar: "مقدمة ابن خلدون" },
     authorId: "a21",
     categoryId: "c2",
     price: 28000,
@@ -592,7 +566,7 @@ export const books: SeedBook[] = [
     reviewsCount: 498,
     stock: 18,
     pages: 720,
-    publisher: { ar: "دار الكتب العلمية", en: "Dar Al-Kotob Al-Ilmiyah" },
+    publisher: { ar: "دار الكتب العلمية" },
     publishedYear: 1377,
     isbn: "9782745104113",
     language: ARABIC,
@@ -600,7 +574,6 @@ export const books: SeedBook[] = [
     weightGrams: 980,
     description: {
       ar: "الأساس الأول لعلم الاجتماع، ومدخل خالد لفهم قيام الدول وسقوطها.",
-      en: "The founding text of sociology and a timeless study of how states rise and fall.",
     },
     tags: ["featured"],
     createdAt: "2025-10-10",
@@ -608,7 +581,7 @@ export const books: SeedBook[] = [
   {
     id: "b25",
     slug: "qissat-al-hadara",
-    title: { ar: "قصة الحضارة", en: "The Story of Civilization" },
+    title: { ar: "قصة الحضارة" },
     authorId: "a22",
     categoryId: "c2",
     price: 40000,
@@ -617,7 +590,7 @@ export const books: SeedBook[] = [
     reviewsCount: 322,
     stock: 7,
     pages: 900,
-    publisher: { ar: "دار الجيل", en: "Dar Al-Jeel" },
+    publisher: { ar: "دار الجيل" },
     publishedYear: 1935,
     isbn: "9789953110113",
     language: ARABIC,
@@ -625,7 +598,6 @@ export const books: SeedBook[] = [
     weightGrams: 1400,
     description: {
       ar: "رحلة موسوعية في تاريخ الحضارات من الشرق القديم إلى العصر الحديث.",
-      en: "An encyclopedic journey through civilizations from the ancient East to the modern age.",
     },
     tags: [],
     createdAt: "2025-08-18",
@@ -633,7 +605,7 @@ export const books: SeedBook[] = [
   {
     id: "b26",
     slug: "qissat-al-falsafa",
-    title: { ar: "قصة الفلسفة", en: "The Story of Philosophy" },
+    title: { ar: "قصة الفلسفة" },
     authorId: "a22",
     categoryId: "c4",
     price: 27000,
@@ -641,7 +613,7 @@ export const books: SeedBook[] = [
     reviewsCount: 407,
     stock: 20,
     pages: 600,
-    publisher: { ar: "دار المعارف", en: "Dar Al-Maaref" },
+    publisher: { ar: "دار المعارف" },
     publishedYear: 1926,
     isbn: "9789770111134",
     language: ARABIC,
@@ -649,7 +621,6 @@ export const books: SeedBook[] = [
     weightGrams: 700,
     description: {
       ar: "مدخل ممتع لحياة كبار الفلاسفة وأفكارهم من أفلاطون إلى ديوي.",
-      en: "An enjoyable introduction to the great philosophers, from Plato to Dewey.",
     },
     tags: [],
     createdAt: "2025-07-02",
@@ -659,7 +630,6 @@ export const books: SeedBook[] = [
     slug: "al-adat-al-sabaa",
     title: {
       ar: "العادات السبع للناس الأكثر فعالية",
-      en: "The 7 Habits of Highly Effective People",
     },
     authorId: "a23",
     categoryId: "c3",
@@ -669,7 +639,7 @@ export const books: SeedBook[] = [
     reviewsCount: 1123,
     stock: 52,
     pages: 432,
-    publisher: { ar: "مكتبة جرير", en: "Jarir Bookstore" },
+    publisher: { ar: "مكتبة جرير" },
     publishedYear: 1989,
     isbn: "9789960490113",
     language: ARABIC,
@@ -677,7 +647,6 @@ export const books: SeedBook[] = [
     weightGrams: 480,
     description: {
       ar: "إطار عملي لبناء عادات تصنع الفاعلية الشخصية والمهنية.",
-      en: "A practical framework of habits for personal and professional effectiveness.",
     },
     tags: ["bestseller"],
     createdAt: "2026-02-24",
@@ -685,7 +654,7 @@ export const books: SeedBook[] = [
   {
     id: "b28",
     slug: "al-kawn",
-    title: { ar: "الكون", en: "Cosmos" },
+    title: { ar: "الكون" },
     authorId: "a24",
     categoryId: "c6",
     price: 32000,
@@ -693,7 +662,7 @@ export const books: SeedBook[] = [
     reviewsCount: 289,
     stock: 11,
     pages: 480,
-    publisher: { ar: "دار التنوير", en: "Dar Al-Tanweer" },
+    publisher: { ar: "دار التنوير" },
     publishedYear: 1980,
     isbn: "9789778190113",
     language: ARABIC,
@@ -701,7 +670,6 @@ export const books: SeedBook[] = [
     weightGrams: 820,
     description: {
       ar: "جولة في المجرات وتاريخ العلم بلغة شاعرية يفهمها الجميع.",
-      en: "A tour of the galaxies and the history of science, in language anyone can follow.",
     },
     tags: ["new", "featured"],
     createdAt: "2026-03-04",
@@ -709,7 +677,7 @@ export const books: SeedBook[] = [
   {
     id: "b29",
     slug: "kalila-wa-dimna",
-    title: { ar: "كليلة ودمنة", en: "Kalila wa-Dimna" },
+    title: { ar: "كليلة ودمنة" },
     authorId: "a25",
     categoryId: "c5",
     price: 12000,
@@ -717,7 +685,7 @@ export const books: SeedBook[] = [
     reviewsCount: 517,
     stock: 64,
     pages: 240,
-    publisher: { ar: "دار المعارف", en: "Dar Al-Maaref" },
+    publisher: { ar: "دار المعارف" },
     publishedYear: 750,
     isbn: "9789770112117",
     language: ARABIC,
@@ -725,7 +693,6 @@ export const books: SeedBook[] = [
     weightGrams: 360,
     description: {
       ar: "حكايات على ألسنة الحيوان تحمل حكمة الحكم والسياسة والصداقة.",
-      en: "Animal fables carrying old wisdom on rule, politics and friendship.",
     },
     tags: ["new"],
     createdAt: "2026-03-12",
@@ -733,7 +700,7 @@ export const books: SeedBook[] = [
   {
     id: "b30",
     slug: "arabiyat-al-shahid",
-    title: { ar: "عائد إلى حيفا", en: "Returning to Haifa" },
+    title: { ar: "عائد إلى حيفا" },
     authorId: "a3",
     categoryId: "c1",
     price: 9500,
@@ -741,7 +708,7 @@ export const books: SeedBook[] = [
     reviewsCount: 425,
     stock: 47,
     pages: 96,
-    publisher: { ar: "مؤسسة الأبحاث العربية", en: "Arab Research Institute" },
+    publisher: { ar: "مؤسسة الأبحاث العربية" },
     publishedYear: 1969,
     isbn: "9789953362213",
     language: ARABIC,
@@ -749,7 +716,6 @@ export const books: SeedBook[] = [
     weightGrams: 150,
     description: {
       ar: "زوجان يعودان بعد عشرين عامًا إلى البيت الذي تركاه، فيجدان أسئلة أثقل من الذكرى.",
-      en: "A couple return after twenty years to the home they left, and find questions heavier than memory.",
     },
     tags: ["new"],
     createdAt: "2026-03-18",

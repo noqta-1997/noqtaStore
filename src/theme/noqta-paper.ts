@@ -1,11 +1,22 @@
 /**
- * Noqta's neutral ramp — warm paper instead of Fluent's grey.
+ * Noqta's neutral ramp — a cool grey carrying a faint blue cast.
  *
  * Plain data with no imports, for the same reason `noqta-brand.ts` is: two
  * very different consumers read it. The build-time token generator folds it
  * into the emitted CSS, and `FluentShell` folds it into the runtime theme the
- * islands are painted with. One source is what stops a dialog from opening in
- * cold grey on a cream page.
+ * islands are painted with. One source is what stops a dialog from opening on
+ * a different grey than the page under it.
+ *
+ * The cast is what separates this from Fluent's own neutrals, which are dead
+ * grey. A few points of blue in the surfaces is most of what reads as calm in
+ * the dashboards this was cut from.
+ *
+ * `paper50` is deliberately a step darker than a near-white page would be.
+ * The reference gets its depth from the ground being clearly darker than the
+ * sheets on it — cards at `paper0` read as floating without needing a shadow,
+ * which is what lets the whole design run on hairlines. Pulled too close to
+ * white and the cards vanish into the page; that was the first thing this
+ * ramp got wrong.
  *
  * Fluent's neutrals are computed from a fixed grey ramp inside
  * `createLightTheme` / `createDarkTheme` and are not parameterised the way the
@@ -14,7 +25,7 @@
  * Fluent's neutrals stay as generated, because nothing reads them.
  *
  * Contrast, measured on the light page (`paper50`) and the band (`paper100`):
- * ink900 15.4:1 / 14.1:1, ink600 7.35:1 / 6.74:1, ink400 5.46:1 / 5.01:1.
+ * ink900 14.6:1 / 13.5:1, ink600 6.85:1 / 6.36:1, ink400 5.20:1 / 4.83:1.
  */
 
 export interface PaperRamp {
@@ -43,31 +54,31 @@ export interface PaperRamp {
 
 export const noqtaPaperLight: PaperRamp = {
   paper0: "#ffffff",
-  paper50: "#fdfbf6",
-  paper100: "#f8f4e9",
-  paper150: "#f2ecdd",
-  paper200: "#eae2ce",
-  paper300: "#e2d8c0",
-  paper400: "#cfc2a4",
+  paper50: "#eff1f6",
+  paper100: "#e5e9f0",
+  paper150: "#dce1ea",
+  paper200: "#d2d8e3",
+  paper300: "#c8cfdc",
+  paper400: "#a2abbd",
 
-  ink900: "#221e17",
-  ink600: "#5a5348",
-  ink400: "#6f6658",
+  ink900: "#1a1f2b",
+  ink600: "#4a5364",
+  ink400: "#5c6575",
 };
 
-/** The same paper under a lamp: hues stay warm, lightness inverts. */
+/** The same surfaces under a lamp: hues stay cool, lightness inverts. */
 export const noqtaPaperDark: PaperRamp = {
-  paper0: "#211c16",
-  paper50: "#16130f",
-  paper100: "#1c1811",
-  paper150: "#2a241c",
-  paper200: "#332c22",
-  paper300: "#3a3227",
-  paper400: "#6a5e4a",
+  paper0: "#1c2029",
+  paper50: "#11141b",
+  paper100: "#161a22",
+  paper150: "#232833",
+  paper200: "#2c313d",
+  paper300: "#333945",
+  paper400: "#5d6575",
 
-  ink900: "#f2ece0",
-  ink600: "#cdc4b4",
-  ink400: "#a2988a",
+  ink900: "#e8eaf0",
+  ink600: "#b4bac6",
+  ink400: "#8d94a3",
 };
 
 /**

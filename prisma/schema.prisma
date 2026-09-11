@@ -90,9 +90,7 @@ model Category {
   id            String   @id @default(cuid())
   slug          String   @unique
   nameAr        String
-  nameEn        String
   descriptionAr String
-  descriptionEn String
   /// Lucide icon name; the UI layer owns the mapping.
   icon          String
   createdAt     DateTime @default(now())
@@ -107,11 +105,8 @@ model Publisher {
   id            String   @id @default(cuid())
   slug          String   @unique
   nameAr        String
-  nameEn        String
   countryAr     String   @default("")
-  countryEn     String   @default("")
   descriptionAr String   @default("")
-  descriptionEn String   @default("")
   foundedYear   Int?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -125,11 +120,8 @@ model Author {
   id        String   @id @default(cuid())
   slug      String   @unique
   nameAr    String
-  nameEn    String
   countryAr String
-  countryEn String
   bioAr     String
-  bioEn     String
   avatarUrl String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -143,9 +135,7 @@ model Book {
   id             String    @id @default(cuid())
   slug           String    @unique
   titleAr        String
-  titleEn        String
   descriptionAr  String
-  descriptionEn  String
   price          Int
   compareAtPrice Int?
   stock          Int       @default(0)
@@ -153,7 +143,6 @@ model Book {
   publishedYear  Int
   isbn           String    @unique
   languageAr     String    @default("العربية")
-  languageEn     String    @default("Arabic")
   coverType      CoverType @default(paperback)
   weightGrams    Int
   coverUrl       String?

@@ -29,7 +29,6 @@ import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 
 interface AccountMenuProps {
-  locale: string;
   labels: {
     login: string;
     account: string;
@@ -49,7 +48,7 @@ interface AccountMenuProps {
  * storefront shell can stay statically rendered — only this control changes
  * once Supabase resolves who is signed in.
  */
-export function AccountMenu({ locale, labels }: AccountMenuProps) {
+export function AccountMenu({ labels }: AccountMenuProps) {
   const router = useRouter();
   const [displayName, setDisplayName] = useState<string | null>(null);
   /*
@@ -94,7 +93,7 @@ export function AccountMenu({ locale, labels }: AccountMenuProps) {
     return (
       <>
         <Link
-          href={`/${locale}/login`}
+          href={`/login`}
           className={buttonStyles({
             variant: "secondary",
             size: "md",
@@ -106,7 +105,7 @@ export function AccountMenu({ locale, labels }: AccountMenuProps) {
         </Link>
 
         <Link
-          href={`/${locale}/login`}
+          href={`/login`}
           aria-label={labels.account}
           title={labels.account}
           className="inline-flex size-10 items-center justify-center border border-transparent text-on-surface transition-colors hover:border-line hover:bg-state-hover lg:hidden"
@@ -118,17 +117,17 @@ export function AccountMenu({ locale, labels }: AccountMenuProps) {
   }
 
   const items = [
-    { href: `/${locale}/account`, label: labels.profile, icon: UserRound },
-    { href: `/${locale}/account/orders`, label: labels.orders, icon: Package },
-    { href: `/${locale}/account/wishlist`, label: labels.wishlist, icon: Heart },
-    { href: `/${locale}/account/reviews`, label: labels.reviews, icon: Star },
-    { href: `/${locale}/account/addresses`, label: labels.addresses, icon: MapPin },
+    { href: `/account`, label: labels.profile, icon: UserRound },
+    { href: `/account/orders`, label: labels.orders, icon: Package },
+    { href: `/account/wishlist`, label: labels.wishlist, icon: Heart },
+    { href: `/account/reviews`, label: labels.reviews, icon: Star },
+    { href: `/account/addresses`, label: labels.addresses, icon: MapPin },
   ];
 
   const signOut = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.replace(`/${locale}`);
+    router.replace("/");
     router.refresh();
   };
 
@@ -189,7 +188,7 @@ export function AccountMenu({ locale, labels }: AccountMenuProps) {
                 icon={
                   <LayoutDashboard aria-hidden className="size-4" strokeWidth={1.75} />
                 }
-                href={`/${locale}/admin`}
+                href={`/admin`}
               >
                 {labels.adminPanel}
               </MenuItemLink>

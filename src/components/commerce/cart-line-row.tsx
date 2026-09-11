@@ -22,7 +22,7 @@ export function CartLineRow({ line, locale, dictionary }: CartLineRowProps) {
   return (
     <li className="flex gap-4 p-4 sm:p-5">
       <Link
-        href={`/${locale}/books/${book.slug}`}
+        href={`/books/${book.slug}`}
         className="w-20 shrink-0 sm:w-24"
         aria-label={book.title[locale]}
       >
@@ -44,7 +44,7 @@ export function CartLineRow({ line, locale, dictionary }: CartLineRowProps) {
             </span>
             <h3 className="text-body-lg leading-snug font-bold">
               <Link
-                href={`/${locale}/books/${book.slug}`}
+                href={`/books/${book.slug}`}
                 className="underline-offset-4 hover:underline"
               >
                 {book.title[locale]}

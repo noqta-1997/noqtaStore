@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-04T12:52:09.819Z",
+  "capturedAt": "2026-09-11T22:11:37.969Z",
   "project": "mobile-dark",
-  "pagesScanned": 28,
+  "pagesScanned": 14,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -10,7 +10,7 @@
       "locale": "ar",
       "theme": "dark",
       "project": "mobile-dark",
-      "url": "/ar/account",
+      "url": "/account",
       "violations": [],
       "total": 0
     },
@@ -19,7 +19,7 @@
       "locale": "ar",
       "theme": "dark",
       "project": "mobile-dark",
-      "url": "/ar/account/orders",
+      "url": "/account/orders",
       "violations": [],
       "total": 0
     },
@@ -28,7 +28,7 @@
       "locale": "ar",
       "theme": "dark",
       "project": "mobile-dark",
-      "url": "/ar/admin",
+      "url": "/admin",
       "violations": [],
       "total": 0
     },
@@ -37,7 +37,7 @@
       "locale": "ar",
       "theme": "dark",
       "project": "mobile-dark",
-      "url": "/ar/admin/books",
+      "url": "/admin/books",
       "violations": [],
       "total": 0
     },
@@ -46,7 +46,7 @@
       "locale": "ar",
       "theme": "dark",
       "project": "mobile-dark",
-      "url": "/ar/checkout",
+      "url": "/checkout",
       "violations": [],
       "total": 0
     },
@@ -55,7 +55,7 @@
       "locale": "ar",
       "theme": "dark",
       "project": "mobile-dark",
-      "url": "/ar/checkout/success",
+      "url": "/checkout/success",
       "violations": [],
       "total": 0
     },
@@ -64,7 +64,7 @@
       "locale": "ar",
       "theme": "dark",
       "project": "mobile-dark",
-      "url": "/ar/account/addresses",
+      "url": "/account/addresses",
       "violations": [],
       "total": 0
     },
@@ -73,7 +73,7 @@
       "locale": "ar",
       "theme": "dark",
       "project": "mobile-dark",
-      "url": "/ar/account/reviews",
+      "url": "/account/reviews",
       "violations": [],
       "total": 0
     },
@@ -82,7 +82,7 @@
       "locale": "ar",
       "theme": "dark",
       "project": "mobile-dark",
-      "url": "/ar/account/wishlist",
+      "url": "/account/wishlist",
       "violations": [],
       "total": 0
     },
@@ -91,7 +91,7 @@
       "locale": "ar",
       "theme": "dark",
       "project": "mobile-dark",
-      "url": "/ar/account/orders/o1",
+      "url": "/account/orders/o1",
       "violations": [],
       "total": 0
     },
@@ -100,7 +100,7 @@
       "locale": "ar",
       "theme": "dark",
       "project": "mobile-dark",
-      "url": "/ar/admin/orders",
+      "url": "/admin/orders",
       "violations": [],
       "total": 0
     },
@@ -109,7 +109,7 @@
       "locale": "ar",
       "theme": "dark",
       "project": "mobile-dark",
-      "url": "/ar/admin/authors",
+      "url": "/admin/authors",
       "violations": [],
       "total": 0
     },
@@ -118,7 +118,7 @@
       "locale": "ar",
       "theme": "dark",
       "project": "mobile-dark",
-      "url": "/ar/admin/books/new",
+      "url": "/admin/books/new",
       "violations": [],
       "total": 0
     },
@@ -127,133 +127,7 @@
       "locale": "ar",
       "theme": "dark",
       "project": "mobile-dark",
-      "url": "/ar/admin/reports",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "account",
-      "locale": "en",
-      "theme": "dark",
-      "project": "mobile-dark",
-      "url": "/en/account",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "account-orders",
-      "locale": "en",
-      "theme": "dark",
-      "project": "mobile-dark",
-      "url": "/en/account/orders",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "admin-dashboard",
-      "locale": "en",
-      "theme": "dark",
-      "project": "mobile-dark",
-      "url": "/en/admin",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "admin-books",
-      "locale": "en",
-      "theme": "dark",
-      "project": "mobile-dark",
-      "url": "/en/admin/books",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "checkout",
-      "locale": "en",
-      "theme": "dark",
-      "project": "mobile-dark",
-      "url": "/en/checkout",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "checkout-success",
-      "locale": "en",
-      "theme": "dark",
-      "project": "mobile-dark",
-      "url": "/en/checkout/success",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "account-addresses",
-      "locale": "en",
-      "theme": "dark",
-      "project": "mobile-dark",
-      "url": "/en/account/addresses",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "account-reviews",
-      "locale": "en",
-      "theme": "dark",
-      "project": "mobile-dark",
-      "url": "/en/account/reviews",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "account-wishlist",
-      "locale": "en",
-      "theme": "dark",
-      "project": "mobile-dark",
-      "url": "/en/account/wishlist",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "account-order-detail",
-      "locale": "en",
-      "theme": "dark",
-      "project": "mobile-dark",
-      "url": "/en/account/orders/o1",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "admin-orders",
-      "locale": "en",
-      "theme": "dark",
-      "project": "mobile-dark",
-      "url": "/en/admin/orders",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "admin-authors",
-      "locale": "en",
-      "theme": "dark",
-      "project": "mobile-dark",
-      "url": "/en/admin/authors",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "admin-book-new",
-      "locale": "en",
-      "theme": "dark",
-      "project": "mobile-dark",
-      "url": "/en/admin/books/new",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "admin-reports",
-      "locale": "en",
-      "theme": "dark",
-      "project": "mobile-dark",
-      "url": "/en/admin/reports",
+      "url": "/admin/reports",
       "violations": [],
       "total": 0
     }

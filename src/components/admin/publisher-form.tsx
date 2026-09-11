@@ -36,61 +36,8 @@ export function PublisherForm({ admin, dictionary, publisher }: PublisherFormPro
       <Field label={t.nameAr} htmlFor="nameAr">
         <Input id="nameAr" name="nameAr" defaultValue={publisher?.name.ar} required />
       </Field>
-      <Field label={t.nameEn} htmlFor="nameEn">
-        <Input
-          id="nameEn"
-          name="nameEn"
-          dir="ltr"
-          defaultValue={publisher?.name.en}
-          required
-        />
-      </Field>
-      <Field label={t.slug} htmlFor="slug" optional={dictionary.common.optional}>
-        <Input
-          id="slug"
-          name="slug"
-          dir="ltr"
-          data-numeric
-          defaultValue={publisher?.slug}
-        />
-      </Field>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field
-          label={t.countryAr}
-          htmlFor="countryAr"
-          optional={dictionary.common.optional}
-        >
-          <Input id="countryAr" name="countryAr" defaultValue={publisher?.country.ar} />
-        </Field>
-        <Field
-          label={t.countryEn}
-          htmlFor="countryEn"
-          optional={dictionary.common.optional}
-        >
-          <Input
-            id="countryEn"
-            name="countryEn"
-            dir="ltr"
-            defaultValue={publisher?.country.en}
-          />
-        </Field>
-        <Field
-          label={t.foundedYear}
-          htmlFor="foundedYear"
-          optional={dictionary.common.optional}
-        >
-          <Input
-            id="foundedYear"
-            name="foundedYear"
-            type="number"
-            dir="ltr"
-            min={1400}
-            max={new Date().getFullYear()}
-            data-numeric
-            defaultValue={publisher?.foundedYear ?? ""}
-          />
-        </Field>
       </div>
 
       <Field
@@ -103,19 +50,6 @@ export function PublisherForm({ admin, dictionary, publisher }: PublisherFormPro
           name="descriptionAr"
           rows={3}
           defaultValue={publisher?.description.ar}
-        />
-      </Field>
-      <Field
-        label={t.descriptionEn}
-        htmlFor="descriptionEn"
-        optional={dictionary.common.optional}
-      >
-        <Textarea
-          id="descriptionEn"
-          name="descriptionEn"
-          rows={3}
-          dir="ltr"
-          defaultValue={publisher?.description.en}
         />
       </Field>
 

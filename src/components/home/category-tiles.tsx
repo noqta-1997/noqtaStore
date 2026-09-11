@@ -35,14 +35,14 @@ export function CategoryTiles({
           title={section.title}
           subtitle={section.subtitle}
           actionLabel={dictionary.common.viewAll}
-          actionHref={`/${locale}/categories`}
+          actionHref={`/categories`}
         />
 
         <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {categories.map((category) => (
             <li key={category.id}>
               <Link
-                href={`/${locale}/categories/${category.slug}`}
+                href={`/categories/${category.slug}`}
                 className="group flex h-full items-start gap-3 rounded-xl border border-line bg-card p-4 transition-[box-shadow,border-color] duration-100 ease-fluent hover:border-line-hover hover:elevation-md focus-within:elevation-md"
               >
                 <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-primary transition-colors duration-100 ease-fluent group-hover:bg-primary-container group-hover:text-on-primary-container">

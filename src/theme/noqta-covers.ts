@@ -14,7 +14,13 @@
  * matched sets; the remaining two are Noqta's brand ramp, kept so a shelf
  * still says whose shop it is. Nothing here was picked by eye — deriving the
  * whole set from the brand ramp was the previous approach, and it made every
- * shelf in the store one shade of orange.
+ * shelf in the store one shade of the brand.
+ *
+ * The two brand jackets follow the ramp when it moves. They were the orange
+ * `#ab3500` / `#fbd9ce` pair; the recut re-anchored them on the indigo, and
+ * their contrasts were re-measured rather than assumed — the ink jacket came
+ * out at 4.67, which clears the small-text bar but by less than the orange
+ * did, so it is the one to re-check first if the ramp is ever re-tuned.
  *
  * **The contract.** Both lines of type on a jacket sit directly on its
  * background, and the author line is 10px, which is small text: the pair has
@@ -37,8 +43,8 @@ export interface CoverPalette {
  * walks it, so neighbouring slugs rarely land on the same kind twice.
  */
 export const noqtaCovers: readonly CoverPalette[] = [
-  { background: "#ab3500", foreground: "#fef0ec" }, // brand, ink   — 5.83
-  { background: "#fbd9ce", foreground: "#521d0a" }, // brand, paper — 10.34
+  { background: "#3b5bfd", foreground: "#f2f4ff" }, // brand, ink   — 4.67
+  { background: "#e4e8ff", foreground: "#1c2c79" }, // brand, paper — 10.25
   { background: "#063b06", foreground: "#9ad29a" }, // forest       — 7.37
   { background: "#e0cea2", foreground: "#553e06" }, // brass        — 6.51
   { background: "#001665", foreground: "#a3b2e8" }, // navy         — 7.75

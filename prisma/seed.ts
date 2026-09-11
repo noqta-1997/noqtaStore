@@ -75,9 +75,7 @@ async function seedCatalogue() {
       id: category.id,
       slug: category.slug,
       nameAr: category.name.ar,
-      nameEn: category.name.en,
       descriptionAr: category.description.ar,
-      descriptionEn: category.description.en,
       icon: category.icon,
     })),
   });
@@ -87,30 +85,39 @@ async function seedCatalogue() {
       id: author.id,
       slug: author.slug,
       nameAr: author.name.ar,
-      nameEn: author.name.en,
       countryAr: author.country.ar,
-      countryEn: author.country.en,
       bioAr: author.bio.ar,
-      bioEn: author.bio.en,
       avatarUrl: author.avatarUrl ?? null,
     })),
   });
 
-  // Publishers come from the catalogue itself: one row per distinct name.
-  const publisherNames = new Map<string, { ar: string; en: string }>();
-  for (const book of books) publisherNames.set(book.publisher.en, book.publisher);
+  /*
+   * Publishers come from the catalogue itself: one row per distinct name.
+   *
+   * The English name used to be both the map key and the source of the slug,
+   * which is how the seeded publishers ended up with Latin slugs. With English
+   * gone the Arabic name is the key, and the slug keeps Arabic letters — the
+   * same character class `slugify` in app/actions/admin.ts uses, so a
+   * publisher created by hand in the panel and one created here are shaped
+   * alike. Rows already in the database keep the Latin slugs they were seeded
+   * with; this only decides what a fresh seed produces.
+   */
+  const publisherNames = new Map<string, { ar: string }>();
+  for (const book of books) publisherNames.set(book.publisher.ar, book.publisher);
 
   const publisherIds = new Map<string, string>();
-  for (const [nameEn, name] of publisherNames) {
-    const slug = nameEn
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
+  let fallback = 0;
+  for (const [nameAr, name] of publisherNames) {
+    const slug =
+      nameAr
+        .toLowerCase()
+        .replace(/[^a-z0-9ء-ي]+/g, "-")
+        .replace(/^-+|-+$/g, "") || `publisher-${++fallback}`;
 
     const row = await prisma.publisher.create({
-      data: { slug, nameAr: name.ar, nameEn: name.en },
+      data: { slug, nameAr: name.ar },
     });
-    publisherIds.set(nameEn, row.id);
+    publisherIds.set(nameAr, row.id);
   }
 
   await prisma.book.createMany({
@@ -118,18 +125,15 @@ async function seedCatalogue() {
       id: book.id,
       slug: book.slug,
       titleAr: book.title.ar,
-      titleEn: book.title.en,
       descriptionAr: book.description.ar,
-      descriptionEn: book.description.en,
       price: book.price,
       compareAtPrice: book.compareAtPrice ?? null,
       stock: book.stock,
       pages: book.pages,
-      publisherId: publisherIds.get(book.publisher.en)!,
+      publisherId: publisherIds.get(book.publisher.ar)!,
       publishedYear: book.publishedYear,
       isbn: book.isbn,
       languageAr: book.language.ar,
-      languageEn: book.language.en,
       coverType: book.coverType,
       weightGrams: book.weightGrams,
       coverUrl: book.coverUrl ?? null,

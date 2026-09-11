@@ -19,7 +19,6 @@ import type {
   BookTag,
   ContactStatus,
   CouponType,
-  CoverType,
   OrderStatus,
   ReviewStatus,
 } from "@/types";
@@ -60,8 +59,7 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
   const titleAr = text(formData, "titleAr");
-  const titleEn = text(formData, "titleEn");
-  if (!titleAr || !titleEn) return fail("missingTitle");
+  if (!titleAr) return fail("missingTitle");
 
   const authorId = text(formData, "authorId");
   const categoryId = text(formData, "categoryId");
@@ -69,22 +67,25 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
   if (!authorId || !categoryId || !publisherId) return fail("missingRelation");
 
   const bookId = text(formData, "bookId");
-  const coverType = text(formData, "coverType") as CoverType;
 
+  /*
+   * What the form still edits.
+   *
+   * The slug, ISBN, cover type and weight were taken off the form. They are
+   * deliberately absent here rather than defaulted, because this object is the
+   * update payload: writing a fallback into it would mean every edit silently
+   * replaced the real ISBN with a `TEMP-` string, reset a hardcover to
+   * paperback, zeroed the weight, and — worst — regenerated the slug from the
+   * title, changing the book's public URL out from under any link to it.
+   */
   const data = {
     titleAr,
-    titleEn,
-    slug: slugify(text(formData, "slug") || titleEn, `book-${Date.now()}`),
     descriptionAr: text(formData, "descriptionAr"),
-    descriptionEn: text(formData, "descriptionEn"),
     price: number(formData, "price"),
     compareAtPrice: optionalNumber(formData, "compareAtPrice"),
     stock: number(formData, "stock"),
     pages: number(formData, "pages"),
     publishedYear: number(formData, "publishedYear", new Date().getFullYear()),
-    isbn: text(formData, "isbn") || `TEMP-${Date.now()}`,
-    coverType: coverType === "hardcover" ? "hardcover" : "paperback",
-    weightGrams: number(formData, "weightGrams"),
     tags: formData.getAll("tags").filter((tag): tag is string => typeof tag === "string") as BookTag[],
     authorId,
     categoryId,
@@ -95,7 +96,23 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
     if (bookId) {
       await prisma.book.update({ where: { id: bookId }, data });
     } else {
-      await prisma.book.create({ data });
+      /*
+       * A new row still needs the four: `slug` and `isbn` are unique and
+       * non-null, `weightGrams` is non-null, and `coverType` has a schema
+       * default the create is explicit about. They are derived once, here, and
+       * never touched again — the slug from the title, the ISBN as a
+       * placeholder the owner can correct in the database if a real one
+       * arrives.
+       */
+      await prisma.book.create({
+        data: {
+          ...data,
+          slug: slugify(titleAr, `book-${Date.now()}`),
+          isbn: `TEMP-${Date.now()}`,
+          coverType: "paperback",
+          weightGrams: 0,
+        },
+      });
     }
   } catch {
     return fail("duplicate");
@@ -127,15 +144,13 @@ export async function saveCategory(formData: FormData): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
   const nameAr = text(formData, "nameAr");
-  const nameEn = text(formData, "nameEn");
-  if (!nameAr || !nameEn) return fail("missingTitle");
+  if (!nameAr) return fail("missingTitle");
 
+  /* The slug left the form; see the note in `saveBook` for why it is absent
+     from the update payload rather than defaulted into it. */
   const data = {
     nameAr,
-    nameEn,
-    slug: slugify(text(formData, "slug") || nameEn, `category-${Date.now()}`),
     descriptionAr: text(formData, "descriptionAr"),
-    descriptionEn: text(formData, "descriptionEn"),
     icon: text(formData, "icon") || "BookOpen",
   };
 
@@ -145,7 +160,9 @@ export async function saveCategory(formData: FormData): Promise<ActionResult> {
     if (categoryId) {
       await prisma.category.update({ where: { id: categoryId }, data });
     } else {
-      await prisma.category.create({ data });
+      await prisma.category.create({
+        data: { ...data, slug: slugify(nameAr, `category-${Date.now()}`) },
+      });
     }
   } catch {
     return fail("duplicate");
@@ -173,17 +190,14 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
   const nameAr = text(formData, "nameAr");
-  const nameEn = text(formData, "nameEn");
-  if (!nameAr || !nameEn) return fail("missingTitle");
+  if (!nameAr) return fail("missingTitle");
 
+  /* Country and slug left the form. `countryAr` is non-null with no schema
+     default, so a create supplies an empty string; an update leaves whatever
+     the row already holds. */
   const data = {
     nameAr,
-    nameEn,
-    slug: slugify(text(formData, "slug") || nameEn, `author-${Date.now()}`),
-    countryAr: text(formData, "countryAr"),
-    countryEn: text(formData, "countryEn"),
     bioAr: text(formData, "bioAr"),
-    bioEn: text(formData, "bioEn"),
   };
 
   const authorId = text(formData, "authorId");
@@ -192,7 +206,13 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
     if (authorId) {
       await prisma.author.update({ where: { id: authorId }, data });
     } else {
-      await prisma.author.create({ data });
+      await prisma.author.create({
+        data: {
+          ...data,
+          slug: slugify(nameAr, `author-${Date.now()}`),
+          countryAr: "",
+        },
+      });
     }
   } catch {
     return fail("duplicate");
@@ -220,20 +240,14 @@ export async function savePublisher(formData: FormData): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
   const nameAr = text(formData, "nameAr");
-  const nameEn = text(formData, "nameEn");
-  if (!nameAr || !nameEn) return fail("missingTitle");
+  if (!nameAr) return fail("missingTitle");
 
-  const foundedYear = optionalNumber(formData, "foundedYear");
-
+  /* Country, founding year and slug left the form. `countryAr` defaults to ""
+     in the schema and `foundedYear` is nullable, so a create needs neither;
+     only the unique slug has to be derived. */
   const data = {
     nameAr,
-    nameEn,
-    slug: slugify(text(formData, "slug") || nameEn, `publisher-${Date.now()}`),
-    countryAr: text(formData, "countryAr"),
-    countryEn: text(formData, "countryEn"),
     descriptionAr: text(formData, "descriptionAr"),
-    descriptionEn: text(formData, "descriptionEn"),
-    foundedYear: foundedYear && foundedYear > 0 ? Math.round(foundedYear) : null,
   };
 
   const publisherId = text(formData, "publisherId");
@@ -242,7 +256,9 @@ export async function savePublisher(formData: FormData): Promise<ActionResult> {
     if (publisherId) {
       await prisma.publisher.update({ where: { id: publisherId }, data });
     } else {
-      await prisma.publisher.create({ data });
+      await prisma.publisher.create({
+        data: { ...data, slug: slugify(nameAr, `publisher-${Date.now()}`) },
+      });
     }
   } catch {
     return fail("duplicate");
@@ -572,14 +588,11 @@ const settingSections = {
   store: {
     fields: [
       "nameAr",
-      "nameEn",
       "taglineAr",
-      "taglineEn",
       "email",
       "phone",
       "address",
       "currency",
-      "defaultLocale",
     ],
     flags: [],
   },

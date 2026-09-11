@@ -2,11 +2,10 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 
 import { Container } from "@/components/ui/container";
-import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/get-dictionary";
+import { LogoMark } from "@/components/layout/logo-mark";
 
 interface StorefrontFooterProps {
-  locale: Locale;
   dictionary: Dictionary;
   /** Overrides the shipped copy when the settings screen has been filled in. */
   brand: { name: string; tagline: string };
@@ -21,7 +20,6 @@ interface StorefrontFooterProps {
  * rail at the top of the header.
  */
 export function StorefrontFooter({
-  locale,
   dictionary,
   brand,
   contact,
@@ -32,28 +30,28 @@ export function StorefrontFooter({
     {
       title: footer.shop.title,
       links: [
-        { label: footer.shop.newArrivals, href: `/${locale}/books?sort=newest` },
-        { label: footer.shop.bestsellers, href: `/${locale}/books?sort=popular` },
-        { label: footer.shop.offers, href: `/${locale}/offers` },
-        { label: footer.shop.categories, href: `/${locale}/categories` },
+        { label: footer.shop.newArrivals, href: `/books?sort=newest` },
+        { label: footer.shop.bestsellers, href: `/books?sort=popular` },
+        { label: footer.shop.offers, href: `/offers` },
+        { label: footer.shop.categories, href: `/categories` },
       ],
     },
     {
       title: footer.help.title,
       links: [
-        { label: footer.help.shipping, href: `/${locale}/shipping` },
-        { label: footer.help.returns, href: `/${locale}/returns` },
-        { label: footer.help.faq, href: `/${locale}/faq` },
-        { label: footer.help.contact, href: `/${locale}/contact` },
+        { label: footer.help.shipping, href: `/shipping` },
+        { label: footer.help.returns, href: `/returns` },
+        { label: footer.help.faq, href: `/faq` },
+        { label: footer.help.contact, href: `/contact` },
       ],
     },
     {
       title: footer.store.title,
       links: [
-        { label: footer.store.about, href: `/${locale}/about` },
-        { label: footer.store.publishers, href: `/${locale}/publishers` },
-        { label: footer.store.authors, href: `/${locale}/authors` },
-        { label: footer.store.careers, href: `/${locale}/careers` },
+        { label: footer.store.about, href: `/about` },
+        { label: footer.store.publishers, href: `/publishers` },
+        { label: footer.store.authors, href: `/authors` },
+        { label: footer.store.careers, href: `/careers` },
       ],
     },
   ];
@@ -63,9 +61,7 @@ export function StorefrontFooter({
       <Container className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-12 lg:py-20">
         <div className="space-y-4 lg:col-span-4">
           <div className="flex items-center gap-2.5">
-            <span className="flex size-9 items-center justify-center rounded-full bg-primary-container">
-              <span className="size-2.5 rounded-full bg-on-primary-container" />
-            </span>
+            <LogoMark size={36} />
             <span className="font-display text-xl font-bold text-primary">
               {brand.name}
             </span>
@@ -125,7 +121,7 @@ export function StorefrontFooter({
           <ul className="flex items-center gap-5">
             <li>
               <Link
-                href={`/${locale}/privacy`}
+                href={`/privacy`}
                 className="text-label-md underline-offset-4 hover:text-primary hover:underline"
               >
                 {footer.privacy}
@@ -133,7 +129,7 @@ export function StorefrontFooter({
             </li>
             <li>
               <Link
-                href={`/${locale}/terms`}
+                href={`/terms`}
                 className="text-label-md underline-offset-4 hover:text-primary hover:underline"
               >
                 {footer.terms}

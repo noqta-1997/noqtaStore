@@ -509,7 +509,7 @@ which rules out the admin sweep leaking through shared components.
 To bring the admin pages under the suites, sign in once and save a session:
 
 ```
-npx playwright open --save-storage=tests/.auth/user.json http://localhost:3000/ar/login
+npx playwright open --save-storage=tests/.auth/user.json http://localhost:3000/login
 ```
 
 ---
@@ -730,6 +730,148 @@ where it stops the item refusing to shrink below its content. Two of the sites
 are grid items — the contact form panel and the order items panel — and that
 is the behaviour this codebase wants there anyway: a grid column holding a
 table needs `min-w-0` or it overflows horizontally on mobile.
+
+## The recut — indigo on cool grey, one face
+
+The paper pass above was cut against a printed-paper bookshop. In September
+2026 the store was recut against a neutral dashboard reference instead: a
+cool grey ground with a faint blue cast, an indigo accent used sparingly, flat
+surfaces divided by hairlines rather than lifted by shadow, and a single sans
+face. Everything the paper pass put in place is what made this cheap — the two
+ramp files changed and the token layer followed; no call site was re-coloured
+by hand.
+
+### The brand ramp
+
+`src/theme/noqta-brand.ts` is re-hued from the orange to the indigo. The
+profile is untouched: step 80 is still the load-bearing one, now `#3b5bfd`,
+and white on it measures 5.12:1. The tints from step 90 up are fills behind
+dark text, as before.
+
+One alias moved. `--primary` — the *text* role — pointed at
+`colorBrandForeground1`, which is ramp 80, the same value as the fill. That
+measures 5.12:1 on white but only **4.21:1** on `--surface-low`, and the
+offers page sets a 12px semibold label in it on exactly that band, so the
+accessibility baseline failed it. It now points at `colorBrandForeground2`,
+ramp 70: 5.40:1 on the band, 6.58:1 on a card, and `#94a4ff` for 7.49:1 in
+dark mode. White is the easy surface; the band is the one that fails, so check
+both if this is ever re-pointed.
+
+The two brand jackets in `noqta-covers.ts` follow the ramp: `#3b5bfd` under
+`#f2f4ff` measures 4.67, the paper pair `#e4e8ff` / `#1c2c79` 10.25. The ink
+jacket clears the small-text bar by less than the orange did and is the first
+thing to re-measure if the ramp is re-tuned.
+
+### The neutral ramp
+
+`noqta-paper.ts` keeps its name, its shape and its two consumers; only the
+values changed.
+
+| Step | Light | Dark | Role |
+| --- | --- | --- | --- |
+| `--paper-0` | `#ffffff` | `#1c2029` | cards |
+| `--paper-50` | `#eff1f6` | `#11141b` | the page |
+| `--paper-100` | `#e5e9f0` | `#161a22` | banded sections, footer |
+| `--paper-150` | `#dce1ea` | `#232833` | hover |
+| `--paper-200` | `#d2d8e3` | `#2c313d` | pressed, dividers |
+| `--paper-300` | `#c8cfdc` | `#333945` | hairlines |
+| `--paper-400` | `#a2abbd` | `#5d6575` | control strokes |
+| `--ink-900` | `#1a1f2b` | `#e8eaf0` | body text |
+| `--ink-600` | `#4a5364` | `#b4bac6` | secondary text |
+| `--ink-400` | `#5c6575` | `#8d94a3` | muted text |
+
+`--paper-50` is deliberately a step darker than a near-white page would be.
+The reference gets its depth from the ground being clearly darker than the
+sheets on it, so a card at `--paper-0` reads as floating without a shadow —
+which is what lets the design run on hairlines. Pulled closer to white the
+cards vanished into the page; that was the first thing the ramp got wrong.
+Measured on the light page and the band: `--ink-900` 14.6:1 / 13.5:1,
+`--ink-600` 6.85:1 / 6.36:1, `--ink-400` 5.20:1 / 4.83:1.
+
+The elevation utilities went with the ground: the shade is now faint and
+shares the surfaces' blue cast (`rgba(24, 32, 48, 0.05)` and `0.08`), because
+a shadow greyer than the surface it falls on reads as dirt. The anchor band is
+`#1e2430` / `#14181f`, and `--on-anchor-brand` is ramp step 110, `#94a4ff`,
+which measures 6.69:1 on the light value and 7.65:1 on the dark one.
+
+### Colour is rationed
+
+Two decisions keep the accent meaningful, and both removed colour rather than
+adding it.
+
+**`--data`, one token added.** `#6478cf` light, `#8f9ee6` dark — a step off
+`--primary-container`. The dashboard draws dozens of bars, and at full brand
+strength they read as dozens of buttons. Muted enough to recede, saturated
+enough to stay data: 4.62:1 on the card, so a thin bar is still legible.
+The bar chart, the area chart and the share bars all paint with it; the hover
+state on a bar is where the full brand fill still appears. The area chart was
+also redrawn in the process — cubic segments whose control points sit at the
+midpoint of each span, so a series of eleven flat months and a spike cannot
+overshoot a value it never reached, and the end marker is an HTML element
+positioned in percent rather than an SVG circle, which a stretched viewBox had
+been squashing nine to one.
+
+**Amber means a rating.** `--gold` / `--gold-fg` are now used by the stars,
+the star picker and the distribution bars, and by nothing else. `Badge` lost
+its `gold` tone; the hero eyebrow and the book tag that wore it take `muted`.
+Against cream the amber chip read as one warm family; against cool grey it
+read as a second accent competing with the indigo. `Badge` gained `tint`
+instead — `--primary-fixed` under `--on-primary-fixed` — for the discount chip,
+so a card that carries a discount and an add-to-cart button has one solid fill
+on it, the one that does something. (`--on-primary-container` on that tint
+measures 1.11:1; the baseline caught that pairing once.)
+
+### One face
+
+The two serif faces and IBM Plex Sans Arabic are gone. Almarai is the whole
+store — `--font-sans`, `--font-display` and `--font-mono` all resolve to it,
+with Fluent's system stack behind it as the fallback that paints if the
+webfont fails. It is served from `public/fonts/` through `next/font/local`.
+
+Two things about it are worth knowing. First, **only the Bold is present**, so
+every weight the scale declares renders at 700; the declarations were kept
+honest and start working the moment a Regular file is dropped beside it and
+listed in `src/app/layout.tsx`. Second, the `body` font had never actually
+reached the page. `FluentProvider` paints `font-family: var(--fontFamilyBase)`
+on its own element, and `display: contents` removes that element from the box
+tree but not from the inheritance tree — so everything under the provider
+inherited Fluent's Segoe stack, and headings escaped only because
+`font-display` is a class. The fix is one unlayered rule at the foot of
+`globals.css`, `.fui-FluentProvider.fui-FluentProvider`, doubled to (0,2,0) so
+it beats Griffel's runtime class whatever the injection order. It re-asserts
+`--font-sans` rather than overriding `fontFamilyBase` in the theme, which
+would close a `var()` cycle and drop the declaration.
+
+### The mark, and three square corners
+
+The wordmark's dot was drawn in CSS. It is real artwork now — `logo.png`,
+navy on light, and `logoNM.png`, the white silhouette for dark grounds — and
+`LogoMark` renders both, with `[data-logo]` rules in `globals.css` showing one
+per theme. The choice cannot be made in JavaScript: the theme comes from
+`localStorage` before first paint, so a component that chose would guess and
+then correct itself, flashing the wrong mark on every load. The dark file
+replaced a `brightness()` filter that had been standing in until one existed.
+
+Three smaller changes touch every page that has them. `Table` is square on all
+four corners, because a 16px radius cut pale notches out of the header band —
+it is the only component whose radius changed, and the radius tokens are
+untouched. `StatusBadge` is a 28px square-cornered label rather than a pill,
+with a `fill` variant that lets the colour own its table cell. And `html` sets
+`scrollbar-gutter: stable`, so the layout no longer jumps sideways between a
+short page and a long one, or when a dialog locks the body.
+
+### How it was verified
+
+The visual and accessibility baselines were re-captured after the recut: 168
+screenshots and 30 scans (16 public pages, 14 behind a login) at zero
+violations. The English half of the matrix was retired at the same time, which
+is why the filenames still say `-ar` and the counts are half what the earlier
+passes quote. `npm run tokens:check` still passes at 459 tokens.
+
+One baseline moved on its own a week later: `admin-orders`, because the
+seeded owner's phone number had been filled in and the orders table prints it
+under the customer's name. That is data drift, not a regression, and the six
+captures were re-taken rather than the page touched.
 
 ## The bar leaves the navs
 

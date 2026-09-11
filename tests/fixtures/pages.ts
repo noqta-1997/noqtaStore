@@ -31,36 +31,36 @@ export interface PageCase {
 }
 
 export const PAGES: PageCase[] = [
-  { id: "home", path: (l) => `/${l}`, ready: "main h1" },
-  { id: "catalogue", path: (l) => `/${l}/books`, ready: "main" },
+  { id: "home", path: () => "/", ready: "main h1" },
+  { id: "catalogue", path: () => "/books", ready: "main" },
   {
     id: "book-detail",
-    path: (l) => `/${l}/books/al-amir-al-saghir`,
+    path: () => "/books/al-amir-al-saghir",
     ready: "main h1",
   },
-  { id: "categories", path: (l) => `/${l}/categories`, ready: "main" },
+  { id: "categories", path: () => "/categories", ready: "main" },
   {
     id: "category-detail",
-    path: (l) => `/${l}/categories/literature`,
+    path: () => "/categories/literature",
     ready: "main",
   },
-  { id: "authors", path: (l) => `/${l}/authors`, ready: "main" },
+  { id: "authors", path: () => "/authors", ready: "main" },
   {
     id: "author-detail",
-    path: (l) => `/${l}/authors/naguib-mahfouz`,
+    path: () => "/authors/naguib-mahfouz",
     ready: "main",
   },
-  { id: "publishers", path: (l) => `/${l}/publishers`, ready: "main" },
-  { id: "offers", path: (l) => `/${l}/offers`, ready: "main" },
-  { id: "search", path: (l) => `/${l}/search?q=1984`, ready: "main" },
-  { id: "cart", path: (l) => `/${l}/cart`, ready: "main" },
+  { id: "publishers", path: () => "/publishers", ready: "main" },
+  { id: "offers", path: () => "/offers", ready: "main" },
+  { id: "search", path: () => "/search?q=1984", ready: "main" },
+  { id: "cart", path: () => "/cart", ready: "main" },
   // Sign-in is a single Google button now; the page carries no form.
-  { id: "login", path: (l) => `/${l}/login`, ready: "main button" },
-  { id: "faq", path: (l) => `/${l}/faq`, ready: "main" },
-  { id: "contact", path: (l) => `/${l}/contact`, ready: "main form" },
+  { id: "login", path: () => "/login", ready: "main button" },
+  { id: "faq", path: () => "/faq", ready: "main" },
+  { id: "contact", path: () => "/contact", ready: "main form" },
   {
     id: "publisher-detail",
-    path: (l) => `/${l}/publishers/dar-el-shorouk`,
+    path: () => "/publishers/dar-el-shorouk",
     ready: "main",
   },
 
@@ -68,29 +68,29 @@ export const PAGES: PageCase[] = [
   // site chrome rather than the bare root shell.
   {
     id: "not-found",
-    path: (l) => `/${l}/books/no-such-book`,
+    path: () => "/books/no-such-book",
     ready: "main",
   },
 
   // Behind auth — infrastructure is ready, capture is skipped without a session.
-  { id: "account", path: (l) => `/${l}/account`, gated: true, ready: "main" },
+  { id: "account", path: () => "/account", gated: true, ready: "main" },
   {
     id: "account-orders",
-    path: (l) => `/${l}/account/orders`,
+    path: () => "/account/orders",
     gated: true,
     ready: "main",
   },
   {
     id: "admin-dashboard",
-    path: (l) => `/${l}/admin`,
+    path: () => "/admin",
     gated: true,
     volatile: true,
   },
-  { id: "admin-books", path: (l) => `/${l}/admin/books`, gated: true },
-  { id: "checkout", path: (l) => `/${l}/checkout`, gated: true, ready: "main" },
+  { id: "admin-books", path: () => "/admin/books", gated: true },
+  { id: "checkout", path: () => "/checkout", gated: true, ready: "main" },
   {
     id: "checkout-success",
-    path: (l) => `/${l}/checkout/success`,
+    path: () => "/checkout/success",
     gated: true,
     ready: "main",
   },
@@ -100,37 +100,37 @@ export const PAGES: PageCase[] = [
   // past, so the "done" marks mappers.ts recomputes against now cannot move.
   {
     id: "account-addresses",
-    path: (l) => `/${l}/account/addresses`,
+    path: () => "/account/addresses",
     gated: true,
     ready: "main",
   },
   {
     id: "account-reviews",
-    path: (l) => `/${l}/account/reviews`,
+    path: () => "/account/reviews",
     gated: true,
     ready: "main",
   },
   {
     id: "account-wishlist",
-    path: (l) => `/${l}/account/wishlist`,
+    path: () => "/account/wishlist",
     gated: true,
     ready: "main",
   },
   {
     id: "account-order-detail",
-    path: (l) => `/${l}/account/orders/o1`,
+    path: () => "/account/orders/o1",
     gated: true,
     ready: "main",
   },
 
   // The admin half: the table page, the list-beside-a-form page, the long
   // form, and the report. admin-books already covers the plain table.
-  { id: "admin-orders", path: (l) => `/${l}/admin/orders`, gated: true },
-  { id: "admin-authors", path: (l) => `/${l}/admin/authors`, gated: true },
-  { id: "admin-book-new", path: (l) => `/${l}/admin/books/new`, gated: true },
+  { id: "admin-orders", path: () => "/admin/orders", gated: true },
+  { id: "admin-authors", path: () => "/admin/authors", gated: true },
+  { id: "admin-book-new", path: () => "/admin/books/new", gated: true },
   {
     id: "admin-reports",
-    path: (l) => `/${l}/admin/reports`,
+    path: () => "/admin/reports",
     gated: true,
     volatile: true,
   },
@@ -139,4 +139,4 @@ export const PAGES: PageCase[] = [
 export const PUBLIC_PAGES = PAGES.filter((page) => !page.gated);
 export const GATED_PAGES = PAGES.filter((page) => page.gated);
 
-export const LOCALES: Locale[] = ["ar", "en"];
+export const LOCALES: Locale[] = ["ar"];

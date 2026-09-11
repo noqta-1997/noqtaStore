@@ -29,7 +29,7 @@ export function AuthorsSpotlight({
           title={section.title}
           subtitle={section.subtitle}
           actionLabel={dictionary.common.viewAll}
-          actionHref={`/${locale}/authors`}
+          actionHref={`/authors`}
         />
 
         <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

@@ -41,7 +41,7 @@ interface AuthorCardProps {
 export function AuthorCard({ author, locale, booksLabel, className }: AuthorCardProps) {
   return (
     <Link
-      href={`/${locale}/authors/${author.slug}`}
+      href={`/authors/${author.slug}`}
       className={cn(
         "group flex h-full items-center gap-3 rounded-full border border-line bg-card p-2 pe-4",
         "transition-[box-shadow,border-color] duration-100 ease-fluent",

@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 interface AccountNavProps {
-  locale: string;
   labels: {
     profile: string;
     orders: string;
@@ -18,9 +17,9 @@ interface AccountNavProps {
   };
 }
 
-export function AccountNav({ locale, labels }: AccountNavProps) {
+export function AccountNav({ labels }: AccountNavProps) {
   const pathname = usePathname();
-  const base = `/${locale}/account`;
+  const base = `/account`;
 
   const items = [
     { href: base, label: labels.profile, icon: UserRound, exact: true },
@@ -64,7 +63,7 @@ export function AccountNav({ locale, labels }: AccountNavProps) {
 
         <li className="flex-1 lg:flex-none">
           <Link
-            href={`/${locale}/login`}
+            href={`/login`}
             className="flex items-center gap-2.5 whitespace-nowrap rounded-md px-3 py-2 text-body-md text-error transition-colors duration-100 ease-fluent hover:bg-error-container"
           >
             <LogOut aria-hidden className="size-4 shrink-0 rtl:rotate-180" strokeWidth={1.75} />

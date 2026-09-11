@@ -1,4 +1,3 @@
-import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/get-dictionary";
 
 export interface NavItem {
@@ -7,14 +6,14 @@ export interface NavItem {
 }
 
 /** Single source of truth for the storefront's main navigation. */
-export function getMainNav(locale: Locale, nav: Dictionary["nav"]): NavItem[] {
+export function getMainNav(nav: Dictionary["nav"]): NavItem[] {
   return [
-    { href: `/${locale}`, label: nav.home },
-    { href: `/${locale}/books`, label: nav.books },
-    { href: `/${locale}/categories`, label: nav.categories },
-    { href: `/${locale}/authors`, label: nav.authors },
-    { href: `/${locale}/publishers`, label: nav.publishers },
-    { href: `/${locale}/offers`, label: nav.offers },
-    { href: `/${locale}/about`, label: nav.about },
+    { href: "/", label: nav.home },
+    { href: "/books", label: nav.books },
+    { href: "/categories", label: nav.categories },
+    { href: "/authors", label: nav.authors },
+    { href: "/publishers", label: nav.publishers },
+    { href: "/offers", label: nav.offers },
+    { href: "/about", label: nav.about },
   ];
 }

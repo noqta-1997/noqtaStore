@@ -27,19 +27,20 @@ import type {
  * were replaced by Postgres.
  *
  * Customer-written text (addresses, reviews) is stored in one column — the
- * reader types one string. It is mirrored into both locales here so the
- * bilingual UI can render it without a special case.
+ * reader types one string. `mirror` used to copy it into both locales so the
+ * bilingual UI could render it without a special case; with Arabic the only
+ * locale it now wraps the string in the one-key shape `Localized` still has.
  */
 function mirror(value: string): Localized {
-  return { ar: value, en: value };
+  return { ar: value };
 }
 
 export function toCategory(row: CategoryRow): Category & { booksCount: number } {
   return {
     id: row.id,
     slug: row.slug,
-    name: { ar: row.nameAr, en: row.nameEn },
-    description: { ar: row.descriptionAr, en: row.descriptionEn },
+    name: { ar: row.nameAr },
+    description: { ar: row.descriptionAr },
     icon: row.icon,
     booksCount: 0,
   };
@@ -57,9 +58,9 @@ export function toAuthor(
   return {
     id: row.id,
     slug: row.slug,
-    name: { ar: row.nameAr, en: row.nameEn },
-    country: { ar: row.countryAr, en: row.countryEn },
-    bio: { ar: row.bioAr, en: row.bioEn },
+    name: { ar: row.nameAr },
+    country: { ar: row.countryAr },
+    bio: { ar: row.bioAr },
     booksCount: row._count?.books ?? 0,
     avatarUrl: row.avatarUrl ?? undefined,
   };
@@ -71,9 +72,9 @@ export function toPublisher(
   return {
     id: row.id,
     slug: row.slug,
-    name: { ar: row.nameAr, en: row.nameEn },
-    country: { ar: row.countryAr, en: row.countryEn },
-    description: { ar: row.descriptionAr, en: row.descriptionEn },
+    name: { ar: row.nameAr },
+    country: { ar: row.countryAr },
+    description: { ar: row.descriptionAr },
     booksCount: row._count?.books ?? 0,
     foundedYear: row.foundedYear ?? undefined,
   };
@@ -89,7 +90,7 @@ export function toBook(row: BookRowWithRelations): BookWithRelations {
   return {
     id: row.id,
     slug: row.slug,
-    title: { ar: row.titleAr, en: row.titleEn },
+    title: { ar: row.titleAr },
     authorId: row.authorId,
     categoryId: row.categoryId,
     price: row.price,
@@ -101,10 +102,10 @@ export function toBook(row: BookRowWithRelations): BookWithRelations {
     publisherId: row.publisherId,
     publishedYear: row.publishedYear,
     isbn: row.isbn,
-    language: { ar: row.languageAr, en: row.languageEn },
+    language: { ar: row.languageAr },
     coverType: row.coverType,
     weightGrams: row.weightGrams,
-    description: { ar: row.descriptionAr, en: row.descriptionEn },
+    description: { ar: row.descriptionAr },
     tags: row.tags,
     coverUrl: row.coverUrl ?? undefined,
     createdAt: row.createdAt.toISOString().slice(0, 10),
@@ -151,7 +152,7 @@ export function toReviewWithStatus(
   return {
     ...toReviewWithAuthor(row),
     status: row.status,
-    bookTitle: { ar: row.book.titleAr, en: row.book.titleEn },
+    bookTitle: { ar: row.book.titleAr },
   };
 }
 

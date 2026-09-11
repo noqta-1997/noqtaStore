@@ -9,7 +9,6 @@ import {
   toReviewWithStatus,
 } from "@/data/mappers";
 import type { Prisma } from "@/generated/prisma/client";
-import type { Locale } from "@/i18n/config";
 import { getCurrentCustomer } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import type {
@@ -120,16 +119,19 @@ function bookWhere(query: BookQuery): Prisma.BookWhereInput {
 
   if (query.q?.trim()) {
     const term = query.q.trim();
+    /*
+     * The English columns were dropped with the English site, so a search for
+     * a Latin-script title no longer matches on the title itself. The ISBN
+     * clause is what still answers those queries, and the seeded slugs are
+     * Latin too — a reader who types "1984" or an ISBN still finds the book.
+     */
     where.OR = [
       { titleAr: { contains: term, mode: "insensitive" } },
-      { titleEn: { contains: term, mode: "insensitive" } },
+      { slug: { contains: term, mode: "insensitive" } },
       { isbn: { contains: term } },
       { publisher: { nameAr: { contains: term, mode: "insensitive" } } },
-      { publisher: { nameEn: { contains: term, mode: "insensitive" } } },
       { author: { nameAr: { contains: term, mode: "insensitive" } } },
-      { author: { nameEn: { contains: term, mode: "insensitive" } } },
       { category: { nameAr: { contains: term, mode: "insensitive" } } },
-      { category: { nameEn: { contains: term, mode: "insensitive" } } },
     ];
   }
 
@@ -784,7 +786,7 @@ function toCustomerSummary(
     name: row.name,
     email: row.email,
     phone: row.phone,
-    city: { ar: row.city ?? "", en: row.city ?? "" },
+    city: { ar: row.city ?? "" },
     ordersCount: totals.ordersCount,
     totalSpent: totals.totalSpent,
     joinedAt: row.createdAt.toISOString().slice(0, 10),
@@ -984,7 +986,6 @@ export async function getAdminReviews(query: AdminListQuery = {}) {
     where.OR = [
       { customer: { name: { contains: term, mode: "insensitive" } } },
       { book: { titleAr: { contains: term, mode: "insensitive" } } },
-      { book: { titleEn: { contains: term, mode: "insensitive" } } },
     ];
   }
 
@@ -1059,7 +1060,7 @@ export async function getStockCounts() {
 export async function getPublishers(): Promise<Publisher[]> {
   const rows = await prisma.publisher.findMany({
     include: { _count: { select: { books: true } } },
-    orderBy: [{ books: { _count: "desc" } }, { nameEn: "asc" }],
+    orderBy: [{ books: { _count: "desc" } }, { nameAr: "asc" }],
   });
 
   return rows.map(toPublisher);
@@ -1122,8 +1123,8 @@ export async function getStoreIdentity(): Promise<StoreIdentity> {
   const settings = await getStoreSettings();
 
   return {
-    name: { ar: settings.nameAr ?? "", en: settings.nameEn ?? "" },
-    tagline: { ar: settings.taglineAr ?? "", en: settings.taglineEn ?? "" },
+    name: { ar: settings.nameAr ?? "" },
+    tagline: { ar: settings.taglineAr ?? "" },
     email: settings.email ?? "",
     phone: settings.phone ?? "",
     address: settings.address ?? "",
@@ -1300,7 +1301,7 @@ const NOTIFICATIONS_PER_KIND = 5;
  * settings screen has switched on. The count is the true outstanding total,
  * not a tally of unread messages: acting on something removes it from here.
  */
-export async function getAdminNotifications(locale: Locale): Promise<{
+export async function getAdminNotifications(): Promise<{
   items: AdminNotification[];
   total: number;
 }> {
@@ -1322,7 +1323,7 @@ export async function getAdminNotifications(locale: Locale): Promise<{
             where: { status: "pending" },
             include: {
               customer: { select: { name: true } },
-              book: { select: { titleAr: true, titleEn: true } },
+              book: { select: { titleAr: true } },
             },
             orderBy: { createdAt: "desc" },
             take: NOTIFICATIONS_PER_KIND,
@@ -1352,23 +1353,23 @@ export async function getAdminNotifications(locale: Locale): Promise<{
       kind: "order" as const,
       label: order.reference,
       detail: order.customer.name,
-      href: `/${locale}/admin/orders/${order.id}`,
+      href: `/admin/orders/${order.id}`,
       at: order.createdAt.toISOString(),
     })),
     ...reviews.map((review) => ({
       id: `review-${review.id}`,
       kind: "review" as const,
-      label: locale === "ar" ? review.book.titleAr : review.book.titleEn,
+      label: review.book.titleAr,
       detail: review.customer.name,
-      href: `/${locale}/admin/reviews?status=pending`,
+      href: `/admin/reviews?status=pending`,
       at: review.createdAt.toISOString(),
     })),
     ...books.map((book) => ({
       id: `stock-${book.id}`,
       kind: "stock" as const,
-      label: locale === "ar" ? book.titleAr : book.titleEn,
+      label: book.titleAr,
       detail: String(book.stock),
-      href: `/${locale}/admin/books/${book.id}`,
+      href: `/admin/books/${book.id}`,
       at: book.updatedAt.toISOString(),
     })),
   ].sort((a, b) => b.at.localeCompare(a.at));

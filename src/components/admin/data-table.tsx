@@ -32,7 +32,21 @@ export function Table({
     <div
       data-density={density}
       className={cn(
-        "overflow-x-auto rounded-xl border border-line bg-card",
+        /*
+         * Square on all four corners.
+         *
+         * The box was `rounded-xl`, and a 16px radius cut pale notches out of
+         * the header band's top corners where the card showed through — the
+         * band stopped short of the edge it is meant to cap. The same applies
+         * at the foot once a row is striped or selected, so the radius is gone
+         * rather than halved: a table is a grid of straight rules, and its
+         * frame reads better square than as a card that happens to hold one.
+         *
+         * This is the only component whose radius changed. `rounded-*` at
+         * every other call site — cards, panels, inputs, dialogs, badges —
+         * is untouched, and so are the radius tokens themselves.
+         */
+        "overflow-x-auto border border-line bg-card",
         className,
       )}
     >

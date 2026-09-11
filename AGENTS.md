@@ -11,17 +11,21 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 # Design system — Fluent 2
 
 The UI runs on Microsoft Fluent 2. Not a visual imitation of it: the tokens are
-generated from Microsoft's own theme package, with Noqta's orange substituted
-for the default blue brand ramp.
+generated from Microsoft's own theme package, with Noqta's indigo (`#3b5bfd`)
+substituted for the default brand ramp and a cool, faintly blue neutral ramp
+substituted for Fluent's grey. The brand was orange on cream paper until the
+store was recut on a neutral dashboard reference in September 2026; the ramp
+files are what made that a two-file change.
 
 ## The three layers
 
 1. **`src/theme/noqta-brand.ts`** and **`src/theme/noqta-paper.ts`** — the
-   16-step brand ramp and the warm neutral ramp, plain data with no imports.
+   16-step brand ramp and the neutral ramp, plain data with no imports.
    Everything below reads from them, which is what stops them drifting.
-   Fluent's own neutrals are strictly grey and this design is printed paper,
-   so `withPaper()` folds the paper ramp into the theme in both consumers:
-   the generator and `FluentShell`.
+   Fluent's own neutrals are dead grey and this design's carry a blue cast,
+   so `withPaper()` folds the neutral ramp into the theme in both consumers:
+   the generator and `FluentShell`. (The file keeps its "paper" name from the
+   cream design it was written for; the shape and the consumers are the same.)
 2. **`src/styles/fluent-tokens.css`** — 459 CSS variables, **generated**.
    Never edit it. `npm run tokens` rewrites it; `npm run tokens:check` fails
    the build if it is stale.
@@ -65,9 +69,19 @@ must stay that way.
 - **There is no monospace.** `--font-mono` resolves to the sans stack and
   `label-mono` is a small semibold sans label. The name survives only because
   30-odd call sites say it. `[data-numeric]` still selects tabular figures.
-- **Headings are a serif, in two faces.** Playfair Display covers Latin and
-  Noto Naskh Arabic covers Arabic; the browser picks per glyph. `font-display`
-  is for headings and the wordmark — card titles are sans.
+- **One face, and it is Bold only.** Almarai is the whole store — body,
+  headings and figures — served from `public/fonts/`, and only the 700 is
+  there, so every weight the scale declares renders at 700. Dropping a Regular
+  file beside it and listing it in `src/app/layout.tsx` is the entire fix.
+  `--font-display` still exists and still resolves to Almarai; `font-display`
+  marks headings and the wordmark as a role, not a different face.
+- **The store is Arabic only.** There is no `[locale]` segment, no `/ar`
+  prefix and no English dictionary; `Locale` has one member and every page
+  reads `defaultLocale`. `src/i18n/config.ts` explains what was kept and why.
+- **Colour is rationed.** `--primary-container` is for the one action on a
+  view; chart marks use `--data`, a deliberately muted step, so a dashboard
+  does not read as a page of buttons. Amber (`--gold`) means a rating and
+  nothing else — a chip is never gold.
 
 ## Before you ship a change
 

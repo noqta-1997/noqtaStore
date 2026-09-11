@@ -11,7 +11,6 @@ import { setWishlistSaved, useWishlistIds } from "@/lib/wishlist-store";
 
 interface WishlistButtonProps {
   bookId: string;
-  locale: string;
   label: string;
   addedTitle: string;
   removedTitle: string;
@@ -24,7 +23,6 @@ interface WishlistButtonProps {
 
 export function WishlistButton({
   bookId,
-  locale,
   label,
   addedTitle,
   removedTitle,
@@ -55,7 +53,7 @@ export function WishlistButton({
 
       if (result.error === "unauthenticated") {
         toast({ title: signInMessage, tone: "info" });
-        router.push(`/${locale}/login?next=/${locale}/account/wishlist`);
+        router.push(`/login?next=/account/wishlist`);
       }
       return;
     }

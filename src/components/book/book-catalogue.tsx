@@ -23,7 +23,7 @@ interface BookCatalogueProps {
   bounds: { min: number; max: number };
   result: BookQueryResult;
   values: BookFilterValues;
-  /** Path the filter form posts to, e.g. `/ar/books`. */
+  /** Path the filter form posts to, e.g. `/books`. */
   basePath: string;
   showCategory?: boolean;
 }

@@ -7,19 +7,18 @@ import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 
 interface AdminSignOutProps {
-  locale: string;
   label: string;
 }
 
 /** The panel needs its own way out; the storefront menu is a page away. */
-export function AdminSignOut({ locale, label }: AdminSignOutProps) {
+export function AdminSignOut({ label }: AdminSignOutProps) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
 
   const onClick = async () => {
     setPending(true);
     await createClient().auth.signOut();
-    router.replace(`/${locale}/login`);
+    router.replace(`/login`);
     router.refresh();
   };
 

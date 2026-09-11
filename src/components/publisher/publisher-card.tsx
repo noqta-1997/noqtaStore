@@ -32,7 +32,7 @@ export function PublisherCard({
 }: PublisherCardProps) {
   return (
     <Link
-      href={`/${locale}/publishers/${publisher.slug}`}
+      href={`/publishers/${publisher.slug}`}
       className={cn(
         "group flex h-full flex-col gap-2 rounded-xl border border-line bg-card p-5",
         "transition-[box-shadow,border-color] duration-100 ease-fluent hover:border-line-hover hover:elevation-md focus-within:elevation-md",

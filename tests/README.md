@@ -43,7 +43,13 @@ turns the whole suite into decoration.
 
 ## The matrix
 
-19 public pages × 2 locales × 2 themes × 3 viewports = **228 screenshots**.
+(16 public + 12 gated pages) × 2 themes × 3 viewports = **168 screenshots**.
+The two `volatile` admin pages are scanned for accessibility but not captured.
+
+There used to be a second axis: every page was captured in Arabic and in
+English, which is why the filenames still end in `-ar`. English left the store
+in September 2026 and the suffix stayed, so the baselines did not all have to
+be renamed for a language that no longer exists.
 
 Viewports are mobile 375×812, tablet 768×1024 and desktop 1440×900. Themes are
 seeded through `localStorage`, the same key the app's own pre-paint script

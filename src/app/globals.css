@@ -47,10 +47,21 @@
   --outline: var(--colorNeutralStrokeDisabled);
 
   /* ---- Brand ----
-     The ramp puts `colorBrandBackground` at #ab3500 rather than the old
-     #ff6b35: Fluent always sets white on it, and white on #ff6b35 measures
-     2.84:1. On the cream page the brand foreground measures 6.26:1. */
-  --primary: var(--colorBrandForeground1);
+     The ramp puts `colorBrandBackground` at #3b5bfd, which Fluent always sets
+     white on: that pairing measures 5.12:1. Colour is rationed in this design,
+     so these tokens should reach far fewer call sites than a brand normally
+     does — one action per view, not a hue spread across the page.
+
+     `--primary` is the *text* role and needs more contrast than the fill does,
+     so it points at `colorBrandForeground2` (ramp 70) rather than
+     `Foreground1` (ramp 80, the same value as the fill). Ramp 80 measures
+     5.12:1 on white but only **4.21:1** on `--surface-low`, and the offers
+     page sets a 12px semibold label in it on exactly that band — small text,
+     so it needed 4.5 and the accessibility baseline failed it. Ramp 70 gives
+     5.40:1 there and 6.58:1 on a card; in dark mode the token resolves to
+     #94a4ff for 7.49:1. Check both surfaces if this is ever re-pointed: white
+     is the easy one, the band is the one that fails. */
+  --primary: var(--colorBrandForeground2);
   --primary-container: var(--colorBrandBackground);
   --on-primary-container: var(--colorNeutralForegroundOnBrand);
   --primary-fixed: var(--colorBrandBackground2);
@@ -60,11 +71,17 @@
   --on-primary-fixed: var(--colorBrandForeground1);
 
   /* ---- Accent ----
-     The reference marks ratings and savings in amber, a warmer note than the
-     brand orange. Fluent's Marigold is exactly that hue, so it is borrowed
-     rather than invented. `--gold` is a *fill* (stars, distribution bars);
-     `--gold-fg` is the one to use for text, and clears 4.5:1 on both paper
-     steps. */
+     Amber, borrowed from Fluent's Marigold rather than invented.
+
+     It means exactly one thing: a rating. Stars, the star picker, the
+     distribution bars — nothing else. It used to also tint a ribbon chip and
+     a book tag, and while the page was warm cream that read as one family;
+     against cool grey the same amber reads as a leftover, and worse, as a
+     second accent competing with the indigo. Rationing it to scores is what
+     keeps a gold mark meaningful anywhere on the site.
+
+     `--gold` is a *fill*; `--gold-fg` is the one to use for text, and clears
+     4.5:1 on both paper steps. */
   --gold: var(--colorPaletteMarigoldBackground3);
   --gold-fg: var(--colorPaletteMarigoldForeground2);
 
@@ -120,22 +137,32 @@
   /* ---- No Fluent equivalent ----
      Depth, and the one band that stays dark in *both* themes.
 
-     Fluent's shadows are neutral black at a tight radius; over cream that
-     reads as grime rather than lift, so the elevation utilities below mix
-     their own, warm and further spread. `colorNeutralBackgroundInverted`
-     flips with the theme, which is the opposite of what the announcement
-     rail needs. */
-  --shade-soft: rgba(61, 47, 26, 0.06);
-  --shade-key: rgba(61, 47, 26, 0.1);
+     Fluent's shadows are neutral black at a tight radius. This design leans on
+     hairlines rather than depth, so the elevation utilities below mix a very
+     faint shade that shares the surfaces' blue cast — a shadow greyer than the
+     surface it falls on reads as dirt. `colorNeutralBackgroundInverted` flips
+     with the theme, which is the opposite of what the announcement rail
+     needs. */
+  --shade-soft: rgba(24, 32, 48, 0.05);
+  --shade-key: rgba(24, 32, 48, 0.08);
 
-  --anchor: #2a211a;
-  --on-anchor: #f7f1e4;
-  --on-anchor-variant: #c4b7a4;
+  /* Chart marks. Deliberately a step off `--primary-container`, because the
+     accent is rationed: it marks the one thing on a view you can act on, and a
+     dashboard draws dozens of bars. At full strength those bars read as dozens
+     of buttons and the page stops being calm, which is the whole point of the
+     reference this was cut from. Muted enough to recede, saturated enough to
+     stay data rather than decoration — 4.62:1 on the card, so a thin bar is
+     still legible to a low-vision reader. */
+  --data: #6478cf;
+
+  --anchor: #1e2430;
+  --on-anchor: #eef0f5;
+  --on-anchor-variant: #a8b0c0;
   /* Brand text on the anchor band. The band is dark in both themes, so this
      cannot follow the theme-aware brand token: `colorBrandForeground1` is
-     #ab3500 in light mode and measures 2.64:1 here. Ramp step 110 is fixed
-     and clears 6:1 against both anchor values. */
-  --on-anchor-brand: #ec805d;
+     the mid-ramp indigo in light mode and disappears into this band. Ramp
+     step 110 is fixed and measures 6.69:1 here, 7.65:1 on the dark value. */
+  --on-anchor-brand: #94a4ff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -143,9 +170,11 @@
     --shade-soft: rgba(0, 0, 0, 0.32);
     --shade-key: rgba(0, 0, 0, 0.45);
 
-    --anchor: #120f0c;
-    --on-anchor: #e8e1d4;
-    --on-anchor-variant: #a89d8c;
+    --data: #8f9ee6;
+
+    --anchor: #14181f;
+    --on-anchor: #e4e7ee;
+    --on-anchor-variant: #98a1b2;
   }
 }
 
@@ -153,9 +182,11 @@
   --shade-soft: rgba(0, 0, 0, 0.32);
   --shade-key: rgba(0, 0, 0, 0.45);
 
-  --anchor: #120f0c;
-  --on-anchor: #e8e1d4;
-  --on-anchor-variant: #a89d8c;
+  --data: #8f9ee6;
+
+  --anchor: #14181f;
+  --on-anchor: #e4e7ee;
+  --on-anchor-variant: #98a1b2;
 }
 
 @theme inline {
@@ -191,6 +222,7 @@
   --color-line-hover: var(--line-hover);
   --color-line-pressed: var(--line-pressed);
   --color-accent-stroke: var(--accent-stroke);
+  --color-data: var(--data);
 
   --color-primary: var(--primary);
   --color-primary-container: var(--primary-container);
@@ -247,22 +279,25 @@
   --ease-decelerate: var(--curveDecelerateMid);
 
   /* ---- Typography ----
-     The reference sets its headings in a high-contrast serif and its running
-     text in a humanist sans. No single family covers both scripts, so the
-     display stack is Playfair Display for Latin with Noto Naskh Arabic
-     behind it — fallback is resolved per glyph, so an Arabic heading picks up
-     the Naskh face and a Latin one the didone. Body text stays on Plex
-     Arabic.
+     One face for the whole store: Almarai. IBM Plex Sans Arabic was removed
+     along with the last of the two-family split, so all three role tokens
+     resolve to the same stack and differ only in the name they answer to.
 
-     `--font-mono` is a misnomer now and is kept only because 30-odd call
-     sites and two utilities say `font-mono`. The reference has no monospace
-     anywhere — prices included — so the role it names is really "figures and
-     micro labels", and that is set in the sans face with tabular figures.
-     Dropping JetBrains pays for one of the two serif faces. */
-  --font-sans: var(--font-plex-arabic), var(--fontFamilyBase);
-  --font-display: var(--font-playfair), var(--font-naskh-arabic),
-    var(--font-plex-arabic), var(--fontFamilyBase);
-  --font-mono: var(--font-plex-arabic), var(--fontFamilyBase);
+     `--fontFamilyBase` stays behind it as the fallback. That is Fluent's
+     system stack, not a face this design ships — it is what paints if the
+     webfont fails, and dropping it would leave the browser to pick blind.
+
+     Note the weight limit: only Almarai Bold is present, so every step below
+     renders at 700 no matter what weight it declares. The declarations stay
+     honest — they describe the scale the design wants — and start working the
+     moment a Regular file is added. See the note in app/layout.tsx.
+
+     `--font-mono` is a misnomer kept only because 30-odd call sites say
+     `font-mono`: the role it really names is "figures and micro labels", set
+     with tabular figures via `[data-numeric]`. There is no monospace. */
+  --font-sans: var(--font-almarai), var(--fontFamilyBase);
+  --font-display: var(--font-almarai), var(--fontFamilyBase);
+  --font-mono: var(--font-almarai), var(--fontFamilyBase);
 
   /* The seven semantic steps keep their names and their Fluent sizes, so no
      call site changes. The one exception is the display step: the reference
@@ -376,6 +411,24 @@
   html {
     -webkit-text-size-adjust: 100%;
     color-scheme: light;
+
+    /*
+     * Always leave room for the scrollbar, even on pages short enough not to
+     * need one.
+     *
+     * Without this the gutter appears and disappears with the page's height,
+     * and the whole layout jumps sideways by its width — moving between a
+     * short page and a long one, and again every time a dialog locks the body
+     * while it is open. Reserving the space costs those pixels permanently and
+     * buys a viewport that never shifts.
+     *
+     * `stable` reserves on the scrollbar's own side, which is the left in this
+     * RTL document. `both-edges` would keep the content mathematically centred
+     * but wastes the width twice. Browsers without support (Safari before 18.2)
+     * simply behave as they do today — the gutter is an improvement, not a
+     * dependency.
+     */
+    scrollbar-gutter: stable;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -395,6 +448,7 @@
     font-size: 1rem;
     line-height: 1.6;
   }
+
 
   h1, h2, h3, h4 {
     color: var(--color-on-surface);
@@ -494,4 +548,82 @@
   a[href]::after {
     content: "";
   }
+}
+
+/*
+ * The `body` font never actually reached the page.
+ *
+ * `FluentProvider` paints `font-family: var(--fontFamilyBase)` — Fluent's
+ * Segoe stack — on its own element, and `display: contents` does not stop
+ * that: it takes the element out of the *box* tree while inheritance follows
+ * the *DOM* tree. So every node under the provider inherited Segoe, and the
+ * `body` rule only ever applied to the two nodes above it. The store was set
+ * in the system font from the day Fluent landed; headings escaped it only
+ * because `font-display` is a class, and a class beats an inherited value.
+ *
+ * Two details make this rule look odd, and both are load-bearing:
+ *
+ * 1. It sits outside `@layer base`. Griffel injects its classes unlayered at
+ *    runtime, and an unlayered declaration beats a layered one at equal
+ *    specificity no matter the source order — inside the layer this rule lost.
+ * 2. The class is doubled to reach (0,2,0). Griffel's own class is a single
+ *    class, so matching its specificity would leave the winner decided by
+ *    injection order, which is not ours to control.
+ *
+ * It re-asserts `--font-sans` rather than overriding `fontFamilyBase` in the
+ * theme, because `--font-sans` is defined as
+ * `var(--font-almarai), var(--fontFamilyBase)`; feeding it back into that
+ * token would close a var() cycle and drop the declaration entirely.
+ */
+.fui-FluentProvider.fui-FluentProvider {
+  font-family: var(--font-sans);
+}
+
+/*
+ * Which of the two marks is showing.
+ *
+ * `logo.png` is navy on light; `logoNM.png` is the white silhouette drawn for
+ * dark grounds. Both are in the DOM and this decides — see the note in
+ * components/layout/logo-mark.tsx for why the choice cannot be made in
+ * JavaScript without flashing the wrong one.
+ *
+ * This replaced a `brightness(2.6)` filter on the light artwork, which was
+ * standing in until a dark file existed: the navy measures 1.11:1 on the dark
+ * card, so unfiltered it was not merely dim, it was gone. The real file is
+ * better than any filter — the arc is drawn white rather than clipped to white
+ * by arithmetic.
+ *
+ * Light is the default so it survives with CSS off or the media query
+ * unsupported, and the dark rules are the exception. `:root:not([data-theme=
+ * "light"])` is what lets the manual toggle beat the system preference.
+ */
+[data-logo="dark"] {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) [data-logo="light"] {
+    display: none;
+  }
+
+  :root:not([data-theme="light"]) [data-logo="dark"] {
+    display: block;
+  }
+}
+
+[data-theme="dark"] [data-logo="light"] {
+  display: none;
+}
+
+[data-theme="dark"] [data-logo="dark"] {
+  display: block;
+}
+
+/* And the manual light override wins back under a dark system preference. */
+[data-theme="light"] [data-logo="light"] {
+  display: block;
+}
+
+[data-theme="light"] [data-logo="dark"] {
+  display: none;
 }

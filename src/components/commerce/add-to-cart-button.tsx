@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 
 interface AddToCartButtonProps {
   bookId: string;
-  locale: string;
   label: string;
   toastTitle: string;
   toastNote?: string;
@@ -31,7 +30,6 @@ interface AddToCartButtonProps {
 /** Writes a real cart row; anonymous readers are sent to sign in. */
 export function AddToCartButton({
   bookId,
-  locale,
   label,
   toastTitle,
   toastNote,
@@ -63,7 +61,7 @@ export function AddToCartButton({
 
     if (result.error === "unauthenticated") {
       toast({ title: signInMessage, tone: "info" });
-      router.push(`/${locale}/login?next=/${locale}/cart`);
+      router.push(`/login?next=/cart`);
       return;
     }
 
