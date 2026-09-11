@@ -44,15 +44,15 @@ export function AccountNav({ locale, labels }: AccountNavProps) {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  // Fluent marks the selected item with a subtle background and
-                  // a brand bar on the leading edge, not a saturated fill.
-                  "relative flex items-center gap-2.5 whitespace-nowrap rounded-md px-3 py-2",
+                  // The selected item is marked by its background and its
+                  // weight, the same way the admin rail marks its own. The
+                  // brand bar that used to sit on the leading edge — a
+                  // `before:` pseudo-element — is gone from both.
+                  "flex items-center gap-2.5 whitespace-nowrap rounded-md px-3 py-2",
                   "text-body-md transition-colors duration-100 ease-fluent",
-                  "before:absolute before:inset-y-1.5 before:inset-inline-start-0",
-                  "before:w-0.5 before:rounded-full before:bg-primary before:content-['']",
                   active
-                    ? "bg-state-selected font-semibold text-on-surface before:opacity-100"
-                    : "text-on-surface-variant before:opacity-0 hover:bg-state-hover hover:text-on-surface",
+                    ? "bg-state-selected font-semibold text-on-surface"
+                    : "text-on-surface-variant hover:bg-state-hover hover:text-on-surface",
                 )}
               >
                 <item.icon aria-hidden className="size-4 shrink-0" strokeWidth={1.75} />

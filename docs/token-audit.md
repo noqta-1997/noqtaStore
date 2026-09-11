@@ -425,7 +425,8 @@ covers are printed objects, and every pair clears 4.5:1 at full strength —
 5.83 at the tightest.
 
 **The selected-nav pattern is Fluent's.** A subtle background plus a brand bar
-on the leading edge, instead of a saturated fill.
+on the leading edge, instead of a saturated fill. (The bar was later dropped
+from every nav — see "The bar leaves the navs" at the end of this document.)
 
 ### A correction to the Phase 2 classification
 
@@ -466,7 +467,8 @@ words a sighted reader sees. Each also has an empty state, which none had.
 floating layer in the app. Its own outside-click and escape listeners are gone.
 
 `admin-nav` and `table-toolbar` now use the same selected pattern as the
-storefront: subtle background plus a brand bar, not a saturated fill.
+storefront: subtle background plus a brand bar, not a saturated fill. (The bar
+has since gone — see "The bar leaves the navs" at the end of this document.)
 
 ### Sortable headers — the one approved data-layer change
 
@@ -728,3 +730,29 @@ where it stops the item refusing to shrink below its content. Two of the sites
 are grid items — the contact form panel and the order items panel — and that
 is the behaviour this codebase wants there anyway: a grid column holding a
 table needs `min-w-0` or it overflows horizontally on mobile.
+
+## The bar leaves the navs
+
+The selected item in a nav no longer carries a brand bar on its leading edge.
+`admin-nav` lost it first, when the admin moved onto the token layer: a second
+marker saying what the fill already said, and in RTL it landed hard against
+the rail's right rule. `account-nav` kept it — the storefront rail has a
+padded card around it, so the RTL collision did not apply — until the same
+2px `before:` pseudo-element, painted `--primary` and by then indigo rather
+than orange, was asked to go from everywhere it appeared. It appeared in
+exactly that one component.
+
+What marks the selected item now is what marked it underneath the bar all
+along: `bg-state-selected`, semibold weight and `aria-current="page"`. The
+bar was `aria-hidden` in effect — generated content with no text — so nothing
+announced changes, and the accessibility baseline is unmoved.
+
+Fluent's own `TabList` on the book page still draws its selected indicator.
+That is a horizontal rule under the tab, drawn by the component, and it was
+deliberately left alone.
+
+Only the six account pages render `account-nav`, so 36 gated baselines
+(6 pages × 3 viewports × 2 themes) were re-captured. The diff is below the
+`maxDiffPixelRatio` — a 2px bar on a full-page capture — which is why the
+re-capture had to be `--update-snapshots=all` on the account cases rather
+than a plain `test:baseline`, exactly the case `tests/README.md` warns about.
