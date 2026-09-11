@@ -828,11 +828,15 @@ store — `--font-sans`, `--font-display` and `--font-mono` all resolve to it,
 with Fluent's system stack behind it as the fallback that paints if the
 webfont fails. It is served from `public/fonts/` through `next/font/local`.
 
-Two things about it are worth knowing. First, **only the Bold is present**, so
-every weight the scale declares renders at 700; the declarations were kept
-honest and start working the moment a Regular file is dropped beside it and
-listed in `src/app/layout.tsx`. Second, the `body` font had never actually
-reached the page. `FluentProvider` paints `font-family: var(--fontFamilyBase)`
+Two things about it are worth knowing. First, it ships as two weights, the
+Regular and the Bold, one `.woff2` each. For the first week only the Bold was
+present, and since a browser can embolden but never lighten, every weight the
+scale declared rendered at 700; the Regular restored the split the scale
+wants — 500 resolves down to it, 600 up to the Bold. The `.woff` copies that
+sat beside the `.woff2` as a "fallback" went at the same time: `next/font/local`
+emits a separate `@font-face` per `src` entry, so the browser saw two faces
+with identical descriptors and fetched both, 116 KB for one weight instead of
+50. Second, the `body` font had never actually reached the page. `FluentProvider` paints `font-family: var(--fontFamilyBase)`
 on its own element, and `display: contents` removes that element from the box
 tree but not from the inheritance tree — so everything under the provider
 inherited Fluent's Segoe stack, and headings escaped only because

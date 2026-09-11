@@ -69,10 +69,11 @@ must stay that way.
 - **There is no monospace.** `--font-mono` resolves to the sans stack and
   `label-mono` is a small semibold sans label. The name survives only because
   30-odd call sites say it. `[data-numeric]` still selects tabular figures.
-- **One face, and it is Bold only.** Almarai is the whole store — body,
-  headings and figures — served from `public/fonts/`, and only the 700 is
-  there, so every weight the scale declares renders at 700. Dropping a Regular
-  file beside it and listing it in `src/app/layout.tsx` is the entire fix.
+- **One face, two weights.** Almarai is the whole store — body, headings and
+  figures — served from `public/fonts/` as a Regular and a Bold, `.woff2`
+  only: `next/font/local` makes a separate `@font-face` of every `src` entry,
+  so a `.woff` "fallback" beside the `.woff2` is downloaded as well, not
+  instead. 500 resolves down to the Regular and 600 up to the Bold.
   `--font-display` still exists and still resolves to Almarai; `font-display`
   marks headings and the wordmark as a role, not a different face.
 - **The store is Arabic only.** There is no `[locale]` segment, no `/ar`

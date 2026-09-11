@@ -18,24 +18,26 @@ import "@/app/globals.css";
  * Arabic and its four weights were removed with it, so this is the single
  * webfont family the site downloads.
  *
- * **It is Bold only.** `public/fonts/` holds one file, the 700, and a browser
- * cannot synthesise a lighter weight from a heavier one — it can only embolden.
- * So the 400 the body scale asks for, the 500 the labels ask for and the 600
- * the emphasis asks for all resolve to this one face and render at 700. The
- * type scale still varies size and spacing, but not weight: nothing on the
- * page is lighter than anything else.
+ * Two weights, the 400 and the 700, and they are enough for the scale. The
+ * body asks for 400 and gets it; `font-medium` (500) has nothing of its own
+ * and resolves down to the Regular; `font-semibold` (600) resolves up to the
+ * Bold. For a while only the Bold was here, and since a browser can embolden
+ * but never lighten, every weight on the page rendered at 700 — the Regular
+ * is what made the scale work.
  *
- * Dropping `Almarai-Regular.woff2` beside the Bold and adding it to `src`
- * below is the whole fix — the scale starts working again with no other
- * change, because the weights are already declared in globals.css.
+ * One file per weight, and it is the `.woff2`. `next/font/local` turns every
+ * `src` entry into its own `@font-face`, so a `.woff` listed as a "fallback"
+ * beside the `.woff2` is not a fallback at all: the browser sees two faces
+ * with identical descriptors and downloads both. That doubled the font bytes
+ * for a container every browser that runs this app can already read.
  *
- * `.woff` sits beside the `.woff2` as the fallback for anything that cannot
- * read the newer container.
+ * The files are subset to the 528 code points the family maps, with the
+ * unused `.notdef` duplicates dropped, and carry the OFL beside them.
  */
 const almarai = localFont({
   src: [
+    { path: "../../public/fonts/Almarai-Regular.woff2", weight: "400", style: "normal" },
     { path: "../../public/fonts/Almarai-Bold.woff2", weight: "700", style: "normal" },
-    { path: "../../public/fonts/Almarai-Bold.woff", weight: "700", style: "normal" },
   ],
   variable: "--font-almarai",
   display: "swap",

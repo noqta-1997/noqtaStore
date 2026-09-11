@@ -287,10 +287,10 @@
      system stack, not a face this design ships — it is what paints if the
      webfont fails, and dropping it would leave the browser to pick blind.
 
-     Note the weight limit: only Almarai Bold is present, so every step below
-     renders at 700 no matter what weight it declares. The declarations stay
-     honest — they describe the scale the design wants — and start working the
-     moment a Regular file is added. See the note in app/layout.tsx.
+     Two weights are shipped, 400 and 700. The steps below declare 400, 500,
+     600 and 700; the 500 resolves down to the Regular and the 600 up to the
+     Bold, which is the split the design wants — a label is regular, emphasis
+     is bold. See the note in app/layout.tsx.
 
      `--font-mono` is a misnomer kept only because 30-odd call sites say
      `font-mono`: the role it really names is "figures and micro labels", set
