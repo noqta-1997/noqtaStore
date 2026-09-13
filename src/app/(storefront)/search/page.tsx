@@ -3,14 +3,21 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { BookCatalogue } from "@/components/book/book-catalogue";
+import { HandoutShelf } from "@/components/handout/handout-shelf";
 import { SearchBar } from "@/components/layout/search-bar";
 import { Container } from "@/components/ui/container";
 import { EmptyState } from "@/components/ui/empty-state";
-import { getCategories, getPriceBounds, getPublishers, queryBooks } from "@/data";
+import {
+  getCategories,
+  getPriceBounds,
+  getPublishers,
+  queryBooks,
+  queryHandouts,
+} from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { parseBookQuery, toBookQuery } from "@/lib/book-query";
-import { readParam, type SearchParamsRecord } from "@/lib/search-params";
+import { buildQueryString, readParam, type SearchParamsRecord } from "@/lib/search-params";
 
 interface SearchPageProps {
   searchParams: Promise<SearchParamsRecord>;
@@ -29,15 +36,26 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const term = readParam(raw, "q") ?? "";
   const parsed = parseBookQuery(raw);
 
-  const [dictionary, categories, publishers, bounds, result] = await Promise.all([
+  /*
+   * The same term and filters run against both tables. The books get the
+   * catalogue with its pagination; the handouts get a shelf of the first ten
+   * and a link to their own listing, which takes the same query string.
+   */
+  const [dictionary, categories, publishers, bounds, result, handouts] = await Promise.all([
     getDictionary(locale),
     getCategories(),
     getPublishers(),
     getPriceBounds(),
     term ? queryBooks(toBookQuery(parsed)) : Promise.resolve(null),
+    term
+      ? queryHandouts(toBookQuery(parsed, { page: 1, perPage: 10 }))
+      : Promise.resolve(null),
   ]);
 
   const t = dictionary.searchPage;
+  const booksTotal = result?.total ?? 0;
+  const handoutsTotal = handouts?.total ?? 0;
+  const handoutsHref = `/handouts${buildQueryString({ ...parsed.values, q: term })}`;
 
   return (
     <>
@@ -61,8 +79,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               {result ? (
                 <>
                   {" — "}
-                  <span data-numeric>{result.total}</span>{" "}
-                  {dictionary.books.resultsLabel}
+                  {booksTotal || !handoutsTotal ? (
+                    <>
+                      <span data-numeric>{booksTotal}</span>{" "}
+                      {dictionary.books.resultsLabel}
+                    </>
+                  ) : null}
+                  {booksTotal && handoutsTotal ? " · " : null}
+                  {handoutsTotal ? (
+                    <>
+                      <span data-numeric>{handoutsTotal}</span>{" "}
+                      {t.handoutsCount}
+                    </>
+                  ) : null}
                 </>
               ) : null}
             </p>
@@ -83,18 +112,36 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         </Container>
       </section>
 
-      {result && result.total > 0 ? (
+      {result && booksTotal > 0 ? (
         <BookCatalogue
           locale={locale}
           dictionary={dictionary}
           categories={categories}
-        publishers={publishers}
+          publishers={publishers}
           bounds={bounds}
           result={result}
           values={{ ...parsed.values, q: term }}
           basePath={`/search`}
         />
-      ) : (
+      ) : null}
+
+      {handouts && handoutsTotal > 0 ? (
+        <HandoutShelf
+          title={t.handoutsTitle}
+          subtitle={t.handoutsSubtitle}
+          handouts={handouts.items}
+          locale={locale}
+          dictionary={dictionary.common}
+          actionHref={handoutsHref}
+          priority={!booksTotal}
+          /* Under the catalogue it sits on the band; alone it follows the
+             tinted header, so it stays on the page. */
+          band={booksTotal > 0}
+          className={booksTotal ? "border-t border-line-divider" : undefined}
+        />
+      ) : null}
+
+      {!booksTotal && !handoutsTotal ? (
         <Container className="py-10 lg:py-16">
           <EmptyState
             icon={SearchX}
@@ -104,7 +151,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             actionHref={`/books`}
           />
         </Container>
-      )}
+      ) : null}
     </>
   );
 }

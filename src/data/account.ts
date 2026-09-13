@@ -48,7 +48,7 @@ export const customer: Customer = {
   stats: {
     orders: 4,
     wishlist: 6,
-    booksBought: 17,
+    copiesBought: 17,
   },
 };
 

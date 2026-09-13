@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getCategoryShares, getSalesSeries, getTopBooks } from "@/data";
+import { getCategoryShares, getSalesSeries, getTopBooks, getTopHandouts } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getCurrentCustomer } from "@/lib/auth";
 
@@ -26,10 +26,11 @@ export async function GET() {
 
   const locale = defaultLocale;
 
-  const [series, shares, top] = await Promise.all([
+  const [series, shares, top, topHandouts] = await Promise.all([
     getSalesSeries(),
     getCategoryShares(),
     getTopBooks(),
+    getTopHandouts(),
   ]);
 
   const rows: (string | number)[][] = [
@@ -38,6 +39,9 @@ export async function GET() {
     [],
     ["book", "copies_sold", "revenue_iqd"],
     ...top.map((entry) => [entry.book.title[locale], entry.sold, entry.revenue]),
+    [],
+    ["handout", "copies_sold", "revenue_iqd"],
+    ...topHandouts.map((entry) => [entry.handout.title[locale], entry.sold, entry.revenue]),
     [],
     ["category", "share_percent"],
     ...shares.map((entry) => [entry.category.name[locale], entry.share]),

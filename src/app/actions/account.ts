@@ -37,7 +37,7 @@ export async function updateProfile(formData: FormData): Promise<ActionResult> {
     },
   });
 
-  revalidatePath("/[locale]/account", "page");
+  revalidatePath("/account", "page");
   return ok();
 }
 
@@ -82,7 +82,7 @@ export async function saveAddress(formData: FormData): Promise<ActionResult> {
     await tx.address.create({ data: { ...fields, customerId } });
   });
 
-  revalidatePath("/[locale]/account/addresses", "page");
+  revalidatePath("/account/addresses", "page");
   return ok();
 }
 
@@ -92,7 +92,7 @@ export async function deleteAddress(addressId: string): Promise<ActionResult> {
 
   await prisma.address.deleteMany({ where: { id: addressId, customerId } });
 
-  revalidatePath("/[locale]/account/addresses", "page");
+  revalidatePath("/account/addresses", "page");
   return ok();
 }
 
@@ -108,7 +108,7 @@ export async function setDefaultAddress(addressId: string): Promise<ActionResult
     }),
   ]);
 
-  revalidatePath("/[locale]/account/addresses", "page");
+  revalidatePath("/account/addresses", "page");
   return ok();
 }
 
@@ -128,7 +128,7 @@ export async function deleteOwnReview(reviewId: string): Promise<ActionResult> {
     await refreshBookRating(tx, review.bookId);
   });
 
-  revalidatePath("/[locale]/account/reviews", "page");
+  revalidatePath("/account/reviews", "page");
   return ok();
 }
 
@@ -145,7 +145,7 @@ export async function savePreferences(formData: FormData): Promise<ActionResult>
     },
   });
 
-  revalidatePath("/[locale]/account", "page");
+  revalidatePath("/account", "page");
   return ok();
 }
 
@@ -176,8 +176,8 @@ export async function submitReview(formData: FormData): Promise<ActionResult> {
     data: { bookId, customerId, rating, title, body },
   });
 
-  revalidatePath("/[locale]/account/reviews", "page");
-  revalidatePath("/[locale]/admin/reviews", "page");
+  revalidatePath("/account/reviews", "page");
+  revalidatePath("/admin/reviews", "page");
   return ok();
 }
 

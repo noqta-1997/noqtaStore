@@ -41,7 +41,7 @@ export async function addToCart(
     update: { quantity: next },
   });
 
-  revalidatePath("/[locale]/cart", "page");
+  revalidatePath("/cart", "page");
   return ok();
 }
 
@@ -65,7 +65,7 @@ export async function setCartQuantity(
     data: { quantity: Math.min(quantity, Math.max(book.stock, 1)) },
   });
 
-  revalidatePath("/[locale]/cart", "page");
+  revalidatePath("/cart", "page");
   return ok();
 }
 
@@ -77,7 +77,7 @@ export async function removeFromCart(bookId: string): Promise<ActionResult> {
     .delete({ where: { customerId_bookId: { customerId, bookId } } })
     .catch(() => null);
 
-  revalidatePath("/[locale]/cart", "page");
+  revalidatePath("/cart", "page");
   return ok();
 }
 
@@ -93,12 +93,12 @@ export async function toggleWishlist(bookId: string): Promise<ActionResult> {
     await prisma.wishlistItem.delete({
       where: { customerId_bookId: { customerId, bookId } },
     });
-    revalidatePath("/[locale]/account/wishlist", "page");
+    revalidatePath("/account/wishlist", "page");
     return ok("removed");
   }
 
   await prisma.wishlistItem.create({ data: { customerId, bookId } });
-  revalidatePath("/[locale]/account/wishlist", "page");
+  revalidatePath("/account/wishlist", "page");
   return ok("added");
 }
 
@@ -230,7 +230,7 @@ export async function addWishlistToCart(): Promise<ActionResult> {
     ),
   ]);
 
-  revalidatePath("/[locale]/cart", "page");
+  revalidatePath("/cart", "page");
   return ok(String(available.length + availableHandouts.length));
 }
 
@@ -282,7 +282,7 @@ export async function reorder(orderId: string): Promise<ActionResult> {
     ),
   ]);
 
-  revalidatePath("/[locale]/cart", "page");
+  revalidatePath("/cart", "page");
   return ok(String(available.length + availableHandouts.length));
 }
 
@@ -326,15 +326,15 @@ export async function applyCoupon(formData: FormData): Promise<ActionResult> {
     maxAge: 60 * 60 * 24 * 7,
   });
 
-  revalidatePath("/[locale]/cart", "page");
-  revalidatePath("/[locale]/checkout", "page");
+  revalidatePath("/cart", "page");
+  revalidatePath("/checkout", "page");
   return ok(result.coupon.code);
 }
 
 export async function clearCoupon(): Promise<ActionResult> {
   (await cookies()).delete(COUPON_COOKIE);
 
-  revalidatePath("/[locale]/cart", "page");
-  revalidatePath("/[locale]/checkout", "page");
+  revalidatePath("/cart", "page");
+  revalidatePath("/checkout", "page");
   return ok();
 }

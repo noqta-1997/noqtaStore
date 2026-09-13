@@ -166,7 +166,8 @@ export interface Customer {
   stats: {
     orders: number;
     wishlist: number;
-    booksBought: number;
+    /** Copies across every non-cancelled order, books and handouts alike. */
+    copiesBought: number;
   };
 }
 

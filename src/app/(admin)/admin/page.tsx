@@ -16,6 +16,7 @@ import {
   getLowStockBooks,
   getSalesSeries,
   getTopBooks,
+  getTopHandouts,
 } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
@@ -36,17 +37,27 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AdminDashboardPage() {
   const locale = defaultLocale;
 
-  const [dictionary, admin, stats, series, top, shares, lowStock, recent] =
-    await Promise.all([
-      getDictionary(locale),
-      getAdminDictionary(locale),
-      getAdminStats(),
-      getSalesSeries(),
-      getTopBooks(),
-      getCategoryShares(),
-      getLowStockBooks(5),
-      getAdminOrders({ perPage: 5 }),
-    ]);
+  const [
+    dictionary,
+    admin,
+    stats,
+    series,
+    top,
+    topHandouts,
+    shares,
+    lowStock,
+    recent,
+  ] = await Promise.all([
+    getDictionary(locale),
+    getAdminDictionary(locale),
+    getAdminStats(),
+    getSalesSeries(),
+    getTopBooks(),
+    getTopHandouts(),
+    getCategoryShares(),
+    getLowStockBooks(5),
+    getAdminOrders({ perPage: 5 }),
+  ]);
 
   const t = admin.dashboard;
 
@@ -220,6 +231,50 @@ export default async function AdminDashboardPage() {
               </li>
             ))}
           </ol>
+
+          {/* The handout half of the ranking, under its own heading. */}
+          {topHandouts.length ? (
+            <section className="mt-5 space-y-4 border-t border-line-divider pt-4">
+              <h3 className="label-mono text-muted">{t.topBooks.handouts}</h3>
+              <ol className="space-y-4">
+                {topHandouts.map((entry, index) => (
+                  <li key={entry.handoutId} className="flex items-center gap-3">
+                    <span
+                      className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-label-md font-semibold text-primary"
+                      data-numeric
+                    >
+                      {index + 1}
+                    </span>
+                    <span className="w-9 shrink-0">
+                      <BookCover
+                        title={entry.handout.title[locale]}
+                        author={entry.handout.author.name[locale]}
+                        seed={entry.handout.slug}
+                        src={entry.handout.coverUrl}
+                        sizes="2.25rem"
+                        className="rounded-md elevation-sm"
+                        compact
+                      />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <Link
+                        href={`/admin/handouts/${entry.handoutId}`}
+                        className="block truncate text-sm font-semibold text-on-surface underline-offset-4 hover:underline"
+                      >
+                        {entry.handout.title[locale]}
+                      </Link>
+                      <span className="block text-label-md text-muted" data-numeric>
+                        {formatNumber(entry.sold, locale)} {t.topBooks.sold}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-label-md text-on-surface" data-numeric>
+                      {formatCompactPrice(entry.revenue, locale)}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : null}
         </Panel>
       </div>
 

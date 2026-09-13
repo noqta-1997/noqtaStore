@@ -13,6 +13,7 @@ import {
   getCategoryShares,
   getSalesSeries,
   getTopBooks,
+  getTopHandouts,
 } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary } from "@/i18n/get-dictionary";
@@ -52,12 +53,13 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
   const rawRange = readParam(await searchParams, "range");
   const range = (ranges.includes(rawRange as Range) ? rawRange : "year") as Range;
 
-  const [admin, stats, series, shares, top] = await Promise.all([
+  const [admin, stats, series, shares, top, topHandouts] = await Promise.all([
     getAdminDictionary(locale),
     getAdminStats(),
     getSalesSeries(),
     getCategoryShares(),
     getTopBooks(),
+    getTopHandouts(),
   ]);
 
   const t = admin.reports;
@@ -192,8 +194,8 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
             <Thead>
               <Tr>
                 <Th>{admin.books.table.book}</Th>
-                <Th>{admin.dashboard.topBooks.sold}</Th>
-                <Th>{admin.dashboard.topBooks.revenue}</Th>
+                <Th className="w-24">{admin.dashboard.topBooks.sold}</Th>
+                <Th className="w-40">{admin.dashboard.topBooks.revenue}</Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -220,6 +222,43 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
               ))}
             </Tbody>
           </Table>
+
+          {/* The handouts' ranking follows as a second table with its own head;
+              the pinned column widths keep its rows in line with the books'. */}
+          {topHandouts.length ? (
+            <Table minWidth="30rem" className="border-0">
+              <Thead>
+                <Tr>
+                  <Th>{admin.handouts.table.handout}</Th>
+                  <Th className="w-24">{admin.dashboard.topBooks.sold}</Th>
+                  <Th className="w-40">{admin.dashboard.topBooks.revenue}</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {topHandouts.map((entry) => (
+                  <Tr key={entry.handoutId}>
+                    <Td>
+                      <Link
+                        href={`/admin/handouts/${entry.handoutId}`}
+                        className="block max-w-56 truncate font-semibold underline-offset-4 hover:underline"
+                      >
+                        {entry.handout.title[locale]}
+                      </Link>
+                      <span className="block text-label-md text-muted">
+                        {entry.handout.category.name[locale]}
+                      </span>
+                    </Td>
+                    <Td data-numeric>
+                      {formatNumber(entry.sold, locale)}
+                    </Td>
+                    <Td className="whitespace-nowrap font-semibold" data-numeric>
+                      {formatPrice(entry.revenue, locale)}
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          ) : null}
         </Panel>
       </div>
     </>

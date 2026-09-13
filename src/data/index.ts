@@ -482,6 +482,35 @@ export async function getRelatedHandouts(
   return rows.map(toHandout);
 }
 
+/*
+ * The author and publisher pages list their handouts whole, under the
+ * paginated books: an author's handouts are a handful, and a second page
+ * control for them would fight the one the books already have.
+ */
+export async function getHandoutsByAuthor(
+  authorSlug: string,
+): Promise<HandoutWithRelations[]> {
+  const rows = await prisma.handout.findMany({
+    where: { author: { slug: authorSlug } },
+    include: handoutInclude,
+    orderBy: handoutOrderByForSort.popular,
+  });
+
+  return rows.map(toHandout);
+}
+
+export async function getHandoutsByPublisher(
+  publisherSlug: string,
+): Promise<HandoutWithRelations[]> {
+  const rows = await prisma.handout.findMany({
+    where: { publisher: { slug: publisherSlug } },
+    include: handoutInclude,
+    orderBy: handoutOrderByForSort.newest,
+  });
+
+  return rows.map(toHandout);
+}
+
 export async function getReviewsByHandout(handoutId: string): Promise<HandoutReview[]> {
   const rows = await prisma.handoutReview.findMany({
     where: { handoutId, status: "published" },
@@ -532,10 +561,12 @@ export async function getCustomer(): Promise<Customer> {
     },
   });
 
-  const bought = await prisma.orderItem.aggregate({
-    _sum: { quantity: true },
-    where: { order: { customerId: row.id, status: { not: "cancelled" } } },
-  });
+  // Copies bought, over both tables — a handout is a copy too.
+  const sold = { order: { customerId: row.id, status: { not: "cancelled" as const } } };
+  const [bought, handoutsBought] = await Promise.all([
+    prisma.orderItem.aggregate({ _sum: { quantity: true }, where: sold }),
+    prisma.handoutOrderItem.aggregate({ _sum: { quantity: true }, where: sold }),
+  ]);
 
   return {
     id: row.id,
@@ -552,7 +583,7 @@ export async function getCustomer(): Promise<Customer> {
     stats: {
       orders: row._count.orders,
       wishlist: row._count.wishlist + row._count.handoutWishlist,
-      booksBought: bought._sum.quantity ?? 0,
+      copiesBought: (bought._sum.quantity ?? 0) + (handoutsBought._sum.quantity ?? 0),
     },
   };
 }
@@ -942,7 +973,11 @@ async function soldHandoutItems() {
   });
 }
 
-/** `getTopBooks` over the handout lines; the admin handout page reads it. */
+/**
+ * `getTopBooks` over the handout lines. The dashboard, the reports page and
+ * the CSV export read it beside the book list rather than merged into it: a
+ * handout that outsells a book is still listed under its own heading.
+ */
 export async function getTopHandouts() {
   const rows = await soldHandoutItems();
   const totals = new Map<string, { sold: number; revenue: number }>();

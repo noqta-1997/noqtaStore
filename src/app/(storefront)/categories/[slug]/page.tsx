@@ -2,13 +2,21 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { BookCatalogue } from "@/components/book/book-catalogue";
+import { HandoutShelf } from "@/components/handout/handout-shelf";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { PageHeader } from "@/components/ui/page-header";
-import { getCategories, getCategoryBySlug, getPriceBounds, getPublishers, queryBooks } from "@/data";
+import {
+  getCategories,
+  getCategoryBySlug,
+  getPriceBounds,
+  getPublishers,
+  queryBooks,
+  queryHandouts,
+} from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { parseBookQuery, toBookQuery } from "@/lib/book-query";
-import type { SearchParamsRecord } from "@/lib/search-params";
+import { buildQueryString, type SearchParamsRecord } from "@/lib/search-params";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -50,13 +58,21 @@ export default async function CategoryPage({
 
   const parsed = parseBookQuery(await searchParams);
 
-  const [dictionary, categories, publishers, bounds, result] = await Promise.all([
+  /*
+   * The handouts of the category answer to the same filters as its books, on
+   * a shelf under the catalogue: the first ten, and a link to the handouts
+   * listing scoped the same way for the rest.
+   */
+  const [dictionary, categories, publishers, bounds, result, handouts] = await Promise.all([
     getDictionary(locale),
     getCategories(),
     getPublishers(),
     getPriceBounds(),
     queryBooks(toBookQuery(parsed, { category: slug })),
+    queryHandouts(toBookQuery(parsed, { category: slug, page: 1, perPage: 10 })),
   ]);
+
+  const handoutsHref = `/handouts${buildQueryString({ ...parsed.values, category: slug })}`;
 
   return (
     <>
@@ -87,6 +103,19 @@ export default async function CategoryPage({
         basePath={`/categories/${slug}`}
         showCategory={false}
       />
+
+      {handouts.total > 0 ? (
+        <HandoutShelf
+          title={dictionary.categoriesPage.handoutsTitle}
+          subtitle={dictionary.categoriesPage.handoutsSubtitle}
+          handouts={handouts.items}
+          locale={locale}
+          dictionary={dictionary.common}
+          actionHref={handoutsHref}
+          band
+          className="border-t border-line-divider"
+        />
+      ) : null}
     </>
   );
 }

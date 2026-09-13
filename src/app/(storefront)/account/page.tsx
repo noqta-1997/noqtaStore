@@ -47,7 +47,7 @@ export default async function ProfilePage() {
   const stats = [
     { icon: Package, value: customer.stats.orders, label: t.stats.orders },
     { icon: Heart, value: customer.stats.wishlist, label: t.stats.wishlist },
-    { icon: Library, value: customer.stats.booksBought, label: t.stats.books },
+    { icon: Library, value: customer.stats.copiesBought, label: t.stats.copies },
   ];
 
   return (

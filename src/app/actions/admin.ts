@@ -41,21 +41,27 @@ function slugify(value: string, fallback: string) {
 
 /** Storefront pages are cached, so catalogue writes must invalidate them. */
 function revalidateCatalogue() {
-  revalidatePath("/[locale]", "page");
-  revalidatePath("/[locale]/books", "page");
-  revalidatePath("/[locale]/books/[slug]", "page");
-  revalidatePath("/[locale]/categories", "page");
-  revalidatePath("/[locale]/categories/[slug]", "page");
-  revalidatePath("/[locale]/authors", "page");
-  revalidatePath("/[locale]/authors/[slug]", "page");
-  revalidatePath("/[locale]/publishers", "page");
-  revalidatePath("/[locale]/publishers/[slug]", "page");
+  revalidatePath("/", "page");
+  revalidatePath("/books", "page");
+  revalidatePath("/books/[slug]", "page");
+  revalidatePath("/categories", "page");
+  revalidatePath("/categories/[slug]", "page");
+  revalidatePath("/authors", "page");
+  revalidatePath("/authors/[slug]", "page");
+  revalidatePath("/publishers", "page");
+  revalidatePath("/publishers/[slug]", "page");
 }
 
-/** The handout pages are cached the same way; only they list handouts. */
+/**
+ * The handout pages are cached the same way, and the category, author and
+ * publisher pages carry a handouts section under their books.
+ */
 function revalidateHandouts() {
   revalidatePath("/handouts", "page");
   revalidatePath("/handouts/[slug]", "page");
+  revalidatePath("/categories/[slug]", "page");
+  revalidatePath("/authors/[slug]", "page");
+  revalidatePath("/publishers/[slug]", "page");
   revalidatePath("/admin/handouts", "page");
   revalidatePath("/admin/handout-reviews", "page");
 }
@@ -128,7 +134,7 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
   }
 
   revalidateCatalogue();
-  revalidatePath("/[locale]/admin/books", "page");
+  revalidatePath("/admin/books", "page");
   return ok();
 }
 
@@ -141,7 +147,7 @@ export async function deleteBook(bookId: string): Promise<ActionResult> {
   await prisma.book.delete({ where: { id: bookId } });
 
   revalidateCatalogue();
-  revalidatePath("/[locale]/admin/books", "page");
+  revalidatePath("/admin/books", "page");
   return ok();
 }
 
@@ -267,7 +273,7 @@ export async function saveCategory(formData: FormData): Promise<ActionResult> {
   }
 
   revalidateCatalogue();
-  revalidatePath("/[locale]/admin/categories", "page");
+  revalidatePath("/admin/categories", "page");
   return ok();
 }
 
@@ -280,7 +286,7 @@ export async function deleteCategory(categoryId: string): Promise<ActionResult> 
   await prisma.category.delete({ where: { id: categoryId } });
 
   revalidateCatalogue();
-  revalidatePath("/[locale]/admin/categories", "page");
+  revalidatePath("/admin/categories", "page");
   return ok();
 }
 
@@ -317,7 +323,7 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
   }
 
   revalidateCatalogue();
-  revalidatePath("/[locale]/admin/authors", "page");
+  revalidatePath("/admin/authors", "page");
   return ok();
 }
 
@@ -330,7 +336,7 @@ export async function deleteAuthor(authorId: string): Promise<ActionResult> {
   await prisma.author.delete({ where: { id: authorId } });
 
   revalidateCatalogue();
-  revalidatePath("/[locale]/admin/authors", "page");
+  revalidatePath("/admin/authors", "page");
   return ok();
 }
 
@@ -363,7 +369,7 @@ export async function savePublisher(formData: FormData): Promise<ActionResult> {
   }
 
   revalidateCatalogue();
-  revalidatePath("/[locale]/admin/publishers", "page");
+  revalidatePath("/admin/publishers", "page");
   return ok();
 }
 
@@ -376,7 +382,7 @@ export async function deletePublisher(publisherId: string): Promise<ActionResult
   await prisma.publisher.delete({ where: { id: publisherId } });
 
   revalidateCatalogue();
-  revalidatePath("/[locale]/admin/publishers", "page");
+  revalidatePath("/admin/publishers", "page");
   return ok();
 }
 
@@ -488,8 +494,8 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
     revalidateCatalogue();
     revalidateHandouts();
   }
-  revalidatePath("/[locale]/admin/orders", "page");
-  revalidatePath("/[locale]/account/orders", "page");
+  revalidatePath("/admin/orders", "page");
+  revalidatePath("/account/orders", "page");
   return ok();
 }
 
@@ -546,8 +552,8 @@ export async function deleteOrder(orderId: string): Promise<ActionResult> {
     revalidateCatalogue();
     revalidateHandouts();
   }
-  revalidatePath("/[locale]/admin/orders", "page");
-  revalidatePath("/[locale]/account/orders", "page");
+  revalidatePath("/admin/orders", "page");
+  revalidatePath("/account/orders", "page");
   return ok();
 }
 
@@ -568,7 +574,7 @@ export async function setReviewStatus(
     await refreshBookRating(tx, review.bookId);
   });
 
-  revalidatePath("/[locale]/admin/reviews", "page");
+  revalidatePath("/admin/reviews", "page");
   revalidateCatalogue();
   return ok();
 }
@@ -590,7 +596,7 @@ export async function toggleCustomerBlock(customerId: string): Promise<ActionRes
     data: { status: customer.status === "active" ? "blocked" : "active" },
   });
 
-  revalidatePath("/[locale]/admin/customers", "page");
+  revalidatePath("/admin/customers", "page");
   return ok();
 }
 
@@ -640,7 +646,7 @@ export async function saveCoupon(formData: FormData): Promise<ActionResult> {
     return fail("duplicate");
   }
 
-  revalidatePath("/[locale]/admin/coupons", "page");
+  revalidatePath("/admin/coupons", "page");
   return ok();
 }
 
@@ -650,7 +656,7 @@ export async function deleteCoupon(couponId: string): Promise<ActionResult> {
   const removed = await prisma.coupon.deleteMany({ where: { id: couponId } });
   if (!removed.count) return fail("notFound");
 
-  revalidatePath("/[locale]/admin/coupons", "page");
+  revalidatePath("/admin/coupons", "page");
   return ok();
 }
 
@@ -668,7 +674,7 @@ export async function toggleCoupon(couponId: string): Promise<ActionResult> {
     data: { active: !coupon.active },
   });
 
-  revalidatePath("/[locale]/admin/coupons", "page");
+  revalidatePath("/admin/coupons", "page");
   return ok();
 }
 
@@ -688,7 +694,7 @@ export async function setMessageStatus(
   });
   if (!updated.count) return fail("notFound");
 
-  revalidatePath("/[locale]/admin/messages", "page");
+  revalidatePath("/admin/messages", "page");
   return ok();
 }
 
@@ -698,7 +704,7 @@ export async function deleteContactMessage(messageId: string): Promise<ActionRes
   const removed = await prisma.contactMessage.deleteMany({ where: { id: messageId } });
   if (!removed.count) return fail("notFound");
 
-  revalidatePath("/[locale]/admin/messages", "page");
+  revalidatePath("/admin/messages", "page");
   return ok();
 }
 
@@ -708,7 +714,7 @@ export async function removeSubscriber(email: string): Promise<ActionResult> {
   const removed = await prisma.newsletterSubscriber.deleteMany({ where: { email } });
   if (!removed.count) return fail("notFound");
 
-  revalidatePath("/[locale]/admin/messages", "page");
+  revalidatePath("/admin/messages", "page");
   return ok();
 }
 
@@ -775,27 +781,26 @@ export async function saveSettings(formData: FormData): Promise<ActionResult> {
     ),
   );
 
-  revalidatePath("/[locale]/admin/settings", "page");
+  revalidatePath("/admin/settings", "page");
 
   if (section === "shipping") {
-    revalidatePath("/[locale]/cart", "page");
-    revalidatePath("/[locale]/checkout", "page");
+    revalidatePath("/cart", "page");
+    revalidatePath("/checkout", "page");
   }
 
   if (section === "payments") {
-    revalidatePath("/[locale]/checkout", "page");
+    revalidatePath("/checkout", "page");
   }
 
   if (section === "adminNotifications") {
     // The bell lives in the admin layout, so the page alone is not enough.
-    revalidatePath("/[locale]/admin", "layout");
+    revalidatePath("/admin", "layout");
   }
 
   if (section === "store") {
     // The name, tagline and contact lines are baked into the header, footer
     // and page titles of every prerendered storefront page.
-    revalidatePath("/[locale]", "layout");
-    revalidatePath("/", "page");
+    revalidatePath("/", "layout");
   }
 
   return ok();

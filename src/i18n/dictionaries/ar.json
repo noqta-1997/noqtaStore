@@ -362,12 +362,15 @@
     "title": "التصنيفات",
     "subtitle": "رفوف تغطي ما تبحث عنه",
     "browse": "تصفّح التصنيف",
-    "inCategory": "في هذا التصنيف"
+    "inCategory": "في هذا التصنيف",
+    "handoutsTitle": "الملازم",
+    "handoutsSubtitle": "ملازم من هذا التصنيف"
   },
   "authorsPage": {
     "title": "المؤلفون",
     "subtitle": "الأسماء التي تصنع مكتبتنا",
     "booksBy": "كتب المؤلف",
+    "handoutsBy": "ملازم المؤلف",
     "viewProfile": "الملف الكامل",
     "country": "البلد",
     "booksCount": "عدد الكتب"
@@ -376,6 +379,7 @@
     "title": "دور النشر",
     "subtitle": "البيوت التي تصدر عنها كتب المتجر",
     "booksBy": "إصدارات الدار",
+    "handoutsBy": "ملازم الدار",
     "country": "البلد",
     "founded": "سنة التأسيس",
     "booksCount": "عدد الكتب",
@@ -390,7 +394,10 @@
       "description": "تحقّق من الإملاء أو جرّب كلمات أعمّ.",
       "action": "تصفّح كل الكتب"
     },
-    "suggestions": "اقتراحات للبحث"
+    "suggestions": "اقتراحات للبحث",
+    "handoutsTitle": "الملازم",
+    "handoutsSubtitle": "ملازم تطابق بحثك",
+    "handoutsCount": "ملزمة"
   },
   "offersPage": {
     "title": "العروض",
@@ -525,7 +532,7 @@
       "stats": {
         "orders": "طلب",
         "wishlist": "في المفضلة",
-        "books": "كتابًا اشتريته"
+        "copies": "نسخةً اشتريتها"
       }
     },
     "orders": {
