@@ -5,7 +5,7 @@
   },
   "common": {
     "search": "بحث",
-    "searchPlaceholder": "كتاب أو مؤلف…",
+    "searchPlaceholder": "كتاب أو مدرس…",
     "cart": "السلة",
     "wishlist": "المفضلة",
     "account": "حسابي",
@@ -14,7 +14,7 @@
     "close": "إغلاق",
     "addToCart": "أضف إلى السلة",
     "viewAll": "عرض الكل",
-    "by": "تأليف",
+    "by": "إعداد",
     "reviews": "تقييم",
     "off": "خصم",
     "inStock": "متوفر",
@@ -109,7 +109,7 @@
       "inUse": "العنصر مرتبط بسجلات أخرى ولا يمكن حذفه",
       "duplicate": "قيمة مكرّرة — غيّر المُعرّف أو الترقيم الدولي",
       "missingTitle": "الاسم مطلوب باللغتين",
-      "missingRelation": "اختر المؤلف والتصنيف",
+      "missingRelation": "اختر المدرس والتصنيف",
       "missingName": "الاسم مطلوب",
       "notFound": "العنصر غير موجود",
       "selfBlock": "لا يمكنك حظر حسابك",
@@ -134,7 +134,7 @@
     "books": "الكتب",
     "handouts": "الملازم",
     "categories": "التصنيفات",
-    "authors": "المؤلفون",
+    "authors": "المدرسون",
     "publishers": "المطابع والمكتبات",
     "offers": "العروض",
     "about": "من نحن"
@@ -154,7 +154,7 @@
       "featuredLabel": "كتاب الأسبوع",
       "stats": {
         "books": "عنوان متوفر",
-        "authors": "مؤلف",
+        "authors": "مدرس",
         "publishers": "مطبعة ومكتبة"
       }
     },
@@ -196,7 +196,7 @@
       "cta": "تسوّق العرض"
     },
     "authors": {
-      "title": "مؤلفون تحت الضوء",
+      "title": "مدرسون تحت الضوء",
       "subtitle": "أسماء تركت أثرًا في المكتبة العربية",
       "booksCount": "كتاب"
     },
@@ -279,7 +279,7 @@
       "cancel": "إلغاء",
       "pendingNote": "تُنشر المراجعة بعد مراجعتها من فريق المتجر."
     },
-    "aboutAuthor": "عن المؤلف",
+    "aboutAuthor": "عن المدرس",
     "related": "كتب مشابهة",
     "relatedSubtitle": "من التصنيف نفسه"
   },
@@ -354,7 +354,7 @@
       "cancel": "إلغاء",
       "pendingNote": "تُنشر المراجعة بعد مراجعتها من فريق المتجر."
     },
-    "aboutAuthor": "عن المؤلف",
+    "aboutAuthor": "عن المدرس",
     "related": "ملازم مشابهة",
     "relatedSubtitle": "من التصنيف نفسه"
   },
@@ -367,10 +367,10 @@
     "handoutsSubtitle": "ملازم من هذا التصنيف"
   },
   "authorsPage": {
-    "title": "المؤلفون",
+    "title": "المدرسون",
     "subtitle": "الأسماء التي تصنع مكتبتنا",
-    "booksBy": "كتب المؤلف",
-    "handoutsBy": "ملازم المؤلف",
+    "booksBy": "كتب المدرس",
+    "handoutsBy": "ملازم المدرس",
     "viewProfile": "الملف الكامل",
     "country": "البلد",
     "booksCount": "عدد الكتب"
@@ -388,7 +388,7 @@
   "searchPage": {
     "title": "نتائج البحث",
     "resultsFor": "نتائج البحث عن",
-    "placeholder": "اكتب اسم كتاب أو مؤلف…",
+    "placeholder": "اكتب اسم كتاب أو مدرس…",
     "empty": {
       "title": "لم نعثر على نتائج",
       "description": "تحقّق من الإملاء أو جرّب كلمات أعمّ.",
@@ -819,7 +819,7 @@
       "title": "المتجر",
       "about": "من نحن",
       "publishers": "المطابع والمكتبات",
-      "authors": "المؤلفون",
+      "authors": "المدرسون",
       "careers": "الوظائف"
     },
     "contact": {
