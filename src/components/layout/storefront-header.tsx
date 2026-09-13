@@ -57,7 +57,7 @@ export function StorefrontHeader({
         </Container>
       </div>
 
-      <Container className="flex h-18 items-center gap-3">
+      <Container className="flex h-18 items-center gap-2">
         <MobileNav
           items={navItems}
           categories={categoryItems}
@@ -87,7 +87,7 @@ export function StorefrontHeader({
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="inline-block rounded-md px-2 py-2 text-body-md font-medium text-on-surface-variant transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface"
+                  className="inline-block rounded-md px-1.5 py-2 text-body-md font-medium text-on-surface-variant transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface"
                 >
                   {item.label}
                 </Link>
@@ -102,7 +102,7 @@ export function StorefrontHeader({
             label={dictionary.common.search}
             placeholder={dictionary.common.searchPlaceholder}
             compact
-            className="hidden w-48 xl:flex"
+            className="hidden w-40 xl:flex"
           />
 
           <Link
