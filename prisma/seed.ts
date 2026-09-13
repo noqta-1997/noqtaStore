@@ -45,6 +45,10 @@ async function clear() {
   // Children first: the schema cascades, but explicit order keeps the log clear.
   await prisma.orderEvent.deleteMany();
   await prisma.orderItem.deleteMany();
+  await prisma.handoutOrderItem.deleteMany();
+  await prisma.handoutReview.deleteMany();
+  await prisma.handoutWishlistItem.deleteMany();
+  await prisma.handoutCartItem.deleteMany();
   await prisma.order.deleteMany();
   await prisma.review.deleteMany();
   await prisma.wishlistItem.deleteMany();

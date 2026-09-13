@@ -2,6 +2,8 @@ import Link from "next/link";
 
 import { BookCover } from "@/components/book/book-cover";
 import { PriceTag } from "@/components/commerce/price-tag";
+import { HandoutAddToCartButton } from "@/components/handout/handout-add-to-cart-button";
+import { HandoutWishlistButton } from "@/components/handout/handout-wishlist-button";
 import { Badge } from "@/components/ui/badge";
 import { Rating } from "@/components/ui/rating";
 import type { Locale } from "@/i18n/config";
@@ -21,11 +23,8 @@ interface HandoutCardProps {
 }
 
 /**
- * The shelf card for a handout — `BookCard` pointed at `/handouts`.
- *
- * The wishlist heart and the cart button are the one thing missing: both
- * write rows that reference the books table, so they return once the cart
- * and wishlist know about handouts. Everything else on the book card is here.
+ * The shelf card for a handout — `BookCard` pointed at `/handouts`, with the
+ * wishlist heart and the cart button writing to the handout tables.
  */
 export function HandoutCard({
   handout,
@@ -70,6 +69,16 @@ export function HandoutCard({
           ) : null}
           {isSoldOut ? <Badge tone="muted">{dictionary.outOfStock}</Badge> : null}
         </div>
+
+        <HandoutWishlistButton
+          handoutId={handout.id}
+          label={dictionary.wishlist}
+          addedTitle={dictionary.toast.addedToWishlist}
+          removedTitle={dictionary.toast.removedFromWishlist}
+          signInMessage={dictionary.toast.signInRequired}
+          handoutTitle={handout.title[locale]}
+          className="absolute end-2 top-2 z-10 opacity-0 transition-opacity duration-100 ease-fluent group-hover:opacity-100 focus-visible:opacity-100 max-sm:opacity-100"
+        />
       </div>
 
       <span className="text-label-md text-muted">{handout.category.name[locale]}</span>
@@ -99,7 +108,23 @@ export function HandoutCard({
           {dictionary.by} {handout.author.name[locale]}
         </p>
 
-        <Rating value={handout.rating} locale={locale} compact />
+        <div className="flex shrink-0 items-center gap-2">
+          <Rating value={handout.rating} locale={locale} compact />
+
+          <HandoutAddToCartButton
+            handoutId={handout.id}
+            size="sm"
+            iconOnly
+            disabled={isSoldOut}
+            label={dictionary.addToCart}
+            toastTitle={dictionary.toast.addedToCart}
+            toastNote={handout.title[locale]}
+            signInMessage={dictionary.toast.signInRequired}
+            outOfStockMessage={dictionary.outOfStock}
+            failureMessage={dictionary.toast.actionFailed}
+            className="relative z-10 size-9 rounded-full px-0"
+          />
+        </div>
       </div>
     </article>
   );

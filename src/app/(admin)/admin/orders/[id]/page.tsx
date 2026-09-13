@@ -12,7 +12,7 @@ import { OrderSummary } from "@/components/commerce/order-summary";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { getAdminOrderById, getOrderItems } from "@/data";
+import { getAdminOrderById, getOrderHandoutItems, getOrderItems } from "@/data";
 import { ActionForm } from "@/components/ui/action-form";
 import { updateOrderStatus } from "@/app/actions/admin";
 import { defaultLocale } from "@/i18n/config";
@@ -55,10 +55,11 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
     notFound();
   }
 
-  const [dictionary, admin, items] = await Promise.all([
+  const [dictionary, admin, items, handoutItems] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
     getOrderItems(order),
+    getOrderHandoutItems(order),
   ]);
 
   const t = admin.orderDetails;
@@ -140,6 +141,45 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
                           </Link>
                           <span className="block text-label-md text-muted">
                             {item.book.author.name[locale]}
+                          </span>
+                        </span>
+                      </div>
+                    </Td>
+                    <Td className="whitespace-nowrap" data-numeric>
+                      {formatPrice(item.unitPrice, locale)}
+                    </Td>
+                    <Td data-numeric>
+                      {formatNumber(item.quantity, locale)}
+                    </Td>
+                    <Td className="whitespace-nowrap font-semibold" data-numeric>
+                      {formatPrice(item.lineTotal, locale)}
+                    </Td>
+                  </Tr>
+                ))}
+                {handoutItems.map((item) => (
+                  <Tr key={item.handoutId}>
+                    <Td>
+                      <div className="flex items-center gap-3">
+                        <span className="w-9 shrink-0">
+                          <BookCover
+                            title={item.handout.title[locale]}
+                            author={item.handout.author.name[locale]}
+                            seed={item.handout.slug}
+                            src={item.handout.coverUrl}
+                            sizes="2.25rem"
+                            className="rounded-md elevation-sm"
+                            compact
+                          />
+                        </span>
+                        <span className="min-w-0">
+                          <Link
+                            href={`/admin/handouts/${item.handoutId}`}
+                            className="block max-w-56 truncate font-semibold underline-offset-4 hover:underline"
+                          >
+                            {item.handout.title[locale]}
+                          </Link>
+                          <span className="block text-label-md text-muted">
+                            {item.handout.author.name[locale]}
                           </span>
                         </span>
                       </div>

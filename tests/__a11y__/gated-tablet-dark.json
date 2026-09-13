@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-12T21:29:02.085Z",
+  "capturedAt": "2026-09-13T07:33:14.431Z",
   "project": "tablet-dark",
-  "pagesScanned": 16,
+  "pagesScanned": 17,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -137,6 +137,15 @@
       "theme": "dark",
       "project": "tablet-dark",
       "url": "/admin/handouts/new",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-handout-reviews",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "tablet-dark",
+      "url": "/admin/handout-reviews",
       "violations": [],
       "total": 0
     },

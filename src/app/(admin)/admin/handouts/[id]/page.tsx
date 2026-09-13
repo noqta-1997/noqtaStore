@@ -12,10 +12,10 @@ import { HandoutSpecs } from "@/components/handout/handout-specs";
 import { Badge } from "@/components/ui/badge";
 import { buttonStyles } from "@/components/ui/button";
 import { Rating } from "@/components/ui/rating";
-import { getHandoutById } from "@/data";
+import { getHandoutById, getHandoutSales, getReviewsByHandout } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
-import { formatCompactPrice, formatNumber } from "@/lib/format";
+import { formatCompactPrice, formatDate, formatNumber } from "@/lib/format";
 
 interface AdminHandoutPageProps {
   params: Promise<{ id: string }>;
@@ -43,18 +43,15 @@ export default async function AdminHandoutPage({ params }: AdminHandoutPageProps
     notFound();
   }
 
-  const [dictionary, admin] = await Promise.all([
+  const [dictionary, admin, reviews, sales] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
+    getReviewsByHandout(handout.id),
+    getHandoutSales(handout.id),
   ]);
 
   const t = admin.handoutDetails;
-
-  // Orders and reviews do not reference handouts yet, so nothing has been sold
-  // and no review can exist: the two sales counters read zero until the cart
-  // and orders learn about handouts. The rating pair reads the row itself.
-  const sold = 0;
-  const revenue = 0;
+  const { sold, revenue } = sales;
 
   return (
     <>
@@ -149,9 +146,31 @@ export default async function AdminHandoutPage({ params }: AdminHandoutPageProps
       </div>
 
       <Panel title={t.recentReviews} flush>
-        <p className="p-5 text-body-md text-muted">
-          {dictionary.handoutDetails.reviewsSection.empty}
-        </p>
+        {reviews.length ? (
+          <ul className="divide-y divide-line-divider">
+            {reviews.map((review) => (
+              <li key={review.id} className="space-y-1.5 p-5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-sm font-semibold text-on-surface">
+                    {review.authorName}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <Rating value={review.rating} locale={locale} />
+                    <span className="text-label-md text-muted" data-numeric>
+                      {formatDate(review.createdAt, locale)}
+                    </span>
+                  </div>
+                </div>
+                <p className="font-display text-base font-bold">{review.title[locale]}</p>
+                <p className="text-body-md text-on-surface-variant">{review.body[locale]}</p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="p-5 text-body-md text-muted">
+            {dictionary.handoutDetails.reviewsSection.empty}
+          </p>
+        )}
       </Panel>
     </>
   );

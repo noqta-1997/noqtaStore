@@ -7,7 +7,7 @@ import { BookCover } from "@/components/book/book-cover";
 import { OrderSummary } from "@/components/commerce/order-summary";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Surface, surfaceTitleStyles } from "@/components/ui/surface";
-import { getOrderById, getOrderItems } from "@/data";
+import { getOrderById, getOrderHandoutItems, getOrderItems } from "@/data";
 import { PrintButton } from "@/components/ui/print-button";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
@@ -40,9 +40,10 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
     notFound();
   }
 
-  const [dictionary, items] = await Promise.all([
+  const [dictionary, items, handoutItems] = await Promise.all([
     getDictionary(locale),
     getOrderItems(order),
+    getOrderHandoutItems(order),
   ]);
 
   const t = dictionary.account.orderDetails;
@@ -178,6 +179,38 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
                   </Link>
                   <span className="block text-label-md text-muted">
                     {dictionary.common.by} {item.book.author.name[locale]}
+                  </span>
+                  <span className="mt-1 block text-label-sm text-muted" data-numeric>
+                    {formatPrice(item.unitPrice, locale)} × {item.quantity}
+                  </span>
+                </span>
+                <span className="shrink-0 text-body-md font-semibold" data-numeric>
+                  {formatPrice(item.lineTotal, locale)}
+                </span>
+              </li>
+            ))}
+            {handoutItems.map((item) => (
+              <li key={item.handoutId} className="flex items-center gap-4 p-5">
+                <span className="w-14 shrink-0">
+                  <BookCover
+                    title={item.handout.title[locale]}
+                    author={item.handout.author.name[locale]}
+                    seed={item.handout.slug}
+                    src={item.handout.coverUrl}
+                    sizes="3.5rem"
+                    className="border border-line"
+                    compact
+                  />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <Link
+                    href={`/handouts/${item.handout.slug}`}
+                    className="block font-display text-base font-bold underline-offset-4 hover:underline"
+                  >
+                    {item.handout.title[locale]}
+                  </Link>
+                  <span className="block text-label-md text-muted">
+                    {dictionary.common.by} {item.handout.author.name[locale]}
                   </span>
                   <span className="mt-1 block text-label-sm text-muted" data-numeric>
                     {formatPrice(item.unitPrice, locale)} × {item.quantity}

@@ -7,6 +7,7 @@ import {
   FolderTree,
   LayoutDashboard,
   Mail,
+  NotebookPen,
   NotebookText,
   Package,
   PenLine,
@@ -35,6 +36,7 @@ export interface AdminNavLabels {
   orders: string;
   customers: string;
   reviews: string;
+  handoutReviews: string;
   messages: string;
   coupons: string;
   reports: string;
@@ -82,6 +84,7 @@ export function AdminNav({ labels, iconsOnly = false, onNavigate }: AdminNavProp
         { href: `${base}/orders`, label: labels.orders, icon: Package },
         { href: `${base}/customers`, label: labels.customers, icon: Users },
         { href: `${base}/reviews`, label: labels.reviews, icon: Star },
+        { href: `${base}/handout-reviews`, label: labels.handoutReviews, icon: NotebookPen },
         { href: `${base}/messages`, label: labels.messages, icon: Mail },
         { href: `${base}/coupons`, label: labels.coupons, icon: TicketPercent },
       ],

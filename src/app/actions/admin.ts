@@ -14,6 +14,7 @@ import {
 import { getCurrentCustomer } from "@/lib/auth";
 import { isOwner } from "@/lib/owner";
 import { refreshBookRating } from "@/lib/book-rating";
+import { refreshHandoutRating } from "@/lib/handout-rating";
 import { prisma } from "@/lib/prisma";
 import type {
   BookTag,
@@ -56,6 +57,7 @@ function revalidateHandouts() {
   revalidatePath("/handouts", "page");
   revalidatePath("/handouts/[slug]", "page");
   revalidatePath("/admin/handouts", "page");
+  revalidatePath("/admin/handout-reviews", "page");
 }
 
 /* ------------------------------------------------------------------ */
@@ -202,9 +204,31 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
 export async function deleteHandout(handoutId: string): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
-  // No `inUse` guard yet: nothing references a handout until the cart and
-  // orders learn about them.
+  const ordered = await prisma.handoutOrderItem.count({ where: { handoutId } });
+  if (ordered > 0) return fail("inUse");
+
   await prisma.handout.delete({ where: { id: handoutId } });
+
+  revalidateHandouts();
+  return ok();
+}
+
+export async function setHandoutReviewStatus(
+  reviewId: string,
+  status: ReviewStatus,
+): Promise<ActionResult> {
+  if (!(await requireManager())) return fail("forbidden");
+
+  const review = await prisma.handoutReview.findUnique({
+    where: { id: reviewId },
+    select: { handoutId: true },
+  });
+  if (!review) return fail("notFound");
+
+  await prisma.$transaction(async (tx) => {
+    await tx.handoutReview.update({ where: { id: reviewId }, data: { status } });
+    await refreshHandoutRating(tx, review.handoutId);
+  });
 
   revalidateHandouts();
   return ok();
@@ -392,6 +416,7 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
     select: {
       status: true,
       items: { select: { bookId: true, quantity: true } },
+      handoutItems: { select: { handoutId: true, quantity: true } },
     },
   });
   if (!order) return fail("notFound");
@@ -414,20 +439,43 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
       (item) => (onShelf.get(item.bookId) ?? 0) < item.quantity,
     );
     if (short) return fail("outOfStock");
+
+    const handouts = await prisma.handout.findMany({
+      where: { id: { in: order.handoutItems.map((item) => item.handoutId) } },
+      select: { id: true, stock: true },
+    });
+    const handoutsOnShelf = new Map(handouts.map((handout) => [handout.id, handout.stock]));
+
+    const handoutShort = order.handoutItems.some(
+      (item) => (handoutsOnShelf.get(item.handoutId) ?? 0) < item.quantity,
+    );
+    if (handoutShort) return fail("outOfStock");
   }
 
   const stockMoves =
     reclaiming || releasing
-      ? order.items.map((item) =>
-          prisma.book.update({
-            where: { id: item.bookId },
-            data: {
-              stock: reclaiming
-                ? { decrement: item.quantity }
-                : { increment: item.quantity },
-            },
-          }),
-        )
+      ? [
+          ...order.items.map((item) =>
+            prisma.book.update({
+              where: { id: item.bookId },
+              data: {
+                stock: reclaiming
+                  ? { decrement: item.quantity }
+                  : { increment: item.quantity },
+              },
+            }),
+          ),
+          ...order.handoutItems.map((item) =>
+            prisma.handout.update({
+              where: { id: item.handoutId },
+              data: {
+                stock: reclaiming
+                  ? { decrement: item.quantity }
+                  : { increment: item.quantity },
+              },
+            }),
+          ),
+        ]
       : [];
 
   await prisma.$transaction([
@@ -436,7 +484,10 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
     ...stockMoves,
   ]);
 
-  if (stockMoves.length) revalidateCatalogue();
+  if (stockMoves.length) {
+    revalidateCatalogue();
+    revalidateHandouts();
+  }
   revalidatePath("/[locale]/admin/orders", "page");
   revalidatePath("/[locale]/account/orders", "page");
   return ok();
@@ -463,6 +514,7 @@ export async function deleteOrder(orderId: string): Promise<ActionResult> {
     select: {
       status: true,
       items: { select: { bookId: true, quantity: true } },
+      handoutItems: { select: { handoutId: true, quantity: true } },
     },
   });
   if (!order) return fail("notFound");
@@ -480,9 +532,20 @@ export async function deleteOrder(orderId: string): Promise<ActionResult> {
           }),
         )
       : []),
+    ...(releasing
+      ? order.handoutItems.map((item) =>
+          prisma.handout.update({
+            where: { id: item.handoutId },
+            data: { stock: { increment: item.quantity } },
+          }),
+        )
+      : []),
   ]);
 
-  if (releasing) revalidateCatalogue();
+  if (releasing) {
+    revalidateCatalogue();
+    revalidateHandouts();
+  }
   revalidatePath("/[locale]/admin/orders", "page");
   revalidatePath("/[locale]/account/orders", "page");
   return ok();

@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { CartLineRow } from "@/components/commerce/cart-line-row";
 import { OrderSummary } from "@/components/commerce/order-summary";
+import { HandoutCartLineRow } from "@/components/handout/handout-cart-line-row";
 import { Button, buttonStyles } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -11,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { List } from "@/components/ui/list-row";
 import { PageHeader } from "@/components/ui/page-header";
 import { Surface } from "@/components/ui/surface";
-import { getCart, getShippingRules } from "@/data";
+import { getCart, getHandoutCart, getShippingRules } from "@/data";
 import { applyCoupon, clearCoupon } from "@/app/actions/cart";
 import { ActionForm } from "@/components/ui/action-form";
 import { getAppliedCoupon } from "@/lib/coupon";
@@ -33,15 +34,22 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function CartPage({ searchParams }: CartPageProps) {
   const locale = defaultLocale;
 
-  const [dictionary, allLines, shippingRules] = await Promise.all([
+  // The cart has two halves — books and handouts — shown as one list.
+  const [dictionary, allLines, allHandoutLines, shippingRules] = await Promise.all([
     getDictionary(locale),
     getCart(),
+    getHandoutCart(),
     getShippingRules(),
   ]);
-  const lines = isEmptyPreview(await searchParams) ? [] : allLines;
+  const previewEmpty = isEmptyPreview(await searchParams);
+  const lines = previewEmpty ? [] : allLines;
+  const handoutLines = previewEmpty ? [] : allHandoutLines;
+  const hasLines = lines.length > 0 || handoutLines.length > 0;
 
   const t = dictionary.cart;
-  const subtotal = lines.reduce((total, line) => total + line.lineTotal, 0);
+  const subtotal =
+    lines.reduce((total, line) => total + line.lineTotal, 0) +
+    handoutLines.reduce((total, line) => total + line.lineTotal, 0);
   const coupon = await getAppliedCoupon(subtotal);
   const discount = coupon?.discount ?? 0;
   const qualifiesForFreeShipping = subtotal >= shippingRules.freeThreshold;
@@ -51,14 +59,16 @@ export default async function CartPage({ searchParams }: CartPageProps) {
     100,
     Math.round((subtotal / shippingRules.freeThreshold) * 100),
   );
-  const itemsCount = lines.reduce((total, line) => total + line.quantity, 0);
+  const itemsCount =
+    lines.reduce((total, line) => total + line.quantity, 0) +
+    handoutLines.reduce((total, line) => total + line.quantity, 0);
 
   return (
     <>
       <PageHeader
         title={t.title}
         subtitle={
-          lines.length
+          hasLines
             ? `${formatNumber(itemsCount, locale)} ${t.itemsCount}`
             : undefined
         }
@@ -70,7 +80,7 @@ export default async function CartPage({ searchParams }: CartPageProps) {
       />
 
       <Container className="py-8 lg:py-12">
-        {lines.length ? (
+        {hasLines ? (
           <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
             <div className="min-w-0 space-y-4 lg:col-span-8">
               <Surface
@@ -97,6 +107,14 @@ export default async function CartPage({ searchParams }: CartPageProps) {
                 {lines.map((line) => (
                   <CartLineRow
                     key={line.bookId}
+                    line={line}
+                    locale={locale}
+                    dictionary={dictionary.common}
+                  />
+                ))}
+                {handoutLines.map((line) => (
+                  <HandoutCartLineRow
+                    key={line.handoutId}
                     line={line}
                     locale={locale}
                     dictionary={dictionary.common}

@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-12T21:24:57.182Z",
+  "capturedAt": "2026-09-13T07:28:52.724Z",
   "project": "mobile-light",
-  "pagesScanned": 16,
+  "pagesScanned": 17,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -137,6 +137,15 @@
       "theme": "light",
       "project": "mobile-light",
       "url": "/admin/handouts/new",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-handout-reviews",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/admin/handout-reviews",
       "violations": [],
       "total": 0
     },

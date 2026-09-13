@@ -209,9 +209,13 @@ model Handout {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  author    Author    @relation(fields: [authorId], references: [id])
-  category  Category  @relation(fields: [categoryId], references: [id])
-  publisher Publisher @relation(fields: [publisherId], references: [id])
+  author        Author                @relation(fields: [authorId], references: [id])
+  category      Category              @relation(fields: [categoryId], references: [id])
+  publisher     Publisher             @relation(fields: [publisherId], references: [id])
+  reviews       HandoutReview[]
+  orderItems    HandoutOrderItem[]
+  wishlistItems HandoutWishlistItem[]
+  cartItems     HandoutCartItem[]
 
   @@index([categoryId])
   @@index([authorId])
@@ -251,6 +255,10 @@ model Customer {
   reviews   Review[]
   wishlist  WishlistItem[]
   cart      CartItem[]
+
+  handoutReviews  HandoutReview[]
+  handoutWishlist HandoutWishlistItem[]
+  handoutCart     HandoutCartItem[]
 
   @@map("customers")
 }
@@ -308,6 +316,8 @@ model Order {
   items    OrderItem[]
   timeline OrderEvent[]
 
+  handoutItems HandoutOrderItem[]
+
   @@index([customerId])
   @@index([status])
   @@index([createdAt])
@@ -340,6 +350,24 @@ model OrderEvent {
 
   @@index([orderId])
   @@map("order_events")
+}
+
+/// An order line for a handout. Orders hold both kinds of line side by side;
+/// the two tables are kept apart because the two catalogues are.
+model HandoutOrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  handoutId String
+  quantity  Int    @default(1)
+  /// Price at the moment of ordering, not the current catalogue price.
+  unitPrice Int
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  handout Handout @relation(fields: [handoutId], references: [id])
+
+  @@index([orderId])
+  @@index([handoutId])
+  @@map("handout_order_items")
 }
 
 // ------------------------------------------------------------------
@@ -389,6 +417,55 @@ model CartItem {
 
   @@id([customerId, bookId])
   @@map("cart_items")
+}
+
+// ------------------------------------------------------------------
+// The same three, for handouts
+// ------------------------------------------------------------------
+
+model HandoutReview {
+  id         String       @id @default(cuid())
+  handoutId  String
+  customerId String
+  rating     Int
+  title      String
+  body       String
+  status     ReviewStatus @default(pending)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  handout  Handout  @relation(fields: [handoutId], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  /// One review per handout per reader.
+  @@unique([handoutId, customerId])
+  @@index([status])
+  @@map("handout_reviews")
+}
+
+model HandoutWishlistItem {
+  customerId String
+  handoutId  String
+  createdAt  DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  handout  Handout  @relation(fields: [handoutId], references: [id], onDelete: Cascade)
+
+  @@id([customerId, handoutId])
+  @@map("handout_wishlist_items")
+}
+
+model HandoutCartItem {
+  customerId String
+  handoutId  String
+  quantity   Int      @default(1)
+  updatedAt  DateTime @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  handout  Handout  @relation(fields: [handoutId], references: [id], onDelete: Cascade)
+
+  @@id([customerId, handoutId])
+  @@map("handout_cart_items")
 }
 
 // ------------------------------------------------------------------

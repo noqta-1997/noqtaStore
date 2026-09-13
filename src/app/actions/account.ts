@@ -10,6 +10,7 @@ import {
   type ActionResult,
 } from "@/lib/action-result";
 import { refreshBookRating } from "@/lib/book-rating";
+import { refreshHandoutRating } from "@/lib/handout-rating";
 import { getCurrentCustomer } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -177,5 +178,58 @@ export async function submitReview(formData: FormData): Promise<ActionResult> {
 
   revalidatePath("/[locale]/account/reviews", "page");
   revalidatePath("/[locale]/admin/reviews", "page");
+  return ok();
+}
+
+/* ------------------------------------------------------------------ */
+/* Handout reviews — the two review writes over the handout table      */
+/* ------------------------------------------------------------------ */
+
+export async function deleteOwnHandoutReview(reviewId: string): Promise<ActionResult> {
+  const customerId = await requireCustomerId();
+  if (!customerId) return fail("unauthenticated");
+
+  const review = await prisma.handoutReview.findFirst({
+    where: { id: reviewId, customerId },
+    select: { handoutId: true },
+  });
+
+  if (!review) return fail("notFound");
+
+  await prisma.$transaction(async (tx) => {
+    await tx.handoutReview.delete({ where: { id: reviewId } });
+    await refreshHandoutRating(tx, review.handoutId);
+  });
+
+  revalidatePath("/account/reviews");
+  return ok();
+}
+
+/** A reader's own handout review; `pending` until the moderation queue decides. */
+export async function submitHandoutReview(formData: FormData): Promise<ActionResult> {
+  const customerId = await requireCustomerId();
+  if (!customerId) return fail("unauthenticated");
+
+  const handoutId = text(formData, "handoutId");
+  const rating = Number(text(formData, "rating"));
+  const title = text(formData, "title");
+  const body = text(formData, "body");
+
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return fail("invalidRating");
+  }
+  if (!handoutId || !title || !body) return fail("missingReview");
+
+  const existing = await prisma.handoutReview.findUnique({
+    where: { handoutId_customerId: { handoutId, customerId } },
+  });
+  if (existing) return fail("alreadyReviewed");
+
+  await prisma.handoutReview.create({
+    data: { handoutId, customerId, rating, title, body },
+  });
+
+  revalidatePath("/account/reviews");
+  revalidatePath("/admin/handout-reviews");
   return ok();
 }

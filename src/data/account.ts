@@ -61,7 +61,8 @@ export const cartLines: CartLine[] = [
 
 export const wishlistBookIds = ["b1", "b7", "b9", "b23", "b24", "b28"];
 
-export const orders: Order[] = [
+// Seed shapes from before handouts existed: these orders carry book lines only.
+export const orders: Omit<Order, "handoutItems">[] = [
   {
     id: "o1",
     reference: "NQ-2026-4187",

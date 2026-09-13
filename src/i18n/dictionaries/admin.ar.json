@@ -17,6 +17,7 @@
     "orders": "الطلبات",
     "customers": "العملاء",
     "reviews": "المراجعات",
+    "handoutReviews": "مراجعات الملازم",
     "messages": "الرسائل",
     "coupons": "أكواد الخصم",
     "reports": "التقارير",
@@ -281,6 +282,29 @@
     },
     "viewInStore": "عرض في المتجر",
     "recentReviews": "أحدث المراجعات"
+  },
+  "handoutReviews": {
+    "title": "مراجعات الملازم",
+    "subtitle": "مراجعات القُرّاء بانتظار المعالجة",
+    "searchPlaceholder": "ابحث باسم القارئ أو الملزمة…",
+    "table": {
+      "handout": "الملزمة",
+      "reviewer": "القارئ",
+      "rating": "التقييم",
+      "review": "المراجعة",
+      "date": "التاريخ"
+    },
+    "statuses": {
+      "pending": "بانتظار المراجعة",
+      "published": "منشورة",
+      "rejected": "مرفوضة"
+    },
+    "approve": "نشر",
+    "reject": "رفض",
+    "empty": {
+      "title": "لا توجد مراجعات",
+      "description": "لا شيء بانتظار المعالجة في هذه الحالة."
+    }
   },
   "categories": {
     "title": "إدارة التصنيفات",

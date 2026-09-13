@@ -5,10 +5,10 @@ import Link from "next/link";
 import { BookCover } from "@/components/book/book-cover";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { deleteOwnReview } from "@/app/actions/account";
+import { deleteOwnHandoutReview, deleteOwnReview } from "@/app/actions/account";
 import { IconButton } from "@/components/ui/icon-button";
 import { Rating } from "@/components/ui/rating";
-import { getCustomerReviews } from "@/data";
+import { getCustomerHandoutReviews, getCustomerReviews } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { formatDate, formatNumber } from "@/lib/format";
@@ -37,15 +37,18 @@ export default async function MyReviewsPage({
 }: MyReviewsPageProps) {
   const locale = defaultLocale;
 
-  const [dictionary, allReviews] = await Promise.all([
+  const [dictionary, allReviews, allHandoutReviews] = await Promise.all([
     getDictionary(locale),
     getCustomerReviews(),
+    getCustomerHandoutReviews(),
   ]);
-  const reviews = isEmptyPreview(await searchParams) ? [] : allReviews;
+  const previewEmpty = isEmptyPreview(await searchParams);
+  const reviews = previewEmpty ? [] : allReviews;
+  const handoutReviews = previewEmpty ? [] : allHandoutReviews;
 
   const t = dictionary.account.reviews;
 
-  if (!reviews.length) {
+  if (!reviews.length && !handoutReviews.length) {
     return (
       <EmptyState
         icon={MessageSquareQuote}
@@ -62,7 +65,9 @@ export default async function MyReviewsPage({
       <header className="space-y-1">
         <h2 className="text-headline-md">{t.title}</h2>
         <p className="text-body-md text-muted">
-          <span data-numeric>{formatNumber(reviews.length, locale)}</span>{" "}
+          <span data-numeric>
+            {formatNumber(reviews.length + handoutReviews.length, locale)}
+          </span>{" "}
           {t.itemsCount} — {t.subtitle}
         </p>
       </header>
@@ -132,6 +137,86 @@ export default async function MyReviewsPage({
                     action={deleteOwnReview.bind(null, review.id)}
                     fallbackError={dictionary.common.toast.actionFailed}
                     itemName={review.book.title[locale]}
+                    labels={{
+                      title: dictionary.common.confirm.deleteTitle,
+                      description: dictionary.common.confirm.deleteDescription,
+                      confirm: dictionary.common.confirm.confirm,
+                      cancel: dictionary.common.confirm.cancel,
+                      done: dictionary.common.toast.deleted,
+                      trigger: dictionary.common.remove,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </li>
+        ))}
+
+        {/* The reader's handout reviews, in the same card, after the books. */}
+        {handoutReviews.map((review) => (
+          <li key={review.id} className="rounded-xl border border-line bg-card p-4 sm:p-5">
+            <div className="flex gap-4">
+              <Link
+                href={`/handouts/${review.handout.slug}`}
+                className="w-16 shrink-0 sm:w-20"
+                aria-label={review.handout.title[locale]}
+              >
+                <BookCover
+                  title={review.handout.title[locale]}
+                  author={review.handout.author.name[locale]}
+                  seed={review.handout.slug}
+                  src={review.handout.coverUrl}
+                  sizes="5rem"
+                  className="border border-line"
+                />
+              </Link>
+
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <span className="label-mono block text-muted">{t.onHandout}</span>
+                    <Link
+                      href={`/handouts/${review.handout.slug}`}
+                      className="block font-display text-base font-bold underline-offset-4 hover:underline"
+                    >
+                      {review.handout.title[locale]}
+                    </Link>
+                  </div>
+
+                  <span
+                    className={cn(
+                      "label-mono inline-flex border px-2 py-1",
+                      statusTones[review.status],
+                    )}
+                  >
+                    {t.statuses[review.status]}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <Rating value={review.rating} locale={locale} />
+                  <span className="text-label-sm text-muted" data-numeric>
+                    {formatDate(review.createdAt, locale)}
+                  </span>
+                </div>
+
+                <div>
+                  <p className="font-display text-base font-bold text-on-surface">
+                    {review.title[locale]}
+                  </p>
+                  <p className="text-body-md leading-relaxed text-on-surface-variant">
+                    {review.body[locale]}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-1 border-t border-line-divider pt-3">
+                  <IconButton variant="subtle" label={dictionary.common.edit}>
+                    <Pencil aria-hidden className="size-4" strokeWidth={1.75} />
+                  </IconButton>
+                  <ConfirmDialog
+                    action={deleteOwnHandoutReview.bind(null, review.id)}
+                    fallbackError={dictionary.common.toast.actionFailed}
+                    itemName={review.handout.title[locale]}
                     labels={{
                       title: dictionary.common.confirm.deleteTitle,
                       description: dictionary.common.confirm.deleteDescription,

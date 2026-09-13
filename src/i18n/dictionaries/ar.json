@@ -563,6 +563,8 @@
       "title": "المفضلة",
       "subtitle": "الكتب التي حفظتها للرجوع إليها",
       "itemsCount": "كتاب محفوظ",
+      "handoutsTitle": "الملازم المحفوظة",
+      "handoutsCount": "ملزمة محفوظة",
       "moveAllToCart": "أضف الكل إلى السلة",
       "empty": {
         "title": "قائمة المفضلة فارغة",
@@ -598,6 +600,7 @@
       "subtitle": "ما كتبته عن الكتب التي قرأتها",
       "itemsCount": "مراجعة",
       "onBook": "عن كتاب",
+      "onHandout": "عن ملزمة",
       "statuses": {
         "pending": "بانتظار المراجعة",
         "published": "منشورة",

@@ -3,8 +3,9 @@ import type { Metadata } from "next";
 
 import { BookGrid } from "@/components/book/book-grid";
 import { AddAllToCartButton } from "@/components/commerce/add-all-to-cart-button";
+import { HandoutGrid } from "@/components/handout/handout-grid";
 import { EmptyState } from "@/components/ui/empty-state";
-import { getWishlist } from "@/data";
+import { getHandoutWishlist, getWishlist } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { formatNumber } from "@/lib/format";
@@ -25,15 +26,18 @@ export default async function WishlistPage({
 }: WishlistPageProps) {
   const locale = defaultLocale;
 
-  const [dictionary, allBooks] = await Promise.all([
+  const [dictionary, allBooks, allHandouts] = await Promise.all([
     getDictionary(locale),
     getWishlist(),
+    getHandoutWishlist(),
   ]);
-  const books = isEmptyPreview(await searchParams) ? [] : allBooks;
+  const previewEmpty = isEmptyPreview(await searchParams);
+  const books = previewEmpty ? [] : allBooks;
+  const handouts = previewEmpty ? [] : allHandouts;
 
   const t = dictionary.account.wishlist;
 
-  if (!books.length) {
+  if (!books.length && !handouts.length) {
     return (
       <EmptyState
         icon={Heart}
@@ -51,8 +55,19 @@ export default async function WishlistPage({
         <div className="space-y-1">
           <h2 className="text-headline-md">{t.title}</h2>
           <p className="text-body-md text-muted">
-            <span data-numeric>{formatNumber(books.length, locale)}</span>{" "}
-            {t.itemsCount}
+            {books.length ? (
+              <>
+                <span data-numeric>{formatNumber(books.length, locale)}</span>{" "}
+                {t.itemsCount}
+              </>
+            ) : null}
+            {books.length && handouts.length ? " · " : null}
+            {handouts.length ? (
+              <>
+                <span data-numeric>{formatNumber(handouts.length, locale)}</span>{" "}
+                {t.handoutsCount}
+              </>
+            ) : null}
           </p>
         </div>
 
@@ -63,13 +78,28 @@ export default async function WishlistPage({
         />
       </header>
 
-      <BookGrid
-        books={books}
-        locale={locale}
-        dictionary={dictionary.common}
-        columns="grid-cols-2 sm:grid-cols-3 xl:grid-cols-4"
-        priority
-      />
+      {books.length ? (
+        <BookGrid
+          books={books}
+          locale={locale}
+          dictionary={dictionary.common}
+          columns="grid-cols-2 sm:grid-cols-3 xl:grid-cols-4"
+          priority
+        />
+      ) : null}
+
+      {handouts.length ? (
+        <section className="space-y-4">
+          <h3 className="text-headline-md">{t.handoutsTitle}</h3>
+          <HandoutGrid
+            handouts={handouts}
+            locale={locale}
+            dictionary={dictionary.common}
+            columns="grid-cols-2 sm:grid-cols-3 xl:grid-cols-4"
+            priority={!books.length}
+          />
+        </section>
+      ) : null}
     </div>
   );
 }

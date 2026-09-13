@@ -4,6 +4,8 @@ import {
   toBook,
   toCategoryWithCount,
   toHandout,
+  toHandoutReviewWithAuthor,
+  toHandoutReviewWithStatus,
   toOrder,
   toPublisher,
   toReviewWithAuthor,
@@ -23,11 +25,14 @@ import type {
   NewsletterSubscriber,
   BookWithRelations,
   CartLineWithBook,
+  CartLineWithHandout,
   Category,
   CoverType,
   Customer,
   CustomerStatus,
   CustomerSummary,
+  HandoutReview,
+  HandoutReviewWithStatus,
   HandoutWithRelations,
   Order,
   OrderStatus,
@@ -369,13 +374,19 @@ export interface HandoutQueryResult {
   pageCount: number;
 }
 
-const handoutOrderByForSort: Record<SortKey, Prisma.HandoutOrderByWithRelationInput> = {
-  relevance: { reviewsCount: "desc" },
-  popular: { reviewsCount: "desc" },
-  newest: { createdAt: "desc" },
-  priceAsc: { price: "asc" },
-  priceDesc: { price: "desc" },
-  rating: { rating: "desc" },
+/*
+ * Every key breaks ties on `createdAt`. Three seeded handouts with no reviews
+ * yet all sort equal on the default key, and Postgres returns equal rows in
+ * whatever order it last touched them — the listing reshuffled after a review
+ * was published and withdrawn. The book map has no such tie in its seed data.
+ */
+const handoutOrderByForSort: Record<SortKey, Prisma.HandoutOrderByWithRelationInput[]> = {
+  relevance: [{ reviewsCount: "desc" }, { createdAt: "desc" }],
+  popular: [{ reviewsCount: "desc" }, { createdAt: "desc" }],
+  newest: [{ createdAt: "desc" }],
+  priceAsc: [{ price: "asc" }, { createdAt: "desc" }],
+  priceDesc: [{ price: "desc" }, { createdAt: "desc" }],
+  rating: [{ rating: "desc" }, { createdAt: "desc" }],
 };
 
 function handoutWhere(query: HandoutQuery): Prisma.HandoutWhereInput {
@@ -471,6 +482,16 @@ export async function getRelatedHandouts(
   return rows.map(toHandout);
 }
 
+export async function getReviewsByHandout(handoutId: string): Promise<HandoutReview[]> {
+  const rows = await prisma.handoutReview.findMany({
+    where: { handoutId, status: "published" },
+    include: { customer: { select: { name: true } } },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return rows.map(toHandoutReviewWithAuthor);
+}
+
 export async function getReviewsByBook(bookId: string): Promise<Review[]> {
   const rows = await prisma.review.findMany({
     where: { bookId, status: "published" },
@@ -507,7 +528,7 @@ export async function getCustomer(): Promise<Customer> {
     where: { id: await currentCustomerId() },
     include: {
       addresses: { orderBy: { isDefault: "desc" } },
-      _count: { select: { orders: true, wishlist: true } },
+      _count: { select: { orders: true, wishlist: true, handoutWishlist: true } },
     },
   });
 
@@ -530,7 +551,7 @@ export async function getCustomer(): Promise<Customer> {
     addresses: row.addresses.map(toAddress),
     stats: {
       orders: row._count.orders,
-      wishlist: row._count.wishlist,
+      wishlist: row._count.wishlist + row._count.handoutWishlist,
       booksBought: bought._sum.quantity ?? 0,
     },
   };
@@ -556,30 +577,55 @@ export async function getCart(): Promise<CartLineWithBook[]> {
   });
 }
 
+/** The handout half of the cart; the cart page lists both halves together. */
+export async function getHandoutCart(): Promise<CartLineWithHandout[]> {
+  const customerId = await optionalCustomerId();
+  if (!customerId) return [];
+
+  const rows = await prisma.handoutCartItem.findMany({
+    where: { customerId },
+    include: { handout: { include: handoutInclude } },
+  });
+
+  return rows.map((row) => {
+    const handout = toHandout(row.handout);
+    return {
+      handoutId: row.handoutId,
+      quantity: row.quantity,
+      handout,
+      lineTotal: handout.price * row.quantity,
+    };
+  });
+}
+
 /** Just the number the header badge shows; cheap enough to call per request. */
 export async function getCartCount(): Promise<number> {
   const customerId = await optionalCustomerId();
   if (!customerId) return 0;
 
-  const total = await prisma.cartItem.aggregate({
-    _sum: { quantity: true },
-    where: { customerId },
-  });
+  const [books, handouts] = await Promise.all([
+    prisma.cartItem.aggregate({ _sum: { quantity: true }, where: { customerId } }),
+    prisma.handoutCartItem.aggregate({ _sum: { quantity: true }, where: { customerId } }),
+  ]);
 
-  return total._sum.quantity ?? 0;
+  return (books._sum.quantity ?? 0) + (handouts._sum.quantity ?? 0);
 }
 
-/** The saved book ids, for the hearts the catalogue renders statically. */
+/**
+ * The saved ids, for the hearts the catalogue renders statically. Books and
+ * handouts are listed together: their ids never collide, so every heart on a
+ * page reads one set.
+ */
 export async function getWishlistIds(): Promise<string[]> {
   const customerId = await optionalCustomerId();
   if (!customerId) return [];
 
-  const rows = await prisma.wishlistItem.findMany({
-    where: { customerId },
-    select: { bookId: true },
-  });
+  const [books, handouts] = await Promise.all([
+    prisma.wishlistItem.findMany({ where: { customerId }, select: { bookId: true } }),
+    prisma.handoutWishlistItem.findMany({ where: { customerId }, select: { handoutId: true } }),
+  ]);
 
-  return rows.map((row) => row.bookId);
+  return [...books.map((row) => row.bookId), ...handouts.map((row) => row.handoutId)];
 }
 
 export async function getWishlist(): Promise<BookWithRelations[]> {
@@ -595,10 +641,23 @@ export async function getWishlist(): Promise<BookWithRelations[]> {
   return rows.map((row) => toBook(row.book));
 }
 
+export async function getHandoutWishlist(): Promise<HandoutWithRelations[]> {
+  const customerId = await optionalCustomerId();
+  if (!customerId) return [];
+
+  const rows = await prisma.handoutWishlistItem.findMany({
+    where: { customerId },
+    include: { handout: { include: handoutInclude } },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return rows.map((row) => toHandout(row.handout));
+}
+
 export async function getOrders(): Promise<Order[]> {
   const rows = await prisma.order.findMany({
     where: { customerId: await currentCustomerId() },
-    include: { items: true, timeline: true },
+    include: { items: true, handoutItems: true, timeline: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -612,7 +671,7 @@ export async function getOrderById(id: string): Promise<Order | undefined> {
       customerId: await currentCustomerId(),
       OR: [{ id }, { reference: id }],
     },
-    include: { items: true, timeline: true },
+    include: { items: true, handoutItems: true, timeline: true },
   });
 
   return row ? toOrder(row) : undefined;
@@ -634,6 +693,22 @@ export async function getOrderItems(order: Order) {
   }));
 }
 
+/** The handout lines of an order, joined the same way. */
+export async function getOrderHandoutItems(order: Order) {
+  const rows = await prisma.handoutOrderItem.findMany({
+    where: { orderId: order.id },
+    include: { handout: { include: handoutInclude } },
+  });
+
+  return rows.map((row) => ({
+    handoutId: row.handoutId,
+    quantity: row.quantity,
+    unitPrice: row.unitPrice,
+    handout: toHandout(row.handout),
+    lineTotal: row.unitPrice * row.quantity,
+  }));
+}
+
 /** The signed-in reader's own reviews, joined with their books. */
 export async function getCustomerReviews() {
   const rows = await prisma.review.findMany({
@@ -648,6 +723,23 @@ export async function getCustomerReviews() {
   return rows.map((row) => ({
     ...toReviewWithStatus(row),
     book: toBook(row.book),
+  }));
+}
+
+/** The signed-in reader's own handout reviews, joined with their handouts. */
+export async function getCustomerHandoutReviews() {
+  const rows = await prisma.handoutReview.findMany({
+    where: { customerId: await currentCustomerId() },
+    include: {
+      customer: { select: { name: true } },
+      handout: { include: handoutInclude },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return rows.map((row) => ({
+    ...toHandoutReviewWithStatus(row),
+    handout: toHandout(row.handout),
   }));
 }
 
@@ -745,6 +837,13 @@ const reviewAdminSort: Record<string, Prisma.ReviewOrderByWithRelationInput> = {
   "rating-desc": { rating: "desc" },
 };
 
+const handoutReviewAdminSort: Record<string, Prisma.HandoutReviewOrderByWithRelationInput> = {
+  "created-asc": { createdAt: "asc" },
+  "created-desc": { createdAt: "desc" },
+  "rating-asc": { rating: "asc" },
+  "rating-desc": { rating: "desc" },
+};
+
 function paginationOf(total: number, query: AdminListQuery, fallback = 10) {
   const perPage = query.perPage ?? fallback;
   const pageCount = Math.max(1, Math.ceil(total / perPage));
@@ -830,8 +929,68 @@ export async function getTopBooks() {
   });
 }
 
+/** Handout lines of non-cancelled orders — the handout half of the sales. */
+async function soldHandoutItems() {
+  return prisma.handoutOrderItem.findMany({
+    where: { order: { status: { not: "cancelled" } } },
+    select: {
+      quantity: true,
+      unitPrice: true,
+      handoutId: true,
+      handout: { select: { categoryId: true } },
+    },
+  });
+}
+
+/** `getTopBooks` over the handout lines; the admin handout page reads it. */
+export async function getTopHandouts() {
+  const rows = await soldHandoutItems();
+  const totals = new Map<string, { sold: number; revenue: number }>();
+
+  for (const row of rows) {
+    const entry = totals.get(row.handoutId) ?? { sold: 0, revenue: 0 };
+    entry.sold += row.quantity;
+    entry.revenue += row.quantity * row.unitPrice;
+    totals.set(row.handoutId, entry);
+  }
+
+  const top = [...totals.entries()].sort((a, b) => b[1].sold - a[1].sold).slice(0, 5);
+
+  const handouts = await prisma.handout.findMany({
+    where: { id: { in: top.map(([handoutId]) => handoutId) } },
+    include: handoutInclude,
+  });
+
+  return top.flatMap(([handoutId, value]) => {
+    const handout = handouts.find((entry) => entry.id === handoutId);
+    return handout
+      ? [{ handoutId, sold: value.sold, revenue: value.revenue, handout: toHandout(handout) }]
+      : [];
+  });
+}
+
+/** Sold copies and revenue of one handout, for its admin page. */
+export async function getHandoutSales(handoutId: string) {
+  const rows = await prisma.handoutOrderItem.findMany({
+    where: { handoutId, order: { status: { not: "cancelled" } } },
+    select: { quantity: true, unitPrice: true },
+  });
+
+  return rows.reduce(
+    (totals, row) => ({
+      sold: totals.sold + row.quantity,
+      revenue: totals.revenue + row.quantity * row.unitPrice,
+    }),
+    { sold: 0, revenue: 0 },
+  );
+}
+
 export async function getCategoryShares() {
-  const [rows, categories] = await Promise.all([soldItems(), getCategories()]);
+  const [rows, handoutRows, categories] = await Promise.all([
+    soldItems(),
+    soldHandoutItems(),
+    getCategories(),
+  ]);
 
   const totals = new Map<string, number>();
   let grandTotal = 0;
@@ -839,6 +998,16 @@ export async function getCategoryShares() {
   for (const row of rows) {
     const value = row.quantity * row.unitPrice;
     totals.set(row.book.categoryId, (totals.get(row.book.categoryId) ?? 0) + value);
+    grandTotal += value;
+  }
+
+  // Handouts sell under the same categories, so their revenue joins the share.
+  for (const row of handoutRows) {
+    const value = row.quantity * row.unitPrice;
+    totals.set(
+      row.handout.categoryId,
+      (totals.get(row.handout.categoryId) ?? 0) + value,
+    );
     grandTotal += value;
   }
 
@@ -979,7 +1148,7 @@ export async function getAdminOrders(query: AdminListQuery = {}) {
 
   const rows = await prisma.order.findMany({
     where,
-    include: { items: true, timeline: true, customer: true },
+    include: { items: true, handoutItems: true, timeline: true, customer: true },
     orderBy: adminOrderBy(orderAdminSort, query.sort, { createdAt: "desc" }),
     skip,
     take: perPage,
@@ -1005,7 +1174,7 @@ export async function getAdminOrders(query: AdminListQuery = {}) {
 export async function getAdminOrderById(id: string) {
   const row = await prisma.order.findUnique({
     where: { id },
-    include: { items: true, timeline: true, customer: true },
+    include: { items: true, handoutItems: true, timeline: true, customer: true },
   });
 
   if (!row) return undefined;
@@ -1107,7 +1276,7 @@ export async function getCustomerCounts() {
 export async function getOrdersByCustomer(customerId: string) {
   const rows = await prisma.order.findMany({
     where: { customerId },
-    include: { items: true, timeline: true },
+    include: { items: true, handoutItems: true, timeline: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -1147,6 +1316,51 @@ export async function getAdminReviews(query: AdminListQuery = {}) {
 
 export async function getReviewCounts() {
   const grouped = await prisma.review.groupBy({ by: ["status"], _count: { _all: true } });
+  const byStatus = new Map(grouped.map((row) => [row.status, row._count._all]));
+
+  return {
+    all: grouped.reduce((total, row) => total + row._count._all, 0),
+    pending: byStatus.get("pending") ?? 0,
+    published: byStatus.get("published") ?? 0,
+    rejected: byStatus.get("rejected") ?? 0,
+  };
+}
+
+/** The handout moderation queue — `getAdminReviews` over the other table. */
+export async function getAdminHandoutReviews(query: AdminListQuery = {}) {
+  const where: Prisma.HandoutReviewWhereInput = {};
+
+  if (query.status && reviewStatuses.includes(query.status as ReviewStatus)) {
+    where.status = query.status as ReviewStatus;
+  }
+  if (query.q?.trim()) {
+    const term = query.q.trim();
+    where.OR = [
+      { customer: { name: { contains: term, mode: "insensitive" } } },
+      { handout: { titleAr: { contains: term, mode: "insensitive" } } },
+    ];
+  }
+
+  const total = await prisma.handoutReview.count({ where });
+  const { perPage, pageCount, page, skip } = paginationOf(total, query);
+
+  const rows = await prisma.handoutReview.findMany({
+    where,
+    include: { customer: { select: { name: true } }, handout: true },
+    orderBy: adminOrderBy(handoutReviewAdminSort, query.sort, { createdAt: "desc" }),
+    skip,
+    take: perPage,
+  });
+
+  const items: HandoutReviewWithStatus[] = rows.map(toHandoutReviewWithStatus);
+  return { items, total, page, pageCount };
+}
+
+export async function getHandoutReviewCounts() {
+  const grouped = await prisma.handoutReview.groupBy({
+    by: ["status"],
+    _count: { _all: true },
+  });
   const byStatus = new Map(grouped.map((row) => [row.status, row._count._all]));
 
   return {
@@ -1484,7 +1698,16 @@ export async function getAdminNotifications(): Promise<{
   const settings = await getStoreSettings();
   const wants = (key: string) => settings[key] !== "false";
 
-  const [orders, reviews, books, orderTotal, reviewTotal, stockTotal] =
+  const [
+    orders,
+    reviews,
+    handoutReviews,
+    books,
+    orderTotal,
+    reviewTotal,
+    handoutReviewTotal,
+    stockTotal,
+  ] =
     await Promise.all([
       wants("notifyOrders")
         ? prisma.order.findMany({
@@ -1505,6 +1728,17 @@ export async function getAdminNotifications(): Promise<{
             take: NOTIFICATIONS_PER_KIND,
           })
         : [],
+      wants("notifyReviews")
+        ? prisma.handoutReview.findMany({
+            where: { status: "pending" },
+            include: {
+              customer: { select: { name: true } },
+              handout: { select: { titleAr: true } },
+            },
+            orderBy: { createdAt: "desc" },
+            take: NOTIFICATIONS_PER_KIND,
+          })
+        : [],
       wants("notifyStock")
         ? prisma.book.findMany({
             where: { stock: { lte: LOW_STOCK_THRESHOLD } },
@@ -1517,6 +1751,9 @@ export async function getAdminNotifications(): Promise<{
         : 0,
       wants("notifyReviews")
         ? prisma.review.count({ where: { status: "pending" } })
+        : 0,
+      wants("notifyReviews")
+        ? prisma.handoutReview.count({ where: { status: "pending" } })
         : 0,
       wants("notifyStock")
         ? prisma.book.count({ where: { stock: { lte: LOW_STOCK_THRESHOLD } } })
@@ -1540,6 +1777,14 @@ export async function getAdminNotifications(): Promise<{
       href: `/admin/reviews?status=pending`,
       at: review.createdAt.toISOString(),
     })),
+    ...handoutReviews.map((review) => ({
+      id: `handout-review-${review.id}`,
+      kind: "review" as const,
+      label: review.handout.titleAr,
+      detail: review.customer.name,
+      href: `/admin/handout-reviews?status=pending`,
+      at: review.createdAt.toISOString(),
+    })),
     ...books.map((book) => ({
       id: `stock-${book.id}`,
       kind: "stock" as const,
@@ -1550,5 +1795,8 @@ export async function getAdminNotifications(): Promise<{
     })),
   ].sort((a, b) => b.at.localeCompare(a.at));
 
-  return { items, total: orderTotal + reviewTotal + stockTotal };
+  return {
+    items,
+    total: orderTotal + reviewTotal + handoutReviewTotal + stockTotal,
+  };
 }

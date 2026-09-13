@@ -118,6 +118,17 @@ export interface HandoutWithRelations extends Handout {
   publisher: Publisher;
 }
 
+/** `Review` for a handout; the two live in separate tables. */
+export interface HandoutReview {
+  id: string;
+  handoutId: string;
+  authorName: string;
+  rating: number;
+  title: Localized;
+  body: Localized;
+  createdAt: string;
+}
+
 export type OrderStatus =
   | "pending"
   | "processing"
@@ -166,6 +177,13 @@ export interface OrderItem {
   unitPrice: number;
 }
 
+/** An order line for a handout — the same three fields over the other table. */
+export interface HandoutOrderItem {
+  handoutId: string;
+  quantity: number;
+  unitPrice: number;
+}
+
 export interface OrderTimelineEntry {
   status: OrderStatus;
   date: string;
@@ -178,6 +196,8 @@ export interface Order {
   createdAt: string;
   status: OrderStatus;
   items: OrderItem[];
+  /** Handout lines; an order may hold both kinds. */
+  handoutItems: HandoutOrderItem[];
   subtotal: number;
   shippingCost: number;
   discount: number;
@@ -196,6 +216,17 @@ export interface CartLine {
 /** A cart line joined with its book, ready for the UI. */
 export interface CartLineWithBook extends CartLine {
   book: BookWithRelations;
+  lineTotal: number;
+}
+
+export interface HandoutCartLine {
+  handoutId: string;
+  quantity: number;
+}
+
+/** A handout cart line joined with its handout, ready for the UI. */
+export interface CartLineWithHandout extends HandoutCartLine {
+  handout: HandoutWithRelations;
   lineTotal: number;
 }
 
@@ -228,6 +259,13 @@ export interface ReviewWithStatus extends Review {
 
 /** The same record, named for where the admin tables use it. */
 export type AdminReview = ReviewWithStatus;
+
+/** A handout review plus its moderation status and the handout it belongs to. */
+export interface HandoutReviewWithStatus extends HandoutReview {
+  status: ReviewStatus;
+  /** Denormalised so tables can render without a join. */
+  handoutTitle: Localized;
+}
 
 export interface SalesPoint {
   /** ISO month, e.g. "2026-03". */

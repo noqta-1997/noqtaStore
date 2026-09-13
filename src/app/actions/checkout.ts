@@ -47,14 +47,23 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
   const customer = await getCurrentCustomer();
   if (!customer) return fail("unauthenticated");
 
-  const lines = await prisma.cartItem.findMany({
-    where: { customerId: customer.id },
-    include: { book: { select: { id: true, price: true, stock: true } } },
-  });
+  // Both halves of the cart go into one order.
+  const [lines, handoutLines] = await Promise.all([
+    prisma.cartItem.findMany({
+      where: { customerId: customer.id },
+      include: { book: { select: { id: true, price: true, stock: true } } },
+    }),
+    prisma.handoutCartItem.findMany({
+      where: { customerId: customer.id },
+      include: { handout: { select: { id: true, price: true, stock: true } } },
+    }),
+  ]);
 
-  if (!lines.length) return fail("emptyCart");
+  if (!lines.length && !handoutLines.length) return fail("emptyCart");
 
-  const shortage = lines.find((line) => line.book.stock < line.quantity);
+  const shortage =
+    lines.find((line) => line.book.stock < line.quantity) ??
+    handoutLines.find((line) => line.handout.stock < line.quantity);
   if (shortage) return fail("outOfStock");
 
   const rawShipping = text(formData, "shippingMethod") as ShippingMethod;
@@ -75,10 +84,12 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
   }
 
   // Prices come from the catalogue, never from the browser.
-  const subtotal = lines.reduce(
-    (total, item) => total + item.book.price * item.quantity,
-    0,
-  );
+  const subtotal =
+    lines.reduce((total, item) => total + item.book.price * item.quantity, 0) +
+    handoutLines.reduce(
+      (total, item) => total + item.handout.price * item.quantity,
+      0,
+    );
   const rules = await getShippingRules();
   const shippingCost = shippingCostFor(shippingMethod, subtotal, rules);
 
@@ -113,6 +124,13 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
             unitPrice: item.book.price,
           })),
         },
+        handoutItems: {
+          create: handoutLines.map((item) => ({
+            handoutId: item.handoutId,
+            quantity: item.quantity,
+            unitPrice: item.handout.price,
+          })),
+        },
         timeline: { create: [{ status: "pending" }] },
       },
     });
@@ -124,7 +142,15 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
       });
     }
 
+    for (const item of handoutLines) {
+      await tx.handout.update({
+        where: { id: item.handoutId },
+        data: { stock: { decrement: item.quantity } },
+      });
+    }
+
     await tx.cartItem.deleteMany({ where: { customerId: customer.id } });
+    await tx.handoutCartItem.deleteMany({ where: { customerId: customer.id } });
 
     if (applied?.ok) {
       await tx.coupon.update({

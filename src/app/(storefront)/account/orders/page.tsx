@@ -55,10 +55,9 @@ export default async function OrdersPage({
 
       <ul className="space-y-4">
         {orders.map((order) => {
-          const itemsCount = order.items.reduce(
-            (total, item) => total + item.quantity,
-            0,
-          );
+          const itemsCount =
+            order.items.reduce((total, item) => total + item.quantity, 0) +
+            order.handoutItems.reduce((total, item) => total + item.quantity, 0);
 
           return (
             <li key={order.id} className="rounded-xl border border-line bg-card">

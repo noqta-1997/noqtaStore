@@ -4,6 +4,8 @@ import type {
   BookModel as BookRow,
   CategoryModel as CategoryRow,
   HandoutModel as HandoutRow,
+  HandoutOrderItemModel as HandoutOrderItemRow,
+  HandoutReviewModel as HandoutReviewRow,
   OrderEventModel as OrderEventRow,
   OrderItemModel as OrderItemRow,
   OrderModel as OrderRow,
@@ -15,6 +17,8 @@ import type {
   Author,
   BookWithRelations,
   Category,
+  HandoutReview,
+  HandoutReviewWithStatus,
   HandoutWithRelations,
   Localized,
   Order,
@@ -193,8 +197,37 @@ export function toReviewWithStatus(
   };
 }
 
+export function toHandoutReview(row: HandoutReviewRow): HandoutReview {
+  return {
+    id: row.id,
+    handoutId: row.handoutId,
+    authorName: "",
+    rating: row.rating,
+    title: mirror(row.title),
+    body: mirror(row.body),
+    createdAt: row.createdAt.toISOString().slice(0, 10),
+  };
+}
+
+export function toHandoutReviewWithAuthor(
+  row: HandoutReviewRow & { customer: { name: string } },
+): HandoutReview {
+  return { ...toHandoutReview(row), authorName: row.customer.name };
+}
+
+export function toHandoutReviewWithStatus(
+  row: HandoutReviewRow & { customer: { name: string }; handout: HandoutRow },
+): HandoutReviewWithStatus {
+  return {
+    ...toHandoutReviewWithAuthor(row),
+    status: row.status,
+    handoutTitle: { ar: row.handout.titleAr },
+  };
+}
+
 export type OrderRowWithRelations = OrderRow & {
   items: OrderItemRow[];
+  handoutItems: HandoutOrderItemRow[];
   timeline: OrderEventRow[];
 };
 
@@ -206,6 +239,11 @@ export function toOrder(row: OrderRowWithRelations): Order {
     status: row.status,
     items: row.items.map((item) => ({
       bookId: item.bookId,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+    })),
+    handoutItems: row.handoutItems.map((item) => ({
+      handoutId: item.handoutId,
       quantity: item.quantity,
       unitPrice: item.unitPrice,
     })),

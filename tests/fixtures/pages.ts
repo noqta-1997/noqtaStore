@@ -137,6 +137,7 @@ export const PAGES: PageCase[] = [
   { id: "admin-authors", path: () => "/admin/authors", gated: true },
   { id: "admin-book-new", path: () => "/admin/books/new", gated: true },
   { id: "admin-handout-new", path: () => "/admin/handouts/new", gated: true },
+  { id: "admin-handout-reviews", path: () => "/admin/handout-reviews", gated: true },
   {
     id: "admin-reports",
     path: () => "/admin/reports",

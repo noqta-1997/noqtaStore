@@ -5,15 +5,24 @@ import { notFound } from "next/navigation";
 
 import { BookCover } from "@/components/book/book-cover";
 import { PriceTag } from "@/components/commerce/price-tag";
+import { HandoutAddToCartButton } from "@/components/handout/handout-add-to-cart-button";
+import { HandoutReviews } from "@/components/handout/handout-reviews";
 import { HandoutShelf } from "@/components/handout/handout-shelf";
 import { HandoutSpecs } from "@/components/handout/handout-specs";
+import { HandoutWishlistButton } from "@/components/handout/handout-wishlist-button";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Container } from "@/components/ui/container";
+import { QuantityStepper } from "@/components/ui/quantity-stepper";
 import { Rating } from "@/components/ui/rating";
 import { Surface } from "@/components/ui/surface";
 import { Tabs } from "@/components/ui/tabs";
-import { getHandoutBySlug, getHandoutSlugs, getRelatedHandouts } from "@/data";
+import {
+  getHandoutBySlug,
+  getHandoutSlugs,
+  getRelatedHandouts,
+  getReviewsByHandout,
+} from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { formatDiscount, formatNumber } from "@/lib/format";
@@ -43,15 +52,7 @@ export async function generateMetadata({ params }: HandoutPageProps): Promise<Me
   };
 }
 
-/*
- * The book detail page over a handout.
- *
- * Three things from the book page are not here yet, all for the same reason:
- * the add-to-cart button, the wishlist heart and the reviews tab write rows
- * that reference the books table. They come back once the cart, wishlist and
- * reviews know about handouts; the sticky mobile bar goes with the button it
- * existed to hold.
- */
+/** The book detail page over a handout, control for control. */
 export default async function HandoutPage({ params }: HandoutPageProps) {
   const { slug } = await params;
   const locale = defaultLocale;
@@ -62,8 +63,9 @@ export default async function HandoutPage({ params }: HandoutPageProps) {
     notFound();
   }
 
-  const [dictionary, related] = await Promise.all([
+  const [dictionary, reviews, related] = await Promise.all([
     getDictionary(locale),
+    getReviewsByHandout(handout.id),
     getRelatedHandouts(handout, 5),
   ]);
 
@@ -171,6 +173,38 @@ export default async function HandoutPage({ params }: HandoutPageProps) {
               )}
             </div>
 
+            <div className="flex flex-wrap items-center gap-3">
+              <QuantityStepper
+                max={Math.max(handout.stock, 1)}
+                labels={{
+                  quantity: dictionary.common.quantity,
+                  increase: dictionary.common.increase,
+                  decrease: dictionary.common.decrease,
+                }}
+              />
+              <HandoutAddToCartButton
+                handoutId={handout.id}
+                size="lg"
+                disabled={isSoldOut}
+                label={dictionary.common.addToCart}
+                toastTitle={dictionary.common.toast.addedToCart}
+                toastNote={dictionary.common.toast.addedToCartNote}
+                signInMessage={dictionary.common.toast.signInRequired}
+                outOfStockMessage={dictionary.common.outOfStock}
+                failureMessage={dictionary.common.toast.actionFailed}
+                className="flex-1"
+              />
+              <HandoutWishlistButton
+                handoutId={handout.id}
+                label={t.addToWishlist}
+                addedTitle={dictionary.common.toast.addedToWishlist}
+                removedTitle={dictionary.common.toast.removedFromWishlist}
+                signInMessage={dictionary.common.toast.signInRequired}
+                handoutTitle={handout.title[locale]}
+                className="size-12"
+              />
+            </div>
+
             <ul className="space-y-2 border-t border-line-divider pt-4">
               {highlights.map((item) => (
                 <li
@@ -222,6 +256,18 @@ export default async function HandoutPage({ params }: HandoutPageProps) {
                   <HandoutSpecs handout={handout} locale={locale} dictionary={dictionary} />
                 ),
               },
+              {
+                id: "reviews",
+                label: t.tabs.reviews,
+                content: (
+                  <HandoutReviews
+                    handout={handout}
+                    reviews={reviews}
+                    locale={locale}
+                    dictionary={dictionary}
+                  />
+                ),
+              },
             ]}
           />
         </div>
@@ -239,6 +285,28 @@ export default async function HandoutPage({ params }: HandoutPageProps) {
           />
         </div>
       ) : null}
+
+      {/* Persistent action bar on small screens */}
+      <div className="sticky bottom-0 z-30 border-t border-line-divider bg-card lg:hidden">
+        <Container className="flex items-center justify-between gap-3 py-3">
+          <PriceTag
+            price={handout.price}
+            compareAtPrice={handout.compareAtPrice}
+            locale={locale}
+          />
+          <HandoutAddToCartButton
+            handoutId={handout.id}
+            disabled={isSoldOut}
+            label={dictionary.common.addToCart}
+            toastTitle={dictionary.common.toast.addedToCart}
+            toastNote={dictionary.common.toast.addedToCartNote}
+            signInMessage={dictionary.common.toast.signInRequired}
+            outOfStockMessage={dictionary.common.outOfStock}
+            failureMessage={dictionary.common.toast.actionFailed}
+            className="max-w-48 flex-1"
+          />
+        </Container>
+      </div>
     </>
   );
 }

@@ -70,6 +70,8 @@ function makeOrder(seed: OrderSeed): Order & { customerId: string } {
     createdAt: seed.createdAt,
     status: seed.status,
     items: seed.items,
+    // Seeded orders hold books only; handout lines arrive through the storefront.
+    handoutItems: [],
     subtotal,
     shippingCost: seed.shippingCost,
     discount: seed.discount,
@@ -197,7 +199,7 @@ export const customers: CustomerSummary[] = [
 
 /** Store-wide orders — the customer's own four plus other buyers'. */
 export const adminOrders: (Order & { customerId: string })[] = [
-  ...customerOrders.map((order) => ({ ...order, customerId: "cu1" })),
+  ...customerOrders.map((order) => ({ ...order, handoutItems: [], customerId: "cu1" })),
   makeOrder({
     id: "o5",
     reference: "NQ-2026-4231",
