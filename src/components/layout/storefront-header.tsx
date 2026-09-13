@@ -57,7 +57,7 @@ export function StorefrontHeader({
         </Container>
       </div>
 
-      <Container className="flex h-18 items-center gap-2">
+      <Container className="flex h-18 items-center gap-3 lg:gap-2">
         <MobileNav
           items={navItems}
           categories={categoryItems}
