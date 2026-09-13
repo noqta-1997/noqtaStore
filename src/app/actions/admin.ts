@@ -51,6 +51,13 @@ function revalidateCatalogue() {
   revalidatePath("/[locale]/publishers/[slug]", "page");
 }
 
+/** The handout pages are cached the same way; only they list handouts. */
+function revalidateHandouts() {
+  revalidatePath("/handouts", "page");
+  revalidatePath("/handouts/[slug]", "page");
+  revalidatePath("/admin/handouts", "page");
+}
+
 /* ------------------------------------------------------------------ */
 /* Books                                                               */
 /* ------------------------------------------------------------------ */
@@ -133,6 +140,73 @@ export async function deleteBook(bookId: string): Promise<ActionResult> {
 
   revalidateCatalogue();
   revalidatePath("/[locale]/admin/books", "page");
+  return ok();
+}
+
+/* ------------------------------------------------------------------ */
+/* Handouts                                                            */
+/* ------------------------------------------------------------------ */
+
+/** `saveBook` over the handouts table — the form and its fields are the same. */
+export async function saveHandout(formData: FormData): Promise<ActionResult> {
+  if (!(await requireManager())) return fail("forbidden");
+
+  const titleAr = text(formData, "titleAr");
+  if (!titleAr) return fail("missingTitle");
+
+  const authorId = text(formData, "authorId");
+  const categoryId = text(formData, "categoryId");
+  const publisherId = text(formData, "publisherId");
+  if (!authorId || !categoryId || !publisherId) return fail("missingRelation");
+
+  const handoutId = text(formData, "handoutId");
+
+  // The update payload: slug, ISBN, cover type and weight are absent for the
+  // same reason they are in `saveBook` — an edit must not regenerate them.
+  const data = {
+    titleAr,
+    descriptionAr: text(formData, "descriptionAr"),
+    price: number(formData, "price"),
+    compareAtPrice: optionalNumber(formData, "compareAtPrice"),
+    stock: number(formData, "stock"),
+    pages: number(formData, "pages"),
+    publishedYear: number(formData, "publishedYear", new Date().getFullYear()),
+    tags: formData.getAll("tags").filter((tag): tag is string => typeof tag === "string") as BookTag[],
+    authorId,
+    categoryId,
+    publisherId,
+  } as const;
+
+  try {
+    if (handoutId) {
+      await prisma.handout.update({ where: { id: handoutId }, data });
+    } else {
+      await prisma.handout.create({
+        data: {
+          ...data,
+          slug: slugify(titleAr, `handout-${Date.now()}`),
+          isbn: `TEMP-${Date.now()}`,
+          coverType: "paperback",
+          weightGrams: 0,
+        },
+      });
+    }
+  } catch {
+    return fail("duplicate");
+  }
+
+  revalidateHandouts();
+  return ok();
+}
+
+export async function deleteHandout(handoutId: string): Promise<ActionResult> {
+  if (!(await requireManager())) return fail("forbidden");
+
+  // No `inUse` guard yet: nothing references a handout until the cart and
+  // orders learn about them.
+  await prisma.handout.delete({ where: { id: handoutId } });
+
+  revalidateHandouts();
   return ok();
 }
 

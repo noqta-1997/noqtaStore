@@ -3,6 +3,7 @@ import {
   toAuthor,
   toBook,
   toCategoryWithCount,
+  toHandout,
   toOrder,
   toPublisher,
   toReviewWithAuthor,
@@ -27,6 +28,7 @@ import type {
   Customer,
   CustomerStatus,
   CustomerSummary,
+  HandoutWithRelations,
   Order,
   OrderStatus,
   Publisher,
@@ -47,6 +49,7 @@ export const FREE_SHIPPING_THRESHOLD = 50000;
 export const STANDARD_SHIPPING_COST = 5000;
 export const EXPRESS_SHIPPING_COST = 10000;
 export const BOOKS_PER_PAGE = 12;
+export const HANDOUTS_PER_PAGE = 12;
 export const LOW_STOCK_THRESHOLD = 12;
 
 /**
@@ -343,6 +346,131 @@ export async function getRelatedBooks(
   return rows.map(toBook);
 }
 
+/* ------------------------------------------------------------------ */
+/* Handouts                                                            */
+/* ------------------------------------------------------------------ */
+
+/*
+ * The lecture-note catalogue (ملازم) is the book catalogue over again: the same
+ * columns, the same filters, the same sort keys, read from its own table. It
+ * is copied rather than parameterised on purpose — the two are meant to be
+ * managed apart, and a shared query would be the first thing to couple them.
+ */
+
+const handoutInclude = { author: true, category: true, publisher: true } as const;
+
+/** Same filter set as the books listing; the two forms are interchangeable. */
+export type HandoutQuery = BookQuery;
+
+export interface HandoutQueryResult {
+  items: HandoutWithRelations[];
+  total: number;
+  page: number;
+  pageCount: number;
+}
+
+const handoutOrderByForSort: Record<SortKey, Prisma.HandoutOrderByWithRelationInput> = {
+  relevance: { reviewsCount: "desc" },
+  popular: { reviewsCount: "desc" },
+  newest: { createdAt: "desc" },
+  priceAsc: { price: "asc" },
+  priceDesc: { price: "desc" },
+  rating: { rating: "desc" },
+};
+
+function handoutWhere(query: HandoutQuery): Prisma.HandoutWhereInput {
+  const where: Prisma.HandoutWhereInput = {};
+
+  if (query.q?.trim()) {
+    const term = query.q.trim();
+    where.OR = [
+      { titleAr: { contains: term, mode: "insensitive" } },
+      { slug: { contains: term, mode: "insensitive" } },
+      { isbn: { contains: term } },
+      { publisher: { nameAr: { contains: term, mode: "insensitive" } } },
+      { author: { nameAr: { contains: term, mode: "insensitive" } } },
+      { category: { nameAr: { contains: term, mode: "insensitive" } } },
+    ];
+  }
+
+  if (query.category) where.category = { slug: query.category };
+  if (query.author) where.author = { slug: query.author };
+  if (query.publisher) where.publisher = { slug: query.publisher };
+  if (query.cover) where.coverType = query.cover;
+  if (query.inStock) where.stock = { gt: 0 };
+  if (query.onSale) where.compareAtPrice = { not: null };
+  if (typeof query.rating === "number") where.rating = { gte: query.rating };
+
+  if (typeof query.minPrice === "number" || typeof query.maxPrice === "number") {
+    where.price = {
+      ...(typeof query.minPrice === "number" ? { gte: query.minPrice } : {}),
+      ...(typeof query.maxPrice === "number" ? { lte: query.maxPrice } : {}),
+    };
+  }
+
+  return where;
+}
+
+/** The single entry point behind the handouts listing. */
+export async function queryHandouts(query: HandoutQuery = {}): Promise<HandoutQueryResult> {
+  const perPage = query.perPage ?? HANDOUTS_PER_PAGE;
+  const where = handoutWhere(query);
+
+  const total = await prisma.handout.count({ where });
+  const pageCount = Math.max(1, Math.ceil(total / perPage));
+  const page = Math.min(Math.max(query.page ?? 1, 1), pageCount);
+
+  const rows = await prisma.handout.findMany({
+    where,
+    include: handoutInclude,
+    orderBy: handoutOrderByForSort[query.sort ?? "relevance"],
+    skip: (page - 1) * perPage,
+    take: perPage,
+  });
+
+  return { items: rows.map(toHandout), total, page, pageCount };
+}
+
+export async function getHandoutPriceBounds() {
+  const result = await prisma.handout.aggregate({
+    _min: { price: true },
+    _max: { price: true },
+  });
+
+  return { min: result._min.price ?? 0, max: result._max.price ?? 0 };
+}
+
+export async function getHandoutBySlug(
+  slug: string,
+): Promise<HandoutWithRelations | undefined> {
+  const row = await prisma.handout.findUnique({ where: { slug }, include: handoutInclude });
+  return row ? toHandout(row) : undefined;
+}
+
+export async function getHandoutById(id: string): Promise<HandoutWithRelations | undefined> {
+  const row = await prisma.handout.findUnique({ where: { id }, include: handoutInclude });
+  return row ? toHandout(row) : undefined;
+}
+
+export async function getHandoutSlugs(): Promise<string[]> {
+  const rows = await prisma.handout.findMany({ select: { slug: true } });
+  return rows.map((row) => row.slug);
+}
+
+export async function getRelatedHandouts(
+  handout: HandoutWithRelations,
+  limit = 5,
+): Promise<HandoutWithRelations[]> {
+  const rows = await prisma.handout.findMany({
+    where: { categoryId: handout.categoryId, id: { not: handout.id } },
+    include: handoutInclude,
+    orderBy: { reviewsCount: "desc" },
+    take: limit,
+  });
+
+  return rows.map(toHandout);
+}
+
 export async function getReviewsByBook(bookId: string): Promise<Review[]> {
   const rows = await prisma.review.findMany({
     where: { bookId, status: "published" },
@@ -569,6 +697,19 @@ function adminOrderBy<T>(
 }
 
 const bookAdminSort: Record<string, Prisma.BookOrderByWithRelationInput> = {
+  "title-asc": { titleAr: "asc" },
+  "title-desc": { titleAr: "desc" },
+  "price-asc": { price: "asc" },
+  "price-desc": { price: "desc" },
+  "stock-asc": { stock: "asc" },
+  "stock-desc": { stock: "desc" },
+  "rating-asc": { rating: "asc" },
+  "rating-desc": { rating: "desc" },
+  "created-asc": { createdAt: "asc" },
+  "created-desc": { createdAt: "desc" },
+};
+
+const handoutAdminSort: Record<string, Prisma.HandoutOrderByWithRelationInput> = {
   "title-asc": { titleAr: "asc" },
   "title-desc": { titleAr: "desc" },
   "price-asc": { price: "asc" },
@@ -1048,6 +1189,41 @@ export async function getStockCounts() {
     prisma.book.count({ where: { stock: { gt: LOW_STOCK_THRESHOLD } } }),
     prisma.book.count({ where: { stock: { gt: 0, lte: LOW_STOCK_THRESHOLD } } }),
     prisma.book.count({ where: { stock: 0 } }),
+  ]);
+
+  return { all, inStock, low, out };
+}
+
+/** Handout listing for the admin table — searchable and stock-aware. */
+export async function getAdminHandouts(
+  query: AdminListQuery & { stock?: StockFilter } = {},
+) {
+  const where: Prisma.HandoutWhereInput = handoutWhere({ q: query.q });
+
+  if (query.stock === "inStock") where.stock = { gt: LOW_STOCK_THRESHOLD };
+  else if (query.stock === "low") where.stock = { gt: 0, lte: LOW_STOCK_THRESHOLD };
+  else if (query.stock === "out") where.stock = 0;
+
+  const total = await prisma.handout.count({ where });
+  const { perPage, pageCount, page, skip } = paginationOf(total, query);
+
+  const rows = await prisma.handout.findMany({
+    where,
+    include: handoutInclude,
+    orderBy: adminOrderBy(handoutAdminSort, query.sort, { createdAt: "desc" }),
+    skip,
+    take: perPage,
+  });
+
+  return { items: rows.map(toHandout), total, page, pageCount };
+}
+
+export async function getHandoutStockCounts() {
+  const [all, inStock, low, out] = await Promise.all([
+    prisma.handout.count(),
+    prisma.handout.count({ where: { stock: { gt: LOW_STOCK_THRESHOLD } } }),
+    prisma.handout.count({ where: { stock: { gt: 0, lte: LOW_STOCK_THRESHOLD } } }),
+    prisma.handout.count({ where: { stock: 0 } }),
   ]);
 
   return { all, inStock, low, out };

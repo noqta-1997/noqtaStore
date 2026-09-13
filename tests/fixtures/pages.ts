@@ -38,6 +38,13 @@ export const PAGES: PageCase[] = [
     path: () => "/books/al-amir-al-saghir",
     ready: "main h1",
   },
+  // The handouts catalogue mirrors the books one, read from its own table.
+  { id: "handouts", path: () => "/handouts", ready: "main" },
+  {
+    id: "handout-detail",
+    path: () => "/handouts/physics-sixth-scientific",
+    ready: "main h1",
+  },
   { id: "categories", path: () => "/categories", ready: "main" },
   {
     id: "category-detail",
@@ -87,6 +94,7 @@ export const PAGES: PageCase[] = [
     volatile: true,
   },
   { id: "admin-books", path: () => "/admin/books", gated: true },
+  { id: "admin-handouts", path: () => "/admin/handouts", gated: true },
   { id: "checkout", path: () => "/checkout", gated: true, ready: "main" },
   {
     id: "checkout-success",
@@ -128,6 +136,7 @@ export const PAGES: PageCase[] = [
   { id: "admin-orders", path: () => "/admin/orders", gated: true },
   { id: "admin-authors", path: () => "/admin/authors", gated: true },
   { id: "admin-book-new", path: () => "/admin/books/new", gated: true },
+  { id: "admin-handout-new", path: () => "/admin/handouts/new", gated: true },
   {
     id: "admin-reports",
     path: () => "/admin/reports",

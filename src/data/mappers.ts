@@ -3,6 +3,7 @@ import type {
   AuthorModel as AuthorRow,
   BookModel as BookRow,
   CategoryModel as CategoryRow,
+  HandoutModel as HandoutRow,
   OrderEventModel as OrderEventRow,
   OrderItemModel as OrderItemRow,
   OrderModel as OrderRow,
@@ -14,6 +15,7 @@ import type {
   Author,
   BookWithRelations,
   Category,
+  HandoutWithRelations,
   Localized,
   Order,
   Publisher,
@@ -87,6 +89,41 @@ export type BookRowWithRelations = BookRow & {
 };
 
 export function toBook(row: BookRowWithRelations): BookWithRelations {
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: { ar: row.titleAr },
+    authorId: row.authorId,
+    categoryId: row.categoryId,
+    price: row.price,
+    compareAtPrice: row.compareAtPrice ?? undefined,
+    rating: row.rating,
+    reviewsCount: row.reviewsCount,
+    stock: row.stock,
+    pages: row.pages,
+    publisherId: row.publisherId,
+    publishedYear: row.publishedYear,
+    isbn: row.isbn,
+    language: { ar: row.languageAr },
+    coverType: row.coverType,
+    weightGrams: row.weightGrams,
+    description: { ar: row.descriptionAr },
+    tags: row.tags,
+    coverUrl: row.coverUrl ?? undefined,
+    createdAt: row.createdAt.toISOString().slice(0, 10),
+    author: toAuthor(row.author),
+    category: toCategoryWithCount(row.category),
+    publisher: toPublisher(row.publisher),
+  };
+}
+
+export type HandoutRowWithRelations = HandoutRow & {
+  author: AuthorRow & { _count?: { books: number } };
+  category: CategoryRow & { _count?: { books: number } };
+  publisher: PublisherRow & { _count?: { books: number } };
+};
+
+export function toHandout(row: HandoutRowWithRelations): HandoutWithRelations {
   return {
     id: row.id,
     slug: row.slug,

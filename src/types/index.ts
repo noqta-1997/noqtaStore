@@ -80,6 +80,44 @@ export interface BookWithRelations extends Book {
   publisher: Publisher;
 }
 
+/**
+ * A lecture-note booklet (ملزمة). Shaped exactly like `Book` and stored in
+ * its own table; the two catalogues share only authors, categories and
+ * publishers.
+ */
+export interface Handout {
+  id: string;
+  slug: string;
+  title: Localized;
+  authorId: string;
+  categoryId: string;
+  /** Whole Iraqi dinars — no minor units. */
+  price: number;
+  compareAtPrice?: number;
+  rating: number;
+  reviewsCount: number;
+  stock: number;
+  pages: number;
+  publisherId: string;
+  publishedYear: number;
+  isbn: string;
+  language: Localized;
+  coverType: CoverType;
+  weightGrams: number;
+  description: Localized;
+  tags: BookTag[];
+  /** Optional real cover; a typographic placeholder is drawn when absent. */
+  coverUrl?: string;
+  createdAt: string;
+}
+
+/** A handout joined with its author, category and publisher, ready for the UI. */
+export interface HandoutWithRelations extends Handout {
+  author: Author;
+  category: Category;
+  publisher: Publisher;
+}
+
 export type OrderStatus =
   | "pending"
   | "processing"

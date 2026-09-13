@@ -7,6 +7,7 @@ import {
   FolderTree,
   LayoutDashboard,
   Mail,
+  NotebookText,
   Package,
   PenLine,
   Settings,
@@ -27,6 +28,7 @@ export interface AdminNavLabels {
   sectionSystem: string;
   dashboard: string;
   books: string;
+  handouts: string;
   categories: string;
   authors: string;
   publishers: string;
@@ -68,6 +70,7 @@ export function AdminNav({ labels, iconsOnly = false, onNavigate }: AdminNavProp
       title: labels.sectionCatalogue,
       items: [
         { href: `${base}/books`, label: labels.books, icon: BookOpen },
+        { href: `${base}/handouts`, label: labels.handouts, icon: NotebookText },
         { href: `${base}/categories`, label: labels.categories, icon: FolderTree },
         { href: `${base}/authors`, label: labels.authors, icon: PenLine },
         { href: `${base}/publishers`, label: labels.publishers, icon: Building2 },

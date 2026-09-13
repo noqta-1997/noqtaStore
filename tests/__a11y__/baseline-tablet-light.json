@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-11T23:07:59.431Z",
+  "capturedAt": "2026-09-12T21:26:58.662Z",
   "project": "tablet-light",
-  "pagesScanned": 16,
+  "pagesScanned": 18,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -29,6 +29,24 @@
       "theme": "light",
       "project": "tablet-light",
       "url": "/books/al-amir-al-saghir",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "handouts",
+      "locale": "ar",
+      "theme": "light",
+      "project": "tablet-light",
+      "url": "/handouts",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "handout-detail",
+      "locale": "ar",
+      "theme": "light",
+      "project": "tablet-light",
+      "url": "/handouts/physics-sixth-scientific",
       "violations": [],
       "total": 0
     },

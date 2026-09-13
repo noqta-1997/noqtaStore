@@ -73,6 +73,7 @@
       "reviewRejected": "رُفضت المراجعة",
       "addressSaved": "حُفظ العنوان",
       "bookPublished": "نُشر الكتاب",
+      "handoutPublished": "نُشرت الملزمة",
       "draftSaved": "حُفظت المسودة",
       "itemAdded": "أُضيف العنصر",
       "dismiss": "إغلاق الإشعار",
@@ -131,6 +132,7 @@
   "nav": {
     "home": "الرئيسية",
     "books": "الكتب",
+    "handouts": "الملازم",
     "categories": "التصنيفات",
     "authors": "المؤلفون",
     "publishers": "دور النشر",
@@ -279,6 +281,81 @@
     },
     "aboutAuthor": "عن المؤلف",
     "related": "كتب مشابهة",
+    "relatedSubtitle": "من التصنيف نفسه"
+  },
+  "handouts": {
+    "title": "كل الملازم",
+    "subtitle": "تصفّح الملازم كاملة وصفِّها كما تحب",
+    "resultsLabel": "عنوان",
+    "filtersTitle": "تصفية النتائج",
+    "openFilters": "الفلاتر والترتيب",
+    "category": "التصنيف",
+    "allCategories": "كل التصنيفات",
+    "priceRange": "نطاق السعر",
+    "minPrice": "من",
+    "maxPrice": "إلى",
+    "rating": "التقييم",
+    "ratingAndUp": "فأكثر",
+    "coverType": "نوع الغلاف",
+    "hardcover": "غلاف مقوّى",
+    "paperback": "غلاف عادي",
+    "availability": "التوفّر",
+    "inStockOnly": "المتوفر فقط",
+    "onSaleOnly": "عليه خصم فقط",
+    "sortOptions": {
+      "relevance": "الأكثر ملاءمة",
+      "newest": "الأحدث",
+      "popular": "الأكثر مبيعًا",
+      "priceAsc": "السعر: من الأقل",
+      "priceDesc": "السعر: من الأعلى",
+      "rating": "الأعلى تقييمًا"
+    },
+    "empty": {
+      "title": "لا توجد ملازم مطابقة",
+      "description": "جرّب توسيع نطاق السعر أو إزالة بعض الفلاتر.",
+      "action": "مسح الفلاتر"
+    },
+    "publisher": "دار النشر",
+    "allPublishers": "كل الدور"
+  },
+  "handoutDetails": {
+    "addToWishlist": "أضف إلى المفضلة",
+    "buyNow": "اشترِ الآن",
+    "stockLeft": "نسخة متبقية",
+    "deliveryNote": "توصيل خلال 2–5 أيام عمل مع الدفع عند الاستلام",
+    "returnsNote": "إرجاع مجاني خلال 7 أيام إذا وصلتك الملزمة تالفة",
+    "tabs": {
+      "description": "نبذة عن الملزمة",
+      "specs": "المواصفات",
+      "reviews": "المراجعات"
+    },
+    "specs": {
+      "publisher": "دار النشر",
+      "publishedYear": "سنة النشر",
+      "pages": "عدد الصفحات",
+      "language": "اللغة",
+      "isbn": "الترقيم الدولي",
+      "coverType": "نوع الغلاف",
+      "weight": "الوزن",
+      "grams": "غرام",
+      "page": "صفحة"
+    },
+    "reviewsSection": {
+      "title": "آراء القُرّاء",
+      "averageOf": "من 5",
+      "basedOn": "بناءً على",
+      "empty": "لا توجد مراجعات بعد لهذه الملزمة.",
+      "writeReview": "اكتب مراجعة",
+      "formTitle": "شارك رأيك",
+      "ratingLabel": "تقييمك",
+      "titleLabel": "عنوان المراجعة",
+      "bodyLabel": "رأيك في الملزمة",
+      "submit": "أرسل المراجعة",
+      "cancel": "إلغاء",
+      "pendingNote": "تُنشر المراجعة بعد مراجعتها من فريق المتجر."
+    },
+    "aboutAuthor": "عن المؤلف",
+    "related": "ملازم مشابهة",
     "relatedSubtitle": "من التصنيف نفسه"
   },
   "categoriesPage": {

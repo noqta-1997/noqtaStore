@@ -12,6 +12,7 @@ import { adminOrders, adminReviews, customers, salesSeries } from "../src/data/a
 import { authors } from "../src/data/authors";
 import { books } from "../src/data/books";
 import { categories } from "../src/data/categories";
+import { handouts } from "../src/data/handouts";
 import { reviews } from "../src/data/reviews";
 import { PrismaClient } from "../src/generated/prisma/client";
 import type { OrderStatus } from "../src/types";
@@ -51,6 +52,7 @@ async function clear() {
   await prisma.address.deleteMany();
   await prisma.customer.deleteMany();
   await prisma.book.deleteMany();
+  await prisma.handout.deleteMany();
   await prisma.publisher.deleteMany();
   await prisma.author.deleteMany();
   await prisma.category.deleteMany();
@@ -104,6 +106,7 @@ async function seedCatalogue() {
    */
   const publisherNames = new Map<string, { ar: string }>();
   for (const book of books) publisherNames.set(book.publisher.ar, book.publisher);
+  for (const handout of handouts) publisherNames.set(handout.publisher.ar, handout.publisher);
 
   const publisherIds = new Map<string, string>();
   let fallback = 0;
@@ -146,11 +149,38 @@ async function seedCatalogue() {
     })),
   });
 
+  await prisma.handout.createMany({
+    data: handouts.map((handout) => ({
+      id: handout.id,
+      slug: handout.slug,
+      titleAr: handout.title.ar,
+      descriptionAr: handout.description.ar,
+      price: handout.price,
+      compareAtPrice: handout.compareAtPrice ?? null,
+      stock: handout.stock,
+      pages: handout.pages,
+      publisherId: publisherIds.get(handout.publisher.ar)!,
+      publishedYear: handout.publishedYear,
+      isbn: handout.isbn,
+      languageAr: handout.language.ar,
+      coverType: handout.coverType,
+      weightGrams: handout.weightGrams,
+      coverUrl: handout.coverUrl ?? null,
+      tags: handout.tags,
+      rating: handout.rating,
+      reviewsCount: handout.reviewsCount,
+      authorId: handout.authorId,
+      categoryId: handout.categoryId,
+      createdAt: new Date(handout.createdAt),
+    })),
+  });
+
   return {
     categories: categories.length,
     authors: authors.length,
     publishers: publisherIds.size,
     books: books.length,
+    handouts: handouts.length,
   };
 }
 

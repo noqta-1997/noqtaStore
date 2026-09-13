@@ -87,7 +87,7 @@ export function StorefrontHeader({
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="inline-block rounded-md px-2.5 py-2 text-body-md font-medium text-on-surface-variant transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface"
+                  className="inline-block rounded-md px-2 py-2 text-body-md font-medium text-on-surface-variant transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface"
                 >
                   {item.label}
                 </Link>

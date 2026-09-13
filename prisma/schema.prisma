@@ -98,6 +98,8 @@ model Category {
 
   books Book[]
 
+  handouts Handout[]
+
   @@map("categories")
 }
 
@@ -113,6 +115,8 @@ model Publisher {
 
   books Book[]
 
+  handouts Handout[]
+
   @@map("publishers")
 }
 
@@ -127,6 +131,8 @@ model Author {
   updatedAt DateTime @updatedAt
 
   books Book[]
+
+  handouts Handout[]
 
   @@map("authors")
 }
@@ -171,6 +177,47 @@ model Book {
   @@index([publisherId])
   @@index([createdAt])
   @@map("books")
+}
+
+/// Lecture-note booklets (ملازم). A carbon copy of Book kept in its own
+/// table on purpose: the two catalogues are managed and browsed apart, and
+/// share only the author, category and publisher lookups.
+model Handout {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  titleAr        String
+  descriptionAr  String
+  price          Int
+  compareAtPrice Int?
+  stock          Int       @default(0)
+  pages          Int
+  publishedYear  Int
+  isbn           String    @unique
+  languageAr     String    @default("العربية")
+  coverType      CoverType @default(paperback)
+  weightGrams    Int
+  coverUrl       String?
+  tags           BookTag[] @default([])
+
+  /// Denormalised for the listing pages; recomputed when reviews change.
+  rating       Float @default(0)
+  reviewsCount Int   @default(0)
+
+  authorId    String
+  categoryId  String
+  publisherId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  author    Author    @relation(fields: [authorId], references: [id])
+  category  Category  @relation(fields: [categoryId], references: [id])
+  publisher Publisher @relation(fields: [publisherId], references: [id])
+
+  @@index([categoryId])
+  @@index([authorId])
+  @@index([publisherId])
+  @@index([createdAt])
+  @@map("handouts")
 }
 
 // ------------------------------------------------------------------

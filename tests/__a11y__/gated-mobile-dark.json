@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-11T23:07:23.436Z",
+  "capturedAt": "2026-09-12T21:26:18.059Z",
   "project": "mobile-dark",
-  "pagesScanned": 14,
+  "pagesScanned": 16,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -38,6 +38,15 @@
       "theme": "dark",
       "project": "mobile-dark",
       "url": "/admin/books",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-handouts",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "mobile-dark",
+      "url": "/admin/handouts",
       "violations": [],
       "total": 0
     },
@@ -119,6 +128,15 @@
       "theme": "dark",
       "project": "mobile-dark",
       "url": "/admin/books/new",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-handout-new",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "mobile-dark",
+      "url": "/admin/handouts/new",
       "violations": [],
       "total": 0
     },

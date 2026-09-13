@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-11T23:06:45.087Z",
+  "capturedAt": "2026-09-12T21:25:37.379Z",
   "project": "mobile-dark",
-  "pagesScanned": 16,
+  "pagesScanned": 18,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -29,6 +29,24 @@
       "theme": "dark",
       "project": "mobile-dark",
       "url": "/books/al-amir-al-saghir",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "handouts",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "mobile-dark",
+      "url": "/handouts",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "handout-detail",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "mobile-dark",
+      "url": "/handouts/physics-sixth-scientific",
       "violations": [],
       "total": 0
     },

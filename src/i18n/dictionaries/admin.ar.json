@@ -10,6 +10,7 @@
     "sectionSystem": "النظام",
     "dashboard": "لوحة المعلومات",
     "books": "الكتب",
+    "handouts": "الملازم",
     "categories": "التصنيفات",
     "authors": "المؤلفون",
     "publishers": "دور النشر",
@@ -184,6 +185,92 @@
   },
   "bookDetails": {
     "title": "تفاصيل الكتاب",
+    "overview": "نظرة عامة",
+    "specs": "المواصفات",
+    "stats": {
+      "sold": "نسخة مباعة",
+      "revenue": "إجمالي الإيراد",
+      "rating": "متوسط التقييم",
+      "reviews": "عدد المراجعات"
+    },
+    "viewInStore": "عرض في المتجر",
+    "recentReviews": "أحدث المراجعات"
+  },
+  "handouts": {
+    "title": "إدارة الملازم",
+    "subtitle": "كل الملازم في الكتالوج",
+    "add": "إضافة ملزمة",
+    "searchPlaceholder": "ابحث بالعنوان أو المؤلف أو ISBN…",
+    "table": {
+      "handout": "الملزمة",
+      "author": "المؤلف",
+      "category": "التصنيف",
+      "price": "السعر",
+      "stock": "المخزون",
+      "rating": "التقييم",
+      "status": "الحالة"
+    },
+    "stockStatus": {
+      "inStock": "متوفر",
+      "low": "منخفض",
+      "out": "نفد"
+    },
+    "empty": {
+      "title": "لا توجد ملازم مطابقة",
+      "description": "غيّر كلمات البحث أو أعد ضبط التصفية."
+    },
+    "deleteConfirm": "ستُحذف الملزمة نهائيًا من الكتالوج."
+  },
+  "handoutForm": {
+    "addTitle": "إضافة ملزمة",
+    "addSubtitle": "أدخل بيانات الملزمة الجديدة",
+    "editTitle": "تعديل الملزمة",
+    "editSubtitle": "تحديث بيانات الملزمة",
+    "sections": {
+      "basic": "المعلومات الأساسية",
+      "description": "الوصف",
+      "pricing": "التسعير",
+      "inventory": "المخزون",
+      "publishing": "بيانات النشر",
+      "media": "الغلاف",
+      "organisation": "التنظيم"
+    },
+    "fields": {
+      "titleAr": "العنوان بالعربية",
+      "slug": "المُعرّف في الرابط",
+      "author": "المؤلف",
+      "category": "التصنيف",
+      "descriptionAr": "النبذة بالعربية",
+      "price": "السعر",
+      "compareAtPrice": "السعر قبل الخصم",
+      "stock": "الكمية المتوفرة",
+      "pages": "عدد الصفحات",
+      "publisher": "دار النشر",
+      "publishedYear": "سنة النشر",
+      "isbn": "الترقيم الدولي",
+      "coverType": "نوع الغلاف",
+      "weight": "الوزن بالغرام",
+      "tags": "الوسوم"
+    },
+    "hints": {
+      "slug": "يُولّد تلقائيًا من العنوان، ويمكن تعديله.",
+      "compareAtPrice": "اتركه فارغًا إن لم يكن هناك خصم.",
+      "isbn": "13 رقمًا بلا فواصل."
+    },
+    "upload": {
+      "label": "صورة الغلاف",
+      "hint": "PNG أو JPG بنسبة 2:3، بحد أقصى 2 ميغابايت",
+      "button": "اختر ملفًا",
+      "placeholder": "سيُستخدم غلاف طباعي مؤقت إن لم تُرفع صورة"
+    },
+    "actions": {
+      "publish": "نشر الملزمة",
+      "saveDraft": "حفظ كمسودة",
+      "delete": "حذف الملزمة"
+    }
+  },
+  "handoutDetails": {
+    "title": "تفاصيل الملزمة",
     "overview": "نظرة عامة",
     "specs": "المواصفات",
     "stats": {
