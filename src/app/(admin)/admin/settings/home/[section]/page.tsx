@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { HomeFeaturesFields } from "@/components/admin/home-features-fields";
 import { HomeHeroFields } from "@/components/admin/home-hero-fields";
+import { HomePromoFields } from "@/components/admin/home-promo-fields";
 import { HomeSectionForm } from "@/components/admin/home-section-form";
 import { HomeShelfFields } from "@/components/admin/home-shelf-fields";
 import { getBookById, getBooksByIds, getCategoriesByIds, getStoreSettings } from "@/data";
@@ -20,6 +21,7 @@ import {
   isHomeSection,
   isHomeShelf,
   readHeroContent,
+  readPromoContent,
   readShelfContent,
   type HomeSection,
 } from "@/lib/home-sections";
@@ -30,7 +32,13 @@ interface HomeSectionPageProps {
 }
 
 /** The sections that have an edit page so far; the rest 404 until they do. */
-const editable: readonly HomeSection[] = ["hero", "features", "bestsellers", "categories"];
+const editable: readonly HomeSection[] = [
+  "hero",
+  "features",
+  "bestsellers",
+  "categories",
+  "promo",
+];
 
 async function resolveSection(params: HomeSectionPageProps["params"]) {
   const { section } = await params;
@@ -105,6 +113,10 @@ export default async function HomeSectionPage({ params }: HomeSectionPageProps) 
         content={content}
         picks={picks}
       />
+    );
+  } else if (section === "promo") {
+    fields = (
+      <HomePromoFields admin={admin} texts={texts.promo} content={readPromoContent(settings)} />
     );
   } else {
     fields = <HomeFeaturesFields admin={admin} texts={texts.features} />;

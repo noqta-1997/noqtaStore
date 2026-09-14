@@ -7,6 +7,10 @@ import type { Dictionary } from "@/i18n/get-dictionary";
 
 interface PromoBannerProps {
   dictionary: Dictionary["home"]["promo"];
+  /** Where the button goes. */
+  href: string;
+  /** The figure ghosted behind the copy. */
+  figure: string;
 }
 
 /**
@@ -15,7 +19,7 @@ interface PromoBannerProps {
  * the button. That also fixes the contrast — the copy is ink on a tint now
  * rather than white on the brand fill.
  */
-export function PromoBanner({ dictionary }: PromoBannerProps) {
+export function PromoBanner({ dictionary, href, figure }: PromoBannerProps) {
   return (
     <section className="py-14 lg:py-20">
       <Container>
@@ -24,7 +28,7 @@ export function PromoBanner({ dictionary }: PromoBannerProps) {
             aria-hidden
             className="pointer-events-none absolute -end-8 -bottom-20 font-display text-[12rem] leading-none font-bold text-primary opacity-15 select-none lg:text-[18rem]"
           >
-            25%
+            {figure}
           </span>
 
           <div className="relative grid gap-6 p-8 sm:p-12 lg:grid-cols-12 lg:items-center">
@@ -42,7 +46,7 @@ export function PromoBanner({ dictionary }: PromoBannerProps) {
 
             <div className="lg:col-span-4 lg:justify-self-end">
               <Link
-                href={`/offers`}
+                href={href}
                 className={buttonStyles({
                   size: "lg",
                   className: "h-12 rounded-full",

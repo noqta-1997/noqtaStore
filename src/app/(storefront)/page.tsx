@@ -21,6 +21,7 @@ import {
   applyHomeTexts,
   homeVisibility,
   readHeroContent,
+  readPromoContent,
   readShelfContent,
 } from "@/lib/home-sections";
 
@@ -98,7 +99,9 @@ export default async function HomePage() {
         />
       ) : null}
 
-      {show.promo ? <PromoBanner dictionary={dictionary.home.promo} /> : null}
+      {show.promo ? (
+        <PromoBanner dictionary={dictionary.home.promo} {...readPromoContent(settings)} />
+      ) : null}
 
       {show.newArrivals ? (
         <BookShelf

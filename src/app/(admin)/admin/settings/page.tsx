@@ -36,7 +36,13 @@ const tabs = ["store", "home", "shipping", "payments", "account"] as const;
 type Tab = (typeof tabs)[number];
 
 /** The sections whose copy and content have an edit page so far. */
-const editableSections: readonly HomeSection[] = ["hero", "features", "bestsellers", "categories"];
+const editableSections: readonly HomeSection[] = [
+  "hero",
+  "features",
+  "bestsellers",
+  "categories",
+  "promo",
+];
 
 export default async function SettingsPage({ searchParams }: SettingsPageProps) {
   const locale = defaultLocale;

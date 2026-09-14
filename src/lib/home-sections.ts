@@ -77,7 +77,7 @@ export const HOME_TEXT_FIELDS = {
   ],
   bestsellers: ["title", "subtitle"],
   categories: ["title", "subtitle", "count"],
-  promo: [],
+  promo: ["eyebrow", "title", "description", "cta"],
   newArrivals: [],
   authors: [],
   newsletter: [],
@@ -235,6 +235,38 @@ export async function resolveShelf<T>(
   }
 
   return byRule(content.limit ?? undefined);
+}
+
+/* ------------------------------------------------------------------ */
+/* Promo                                                               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The banner's two values that are not copy: where its button goes, and the
+ * figure ghosted behind it. The figure was "25%" in the component's markup,
+ * separate from the headline that said the same — so a rewritten headline
+ * would have kept the old number behind it.
+ */
+export const PROMO_DEFAULTS = { href: "/offers", figure: "25%" } as const;
+
+/** The figure is set at 12–18rem; more characters than this run off the card. */
+export const PROMO_FIGURE_MAX = 6;
+
+export const PROMO_KEYS = {
+  href: "home.promo.href",
+  figure: "home.promo.figure",
+} as const;
+
+export interface PromoContent {
+  href: string;
+  figure: string;
+}
+
+export function readPromoContent(settings: Record<string, string>): PromoContent {
+  return {
+    href: settings[PROMO_KEYS.href] || PROMO_DEFAULTS.href,
+    figure: settings[PROMO_KEYS.figure] || PROMO_DEFAULTS.figure,
+  };
 }
 
 /* ------------------------------------------------------------------ */

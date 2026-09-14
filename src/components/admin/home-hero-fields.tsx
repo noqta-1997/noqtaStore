@@ -62,7 +62,7 @@ export function HomeHeroFields({
             <Field label={h.primaryCta} htmlFor="primaryCta">
               <Input id="primaryCta" name="primaryCta" defaultValue={texts.primaryCta} />
             </Field>
-            <Field label={h.primaryHref} htmlFor="primaryHref" hint={h.linkHint}>
+            <Field label={h.primaryHref} htmlFor="primaryHref" hint={t.form.linkHint}>
               <Input
                 id="primaryHref"
                 name="primaryHref"
@@ -73,7 +73,7 @@ export function HomeHeroFields({
             <Field label={h.secondaryCta} htmlFor="secondaryCta">
               <Input id="secondaryCta" name="secondaryCta" defaultValue={texts.secondaryCta} />
             </Field>
-            <Field label={h.secondaryHref} htmlFor="secondaryHref" hint={h.linkHint}>
+            <Field label={h.secondaryHref} htmlFor="secondaryHref" hint={t.form.linkHint}>
               <Input
                 id="secondaryHref"
                 name="secondaryHref"

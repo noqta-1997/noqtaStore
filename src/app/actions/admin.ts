@@ -27,6 +27,9 @@ import {
   isHomeSection,
   isHomeShelf,
   isSafeHref,
+  PROMO_DEFAULTS,
+  PROMO_FIGURE_MAX,
+  PROMO_KEYS,
   shelfKeys,
   type HomeShelf,
   type ShelfKind,
@@ -961,6 +964,10 @@ export async function saveHomeSection(formData: FormData): Promise<ActionResult>
     const shelf = await readShelfForm(formData, section);
     if (!shelf.ok) return shelf;
     rows.push(...shelf.rows);
+  } else if (section === "promo") {
+    const promo = readPromoForm(formData);
+    if (!promo.ok) return promo;
+    rows.push(...promo.rows);
   }
 
   await prisma.$transaction(
@@ -1015,6 +1022,23 @@ async function readHeroForm(formData: FormData): Promise<SectionRows> {
       { key: HERO_KEYS.showcase, value: showcaseIds.length ? JSON.stringify(showcaseIds) : null },
       { key: HERO_KEYS.primaryHref, value: link(primaryHref, HERO_DEFAULT_LINKS.primaryHref) },
       { key: HERO_KEYS.secondaryHref, value: link(secondaryHref, HERO_DEFAULT_LINKS.secondaryHref) },
+    ],
+  };
+}
+
+/** The banner's link and ghosted figure, validated. */
+function readPromoForm(formData: FormData): SectionRows {
+  const href = text(formData, "href");
+  if (href && !isSafeHref(href)) return { ok: false, error: "invalidLink" };
+
+  // Bounded in the browser; cut, not refused, for a post that skipped it.
+  const figure = text(formData, "figure").slice(0, PROMO_FIGURE_MAX);
+
+  return {
+    ok: true,
+    rows: [
+      { key: PROMO_KEYS.href, value: href && href !== PROMO_DEFAULTS.href ? href : null },
+      { key: PROMO_KEYS.figure, value: figure && figure !== PROMO_DEFAULTS.figure ? figure : null },
     ],
   };
 }
