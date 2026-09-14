@@ -13,6 +13,11 @@ import {
 } from "@/data/mappers";
 import type { Prisma } from "@/generated/prisma/client";
 import { getCurrentCustomer } from "@/lib/auth";
+import {
+  HOME_SECTIONS,
+  homeSectionKey,
+  type HomeSectionVisibility,
+} from "@/lib/home-sections";
 import { prisma } from "@/lib/prisma";
 import type {
   AdminNotification,
@@ -1588,6 +1593,22 @@ export async function getShippingRules(): Promise<ShippingRules> {
     estimatedDays: settings.estimatedDays || "2-5",
     enablePickup: settings.enablePickup !== "false",
   };
+}
+
+/**
+ * Which of the home page's sections the store is showing. A section is on
+ * until the settings screen switches it off, so a store that has never
+ * opened that tab renders the whole page.
+ */
+export async function getHomeSections(): Promise<HomeSectionVisibility> {
+  const settings = await getStoreSettings();
+
+  return Object.fromEntries(
+    HOME_SECTIONS.map((section) => [
+      section,
+      settings[homeSectionKey(section)] !== "false",
+    ]),
+  ) as HomeSectionVisibility;
 }
 
 /* ------------------------------------------------------------------ */

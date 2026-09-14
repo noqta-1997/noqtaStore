@@ -2,16 +2,20 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { HomeSectionToggle } from "@/components/admin/home-section-toggle";
 import { Panel } from "@/components/admin/panel";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { ListRow } from "@/components/ui/list-row";
 import { RadioCard } from "@/components/ui/radio-card";
 import { Select } from "@/components/ui/select";
-import { getShippingRules, getStoreSettings } from "@/data";
+import { getHomeSections, getShippingRules, getStoreSettings } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
+import { formatNumber } from "@/lib/format";
+import { HOME_SECTIONS } from "@/lib/home-sections";
 import { readParam, type SearchParamsRecord } from "@/lib/search-params";
 import { cn } from "@/lib/utils";
 import { ActionForm } from "@/components/ui/action-form";
@@ -27,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: `${admin.settings.title} — ${admin.brand.panel}` };
 }
 
-const tabs = ["store", "shipping", "payments", "account"] as const;
+const tabs = ["store", "home", "shipping", "payments", "account"] as const;
 type Tab = (typeof tabs)[number];
 
 export default async function SettingsPage({ searchParams }: SettingsPageProps) {
@@ -36,12 +40,14 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
   const rawTab = readParam(await searchParams, "tab");
   const tab = (tabs.includes(rawTab as Tab) ? rawTab : "store") as Tab;
 
-  const [dictionary, admin, settings, shippingRules] = await Promise.all([
-    getDictionary(locale),
-    getAdminDictionary(locale),
-    getStoreSettings(),
-    getShippingRules(),
-  ]);
+  const [dictionary, admin, settings, shippingRules, homeSections] =
+    await Promise.all([
+      getDictionary(locale),
+      getAdminDictionary(locale),
+      getStoreSettings(),
+      getShippingRules(),
+      getHomeSections(),
+    ]);
 
   /** A saved value wins; otherwise the form shows the shipped default. */
   const saved = (key: string, fallback: string) => settings[key] ?? fallback;
@@ -129,6 +135,70 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
               <Button type="submit">{admin.common.saveChanges}</Button>
             </div>
           </ActionForm>
+        </Panel>
+      ) : null}
+
+      {tab === "home" ? (
+        <Panel title={t.home.title} subtitle={t.home.subtitle} flush>
+          <ol className="divide-y divide-line-divider">
+            {HOME_SECTIONS.map((section, index) => {
+              const visible = homeSections[section];
+              const copy = t.home.sections[section];
+
+              return (
+                <ListRow
+                  key={section}
+                  className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4"
+                >
+                  <div className="flex min-w-0 flex-1 items-start gap-3">
+                    <span
+                      className="label-mono w-6 shrink-0 pt-0.5 text-center text-muted"
+                      data-numeric
+                    >
+                      {formatNumber(index + 1, locale)}
+                    </span>
+                    <div className="min-w-0 space-y-0.5">
+                      <p
+                        className={cn(
+                          "text-body-md font-semibold",
+                          visible ? "text-on-surface" : "text-on-surface-variant",
+                        )}
+                      >
+                        {copy.title}
+                      </p>
+                      <p className="text-label-md text-muted">{copy.description}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 ps-9 sm:ps-0">
+                    <span
+                      className={cn(
+                        "inline-flex rounded-full border px-2.5 py-0.5 text-label-md font-semibold",
+                        visible
+                          ? "border-line bg-success text-on-success"
+                          : "border-line bg-surface-low text-on-surface-variant",
+                      )}
+                    >
+                      {visible ? t.home.visible : t.home.hidden}
+                    </span>
+                    <HomeSectionToggle
+                      section={section}
+                      visible={visible}
+                      title={copy.title}
+                      errorMessages={dictionary.common.actionErrors}
+                      labels={{
+                        show: t.home.show,
+                        hide: t.home.hide,
+                        shown: t.home.shown,
+                        hidden: t.home.hiddenToast,
+                        failure: dictionary.common.toast.actionFailed,
+                      }}
+                    />
+                  </div>
+                </ListRow>
+              );
+            })}
+          </ol>
         </Panel>
       ) : null}
 

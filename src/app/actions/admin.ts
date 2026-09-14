@@ -12,6 +12,7 @@ import {
   type ActionResult,
 } from "@/lib/action-result";
 import { getCurrentCustomer } from "@/lib/auth";
+import { homeSectionKey, isHomeSection } from "@/lib/home-sections";
 import { isOwner } from "@/lib/owner";
 import { refreshBookRating } from "@/lib/book-rating";
 import { discardCover, readCoverImage, storeCover } from "@/lib/cover-storage";
@@ -870,6 +871,37 @@ export async function saveSettings(formData: FormData): Promise<ActionResult> {
     // and page titles of every prerendered storefront page.
     revalidatePath("/", "layout");
   }
+
+  return ok();
+}
+
+/**
+ * Shows or hides one section of the home page.
+ *
+ * Each switch is its own row in the settings store, and the value written is
+ * the state the button asked for rather than the opposite of whatever is
+ * stored: two admins pressing "hide" on the same row end up with it hidden,
+ * not flipped back on by the second press.
+ */
+export async function setHomeSectionVisibility(
+  section: string,
+  visible: boolean,
+): Promise<ActionResult> {
+  if (!(await requireManager())) return fail("forbidden");
+  if (!isHomeSection(section)) return fail("unknownSection");
+
+  const key = homeSectionKey(section);
+  const value = String(visible);
+
+  await prisma.storeSetting.upsert({
+    where: { key },
+    create: { key, value },
+    update: { value },
+  });
+
+  revalidatePath("/admin/settings", "page");
+  // The home page is prerendered and otherwise waits out its revalidate window.
+  revalidatePath("/", "page");
 
   return ok();
 }

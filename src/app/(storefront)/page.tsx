@@ -11,6 +11,7 @@ import {
   getBestsellers,
   getBooksByTag,
   getCategories,
+  getHomeSections,
   getNewArrivals,
   getShowcaseBooks,
 } from "@/data";
@@ -23,6 +24,10 @@ export const revalidate = 300;
 export default async function HomePage() {
   const locale = defaultLocale;
 
+  /* Read before the catalogue: a section the panel has switched off is
+     not queried for, not merely left undrawn. */
+  const show = await getHomeSections();
+
   const [
     dictionary,
     categories,
@@ -33,68 +38,82 @@ export default async function HomePage() {
     authors,
   ] = await Promise.all([
     getDictionary(locale),
-    getCategories(),
+    show.categories ? getCategories() : [],
     /* One title: the hero's tagline pill links to it. The jackets it
        scrolls come from the showcase query, not from this tag. */
-    getBooksByTag("featured", 1),
-    getShowcaseBooks(),
-    getBestsellers(10),
-    getNewArrivals(5),
-    getAuthors(6),
+    show.hero ? getBooksByTag("featured", 1) : [],
+    show.hero ? getShowcaseBooks() : [],
+    show.bestsellers ? getBestsellers(10) : [],
+    show.newArrivals ? getNewArrivals(5) : [],
+    show.authors ? getAuthors(6) : [],
   ]);
 
   return (
     <>
-      <Hero
-        locale={locale}
-        dictionary={dictionary}
-        featuredBook={featured[0]}
-        showcase={showcase}
-      />
+      {show.hero ? (
+        <Hero
+          locale={locale}
+          dictionary={dictionary}
+          featuredBook={featured[0]}
+          showcase={showcase}
+        />
+      ) : null}
 
-      <FeaturesStrip dictionary={dictionary.home.features} />
+      {show.features ? (
+        <FeaturesStrip dictionary={dictionary.home.features} />
+      ) : null}
 
-      <BookShelf
-        title={dictionary.home.bestsellers.title}
-        subtitle={dictionary.home.bestsellers.subtitle}
-        books={bestsellers}
-        locale={locale}
-        dictionary={dictionary.common}
-        actionHref={`/books?sort=popular`}
-        priority
-      />
+      {show.bestsellers ? (
+        <BookShelf
+          title={dictionary.home.bestsellers.title}
+          subtitle={dictionary.home.bestsellers.subtitle}
+          books={bestsellers}
+          locale={locale}
+          dictionary={dictionary.common}
+          actionHref={`/books?sort=popular`}
+          priority
+        />
+      ) : null}
 
-      <CategoryTiles
-        locale={locale}
-        dictionary={dictionary}
-        categories={categories}
-      />
+      {show.categories ? (
+        <CategoryTiles
+          locale={locale}
+          dictionary={dictionary}
+          categories={categories}
+        />
+      ) : null}
 
-      <PromoBanner dictionary={dictionary.home.promo} />
+      {show.promo ? <PromoBanner dictionary={dictionary.home.promo} /> : null}
 
-      <BookShelf
-        title={dictionary.home.newArrivals.title}
-        subtitle={dictionary.home.newArrivals.subtitle}
-        books={newArrivals}
-        locale={locale}
-        dictionary={dictionary.common}
-        actionHref={`/books?sort=newest`}
-        band
-      />
+      {show.newArrivals ? (
+        <BookShelf
+          title={dictionary.home.newArrivals.title}
+          subtitle={dictionary.home.newArrivals.subtitle}
+          books={newArrivals}
+          locale={locale}
+          dictionary={dictionary.common}
+          actionHref={`/books?sort=newest`}
+          band
+        />
+      ) : null}
 
-      <AuthorsSpotlight
-        locale={locale}
-        dictionary={dictionary}
-        authors={authors}
-      />
+      {show.authors ? (
+        <AuthorsSpotlight
+          locale={locale}
+          dictionary={dictionary}
+          authors={authors}
+        />
+      ) : null}
 
-      <Newsletter
-        dictionary={dictionary.home.newsletter}
-        locale={locale}
-        toastTitle={dictionary.common.toast.subscribed}
-        errorMessages={dictionary.common.actionErrors}
-        fallbackError={dictionary.common.toast.actionFailed}
-      />
+      {show.newsletter ? (
+        <Newsletter
+          dictionary={dictionary.home.newsletter}
+          locale={locale}
+          toastTitle={dictionary.common.toast.subscribed}
+          errorMessages={dictionary.common.actionErrors}
+          fallbackError={dictionary.common.toast.actionFailed}
+        />
+      ) : null}
     </>
   );
 }
