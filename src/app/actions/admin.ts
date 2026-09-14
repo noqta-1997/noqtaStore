@@ -2,6 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 
+import { searchBookPicks } from "@/data";
+import { defaultLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/get-dictionary";
 import {
   checkbox,
   fail,
@@ -12,7 +15,17 @@ import {
   type ActionResult,
 } from "@/lib/action-result";
 import { getCurrentCustomer } from "@/lib/auth";
-import { homeSectionKey, isHomeSection } from "@/lib/home-sections";
+import {
+  HERO_DEFAULT_LINKS,
+  HERO_KEYS,
+  HERO_SHOWCASE_SIZE,
+  HOME_TEXT_FIELDS,
+  homeSectionKey,
+  homeTextDefault,
+  homeTextKey,
+  isHomeSection,
+  isSafeHref,
+} from "@/lib/home-sections";
 import { isOwner } from "@/lib/owner";
 import { refreshBookRating } from "@/lib/book-rating";
 import { discardCover, readCoverImage, storeCover } from "@/lib/cover-storage";
@@ -23,6 +36,7 @@ import type {
   ContactStatus,
   CouponType,
   OrderStatus,
+  PickOption,
   ReviewStatus,
 } from "@/types";
 
@@ -904,4 +918,120 @@ export async function setHomeSectionVisibility(
   revalidatePath("/", "page");
 
   return ok();
+}
+
+/**
+ * Saves one home page section's copy and content from its edit page.
+ *
+ * Every string the form carries is a row keyed `home.<section>.<field>`. A
+ * field left empty, or set back to the dictionary's own wording, deletes
+ * its row rather than storing a copy of the default: the table then holds
+ * only what the panel actually changed, and a string nobody rewrote follows
+ * the dictionary if the dictionary is edited later. The picked books are
+ * checked against the catalogue before anything is written, so the page
+ * never stores an id it cannot draw.
+ */
+export async function saveHomeSection(formData: FormData): Promise<ActionResult> {
+  if (!(await requireManager())) return fail("forbidden");
+
+  const section = text(formData, "section");
+  if (!isHomeSection(section)) return fail("unknownSection");
+
+  const { home } = await getDictionary(defaultLocale);
+  const rows: { key: string; value: string | null }[] = (
+    HOME_TEXT_FIELDS[section] as readonly string[]
+  ).map((field) => {
+    const value = text(formData, field);
+    return {
+      key: homeTextKey(section, field),
+      value: value && value !== homeTextDefault(home, section, field) ? value : null,
+    };
+  });
+
+  if (section === "hero") {
+    const hero = await readHeroForm(formData);
+    if (!hero.ok) return hero;
+    rows.push(...hero.rows);
+  }
+
+  await prisma.$transaction(
+    rows.map((row) =>
+      row.value === null
+        ? prisma.storeSetting.deleteMany({ where: { key: row.key } })
+        : prisma.storeSetting.upsert({
+            where: { key: row.key },
+            create: { key: row.key, value: row.value },
+            update: { value: row.value },
+          }),
+    ),
+  );
+
+  revalidatePath("/admin/settings", "page");
+  revalidatePath("/admin/settings/home/[section]", "page");
+  // The home page is prerendered and otherwise waits out its revalidate window.
+  revalidatePath("/", "page");
+
+  return ok();
+}
+
+type SectionRows =
+  | { ok: true; rows: { key: string; value: string | null }[] }
+  | { ok: false; error: string };
+
+/** The hero's picks and links, validated. */
+async function readHeroForm(formData: FormData): Promise<SectionRows> {
+  const primaryHref = text(formData, "primaryHref");
+  const secondaryHref = text(formData, "secondaryHref");
+  if ((primaryHref && !isSafeHref(primaryHref)) || (secondaryHref && !isSafeHref(secondaryHref))) {
+    return { ok: false, error: "invalidLink" };
+  }
+
+  const featuredBookId = text(formData, "featuredBookId");
+  // Repeated hidden inputs, in the order the picker shows them.
+  const showcaseIds = [...new Set(idList(formData, "showcaseIds"))].slice(0, HERO_SHOWCASE_SIZE);
+
+  const wanted = [...new Set([featuredBookId, ...showcaseIds].filter(Boolean))];
+  if (wanted.length) {
+    const found = await prisma.book.count({ where: { id: { in: wanted } } });
+    if (found !== wanted.length) return { ok: false, error: "unknownBook" };
+  }
+
+  const link = (value: string, fallback: string) =>
+    value && value !== fallback ? value : null;
+
+  return {
+    ok: true,
+    rows: [
+      { key: HERO_KEYS.featuredBook, value: featuredBookId || null },
+      { key: HERO_KEYS.showcase, value: showcaseIds.length ? JSON.stringify(showcaseIds) : null },
+      { key: HERO_KEYS.primaryHref, value: link(primaryHref, HERO_DEFAULT_LINKS.primaryHref) },
+      { key: HERO_KEYS.secondaryHref, value: link(secondaryHref, HERO_DEFAULT_LINKS.secondaryHref) },
+    ],
+  };
+}
+
+function idList(formData: FormData, name: string): string[] {
+  return formData
+    .getAll(name)
+    .filter((value): value is string => typeof value === "string")
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+/**
+ * What the book pickers on the home page forms search through. Reachable
+ * only by the manager: the catalogue is public, but this shape and ranking
+ * exist for the panel and there is no reason to serve them to anyone else.
+ */
+export async function searchHomeBooks(
+  term: string,
+  exclude: string[],
+): Promise<PickOption[]> {
+  if (!(await requireManager())) return [];
+
+  // Arguments arrive as JSON from the browser, so their shape is checked, not assumed.
+  return searchBookPicks(
+    typeof term === "string" ? term.trim().slice(0, 80) : "",
+    Array.isArray(exclude) ? exclude.filter((id) => typeof id === "string").slice(0, 64) : [],
+  );
 }

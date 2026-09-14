@@ -14,8 +14,8 @@ import {
 import type { Prisma } from "@/generated/prisma/client";
 import { getCurrentCustomer } from "@/lib/auth";
 import {
-  HOME_SECTIONS,
-  homeSectionKey,
+  homeVisibility,
+  type HeroContent,
   type HomeSectionVisibility,
 } from "@/lib/home-sections";
 import { prisma } from "@/lib/prisma";
@@ -41,6 +41,7 @@ import type {
   HandoutWithRelations,
   Order,
   OrderStatus,
+  PickOption,
   Publisher,
   Review,
   ReviewStatus,
@@ -325,6 +326,35 @@ export async function getShowcaseBooks(limit = 12): Promise<BookWithRelations[]>
   return rows.map(toBook);
 }
 
+/**
+ * The title the hero's tagline pill links to: the panel's pick while it is
+ * still in the catalogue, otherwise the most-reviewed title tagged featured.
+ */
+export async function getHeroFeaturedBook(
+  content: HeroContent,
+): Promise<BookWithRelations | undefined> {
+  if (content.featuredBookId) {
+    const picked = await getBookById(content.featuredBookId);
+    if (picked) return picked;
+  }
+
+  const [tagged] = await getBooksByTag("featured", 1);
+  return tagged;
+}
+
+/**
+ * The hero's jackets: the panel's picks, in its order, while any of them are
+ * still in the catalogue; otherwise the showcase ranking.
+ */
+export async function getHeroShowcase(content: HeroContent): Promise<BookWithRelations[]> {
+  if (content.showcaseIds.length) {
+    const picked = await getBooksByIds(content.showcaseIds);
+    if (picked.length) return picked;
+  }
+
+  return getShowcaseBooks();
+}
+
 export async function getDiscountedBooks(limit?: number): Promise<BookWithRelations[]> {
   const rows = await prisma.book.findMany({
     where: { compareAtPrice: { not: null } },
@@ -346,6 +376,53 @@ export async function getBookBySlug(
 export async function getBookById(id: string): Promise<BookWithRelations | undefined> {
   const row = await prisma.book.findUnique({ where: { id }, include: bookInclude });
   return row ? toBook(row) : undefined;
+}
+
+/**
+ * Books in the order their ids were given — the order the panel picked them
+ * in. An id whose book has since been deleted is skipped rather than left
+ * as a hole, so a hand-picked shelf shortens instead of breaking.
+ */
+export async function getBooksByIds(ids: string[]): Promise<BookWithRelations[]> {
+  if (!ids.length) return [];
+
+  const rows = await prisma.book.findMany({
+    where: { id: { in: ids } },
+    include: bookInclude,
+  });
+  const byId = new Map(rows.map((row) => [row.id, toBook(row)]));
+
+  return ids.flatMap((id) => {
+    const book = byId.get(id);
+    return book ? [book] : [];
+  });
+}
+
+/**
+ * What the panel's book pickers search through. The same clauses as the
+ * catalogue search, ranked the way the hero showcase is — real artwork
+ * first — so that with nothing typed the list opens on the jackets most
+ * worth showing.
+ */
+export async function searchBookPicks(
+  term: string,
+  exclude: string[] = [],
+  limit = 8,
+): Promise<PickOption[]> {
+  const rows = await prisma.book.findMany({
+    where: { AND: [bookWhere({ q: term }), { id: { notIn: exclude } }] },
+    include: { author: true },
+    orderBy: [{ coverUrl: { sort: "desc", nulls: "last" } }, { reviewsCount: "desc" }],
+    take: limit,
+  });
+
+  return rows.map((row) => ({
+    id: row.id,
+    label: row.titleAr,
+    sublabel: row.author.nameAr,
+    seed: row.slug,
+    coverUrl: row.coverUrl ?? undefined,
+  }));
 }
 
 export async function getBookSlugs(): Promise<string[]> {
@@ -1601,14 +1678,7 @@ export async function getShippingRules(): Promise<ShippingRules> {
  * opened that tab renders the whole page.
  */
 export async function getHomeSections(): Promise<HomeSectionVisibility> {
-  const settings = await getStoreSettings();
-
-  return Object.fromEntries(
-    HOME_SECTIONS.map((section) => [
-      section,
-      settings[homeSectionKey(section)] !== "false",
-    ]),
-  ) as HomeSectionVisibility;
+  return homeVisibility(await getStoreSettings());
 }
 
 /* ------------------------------------------------------------------ */

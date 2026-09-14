@@ -348,3 +348,17 @@ export interface AdminNotification {
   href: string;
   at: string;
 }
+
+/**
+ * A catalogue entry cut down to what a picker in the panel shows: enough to
+ * recognise it in a list and draw its jacket, and nothing a form does not
+ * need to carry to the browser.
+ */
+export interface PickOption {
+  id: string;
+  label: string;
+  sublabel?: string;
+  /** Stable key for the typographic placeholder's colour. */
+  seed: string;
+  coverUrl?: string;
+}

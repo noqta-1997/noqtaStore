@@ -1,10 +1,11 @@
+import { PenLine } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { HomeSectionToggle } from "@/components/admin/home-section-toggle";
 import { Panel } from "@/components/admin/panel";
-import { Button } from "@/components/ui/button";
+import { Button, buttonStyles } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -15,7 +16,7 @@ import { getHomeSections, getShippingRules, getStoreSettings } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 import { formatNumber } from "@/lib/format";
-import { HOME_SECTIONS } from "@/lib/home-sections";
+import { HOME_SECTIONS, type HomeSection } from "@/lib/home-sections";
 import { readParam, type SearchParamsRecord } from "@/lib/search-params";
 import { cn } from "@/lib/utils";
 import { ActionForm } from "@/components/ui/action-form";
@@ -33,6 +34,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const tabs = ["store", "home", "shipping", "payments", "account"] as const;
 type Tab = (typeof tabs)[number];
+
+/** The sections whose copy and content have an edit page so far. */
+const editableSections: readonly HomeSection[] = ["hero"];
 
 export default async function SettingsPage({ searchParams }: SettingsPageProps) {
   const locale = defaultLocale;
@@ -170,7 +174,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 ps-9 sm:ps-0">
+                  <div className="flex flex-wrap items-center gap-3 ps-9 sm:ps-0">
                     <span
                       className={cn(
                         "inline-flex rounded-full border px-2.5 py-0.5 text-label-md font-semibold",
@@ -181,6 +185,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                     >
                       {visible ? t.home.visible : t.home.hidden}
                     </span>
+                    {editableSections.includes(section) ? (
+                      <Link
+                        href={`${base}/home/${section}`}
+                        aria-label={`${t.home.edit}: ${copy.title}`}
+                        className={buttonStyles({ variant: "secondary", size: "sm" })}
+                      >
+                        <PenLine aria-hidden className="size-4" strokeWidth={1.75} />
+                        {t.home.edit}
+                      </Link>
+                    ) : null}
                     <HomeSectionToggle
                       section={section}
                       visible={visible}

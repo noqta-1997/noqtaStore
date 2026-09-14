@@ -6,23 +6,18 @@ import { buttonStyles } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/get-dictionary";
+import { HERO_SHOWCASE_SIZE } from "@/lib/home-sections";
 import type { BookWithRelations } from "@/types";
-
-/**
- * Jackets in one pass of the marquee. The row is rendered twice and the
- * track slides by one row, so this number fixes both how much is in view
- * and how far a loop travels — the 48s in `globals.css` was timed against
- * it. A catalogue with fewer titles cycles the ones it has.
- */
-const SHOWCASE_SIZE = 12;
 
 interface HeroProps {
   locale: Locale;
   dictionary: Dictionary;
-  /** The one title the tagline pill links to. */
-  featuredBook: BookWithRelations;
-  /** Jackets for the marquee, in the order they enter. */
+  /** The one title the tagline pill links to; without one there is no pill. */
+  featuredBook?: BookWithRelations;
+  /** Jackets for the marquee, in the order they enter. A shorter list cycles. */
   showcase: BookWithRelations[];
+  primaryHref: string;
+  secondaryHref: string;
 }
 
 /**
@@ -37,11 +32,18 @@ interface HeroProps {
  * does not stop for the pointer: nothing in it can be clicked, so a pause
  * would only make the row stutter as the mouse crosses the page.
  */
-export function Hero({ locale, dictionary, featuredBook, showcase }: HeroProps) {
+export function Hero({
+  locale,
+  dictionary,
+  featuredBook,
+  showcase,
+  primaryHref,
+  secondaryHref,
+}: HeroProps) {
   const { hero } = dictionary.home;
 
   const row = showcase.length
-    ? Array.from({ length: SHOWCASE_SIZE }, (_, i) => showcase[i % showcase.length])
+    ? Array.from({ length: HERO_SHOWCASE_SIZE }, (_, i) => showcase[i % showcase.length])
     : [];
 
   return (
@@ -54,29 +56,31 @@ export function Hero({ locale, dictionary, featuredBook, showcase }: HeroProps) 
               standing in for the release note. A pill rather than a `Badge`
               because it is a link and 28px tall, not a 22px label.
             */}
-            <Link
-              href={`/books/${featuredBook.slug}`}
-              className={
-                "inline-flex h-7 max-w-full items-center gap-1.5 rounded-full border " +
-                "border-line bg-card px-3 text-body-md text-on-surface elevation-sm " +
-                "transition-[background-color,border-color] duration-100 ease-fluent " +
-                "hover:border-line-hover hover:bg-card-hover"
-              }
-            >
-              <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-success" />
-              <span className="shrink-0 font-semibold">{hero.featuredLabel}</span>
-              <span aria-hidden className="shrink-0 text-muted">
-                ·
-              </span>
-              <span className="truncate text-on-surface-variant">
-                {featuredBook.title[locale]}
-              </span>
-              <ArrowUpRight
-                aria-hidden
-                className="size-4 shrink-0 rtl:-scale-x-100"
-                strokeWidth={1.75}
-              />
-            </Link>
+            {featuredBook ? (
+              <Link
+                href={`/books/${featuredBook.slug}`}
+                className={
+                  "inline-flex h-7 max-w-full items-center gap-1.5 rounded-full border " +
+                  "border-line bg-card px-3 text-body-md text-on-surface elevation-sm " +
+                  "transition-[background-color,border-color] duration-100 ease-fluent " +
+                  "hover:border-line-hover hover:bg-card-hover"
+                }
+              >
+                <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-success" />
+                <span className="shrink-0 font-semibold">{hero.featuredLabel}</span>
+                <span aria-hidden className="shrink-0 text-muted">
+                  ·
+                </span>
+                <span className="truncate text-on-surface-variant">
+                  {featuredBook.title[locale]}
+                </span>
+                <ArrowUpRight
+                  aria-hidden
+                  className="size-4 shrink-0 rtl:-scale-x-100"
+                  strokeWidth={1.75}
+                />
+              </Link>
+            ) : null}
 
             <h1 id="hero-heading" className="text-display-lg text-balance">
               {hero.title}{" "}
@@ -90,7 +94,7 @@ export function Hero({ locale, dictionary, featuredBook, showcase }: HeroProps) 
 
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
             <Link
-              href={`/books`}
+              href={primaryHref}
               className={buttonStyles({
                 size: "lg",
                 className: "h-12 rounded-full max-sm:w-full",
@@ -100,7 +104,7 @@ export function Hero({ locale, dictionary, featuredBook, showcase }: HeroProps) 
               <ArrowRight aria-hidden className="size-4 rtl:rotate-180" strokeWidth={1.75} />
             </Link>
             <Link
-              href={`/categories`}
+              href={secondaryHref}
               className={buttonStyles({
                 variant: "secondary",
                 size: "lg",

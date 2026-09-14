@@ -9,14 +9,15 @@ import { PromoBanner } from "@/components/home/promo-banner";
 import {
   getAuthors,
   getBestsellers,
-  getBooksByTag,
   getCategories,
-  getHomeSections,
+  getHeroFeaturedBook,
+  getHeroShowcase,
   getNewArrivals,
-  getShowcaseBooks,
+  getStoreSettings,
 } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
+import { applyHomeTexts, homeVisibility, readHeroContent } from "@/lib/home-sections";
 
 /** Catalogue content is re-fetched at most every five minutes. */
 export const revalidate = 300;
@@ -24,12 +25,15 @@ export const revalidate = 300;
 export default async function HomePage() {
   const locale = defaultLocale;
 
-  /* Read before the catalogue: a section the panel has switched off is
-     not queried for, not merely left undrawn. */
-  const show = await getHomeSections();
+  /* The panel's settings are read before the catalogue: a section it has
+     switched off is not queried for, not merely left undrawn, and a section
+     it has hand-picked is fetched by those picks. */
+  const settings = await getStoreSettings();
+  const show = homeVisibility(settings);
+  const hero = readHeroContent(settings);
 
   const [
-    dictionary,
+    shipped,
     categories,
     featured,
     showcase,
@@ -40,13 +44,17 @@ export default async function HomePage() {
     getDictionary(locale),
     show.categories ? getCategories() : [],
     /* One title: the hero's tagline pill links to it. The jackets it
-       scrolls come from the showcase query, not from this tag. */
-    show.hero ? getBooksByTag("featured", 1) : [],
-    show.hero ? getShowcaseBooks() : [],
+       scrolls are a separate list, not this tag. */
+    show.hero ? getHeroFeaturedBook(hero) : undefined,
+    show.hero ? getHeroShowcase(hero) : [],
     show.bestsellers ? getBestsellers(10) : [],
     show.newArrivals ? getNewArrivals(5) : [],
     show.authors ? getAuthors(6) : [],
   ]);
+
+  /* The sections read their copy from the dictionary as they always did;
+     what changes is that the panel's rewrites are laid over it first. */
+  const dictionary = { ...shipped, home: applyHomeTexts(shipped.home, settings) };
 
   return (
     <>
@@ -54,8 +62,10 @@ export default async function HomePage() {
         <Hero
           locale={locale}
           dictionary={dictionary}
-          featuredBook={featured[0]}
+          featuredBook={featured}
           showcase={showcase}
+          primaryHref={hero.primaryHref}
+          secondaryHref={hero.secondaryHref}
         />
       ) : null}
 
