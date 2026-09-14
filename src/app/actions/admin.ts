@@ -14,6 +14,7 @@ import {
 import { getCurrentCustomer } from "@/lib/auth";
 import { isOwner } from "@/lib/owner";
 import { refreshBookRating } from "@/lib/book-rating";
+import { discardCover, readCoverImage, storeCover } from "@/lib/cover-storage";
 import { refreshHandoutRating } from "@/lib/handout-rating";
 import { prisma } from "@/lib/prisma";
 import type {
@@ -81,6 +82,9 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
   const publisherId = text(formData, "publisherId");
   if (!authorId || !categoryId || !publisherId) return fail("missingRelation");
 
+  const cover = readCoverImage(formData);
+  if (!cover.ok) return fail(cover.error);
+
   const bookId = text(formData, "bookId");
 
   /*
@@ -107,9 +111,32 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
     publisherId,
   } as const;
 
+  /*
+   * The cover goes up before the row is written: a failed upload then leaves
+   * the catalogue untouched, and a failed write removes the file it had just
+   * put there. Either way no row ends up pointing at a file that is not
+   * there. Left `undefined`, Prisma leaves the column alone.
+   */
+  let coverUrl: string | undefined;
+  if (cover.file) {
+    try {
+      coverUrl = await storeCover("books", cover.file);
+    } catch {
+      return fail("uploadFailed");
+    }
+  }
+
+  let replaced: string | null = null;
   try {
     if (bookId) {
-      await prisma.book.update({ where: { id: bookId }, data });
+      if (coverUrl) {
+        const current = await prisma.book.findUnique({
+          where: { id: bookId },
+          select: { coverUrl: true },
+        });
+        replaced = current?.coverUrl ?? null;
+      }
+      await prisma.book.update({ where: { id: bookId }, data: { ...data, coverUrl } });
     } else {
       /*
        * A new row still needs the four: `slug` and `isbn` are unique and
@@ -122,6 +149,7 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
       await prisma.book.create({
         data: {
           ...data,
+          coverUrl,
           slug: slugify(titleAr, `book-${Date.now()}`),
           isbn: `TEMP-${Date.now()}`,
           coverType: "paperback",
@@ -130,8 +158,12 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
       });
     }
   } catch {
+    await discardCover(coverUrl);
     return fail("duplicate");
   }
+
+  // Nothing refers to the cover this one replaced any more.
+  await discardCover(replaced);
 
   revalidateCatalogue();
   revalidatePath("/admin/books", "page");
@@ -144,7 +176,11 @@ export async function deleteBook(bookId: string): Promise<ActionResult> {
   const ordered = await prisma.orderItem.count({ where: { bookId } });
   if (ordered > 0) return fail("inUse");
 
-  await prisma.book.delete({ where: { id: bookId } });
+  const deleted = await prisma.book.delete({
+    where: { id: bookId },
+    select: { coverUrl: true },
+  });
+  await discardCover(deleted.coverUrl);
 
   revalidateCatalogue();
   revalidatePath("/admin/books", "page");
@@ -167,6 +203,9 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
   const publisherId = text(formData, "publisherId");
   if (!authorId || !categoryId || !publisherId) return fail("missingRelation");
 
+  const cover = readCoverImage(formData);
+  if (!cover.ok) return fail(cover.error);
+
   const handoutId = text(formData, "handoutId");
 
   // The update payload: slug, ISBN, cover type and weight are absent for the
@@ -185,13 +224,35 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
     publisherId,
   } as const;
 
+  // Upload first, write second, tidy up whichever one lost — as in `saveBook`.
+  let coverUrl: string | undefined;
+  if (cover.file) {
+    try {
+      coverUrl = await storeCover("handouts", cover.file);
+    } catch {
+      return fail("uploadFailed");
+    }
+  }
+
+  let replaced: string | null = null;
   try {
     if (handoutId) {
-      await prisma.handout.update({ where: { id: handoutId }, data });
+      if (coverUrl) {
+        const current = await prisma.handout.findUnique({
+          where: { id: handoutId },
+          select: { coverUrl: true },
+        });
+        replaced = current?.coverUrl ?? null;
+      }
+      await prisma.handout.update({
+        where: { id: handoutId },
+        data: { ...data, coverUrl },
+      });
     } else {
       await prisma.handout.create({
         data: {
           ...data,
+          coverUrl,
           slug: slugify(titleAr, `handout-${Date.now()}`),
           isbn: `TEMP-${Date.now()}`,
           coverType: "paperback",
@@ -200,8 +261,11 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
       });
     }
   } catch {
+    await discardCover(coverUrl);
     return fail("duplicate");
   }
+
+  await discardCover(replaced);
 
   revalidateHandouts();
   return ok();
@@ -213,7 +277,11 @@ export async function deleteHandout(handoutId: string): Promise<ActionResult> {
   const ordered = await prisma.handoutOrderItem.count({ where: { handoutId } });
   if (ordered > 0) return fail("inUse");
 
-  await prisma.handout.delete({ where: { id: handoutId } });
+  const deleted = await prisma.handout.delete({
+    where: { id: handoutId },
+    select: { coverUrl: true },
+  });
+  await discardCover(deleted.coverUrl);
 
   revalidateHandouts();
   return ok();

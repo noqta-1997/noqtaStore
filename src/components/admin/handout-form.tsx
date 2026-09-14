@@ -1,6 +1,6 @@
-import { ImagePlus } from "lucide-react";
 import Link from "next/link";
 
+import { CoverField } from "@/components/admin/cover-field";
 import { Panel } from "@/components/admin/panel";
 import { BookCover } from "@/components/book/book-cover";
 import { Button, buttonStyles } from "@/components/ui/button";
@@ -64,6 +64,9 @@ export function HandoutForm({
         duplicate: dictionary.common.actionErrors.duplicate,
         missingTitle: dictionary.common.actionErrors.missingTitle,
         missingRelation: dictionary.common.actionErrors.missingRelation,
+        invalidImage: dictionary.common.actionErrors.invalidImage,
+        imageTooLarge: dictionary.common.actionErrors.imageTooLarge,
+        uploadFailed: dictionary.common.actionErrors.uploadFailed,
       }}
     >
       {handout ? <input type="hidden" name="handoutId" value={handout.id} /> : null}
@@ -162,30 +165,16 @@ export function HandoutForm({
 
       <div className="space-y-4 lg:col-span-4">
         <Panel title={t.sections.media}>
-          <div className="space-y-3">
-            <div className="mx-auto w-full max-w-40 rounded-xl bg-surface-low p-4">
-              <BookCover
-                title={handout?.title[locale] ?? admin.handouts.title}
-                author={handout?.author.name[locale] ?? admin.brand.name}
-                seed={handout?.slug ?? "new-handout"}
-                src={handout?.coverUrl}
-                sizes="8rem"
-                className="rounded-lg elevation-sm"
-              />
-            </div>
-
-            <label
-              htmlFor="coverImage"
-              className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed border-outline p-5 text-center transition-colors duration-100 ease-fluent hover:border-line-hover hover:bg-state-hover"
-            >
-              <ImagePlus aria-hidden className="size-5 text-primary" strokeWidth={1.75} />
-              <span className="text-label-md text-on-surface">{t.upload.button}</span>
-              <span className="text-label-md text-muted">{t.upload.hint}</span>
-              <input id="coverImage" name="coverImage" type="file" accept="image/*" className="sr-only" />
-            </label>
-
-            <p className="text-label-md text-muted">{t.upload.placeholder}</p>
-          </div>
+          <CoverField labels={t.upload} errors={dictionary.common.actionErrors}>
+            <BookCover
+              title={handout?.title[locale] ?? admin.handouts.title}
+              author={handout?.author.name[locale] ?? admin.brand.name}
+              seed={handout?.slug ?? "new-handout"}
+              src={handout?.coverUrl}
+              sizes="8rem"
+              className="rounded-lg elevation-sm"
+            />
+          </CoverField>
         </Panel>
 
         <Panel title={t.sections.pricing}>

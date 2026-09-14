@@ -45,7 +45,15 @@ export function ActionForm({
     setPending(true);
 
     const form = event.currentTarget;
-    const result = await action(new FormData(form));
+    let result: ActionResult;
+    try {
+      result = await action(new FormData(form));
+    } catch {
+      // The request itself failed — offline, or a body the server refused
+      // before the action ran, such as a cover past the size limit. Reported
+      // like any other failed action rather than left hanging.
+      result = { ok: false, error: "request" };
+    }
     setPending(false);
 
     if (result.ok) {
