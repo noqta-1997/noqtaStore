@@ -36,7 +36,7 @@ export function HomeHeroFields({
   const t = admin.settings.home;
   const h = t.hero;
 
-  const pickerLabels: PickListLabels = { ...t.picker, search: h.searchBooks };
+  const pickerLabels: PickListLabels = { ...t.picker, search: t.picker.searchBooks };
 
   return (
     <div className="grid gap-4 lg:grid-cols-12">

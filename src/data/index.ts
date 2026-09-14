@@ -17,6 +17,8 @@ import {
   homeVisibility,
   type HeroContent,
   type HomeSectionVisibility,
+  type HomeShelf,
+  type ShelfContent,
 } from "@/lib/home-sections";
 import { prisma } from "@/lib/prisma";
 import type {
@@ -353,6 +355,28 @@ export async function getHeroShowcase(content: HeroContent): Promise<BookWithRel
   }
 
   return getShowcaseBooks();
+}
+
+/** Each shelf's own rule, given how many titles to show. */
+const shelfRules: Record<HomeShelf, (limit: number) => Promise<BookWithRelations[]>> = {
+  bestsellers: getBestsellers,
+};
+
+/**
+ * A shelf's titles: the panel's picks, in its order, while it has switched
+ * the shelf to manual and any of them are still in the catalogue; otherwise
+ * the shelf's rule, cut to the panel's count.
+ */
+export async function getShelfBooks(
+  shelf: HomeShelf,
+  content: ShelfContent,
+): Promise<BookWithRelations[]> {
+  if (content.mode === "manual" && content.ids.length) {
+    const picked = await getBooksByIds(content.ids);
+    if (picked.length) return picked;
+  }
+
+  return shelfRules[shelf](content.limit);
 }
 
 export async function getDiscountedBooks(limit?: number): Promise<BookWithRelations[]> {

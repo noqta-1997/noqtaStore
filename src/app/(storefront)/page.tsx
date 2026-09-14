@@ -8,16 +8,21 @@ import { Newsletter } from "@/components/home/newsletter";
 import { PromoBanner } from "@/components/home/promo-banner";
 import {
   getAuthors,
-  getBestsellers,
   getCategories,
   getHeroFeaturedBook,
   getHeroShowcase,
   getNewArrivals,
+  getShelfBooks,
   getStoreSettings,
 } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
-import { applyHomeTexts, homeVisibility, readHeroContent } from "@/lib/home-sections";
+import {
+  applyHomeTexts,
+  homeVisibility,
+  readHeroContent,
+  readShelfContent,
+} from "@/lib/home-sections";
 
 /** Catalogue content is re-fetched at most every five minutes. */
 export const revalidate = 300;
@@ -47,7 +52,7 @@ export default async function HomePage() {
        scrolls are a separate list, not this tag. */
     show.hero ? getHeroFeaturedBook(hero) : undefined,
     show.hero ? getHeroShowcase(hero) : [],
-    show.bestsellers ? getBestsellers(10) : [],
+    show.bestsellers ? getShelfBooks("bestsellers", readShelfContent(settings, "bestsellers")) : [],
     show.newArrivals ? getNewArrivals(5) : [],
     show.authors ? getAuthors(6) : [],
   ]);

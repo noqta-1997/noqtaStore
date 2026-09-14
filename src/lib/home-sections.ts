@@ -75,7 +75,7 @@ export const HOME_TEXT_FIELDS = {
     "returns.title",
     "returns.description",
   ],
-  bestsellers: [],
+  bestsellers: ["title", "subtitle"],
   categories: [],
   promo: [],
   newArrivals: [],
@@ -145,6 +145,65 @@ export function applyHomeTexts(
 export const HOME_FEATURES = ["shipping", "payment", "authentic", "returns"] as const;
 
 export type HomeFeature = (typeof HOME_FEATURES)[number];
+
+/* ------------------------------------------------------------------ */
+/* Shelves                                                             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The shelves the panel may fill by hand instead of by rule: how many titles
+ * the rule shows unless told otherwise, and the most a shelf may hold either
+ * way. Twenty is four rows of the widest grid.
+ */
+export const HOME_SHELVES = {
+  bestsellers: { limit: 10, max: 20 },
+} as const satisfies Partial<Record<HomeSection, { limit: number; max: number }>>;
+
+export type HomeShelf = keyof typeof HOME_SHELVES;
+
+export type ShelfMode = "auto" | "manual";
+
+export interface ShelfContent {
+  /** `auto` follows the shelf's rule; `manual` shows `ids` in order. */
+  mode: ShelfMode;
+  /** How many the rule shows. */
+  limit: number;
+  /** The hand-picked titles, in the order they are drawn. */
+  ids: string[];
+}
+
+export function isHomeShelf(section: HomeSection): section is HomeShelf {
+  return section in HOME_SHELVES;
+}
+
+/** The `store_settings` rows a shelf's mode, count and picks are kept in. */
+export function shelfKeys(shelf: HomeShelf) {
+  return {
+    mode: `home.${shelf}.mode`,
+    limit: `home.${shelf}.limit`,
+    ids: `home.${shelf}.ids`,
+  } as const;
+}
+
+/**
+ * A shelf's content as the panel left it. A count outside the shelf's range
+ * — a row written by hand, or a `max` lowered since — reads as the default
+ * rather than as a shelf of one or of a hundred.
+ */
+export function readShelfContent(
+  settings: Record<string, string>,
+  shelf: HomeShelf,
+): ShelfContent {
+  const keys = shelfKeys(shelf);
+  const { limit, max } = HOME_SHELVES[shelf];
+  const stored = Number(settings[keys.limit]);
+
+  return {
+    mode: settings[keys.mode] === "manual" ? "manual" : "auto",
+    limit: Number.isInteger(stored) && stored >= 1 && stored <= max ? stored : limit,
+    ids: parseIdList(settings[keys.ids]).slice(0, max),
+  };
+}
 
 /* ------------------------------------------------------------------ */
 /* Hero                                                                */

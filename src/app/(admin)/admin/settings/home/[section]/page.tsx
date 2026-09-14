@@ -8,13 +8,16 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { HomeFeaturesFields } from "@/components/admin/home-features-fields";
 import { HomeHeroFields } from "@/components/admin/home-hero-fields";
 import { HomeSectionForm } from "@/components/admin/home-section-form";
+import { HomeShelfFields } from "@/components/admin/home-shelf-fields";
 import { getBookById, getBooksByIds, getStoreSettings } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 import {
   applyHomeTexts,
   isHomeSection,
+  isHomeShelf,
   readHeroContent,
+  readShelfContent,
   type HomeSection,
 } from "@/lib/home-sections";
 import { bookPick } from "@/lib/picks";
@@ -24,7 +27,7 @@ interface HomeSectionPageProps {
 }
 
 /** The sections that have an edit page so far; the rest 404 until they do. */
-const editable: readonly HomeSection[] = ["hero", "features"];
+const editable: readonly HomeSection[] = ["hero", "features", "bestsellers"];
 
 async function resolveSection(params: HomeSectionPageProps["params"]) {
   const { section } = await params;
@@ -75,6 +78,20 @@ export default async function HomeSectionPage({ params }: HomeSectionPageProps) 
         content={hero}
         featured={featured ? bookPick(featured, locale) : null}
         showcase={showcase.map((book) => bookPick(book, locale))}
+      />
+    );
+  } else if (isHomeShelf(section)) {
+    const content = readShelfContent(settings, section);
+    const picks = await getBooksByIds(content.ids);
+
+    fields = (
+      <HomeShelfFields
+        shelf={section}
+        locale={locale}
+        admin={admin}
+        texts={texts[section]}
+        content={content}
+        picks={picks.map((book) => bookPick(book, locale))}
       />
     );
   } else {

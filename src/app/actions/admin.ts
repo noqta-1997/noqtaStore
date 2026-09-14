@@ -19,12 +19,16 @@ import {
   HERO_DEFAULT_LINKS,
   HERO_KEYS,
   HERO_SHOWCASE_SIZE,
+  HOME_SHELVES,
   HOME_TEXT_FIELDS,
   homeSectionKey,
   homeTextDefault,
   homeTextKey,
   isHomeSection,
+  isHomeShelf,
   isSafeHref,
+  shelfKeys,
+  type HomeShelf,
 } from "@/lib/home-sections";
 import { isOwner } from "@/lib/owner";
 import { refreshBookRating } from "@/lib/book-rating";
@@ -952,6 +956,10 @@ export async function saveHomeSection(formData: FormData): Promise<ActionResult>
     const hero = await readHeroForm(formData);
     if (!hero.ok) return hero;
     rows.push(...hero.rows);
+  } else if (isHomeShelf(section)) {
+    const shelf = await readShelfForm(formData, section);
+    if (!shelf.ok) return shelf;
+    rows.push(...shelf.rows);
   }
 
   await prisma.$transaction(
@@ -1006,6 +1014,40 @@ async function readHeroForm(formData: FormData): Promise<SectionRows> {
       { key: HERO_KEYS.showcase, value: showcaseIds.length ? JSON.stringify(showcaseIds) : null },
       { key: HERO_KEYS.primaryHref, value: link(primaryHref, HERO_DEFAULT_LINKS.primaryHref) },
       { key: HERO_KEYS.secondaryHref, value: link(secondaryHref, HERO_DEFAULT_LINKS.secondaryHref) },
+    ],
+  };
+}
+
+/**
+ * A shelf's mode, count and picks, validated. Every one of them is stored
+ * only when it differs from the shelf's own rule, like the strings.
+ */
+async function readShelfForm(formData: FormData, shelf: HomeShelf): Promise<SectionRows> {
+  const { limit: fallback, max } = HOME_SHELVES[shelf];
+  const keys = shelfKeys(shelf);
+
+  const mode = text(formData, "mode") === "manual" ? "manual" : "auto";
+
+  /* The field is bounded in the browser, so a count outside the range only
+     arrives from a post that skipped it; it is brought back into range
+     rather than refused, and an empty field means the shelf's own number. */
+  const typed = text(formData, "limit");
+  const limit = typed
+    ? Math.min(max, Math.max(1, Math.round(number(formData, "limit", fallback))))
+    : fallback;
+
+  const ids = [...new Set(idList(formData, "bookIds"))].slice(0, max);
+  if (ids.length) {
+    const found = await prisma.book.count({ where: { id: { in: ids } } });
+    if (found !== ids.length) return { ok: false, error: "unknownBook" };
+  }
+
+  return {
+    ok: true,
+    rows: [
+      { key: keys.mode, value: mode === "manual" ? mode : null },
+      { key: keys.limit, value: limit === fallback ? null : String(limit) },
+      { key: keys.ids, value: ids.length ? JSON.stringify(ids) : null },
     ],
   };
 }
