@@ -65,7 +65,16 @@ export const HOME_TEXT_FIELDS = {
     "primaryCta",
     "secondaryCta",
   ],
-  features: [],
+  features: [
+    "shipping.title",
+    "shipping.description",
+    "payment.title",
+    "payment.description",
+    "authentic.title",
+    "authentic.description",
+    "returns.title",
+    "returns.description",
+  ],
   bestsellers: [],
   categories: [],
   promo: [],
@@ -122,6 +131,20 @@ export function applyHomeTexts(
 
   return copy as unknown as Dictionary["home"];
 }
+
+/* ------------------------------------------------------------------ */
+/* Features                                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The strip's four promises, in the order they are drawn. Each is two lines
+ * of copy the panel can rewrite and an icon it cannot: the icons are what
+ * make the row scan as four different things, and a wrong one would say
+ * more than a wrong word.
+ */
+export const HOME_FEATURES = ["shipping", "payment", "authentic", "returns"] as const;
+
+export type HomeFeature = (typeof HOME_FEATURES)[number];
 
 /* ------------------------------------------------------------------ */
 /* Hero                                                                */

@@ -2,9 +2,12 @@ import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { HomeHeroForm } from "@/components/admin/home-hero-form";
+import { HomeFeaturesFields } from "@/components/admin/home-features-fields";
+import { HomeHeroFields } from "@/components/admin/home-hero-fields";
+import { HomeSectionForm } from "@/components/admin/home-section-form";
 import { getBookById, getBooksByIds, getStoreSettings } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
@@ -21,7 +24,7 @@ interface HomeSectionPageProps {
 }
 
 /** The sections that have an edit page so far; the rest 404 until they do. */
-const editable: readonly HomeSection[] = ["hero"];
+const editable: readonly HomeSection[] = ["hero", "features"];
 
 async function resolveSection(params: HomeSectionPageProps["params"]) {
   const { section } = await params;
@@ -55,11 +58,28 @@ export default async function HomeSectionPage({ params }: HomeSectionPageProps) 
   const texts = applyHomeTexts(dictionary.home, settings);
   const backHref = `/admin/settings?tab=home`;
 
-  const hero = readHeroContent(settings);
-  const [featured, showcase] = await Promise.all([
-    hero.featuredBookId ? getBookById(hero.featuredBookId) : undefined,
-    getBooksByIds(hero.showcaseIds),
-  ]);
+  let fields: ReactNode;
+
+  if (section === "hero") {
+    const hero = readHeroContent(settings);
+    const [featured, showcase] = await Promise.all([
+      hero.featuredBookId ? getBookById(hero.featuredBookId) : undefined,
+      getBooksByIds(hero.showcaseIds),
+    ]);
+
+    fields = (
+      <HomeHeroFields
+        locale={locale}
+        admin={admin}
+        texts={texts.hero}
+        content={hero}
+        featured={featured ? bookPick(featured, locale) : null}
+        showcase={showcase.map((book) => bookPick(book, locale))}
+      />
+    );
+  } else {
+    fields = <HomeFeaturesFields admin={admin} texts={texts.features} />;
+  }
 
   return (
     <>
@@ -73,16 +93,14 @@ export default async function HomeSectionPage({ params }: HomeSectionPageProps) 
 
       <AdminPageHeader title={copy.title} subtitle={copy.description} />
 
-      <HomeHeroForm
-        locale={locale}
+      <HomeSectionForm
+        section={section}
         admin={admin}
         dictionary={dictionary}
-        texts={texts.hero}
-        content={hero}
-        featured={featured ? bookPick(featured, locale) : null}
-        showcase={showcase.map((book) => bookPick(book, locale))}
         cancelHref={backHref}
-      />
+      >
+        {fields}
+      </HomeSectionForm>
     </>
   );
 }

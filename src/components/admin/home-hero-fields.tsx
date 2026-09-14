@@ -1,10 +1,6 @@
-import Link from "next/link";
-
-import { saveHomeSection, searchHomeBooks } from "@/app/actions/admin";
+import { searchHomeBooks } from "@/app/actions/admin";
 import { Panel } from "@/components/admin/panel";
 import { PickList, type PickListLabels } from "@/components/admin/pick-list";
-import { ActionForm } from "@/components/ui/action-form";
-import { Button, buttonStyles } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,10 +9,9 @@ import type { AdminDictionary, Dictionary } from "@/i18n/get-dictionary";
 import { HERO_SHOWCASE_SIZE, type HeroContent } from "@/lib/home-sections";
 import type { PickOption } from "@/types";
 
-interface HomeHeroFormProps {
+interface HomeHeroFieldsProps {
   locale: Locale;
   admin: AdminDictionary;
-  dictionary: Dictionary;
   /** The hero's strings as the store shows them now — the panel's, or the file's. */
   texts: Dictionary["home"]["hero"];
   content: HeroContent;
@@ -24,44 +19,27 @@ interface HomeHeroFormProps {
   featured: PickOption | null;
   /** The picked jackets, in the order they enter the row. */
   showcase: PickOption[];
-  cancelHref: string;
 }
 
 /**
- * The edit page for the home page's opening section: its copy on one side,
- * the two book pickers on the other. Every field is prefilled with what the
- * store shows today, so saving an untouched form changes nothing.
+ * The opening section's fields: its copy on one side, the two book pickers
+ * on the other.
  */
-export function HomeHeroForm({
+export function HomeHeroFields({
   locale,
   admin,
-  dictionary,
   texts,
   content,
   featured,
   showcase,
-  cancelHref,
-}: HomeHeroFormProps) {
+}: HomeHeroFieldsProps) {
   const t = admin.settings.home;
   const h = t.hero;
 
   const pickerLabels: PickListLabels = { ...t.picker, search: h.searchBooks };
 
   return (
-    <ActionForm
-      className="grid gap-4 lg:grid-cols-12"
-      action={saveHomeSection}
-      successTitle={dictionary.common.toast.saved}
-      fallbackError={dictionary.common.toast.actionFailed}
-      errorMessages={{
-        forbidden: dictionary.common.actionErrors.forbidden,
-        unknownSection: dictionary.common.actionErrors.unknownSection,
-        invalidLink: dictionary.common.actionErrors.invalidLink,
-        unknownBook: dictionary.common.actionErrors.unknownBook,
-      }}
-    >
-      <input type="hidden" name="section" value="hero" />
-
+    <div className="grid gap-4 lg:grid-cols-12">
       <div className="lg:col-span-7">
         <Panel title={t.form.texts} subtitle={t.form.textsHint}>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -130,15 +108,6 @@ export function HomeHeroForm({
           />
         </Panel>
       </div>
-
-      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-card p-4 lg:col-span-12">
-        <Button type="submit" size="lg">
-          {admin.common.saveChanges}
-        </Button>
-        <Link href={cancelHref} className={buttonStyles({ variant: "subtle", size: "lg" })}>
-          {admin.common.cancel}
-        </Link>
-      </div>
-    </ActionForm>
+    </div>
   );
 }
