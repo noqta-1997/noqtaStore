@@ -38,6 +38,7 @@ const editable: readonly HomeSection[] = [
   "bestsellers",
   "categories",
   "promo",
+  "newArrivals",
 ];
 
 async function resolveSection(params: HomeSectionPageProps["params"]) {

@@ -10,7 +10,6 @@ import {
   getAuthors,
   getHeroFeaturedBook,
   getHeroShowcase,
-  getNewArrivals,
   getShelfBooks,
   getShelfCategories,
   getStoreSettings,
@@ -54,7 +53,7 @@ export default async function HomePage() {
     show.hero ? getHeroFeaturedBook(hero) : undefined,
     show.hero ? getHeroShowcase(hero) : [],
     show.bestsellers ? getShelfBooks("bestsellers", readShelfContent(settings, "bestsellers")) : [],
-    show.newArrivals ? getNewArrivals(5) : [],
+    show.newArrivals ? getShelfBooks("newArrivals", readShelfContent(settings, "newArrivals")) : [],
     show.authors ? getAuthors(6) : [],
   ]);
 

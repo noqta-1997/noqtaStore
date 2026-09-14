@@ -410,6 +410,7 @@ export async function getHeroShowcase(content: HeroContent): Promise<BookWithRel
 /** Each book shelf's own rule, given how many titles to show. */
 const bookShelfRules = {
   bestsellers: getBestsellers,
+  newArrivals: getNewArrivals,
 } satisfies Record<string, (limit?: number) => Promise<BookWithRelations[]>>;
 
 export type BookShelf = keyof typeof bookShelfRules;

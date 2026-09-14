@@ -78,7 +78,7 @@ export const HOME_TEXT_FIELDS = {
   bestsellers: ["title", "subtitle"],
   categories: ["title", "subtitle", "count"],
   promo: ["eyebrow", "title", "description", "cta"],
-  newArrivals: [],
+  newArrivals: ["title", "subtitle"],
   authors: [],
   newsletter: [],
 } as const satisfies Record<HomeSection, readonly string[]>;
@@ -169,6 +169,7 @@ interface ShelfShape {
 export const HOME_SHELVES = {
   bestsellers: { kind: "book", limit: 10, max: 20 },
   categories: { kind: "category", limit: null, max: 16 },
+  newArrivals: { kind: "book", limit: 5, max: 20 },
 } as const satisfies Partial<Record<HomeSection, ShelfShape>>;
 
 export type HomeShelf = keyof typeof HOME_SHELVES;
