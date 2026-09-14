@@ -16,7 +16,7 @@ import { getHomeSections, getShippingRules, getStoreSettings } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 import { formatNumber } from "@/lib/format";
-import { HOME_SECTIONS, type HomeSection } from "@/lib/home-sections";
+import { HOME_SECTIONS } from "@/lib/home-sections";
 import { readParam, type SearchParamsRecord } from "@/lib/search-params";
 import { cn } from "@/lib/utils";
 import { ActionForm } from "@/components/ui/action-form";
@@ -34,17 +34,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const tabs = ["store", "home", "shipping", "payments", "account"] as const;
 type Tab = (typeof tabs)[number];
-
-/** The sections whose copy and content have an edit page so far. */
-const editableSections: readonly HomeSection[] = [
-  "hero",
-  "features",
-  "bestsellers",
-  "categories",
-  "promo",
-  "newArrivals",
-  "authors",
-];
 
 export default async function SettingsPage({ searchParams }: SettingsPageProps) {
   const locale = defaultLocale;
@@ -193,16 +182,14 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                     >
                       {visible ? t.home.visible : t.home.hidden}
                     </span>
-                    {editableSections.includes(section) ? (
-                      <Link
-                        href={`${base}/home/${section}`}
-                        aria-label={`${t.home.edit}: ${copy.title}`}
-                        className={buttonStyles({ variant: "secondary", size: "sm" })}
-                      >
-                        <PenLine aria-hidden className="size-4" strokeWidth={1.75} />
-                        {t.home.edit}
-                      </Link>
-                    ) : null}
+                    <Link
+                      href={`${base}/home/${section}`}
+                      aria-label={`${t.home.edit}: ${copy.title}`}
+                      className={buttonStyles({ variant: "secondary", size: "sm" })}
+                    >
+                      <PenLine aria-hidden className="size-4" strokeWidth={1.75} />
+                      {t.home.edit}
+                    </Link>
                     <HomeSectionToggle
                       section={section}
                       visible={visible}

@@ -80,7 +80,7 @@ export const HOME_TEXT_FIELDS = {
   promo: ["eyebrow", "title", "description", "cta"],
   newArrivals: ["title", "subtitle"],
   authors: ["title", "subtitle", "booksCount"],
-  newsletter: [],
+  newsletter: ["title", "description", "placeholder", "cta", "note"],
 } as const satisfies Record<HomeSection, readonly string[]>;
 
 /** The `store_settings` row one rewritten string is kept in. */
