@@ -111,7 +111,7 @@
       "missingTitle": "الاسم مطلوب باللغتين",
       "missingRelation": "اختر المدرس والتصنيف",
       "invalidImage": "الملف ليس صورة PNG أو JPG",
-      "imageTooLarge": "الصورة أكبر من 2 ميغابايت",
+      "imageTooLarge": "تعذّر تصغير الصورة إلى الحد المسموح (2 ميغابايت)",
       "uploadFailed": "تعذّر رفع الصورة، حاول مرة أخرى",
       "missingName": "الاسم مطلوب",
       "notFound": "العنصر غير موجود",
