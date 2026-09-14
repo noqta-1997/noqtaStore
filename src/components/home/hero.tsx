@@ -32,9 +32,10 @@ interface HeroProps {
  * track that moves by exactly one copy's width and then starts over, which
  * the eye cannot tell from a row with no end. It is decoration — every
  * jacket in it is reachable from the shelves further down the page — so the
- * track is hidden from assistive technology rather than read out twice, it
- * holds still under the pointer, and the global reduced-motion rule leaves
- * it parked at its first frame.
+ * track is hidden from assistive technology rather than read out twice, and
+ * the global reduced-motion rule leaves it parked at its first frame. It
+ * does not stop for the pointer: nothing in it can be clicked, so a pause
+ * would only make the row stutter as the mouse crosses the page.
  */
 export function Hero({ locale, dictionary, featuredBook, showcase }: HeroProps) {
   const { hero } = dictionary.home;
@@ -120,8 +121,8 @@ export function Hero({ locale, dictionary, featuredBook, showcase }: HeroProps) 
           force the other axis to `auto`. Clip only takes the width, and it
           keeps the track from widening the page.
         */
-        <div aria-hidden className="group w-full overflow-x-clip">
-          <div className="flex w-max animate-marquee will-change-transform group-hover:[animation-play-state:paused]">
+        <div aria-hidden className="w-full overflow-x-clip">
+          <div className="flex w-max animate-marquee will-change-transform">
             <JacketRow jackets={row} locale={locale} eager />
             <JacketRow jackets={row} locale={locale} />
           </div>
