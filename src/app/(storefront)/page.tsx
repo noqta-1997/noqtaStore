@@ -12,7 +12,7 @@ import {
   getBooksByTag,
   getCategories,
   getNewArrivals,
-  getStoreStats,
+  getShowcaseBooks,
 } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
@@ -27,20 +27,20 @@ export default async function HomePage() {
     dictionary,
     categories,
     featured,
+    showcase,
     bestsellers,
     newArrivals,
     authors,
-    stats,
   ] = await Promise.all([
     getDictionary(locale),
     getCategories(),
-    /* Three rather than one: the hero fans the two extras out behind the
-       featured jacket. Same query, same tag — only the limit moved. */
-    getBooksByTag("featured", 3),
+    /* One title: the hero's tagline pill links to it. The jackets it
+       scrolls come from the showcase query, not from this tag. */
+    getBooksByTag("featured", 1),
+    getShowcaseBooks(),
     getBestsellers(10),
     getNewArrivals(5),
     getAuthors(6),
-    getStoreStats(),
   ]);
 
   return (
@@ -49,8 +49,7 @@ export default async function HomePage() {
         locale={locale}
         dictionary={dictionary}
         featuredBook={featured[0]}
-        companions={featured.slice(1)}
-        stats={stats}
+        showcase={showcase}
       />
 
       <FeaturesStrip dictionary={dictionary.home.features} />

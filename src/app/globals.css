@@ -278,6 +278,26 @@
   --ease-fluent: var(--curveEasyEase);
   --ease-decelerate: var(--curveDecelerateMid);
 
+  /*
+   * The home hero's row of jackets. The track holds the row twice and slides
+   * by exactly one row's width before it resets, which is indistinguishable
+   * from a row that never ends. The slide runs against the writing direction
+   * — the first copy sits at the start edge, so in RTL the track has to move
+   * right for its twin to enter from the left — and `--marquee-shift` is
+   * flipped for that under `html[dir="rtl"]` in the base layer. Twelve
+   * jackets a row over 48s is about 65px a second on a desktop; a phone's
+   * narrower jackets make the same loop a little slower.
+   */
+  --animate-marquee: marquee 48s linear infinite;
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(var(--marquee-shift, -50%));
+    }
+  }
+
   /* ---- Typography ----
      One face for the whole store: Almarai. IBM Plex Sans Arabic was removed
      along with the last of the two-family split, so all three role tokens
@@ -483,6 +503,11 @@
     outline-offset: var(--strokeWidthThin);
     box-shadow: 0 0 0 var(--strokeWidthThin) var(--focus-inner);
     border-radius: var(--borderRadiusXLarge);
+  }
+
+  /* A marquee runs against the writing direction; see `--animate-marquee`. */
+  html[dir="rtl"] {
+    --marquee-shift: 50%;
   }
 
   /* Figures keep tabular spacing so columns of prices still line up. */

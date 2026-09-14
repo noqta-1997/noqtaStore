@@ -304,6 +304,22 @@ export async function getBestsellers(limit = 10): Promise<BookWithRelations[]> {
   return rows.map(toBook);
 }
 
+/**
+ * The jackets the home hero slides past. Real artwork leads — a cover that
+ * someone took the trouble to upload is what a showcase is for — and the
+ * typographic placeholders fill in behind it, the most-reviewed titles first
+ * in both halves.
+ */
+export async function getShowcaseBooks(limit = 12): Promise<BookWithRelations[]> {
+  const rows = await prisma.book.findMany({
+    include: bookInclude,
+    orderBy: [{ coverUrl: { sort: "desc", nulls: "last" } }, { reviewsCount: "desc" }],
+    take: limit,
+  });
+
+  return rows.map(toBook);
+}
+
 export async function getDiscountedBooks(limit?: number): Promise<BookWithRelations[]> {
   const rows = await prisma.book.findMany({
     where: { compareAtPrice: { not: null } },
@@ -529,23 +545,6 @@ export async function getReviewsByBook(bookId: string): Promise<Review[]> {
   });
 
   return rows.map(toReviewWithAuthor);
-}
-
-export async function getStoreStats() {
-  const [booksCount, authorsCount, categoriesCount, publishersCount] =
-    await Promise.all([
-      prisma.book.count(),
-      prisma.author.count(),
-      prisma.category.count(),
-      prisma.publisher.count(),
-    ]);
-
-  return {
-    booksCount,
-    authorsCount,
-    publishersCount,
-    categoriesCount,
-  };
 }
 
 /* ------------------------------------------------------------------ */
