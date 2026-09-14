@@ -1,5 +1,6 @@
 import type { Locale } from "@/i18n/config";
-import type { BookWithRelations, Category, PickOption } from "@/types";
+import { formatNumber } from "@/lib/format";
+import type { Author, BookWithRelations, Category, PickOption } from "@/types";
 
 /** A book as one of the panel's pickers lists it. */
 export function bookPick(book: BookWithRelations, locale: Locale): PickOption {
@@ -8,7 +9,7 @@ export function bookPick(book: BookWithRelations, locale: Locale): PickOption {
     label: book.title[locale],
     sublabel: book.author.name[locale],
     seed: book.slug,
-    coverUrl: book.coverUrl,
+    picture: { kind: "jacket", src: book.coverUrl },
   };
 }
 
@@ -19,6 +20,17 @@ export function categoryPick(category: Category, locale: Locale): PickOption {
     label: category.name[locale],
     sublabel: category.description[locale],
     seed: category.slug,
-    icon: category.icon,
+    picture: { kind: "icon", name: category.icon },
+  };
+}
+
+/** An author as the picker lists them: the card's second line under the name. */
+export function authorPick(author: Author, locale: Locale, booksLabel: string): PickOption {
+  return {
+    id: author.id,
+    label: author.name[locale],
+    sublabel: `${author.country[locale]} · ${formatNumber(author.booksCount, locale)} ${booksLabel}`,
+    seed: author.slug,
+    picture: { kind: "portrait" },
   };
 }

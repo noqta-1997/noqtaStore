@@ -41,6 +41,7 @@ export function HomeSectionForm({
         invalidLink: dictionary.common.actionErrors.invalidLink,
         unknownBook: dictionary.common.actionErrors.unknownBook,
         unknownCategory: dictionary.common.actionErrors.unknownCategory,
+        unknownAuthor: dictionary.common.actionErrors.unknownAuthor,
       }}
     >
       <input type="hidden" name="section" value={section} />

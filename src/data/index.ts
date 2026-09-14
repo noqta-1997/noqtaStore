@@ -257,7 +257,7 @@ export async function searchCategoryPicks(
     label: row.nameAr,
     sublabel: row.descriptionAr,
     seed: row.slug,
-    icon: row.icon,
+    picture: { kind: "icon", name: row.icon },
   }));
 }
 
@@ -292,6 +292,57 @@ export async function getAuthors(limit?: number): Promise<Author[]> {
   });
 
   return rows.map(toAuthor);
+}
+
+/** Authors in the order their ids were given; a deleted one is skipped. */
+export async function getAuthorsByIds(ids: string[]): Promise<Author[]> {
+  if (!ids.length) return [];
+
+  const rows = await prisma.author.findMany({
+    where: { id: { in: ids } },
+    include: { _count: { select: { books: true } } },
+  });
+  const byId = new Map(rows.map((row) => [row.id, toAuthor(row)]));
+
+  return ids.flatMap((id) => {
+    const author = byId.get(id);
+    return author ? [author] : [];
+  });
+}
+
+/** The spotlight: the panel's picks, or the authors with the most books. */
+export async function getShelfAuthors(content: ShelfContent): Promise<Author[]> {
+  return resolveShelf(content, getAuthorsByIds, getAuthors);
+}
+
+/**
+ * What the panel's author picker searches through: by name, most books
+ * first, each with the card's second line — country and count — so two
+ * namesakes can be told apart.
+ */
+export async function searchAuthorPicks(
+  term: string,
+  booksLabel: string,
+  exclude: string[] = [],
+  limit = 8,
+): Promise<PickOption[]> {
+  const rows = await prisma.author.findMany({
+    where: {
+      id: { notIn: exclude },
+      ...(term ? { nameAr: { contains: term, mode: "insensitive" } } : {}),
+    },
+    include: { _count: { select: { books: true } } },
+    orderBy: { books: { _count: "desc" } },
+    take: limit,
+  });
+
+  return rows.map((row) => ({
+    id: row.id,
+    label: row.nameAr,
+    sublabel: `${row.countryAr} · ${row._count.books} ${booksLabel}`,
+    seed: row.slug,
+    picture: { kind: "portrait" },
+  }));
 }
 
 export async function getAuthorBySlug(slug: string): Promise<Author | undefined> {
@@ -489,7 +540,7 @@ export async function searchBookPicks(
     label: row.titleAr,
     sublabel: row.author.nameAr,
     seed: row.slug,
-    coverUrl: row.coverUrl ?? undefined,
+    picture: { kind: "jacket", src: row.coverUrl ?? undefined },
   }));
 }
 

@@ -43,6 +43,7 @@ const editableSections: readonly HomeSection[] = [
   "categories",
   "promo",
   "newArrivals",
+  "authors",
 ];
 
 export default async function SettingsPage({ searchParams }: SettingsPageProps) {

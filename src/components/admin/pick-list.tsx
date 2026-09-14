@@ -10,6 +10,7 @@ import {
   type KeyboardEvent,
 } from "react";
 
+import { authorTone, getAuthorInitials } from "@/components/author/author-card";
 import { BookCover } from "@/components/book/book-cover";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { IconButton } from "@/components/ui/icon-button";
@@ -272,13 +273,30 @@ export function PickList({ name, initial, max, search, locale, labels }: PickLis
 
 /**
  * The entry's picture at row height: a category's icon in the round plate
- * its tile uses, or a jacket 32px wide, so the placeholder drops its lettering.
+ * its tile uses, an author's initials in the tone their card uses, or a
+ * jacket 32px wide, so the placeholder drops its lettering.
  */
 function Jacket({ option }: { option: PickOption }) {
-  if (option.icon) {
+  const { picture } = option;
+
+  if (picture.kind === "icon") {
     return (
       <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-primary">
-        <CategoryIcon name={option.icon} className="size-4" />
+        <CategoryIcon name={picture.name} className="size-4" />
+      </span>
+    );
+  }
+
+  if (picture.kind === "portrait") {
+    return (
+      <span
+        aria-hidden
+        className={cn(
+          "flex size-8 shrink-0 items-center justify-center rounded-full font-display text-label-md font-bold",
+          authorTone(option.seed),
+        )}
+      >
+        {getAuthorInitials(option.label)}
       </span>
     );
   }
@@ -289,7 +307,7 @@ function Jacket({ option }: { option: PickOption }) {
         title={option.label}
         author={option.sublabel ?? ""}
         seed={option.seed}
-        src={option.coverUrl}
+        src={picture.src}
         sizes="2rem"
         compact
         className="rounded-sm"

@@ -79,7 +79,7 @@ export const HOME_TEXT_FIELDS = {
   categories: ["title", "subtitle", "count"],
   promo: ["eyebrow", "title", "description", "cta"],
   newArrivals: ["title", "subtitle"],
-  authors: [],
+  authors: ["title", "subtitle", "booksCount"],
   newsletter: [],
 } as const satisfies Record<HomeSection, readonly string[]>;
 
@@ -151,7 +151,7 @@ export type HomeFeature = (typeof HOME_FEATURES)[number];
 /* ------------------------------------------------------------------ */
 
 /** What a shelf holds, which decides what its picker searches. */
-export type ShelfKind = "book" | "category";
+export type ShelfKind = "book" | "category" | "author";
 
 interface ShelfShape {
   kind: ShelfKind;
@@ -163,13 +163,15 @@ interface ShelfShape {
 
 /**
  * The shelves the panel may fill by hand instead of by rule. Twenty titles
- * is four rows of the widest grid; the category tiles have always shown
- * every category, so their rule has no count until the panel gives it one.
+ * is four rows of the widest grid and twelve authors four rows of theirs;
+ * the category tiles have always shown every category, so their rule has
+ * no count until the panel gives it one.
  */
 export const HOME_SHELVES = {
   bestsellers: { kind: "book", limit: 10, max: 20 },
   categories: { kind: "category", limit: null, max: 16 },
   newArrivals: { kind: "book", limit: 5, max: 20 },
+  authors: { kind: "author", limit: 6, max: 12 },
 } as const satisfies Partial<Record<HomeSection, ShelfShape>>;
 
 export type HomeShelf = keyof typeof HOME_SHELVES;

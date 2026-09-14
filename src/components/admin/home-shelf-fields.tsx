@@ -1,4 +1,4 @@
-import { searchHomeBooks, searchHomeCategories } from "@/app/actions/admin";
+import { searchHomeAuthors, searchHomeBooks, searchHomeCategories } from "@/app/actions/admin";
 import { Panel } from "@/components/admin/panel";
 import { PickList, type PickListLabels } from "@/components/admin/pick-list";
 import { ShelfModeFields } from "@/components/admin/shelf-mode-fields";
@@ -30,6 +30,7 @@ interface HomeShelfFieldsProps {
 const searchByKind: Record<ShelfKind, (term: string, exclude: string[]) => Promise<PickOption[]>> = {
   book: searchHomeBooks,
   category: searchHomeCategories,
+  author: searchHomeAuthors,
 };
 
 /**

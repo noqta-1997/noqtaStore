@@ -10,9 +10,19 @@ import { HomeHeroFields } from "@/components/admin/home-hero-fields";
 import { HomePromoFields } from "@/components/admin/home-promo-fields";
 import { HomeSectionForm } from "@/components/admin/home-section-form";
 import { HomeShelfFields } from "@/components/admin/home-shelf-fields";
-import { getBookById, getBooksByIds, getCategoriesByIds, getStoreSettings } from "@/data";
-import { defaultLocale } from "@/i18n/config";
-import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
+import {
+  getAuthorsByIds,
+  getBookById,
+  getBooksByIds,
+  getCategoriesByIds,
+  getStoreSettings,
+} from "@/data";
+import { defaultLocale, type Locale } from "@/i18n/config";
+import {
+  getAdminDictionary,
+  getDictionary,
+  type Dictionary,
+} from "@/i18n/get-dictionary";
 import {
   applyHomeTexts,
   HOME_SHELVES,
@@ -24,8 +34,10 @@ import {
   readPromoContent,
   readShelfContent,
   type HomeSection,
+  type ShelfKind,
 } from "@/lib/home-sections";
-import { bookPick, categoryPick } from "@/lib/picks";
+import { authorPick, bookPick, categoryPick } from "@/lib/picks";
+import type { PickOption } from "@/types";
 
 interface HomeSectionPageProps {
   params: Promise<{ section: string }>;
@@ -39,6 +51,7 @@ const editable: readonly HomeSection[] = [
   "categories",
   "promo",
   "newArrivals",
+  "authors",
 ];
 
 async function resolveSection(params: HomeSectionPageProps["params"]) {
@@ -54,6 +67,25 @@ export async function generateMetadata({ params }: HomeSectionPageProps): Promis
 
   const title = section ? admin.settings.home.sections[section].title : admin.settings.home.title;
   return { title: `${title} — ${admin.brand.panel}` };
+}
+
+/** The picked entries of a shelf, as its picker lists them. */
+async function shelfPicks(
+  kind: ShelfKind,
+  ids: string[],
+  locale: Locale,
+  texts: Dictionary["home"],
+): Promise<PickOption[]> {
+  switch (kind) {
+    case "book":
+      return (await getBooksByIds(ids)).map((book) => bookPick(book, locale));
+    case "category":
+      return (await getCategoriesByIds(ids)).map((category) => categoryPick(category, locale));
+    case "author":
+      return (await getAuthorsByIds(ids)).map((author) =>
+        authorPick(author, locale, texts.authors.booksCount),
+      );
+  }
 }
 
 export default async function HomeSectionPage({ params }: HomeSectionPageProps) {
@@ -94,12 +126,7 @@ export default async function HomeSectionPage({ params }: HomeSectionPageProps) 
     );
   } else if (isHomeShelf(section)) {
     const content = readShelfContent(settings, section);
-    const picks =
-      HOME_SHELVES[section].kind === "book"
-        ? (await getBooksByIds(content.ids)).map((book) => bookPick(book, locale))
-        : (await getCategoriesByIds(content.ids)).map((category) =>
-            categoryPick(category, locale),
-          );
+    const picks = await shelfPicks(HOME_SHELVES[section].kind, content.ids, locale, texts);
 
     fields = (
       <HomeShelfFields

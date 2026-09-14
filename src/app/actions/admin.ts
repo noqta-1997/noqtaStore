@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { searchBookPicks, searchCategoryPicks } from "@/data";
+import { searchAuthorPicks, searchBookPicks, searchCategoryPicks } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import {
@@ -1047,6 +1047,14 @@ function readPromoForm(formData: FormData): SectionRows {
 const countByKind: Record<ShelfKind, (ids: string[]) => Promise<number>> = {
   book: (ids) => prisma.book.count({ where: { id: { in: ids } } }),
   category: (ids) => prisma.category.count({ where: { id: { in: ids } } }),
+  author: (ids) => prisma.author.count({ where: { id: { in: ids } } }),
+};
+
+/** The error each kind reports when a pick has been deleted since the page loaded. */
+const missingByKind: Record<ShelfKind, string> = {
+  book: "unknownBook",
+  category: "unknownCategory",
+  author: "unknownAuthor",
 };
 
 /**
@@ -1070,7 +1078,7 @@ async function readShelfForm(formData: FormData, shelf: HomeShelf): Promise<Sect
 
   const ids = [...new Set(idList(formData, `${kind}Ids`))].slice(0, max);
   if (ids.length && (await countByKind[kind](ids)) !== ids.length) {
-    return { ok: false, error: kind === "book" ? "unknownBook" : "unknownCategory" };
+    return { ok: false, error: missingByKind[kind] };
   }
 
   return {
@@ -1115,6 +1123,18 @@ export async function searchHomeCategories(
 
   const [safeTerm, safeExclude] = pickerArguments(term, exclude);
   return searchCategoryPicks(safeTerm, safeExclude);
+}
+
+/** The author picker's counterpart, for the spotlight. */
+export async function searchHomeAuthors(
+  term: string,
+  exclude: string[],
+): Promise<PickOption[]> {
+  if (!(await requireManager())) return [];
+
+  const [safeTerm, safeExclude] = pickerArguments(term, exclude);
+  const { home } = await getDictionary(defaultLocale);
+  return searchAuthorPicks(safeTerm, home.authors.booksCount, safeExclude);
 }
 
 /** Picker arguments arrive as JSON from the browser, so their shape is checked, not assumed. */

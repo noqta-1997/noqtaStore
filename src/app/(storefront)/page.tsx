@@ -7,9 +7,9 @@ import { Hero } from "@/components/home/hero";
 import { Newsletter } from "@/components/home/newsletter";
 import { PromoBanner } from "@/components/home/promo-banner";
 import {
-  getAuthors,
   getHeroFeaturedBook,
   getHeroShowcase,
+  getShelfAuthors,
   getShelfBooks,
   getShelfCategories,
   getStoreSettings,
@@ -54,7 +54,7 @@ export default async function HomePage() {
     show.hero ? getHeroShowcase(hero) : [],
     show.bestsellers ? getShelfBooks("bestsellers", readShelfContent(settings, "bestsellers")) : [],
     show.newArrivals ? getShelfBooks("newArrivals", readShelfContent(settings, "newArrivals")) : [],
-    show.authors ? getAuthors(6) : [],
+    show.authors ? getShelfAuthors(readShelfContent(settings, "authors")) : [],
   ]);
 
   /* The sections read their copy from the dictionary as they always did;

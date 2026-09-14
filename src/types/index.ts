@@ -349,18 +349,25 @@ export interface AdminNotification {
   at: string;
 }
 
+/** What a picker draws beside an entry's name. */
+export type PickPicture =
+  /** A book: its cover, or the typographic placeholder when it has none. */
+  | { kind: "jacket"; src?: string }
+  /** A category: the icon its tile shows. */
+  | { kind: "icon"; name: string }
+  /** An author: initials in the tone their card uses. */
+  | { kind: "portrait" };
+
 /**
  * A catalogue entry cut down to what a picker in the panel shows: enough to
- * recognise it in a list and draw its jacket, and nothing a form does not
+ * recognise it in a list and draw its picture, and nothing a form does not
  * need to carry to the browser.
  */
 export interface PickOption {
   id: string;
   label: string;
   sublabel?: string;
-  /** Stable key for the typographic placeholder's colour. */
+  /** Stable key for the placeholder's colour or the portrait's tone. */
   seed: string;
-  coverUrl?: string;
-  /** A category's icon name, drawn in place of a jacket. */
-  icon?: string;
+  picture: PickPicture;
 }
