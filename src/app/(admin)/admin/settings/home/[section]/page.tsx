@@ -9,25 +9,28 @@ import { HomeFeaturesFields } from "@/components/admin/home-features-fields";
 import { HomeHeroFields } from "@/components/admin/home-hero-fields";
 import { HomeSectionForm } from "@/components/admin/home-section-form";
 import { HomeShelfFields } from "@/components/admin/home-shelf-fields";
-import { getBookById, getBooksByIds, getStoreSettings } from "@/data";
+import { getBookById, getBooksByIds, getCategoriesByIds, getStoreSettings } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 import {
   applyHomeTexts,
+  HOME_SHELVES,
+  HOME_TEXT_FIELDS,
+  homeTextDefault,
   isHomeSection,
   isHomeShelf,
   readHeroContent,
   readShelfContent,
   type HomeSection,
 } from "@/lib/home-sections";
-import { bookPick } from "@/lib/picks";
+import { bookPick, categoryPick } from "@/lib/picks";
 
 interface HomeSectionPageProps {
   params: Promise<{ section: string }>;
 }
 
 /** The sections that have an edit page so far; the rest 404 until they do. */
-const editable: readonly HomeSection[] = ["hero", "features", "bestsellers"];
+const editable: readonly HomeSection[] = ["hero", "features", "bestsellers", "categories"];
 
 async function resolveSection(params: HomeSectionPageProps["params"]) {
   const { section } = await params;
@@ -82,16 +85,25 @@ export default async function HomeSectionPage({ params }: HomeSectionPageProps) 
     );
   } else if (isHomeShelf(section)) {
     const content = readShelfContent(settings, section);
-    const picks = await getBooksByIds(content.ids);
+    const picks =
+      HOME_SHELVES[section].kind === "book"
+        ? (await getBooksByIds(content.ids)).map((book) => bookPick(book, locale))
+        : (await getCategoriesByIds(content.ids)).map((category) =>
+            categoryPick(category, locale),
+          );
 
     fields = (
       <HomeShelfFields
         shelf={section}
         locale={locale}
         admin={admin}
-        texts={texts[section]}
+        texts={(HOME_TEXT_FIELDS[section] as readonly string[]).map((name) => ({
+          name,
+          label: t.shelf.texts[name as keyof typeof t.shelf.texts],
+          value: homeTextDefault(texts, section, name),
+        }))}
         content={content}
-        picks={picks.map((book) => bookPick(book, locale))}
+        picks={picks}
       />
     );
   } else {

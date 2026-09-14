@@ -8,11 +8,11 @@ import { Newsletter } from "@/components/home/newsletter";
 import { PromoBanner } from "@/components/home/promo-banner";
 import {
   getAuthors,
-  getCategories,
   getHeroFeaturedBook,
   getHeroShowcase,
   getNewArrivals,
   getShelfBooks,
+  getShelfCategories,
   getStoreSettings,
 } from "@/data";
 import { defaultLocale } from "@/i18n/config";
@@ -47,7 +47,7 @@ export default async function HomePage() {
     authors,
   ] = await Promise.all([
     getDictionary(locale),
-    show.categories ? getCategories() : [],
+    show.categories ? getShelfCategories(readShelfContent(settings, "categories")) : [],
     /* One title: the hero's tagline pill links to it. The jackets it
        scrolls are a separate list, not this tag. */
     show.hero ? getHeroFeaturedBook(hero) : undefined,

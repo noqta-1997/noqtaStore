@@ -76,7 +76,7 @@ export const HOME_TEXT_FIELDS = {
     "returns.description",
   ],
   bestsellers: ["title", "subtitle"],
-  categories: [],
+  categories: ["title", "subtitle", "count"],
   promo: [],
   newArrivals: [],
   authors: [],
@@ -150,14 +150,26 @@ export type HomeFeature = (typeof HOME_FEATURES)[number];
 /* Shelves                                                             */
 /* ------------------------------------------------------------------ */
 
+/** What a shelf holds, which decides what its picker searches. */
+export type ShelfKind = "book" | "category";
+
+interface ShelfShape {
+  kind: ShelfKind;
+  /** How many the rule shows unless told otherwise; `null` is all of them. */
+  limit: number | null;
+  /** The most a shelf may hold, by rule or by hand. */
+  max: number;
+}
+
 /**
- * The shelves the panel may fill by hand instead of by rule: how many titles
- * the rule shows unless told otherwise, and the most a shelf may hold either
- * way. Twenty is four rows of the widest grid.
+ * The shelves the panel may fill by hand instead of by rule. Twenty titles
+ * is four rows of the widest grid; the category tiles have always shown
+ * every category, so their rule has no count until the panel gives it one.
  */
 export const HOME_SHELVES = {
-  bestsellers: { limit: 10, max: 20 },
-} as const satisfies Partial<Record<HomeSection, { limit: number; max: number }>>;
+  bestsellers: { kind: "book", limit: 10, max: 20 },
+  categories: { kind: "category", limit: null, max: 16 },
+} as const satisfies Partial<Record<HomeSection, ShelfShape>>;
 
 export type HomeShelf = keyof typeof HOME_SHELVES;
 
@@ -166,9 +178,9 @@ export type ShelfMode = "auto" | "manual";
 export interface ShelfContent {
   /** `auto` follows the shelf's rule; `manual` shows `ids` in order. */
   mode: ShelfMode;
-  /** How many the rule shows. */
-  limit: number;
-  /** The hand-picked titles, in the order they are drawn. */
+  /** How many the rule shows; `null` is all of them. */
+  limit: number | null;
+  /** The hand-picked entries, in the order they are drawn. */
   ids: string[];
 }
 
@@ -203,6 +215,26 @@ export function readShelfContent(
     limit: Number.isInteger(stored) && stored >= 1 && stored <= max ? stored : limit,
     ids: parseIdList(settings[keys.ids]).slice(0, max),
   };
+}
+
+/**
+ * How a shelf resolves: the panel's picks, in its order, while it has
+ * switched the shelf to manual and any of them still exist; otherwise the
+ * shelf's rule, cut to the panel's count. Shared by every shelf so that the
+ * data layer's job per shelf is only to say what "by ids" and "by rule"
+ * mean for what it holds.
+ */
+export async function resolveShelf<T>(
+  content: ShelfContent,
+  byIds: (ids: string[]) => Promise<T[]>,
+  byRule: (limit: number | undefined) => Promise<T[]>,
+): Promise<T[]> {
+  if (content.mode === "manual" && content.ids.length) {
+    const picked = await byIds(content.ids);
+    if (picked.length) return picked;
+  }
+
+  return byRule(content.limit ?? undefined);
 }
 
 /* ------------------------------------------------------------------ */

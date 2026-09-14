@@ -15,9 +15,9 @@ import type { Prisma } from "@/generated/prisma/client";
 import { getCurrentCustomer } from "@/lib/auth";
 import {
   homeVisibility,
+  resolveShelf,
   type HeroContent,
   type HomeSectionVisibility,
-  type HomeShelf,
   type ShelfContent,
 } from "@/lib/home-sections";
 import { prisma } from "@/lib/prisma";
@@ -202,13 +202,63 @@ export async function getPriceBounds() {
 /* Catalogue                                                           */
 /* ------------------------------------------------------------------ */
 
-export async function getCategories(): Promise<Category[]> {
+export async function getCategories(limit?: number): Promise<Category[]> {
   const rows = await prisma.category.findMany({
     orderBy: { books: { _count: "desc" } },
     include: { _count: { select: { books: true } } },
+    ...(typeof limit === "number" ? { take: limit } : {}),
   });
 
   return rows.map(toCategoryWithCount);
+}
+
+/** Categories in the order their ids were given; a deleted one is skipped. */
+export async function getCategoriesByIds(ids: string[]): Promise<Category[]> {
+  if (!ids.length) return [];
+
+  const rows = await prisma.category.findMany({
+    where: { id: { in: ids } },
+    include: { _count: { select: { books: true } } },
+  });
+  const byId = new Map(rows.map((row) => [row.id, toCategoryWithCount(row)]));
+
+  return ids.flatMap((id) => {
+    const category = byId.get(id);
+    return category ? [category] : [];
+  });
+}
+
+/** The category tiles: the panel's picks, or every category by size. */
+export async function getShelfCategories(content: ShelfContent): Promise<Category[]> {
+  return resolveShelf(content, getCategoriesByIds, getCategories);
+}
+
+/**
+ * What the panel's category picker searches through: by name, largest
+ * first, with the tile's icon in place of a jacket.
+ */
+export async function searchCategoryPicks(
+  term: string,
+  exclude: string[] = [],
+  limit = 8,
+): Promise<PickOption[]> {
+  const rows = await prisma.category.findMany({
+    where: {
+      id: { notIn: exclude },
+      ...(term ? { nameAr: { contains: term, mode: "insensitive" } } : {}),
+    },
+    include: { _count: { select: { books: true } } },
+    orderBy: { books: { _count: "desc" } },
+    take: limit,
+  });
+
+  return rows.map((row) => ({
+    id: row.id,
+    label: row.nameAr,
+    sublabel: row.descriptionAr,
+    seed: row.slug,
+    icon: row.icon,
+  }));
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
@@ -357,26 +407,19 @@ export async function getHeroShowcase(content: HeroContent): Promise<BookWithRel
   return getShowcaseBooks();
 }
 
-/** Each shelf's own rule, given how many titles to show. */
-const shelfRules: Record<HomeShelf, (limit: number) => Promise<BookWithRelations[]>> = {
+/** Each book shelf's own rule, given how many titles to show. */
+const bookShelfRules = {
   bestsellers: getBestsellers,
-};
+} satisfies Record<string, (limit?: number) => Promise<BookWithRelations[]>>;
 
-/**
- * A shelf's titles: the panel's picks, in its order, while it has switched
- * the shelf to manual and any of them are still in the catalogue; otherwise
- * the shelf's rule, cut to the panel's count.
- */
+export type BookShelf = keyof typeof bookShelfRules;
+
+/** A book shelf's titles: the panel's picks, or the shelf's rule cut to its count. */
 export async function getShelfBooks(
-  shelf: HomeShelf,
+  shelf: BookShelf,
   content: ShelfContent,
 ): Promise<BookWithRelations[]> {
-  if (content.mode === "manual" && content.ids.length) {
-    const picked = await getBooksByIds(content.ids);
-    if (picked.length) return picked;
-  }
-
-  return shelfRules[shelf](content.limit);
+  return resolveShelf(content, getBooksByIds, bookShelfRules[shelf]);
 }
 
 export async function getDiscountedBooks(limit?: number): Promise<BookWithRelations[]> {

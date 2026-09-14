@@ -361,4 +361,6 @@ export interface PickOption {
   /** Stable key for the typographic placeholder's colour. */
   seed: string;
   coverUrl?: string;
+  /** A category's icon name, drawn in place of a jacket. */
+  icon?: string;
 }

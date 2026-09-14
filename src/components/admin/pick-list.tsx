@@ -11,6 +11,7 @@ import {
 } from "react";
 
 import { BookCover } from "@/components/book/book-cover";
+import { CategoryIcon } from "@/components/ui/category-icon";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import type { Locale } from "@/i18n/config";
@@ -269,8 +270,19 @@ export function PickList({ name, initial, max, search, locale, labels }: PickLis
   );
 }
 
-/** The jacket at row height: 32px wide, so the placeholder drops its lettering. */
+/**
+ * The entry's picture at row height: a category's icon in the round plate
+ * its tile uses, or a jacket 32px wide, so the placeholder drops its lettering.
+ */
 function Jacket({ option }: { option: PickOption }) {
+  if (option.icon) {
+    return (
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-primary">
+        <CategoryIcon name={option.icon} className="size-4" />
+      </span>
+    );
+  }
+
   return (
     <div className="w-8 shrink-0">
       <BookCover

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { searchBookPicks } from "@/data";
+import { searchBookPicks, searchCategoryPicks } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import {
@@ -29,6 +29,7 @@ import {
   isSafeHref,
   shelfKeys,
   type HomeShelf,
+  type ShelfKind,
 } from "@/lib/home-sections";
 import { isOwner } from "@/lib/owner";
 import { refreshBookRating } from "@/lib/book-rating";
@@ -1018,28 +1019,34 @@ async function readHeroForm(formData: FormData): Promise<SectionRows> {
   };
 }
 
+/** How many of the ids name a row of the shelf's kind. */
+const countByKind: Record<ShelfKind, (ids: string[]) => Promise<number>> = {
+  book: (ids) => prisma.book.count({ where: { id: { in: ids } } }),
+  category: (ids) => prisma.category.count({ where: { id: { in: ids } } }),
+};
+
 /**
  * A shelf's mode, count and picks, validated. Every one of them is stored
  * only when it differs from the shelf's own rule, like the strings.
  */
 async function readShelfForm(formData: FormData, shelf: HomeShelf): Promise<SectionRows> {
-  const { limit: fallback, max } = HOME_SHELVES[shelf];
+  const { kind, limit: fallback, max } = HOME_SHELVES[shelf];
   const keys = shelfKeys(shelf);
 
   const mode = text(formData, "mode") === "manual" ? "manual" : "auto";
 
   /* The field is bounded in the browser, so a count outside the range only
      arrives from a post that skipped it; it is brought back into range
-     rather than refused, and an empty field means the shelf's own number. */
+     rather than refused, and an empty field means the shelf's own number —
+     which for a shelf that shows everything is no number at all. */
   const typed = text(formData, "limit");
   const limit = typed
-    ? Math.min(max, Math.max(1, Math.round(number(formData, "limit", fallback))))
+    ? Math.min(max, Math.max(1, Math.round(number(formData, "limit", fallback ?? max))))
     : fallback;
 
-  const ids = [...new Set(idList(formData, "bookIds"))].slice(0, max);
-  if (ids.length) {
-    const found = await prisma.book.count({ where: { id: { in: ids } } });
-    if (found !== ids.length) return { ok: false, error: "unknownBook" };
+  const ids = [...new Set(idList(formData, `${kind}Ids`))].slice(0, max);
+  if (ids.length && (await countByKind[kind](ids)) !== ids.length) {
+    return { ok: false, error: kind === "book" ? "unknownBook" : "unknownCategory" };
   }
 
   return {
@@ -1071,9 +1078,27 @@ export async function searchHomeBooks(
 ): Promise<PickOption[]> {
   if (!(await requireManager())) return [];
 
-  // Arguments arrive as JSON from the browser, so their shape is checked, not assumed.
-  return searchBookPicks(
+  const [safeTerm, safeExclude] = pickerArguments(term, exclude);
+  return searchBookPicks(safeTerm, safeExclude);
+}
+
+/** The category picker's counterpart, for the category tiles. */
+export async function searchHomeCategories(
+  term: string,
+  exclude: string[],
+): Promise<PickOption[]> {
+  if (!(await requireManager())) return [];
+
+  const [safeTerm, safeExclude] = pickerArguments(term, exclude);
+  return searchCategoryPicks(safeTerm, safeExclude);
+}
+
+/** Picker arguments arrive as JSON from the browser, so their shape is checked, not assumed. */
+function pickerArguments(term: unknown, exclude: unknown): [string, string[]] {
+  return [
     typeof term === "string" ? term.trim().slice(0, 80) : "",
-    Array.isArray(exclude) ? exclude.filter((id) => typeof id === "string").slice(0, 64) : [],
-  );
+    Array.isArray(exclude)
+      ? exclude.filter((id): id is string => typeof id === "string").slice(0, 64)
+      : [],
+  ];
 }
