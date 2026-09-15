@@ -86,14 +86,15 @@ export function toHandoutCategoryWithCount(
 }
 
 export function toAuthor(
-  row: AuthorRow & { _count?: { books: number } },
+  row: AuthorRow & { _count?: { books: number }; subject?: CategoryRow | null },
 ): Author {
   return {
     id: row.id,
     slug: row.slug,
     name: { ar: row.nameAr },
     country: { ar: row.countryAr },
-    subject: row.subjectAr ? { ar: row.subjectAr } : undefined,
+    subjectId: row.subjectId ?? undefined,
+    subject: row.subject ? { ar: row.subject.nameAr } : undefined,
     bio: { ar: row.bioAr },
     booksCount: row._count?.books ?? 0,
     avatarUrl: row.avatarUrl ?? undefined,

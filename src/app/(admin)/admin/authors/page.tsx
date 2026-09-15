@@ -8,7 +8,7 @@ import { RowActions } from "@/components/admin/row-actions";
 import { deleteAuthor } from "@/app/actions/admin";
 import { TableToolbar } from "@/components/admin/table-toolbar";
 import { authorTone, getAuthorInitials } from "@/components/author/author-card";
-import { getAuthors } from "@/data";
+import { getAuthors, getCategories } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 import { formatNumber } from "@/lib/format";
@@ -32,10 +32,11 @@ export default async function AdminAuthorsPage({
 
   const term = readParam(await searchParams, "q");
 
-  const [dictionary, admin, allAuthors] = await Promise.all([
+  const [dictionary, admin, allAuthors, categories] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
     getAuthors(),
+    getCategories(),
   ]);
 
   const authors = term
@@ -135,7 +136,7 @@ export default async function AdminAuthorsPage({
         </div>
 
         <Panel title={t.form.title} className="min-w-0 lg:col-span-4">
-          <AuthorForm admin={admin} dictionary={dictionary} />
+          <AuthorForm admin={admin} dictionary={dictionary} categories={categories} />
         </Panel>
       </div>
     </>

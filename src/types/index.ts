@@ -75,7 +75,9 @@ export interface Author {
   slug: string;
   name: Localized;
   country: Localized;
-  /** The subject the teacher teaches; absent when none is on record. */
+  /** The category the teacher's subject is filed under; absent when none is on record. */
+  subjectId?: string;
+  /** That category's name — carried only where the query loaded it. */
   subject?: Localized;
   bio: Localized;
   booksCount: number;

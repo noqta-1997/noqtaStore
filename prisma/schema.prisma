@@ -108,6 +108,9 @@ model Category {
 
   books Book[]
 
+  /// Teachers whose subject this branch is.
+  authors Author[] @relation("AuthorSubject")
+
   @@index([parentId])
   @@map("categories")
 }
@@ -160,16 +163,20 @@ model Author {
   slug      String   @unique
   nameAr    String
   countryAr String
-  subjectAr String?
+  /// The category the teacher's subject is filed under; null when none is on record.
+  subjectId String?
   bioAr     String
   avatarUrl String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  subject Category? @relation("AuthorSubject", fields: [subjectId], references: [id], onDelete: SetNull)
+
   books Book[]
 
   handouts Handout[]
 
+  @@index([subjectId])
   @@map("authors")
 }
 

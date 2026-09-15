@@ -423,6 +423,11 @@ export async function deleteCategory(categoryId: string): Promise<ActionResult> 
   const books = await prisma.book.count({ where: { categoryId } });
   if (books > 0) return fail("inUse");
 
+  /* A teacher's subject is a branch too; the row would only lose it (the key
+     is SET NULL), but silently is not how the panel drops a relation. */
+  const teachers = await prisma.author.count({ where: { subjectId: categoryId } });
+  if (teachers > 0) return fail("inUse");
+
   await prisma.category.delete({ where: { id: categoryId } });
 
   revalidateCatalogue();
@@ -498,13 +503,18 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
   const nameAr = text(formData, "nameAr");
   if (!nameAr) return fail("missingTitle");
 
+  /* The subject is a branch of the category tree, or nothing. The form only
+     offers branches that exist, so a stale id means the branch went while
+     the form was open. */
+  const subjectId = text(formData, "subjectId");
+  if (subjectId && !(await getCategoryById(subjectId))) return fail("missingRelation");
+
   /* Country and slug left the form. `countryAr` is non-null with no schema
      default, so a create supplies an empty string; an update leaves whatever
-     the row already holds. The subject is nullable, so a cleared field is
-     stored as NULL rather than as "". */
+     the row already holds. */
   const data = {
     nameAr,
-    subjectAr: text(formData, "subjectAr") || null,
+    subjectId: subjectId || null,
     bioAr: text(formData, "bioAr"),
   };
 

@@ -388,10 +388,16 @@ export async function getHandoutCategoryById(
   return (await loadHandoutCategoryIndex()).byId.get(id);
 }
 
+/** The book count, and the branch the teacher's subject points at. */
+const authorInclude = {
+  _count: { select: { books: true } },
+  subject: true,
+} as const;
+
 export async function getAuthors(limit?: number): Promise<Author[]> {
   const rows = await prisma.author.findMany({
     orderBy: { books: { _count: "desc" } },
-    include: { _count: { select: { books: true } } },
+    include: authorInclude,
     ...(typeof limit === "number" ? { take: limit } : {}),
   });
 
@@ -404,7 +410,7 @@ export async function getAuthorsByIds(ids: string[]): Promise<Author[]> {
 
   const rows = await prisma.author.findMany({
     where: { id: { in: ids } },
-    include: { _count: { select: { books: true } } },
+    include: authorInclude,
   });
   const byId = new Map(rows.map((row) => [row.id, toAuthor(row)]));
 
@@ -452,7 +458,7 @@ export async function searchAuthorPicks(
 export async function getAuthorBySlug(slug: string): Promise<Author | undefined> {
   const row = await prisma.author.findUnique({
     where: { slug },
-    include: { _count: { select: { books: true } } },
+    include: authorInclude,
   });
 
   return row ? toAuthor(row) : undefined;
@@ -461,7 +467,7 @@ export async function getAuthorBySlug(slug: string): Promise<Author | undefined>
 export async function getAuthorById(id: string): Promise<Author | undefined> {
   const row = await prisma.author.findUnique({
     where: { id },
-    include: { _count: { select: { books: true } } },
+    include: authorInclude,
   });
 
   return row ? toAuthor(row) : undefined;
