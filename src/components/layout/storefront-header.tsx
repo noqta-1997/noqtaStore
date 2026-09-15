@@ -46,9 +46,10 @@ interface StorefrontHeaderProps {
  * the functional suite finds it, and it is the only control here the suite
  * drives.
  *
- * The two catalogue links carry their category trees: on a desktop each is a
- * link with a panel of the tree under it, and in the phone drawer the trees
- * are listed after the main links. Both are built here, once, as plain data.
+ * The two catalogue items carry their category trees: on a desktop each is a
+ * menu that cascades through the stages and grades, and in the phone drawer
+ * the trees are listed after the main links. Both are built here, once, as
+ * plain data.
  */
 export function StorefrontHeader({
   locale,
@@ -118,7 +119,11 @@ export function StorefrontHeader({
             {navItems.map((item) => (
               <li key={item.href}>
                 {item.tree ? (
-                  <CatalogueMenu menu={menus[item.tree]} linkClassName={navLinkStyles} />
+                  <CatalogueMenu
+                    menu={menus[item.tree]}
+                    wholeLabel={dictionary.nav.wholeBranch}
+                    linkClassName={navLinkStyles}
+                  />
                 ) : (
                   <Link href={item.href} className={navLinkStyles}>
                     {item.label}
