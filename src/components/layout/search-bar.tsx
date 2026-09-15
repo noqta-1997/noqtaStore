@@ -55,7 +55,7 @@ export function SearchBar({
         autoComplete="off"
         defaultValue={defaultValue}
         className={cn(
-          "w-full min-w-0 bg-transparent px-1 text-body-md text-on-surface placeholder:text-muted focus:outline-none",
+          "w-full min-w-0 bg-transparent px-1 text-body-md text-ellipsis text-on-surface placeholder:text-muted focus:outline-none",
           size === "lg" ? "h-12" : compact ? "h-9" : "h-10",
         )}
       />

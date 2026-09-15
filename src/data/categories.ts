@@ -46,7 +46,7 @@ export const categories: Category[] = [
     slug: "children",
     name: { ar: "أطفال وناشئة" },
     description: {
-      ar: "قصص مصوّرة وكتب للأطفال واليافعين",
+      ar: "قصص مصوّرة وكتب مدرسية للأطفال واليافعين",
     },
     icon: "ToyBrick",
     booksCount: 189,

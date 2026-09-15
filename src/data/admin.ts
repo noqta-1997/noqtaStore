@@ -385,7 +385,7 @@ export const adminReviews: AdminReview[] = [
     rating: 1,
     title: { ar: "رسالة إعلانية" },
     body: {
-      ar: "روابط دعائية غير متعلقة بالكتاب.",
+      ar: "روابط دعائية غير متعلقة بالكتاب المدرسي.",
     },
     createdAt: "2026-08-10",
     status: "rejected",

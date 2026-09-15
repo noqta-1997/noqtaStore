@@ -97,7 +97,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
               <Input
                 id="taglineAr"
                 name="taglineAr"
-                defaultValue={saved("taglineAr", "مكتبة ومتجر كتب")}
+                defaultValue={saved("taglineAr", "مكتبة ومتجر كتب مدرسية")}
               />
             </Field>
             <Field label={t.store.email} htmlFor="email">

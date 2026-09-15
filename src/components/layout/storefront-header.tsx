@@ -82,12 +82,12 @@ export function StorefrontHeader({
           aria-label={dictionary.common.menu}
           className="mx-auto hidden lg:block"
         >
-          <ul className="flex items-center gap-1">
+          <ul className="flex items-center gap-0.5">
             {navItems.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="inline-block rounded-md px-1.5 py-2 text-body-md font-medium text-on-surface-variant transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface"
+                  className="inline-block rounded-md px-1 py-2 text-body-md font-medium text-on-surface-variant transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface"
                 >
                   {item.label}
                 </Link>
@@ -102,7 +102,7 @@ export function StorefrontHeader({
             label={dictionary.common.search}
             placeholder={dictionary.common.searchPlaceholder}
             compact
-            className="hidden w-40 xl:flex"
+            className="hidden w-36 xl:flex"
           />
 
           <Link
