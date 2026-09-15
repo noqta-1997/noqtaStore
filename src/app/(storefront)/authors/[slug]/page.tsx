@@ -12,6 +12,7 @@ import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { formatNumber } from "@/lib/format";
 import { buildQueryString, readNumberParam, type SearchParamsRecord } from "@/lib/search-params";
+import { readSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 
 interface AuthorPageProps {
@@ -28,7 +29,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: AuthorPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const slug = readSlug((await params).slug);
   const author = await getAuthorBySlug(slug);
   if (!author) return {};
 
@@ -37,7 +38,7 @@ export async function generateMetadata({ params }: AuthorPageProps): Promise<Met
 }
 
 export default async function AuthorPage({ params, searchParams }: AuthorPageProps) {
-  const { slug } = await params;
+  const slug = readSlug((await params).slug);
   const locale = defaultLocale;
 
   const author = await getAuthorBySlug(slug);

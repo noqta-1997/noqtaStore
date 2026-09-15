@@ -26,6 +26,7 @@ import {
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { formatDiscount, formatNumber } from "@/lib/format";
+import { readSlug } from "@/lib/slug";
 
 interface BookPageProps {
   params: Promise<{ slug: string }>;
@@ -40,7 +41,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: BookPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const slug = readSlug((await params).slug);
   const book = await getBookBySlug(slug);
   if (!book) return {};
 
@@ -53,7 +54,7 @@ export async function generateMetadata({ params }: BookPageProps): Promise<Metad
 }
 
 export default async function BookPage({ params }: BookPageProps) {
-  const { slug } = await params;
+  const slug = readSlug((await params).slug);
   const locale = defaultLocale;
 
   const book = await getBookBySlug(slug);

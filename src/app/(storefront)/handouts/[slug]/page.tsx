@@ -26,6 +26,7 @@ import {
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { formatDiscount, formatNumber } from "@/lib/format";
+import { readSlug } from "@/lib/slug";
 
 interface HandoutPageProps {
   params: Promise<{ slug: string }>;
@@ -40,7 +41,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: HandoutPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const slug = readSlug((await params).slug);
   const handout = await getHandoutBySlug(slug);
   if (!handout) return {};
 
@@ -54,7 +55,7 @@ export async function generateMetadata({ params }: HandoutPageProps): Promise<Me
 
 /** The book detail page over a handout, control for control. */
 export default async function HandoutPage({ params }: HandoutPageProps) {
-  const { slug } = await params;
+  const slug = readSlug((await params).slug);
   const locale = defaultLocale;
 
   const handout = await getHandoutBySlug(slug);

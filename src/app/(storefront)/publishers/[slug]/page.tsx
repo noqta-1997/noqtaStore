@@ -22,6 +22,7 @@ import {
   readNumberParam,
   type SearchParamsRecord,
 } from "@/lib/search-params";
+import { readSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 
 interface PublisherPageProps {
@@ -38,7 +39,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PublisherPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const slug = readSlug((await params).slug);
   const publisher = await getPublisherBySlug(slug);
   if (!publisher) return {};
 
@@ -53,7 +54,7 @@ export default async function PublisherPage({
   params,
   searchParams,
 }: PublisherPageProps) {
-  const { slug } = await params;
+  const slug = readSlug((await params).slug);
   const locale = defaultLocale;
 
   const publisher = await getPublisherBySlug(slug);
