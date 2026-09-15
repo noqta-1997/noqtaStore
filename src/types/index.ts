@@ -75,6 +75,8 @@ export interface Author {
   slug: string;
   name: Localized;
   country: Localized;
+  /** The subject the teacher teaches; absent when none is on record. */
+  subject?: Localized;
   bio: Localized;
   booksCount: number;
   avatarUrl?: string;

@@ -39,6 +39,14 @@ export function AuthorForm({ admin, dictionary, author }: AuthorFormProps) {
       <Field label={t.nameAr} htmlFor="nameAr">
         <Input id="nameAr" name="nameAr" defaultValue={author?.name.ar} required />
       </Field>
+      <Field label={t.subjectAr} htmlFor="subjectAr">
+        <Input
+          id="subjectAr"
+          name="subjectAr"
+          defaultValue={author?.subject?.ar}
+          placeholder={t.subjectPlaceholder}
+        />
+      </Field>
       <Field label={t.bioAr} htmlFor="bioAr">
         <Textarea id="bioAr" name="bioAr" rows={3} defaultValue={author?.bio.ar} />
       </Field>

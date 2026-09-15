@@ -500,9 +500,11 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
 
   /* Country and slug left the form. `countryAr` is non-null with no schema
      default, so a create supplies an empty string; an update leaves whatever
-     the row already holds. */
+     the row already holds. The subject is nullable, so a cleared field is
+     stored as NULL rather than as "". */
   const data = {
     nameAr,
+    subjectAr: text(formData, "subjectAr") || null,
     bioAr: text(formData, "bioAr"),
   };
 

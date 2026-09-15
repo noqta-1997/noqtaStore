@@ -110,6 +110,7 @@ async function seedCatalogue() {
       slug: author.slug,
       nameAr: author.name.ar,
       countryAr: author.country.ar,
+      subjectAr: author.subject?.ar ?? null,
       bioAr: author.bio.ar,
       avatarUrl: author.avatarUrl ?? null,
     })),

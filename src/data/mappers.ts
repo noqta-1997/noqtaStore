@@ -93,6 +93,7 @@ export function toAuthor(
     slug: row.slug,
     name: { ar: row.nameAr },
     country: { ar: row.countryAr },
+    subject: row.subjectAr ? { ar: row.subjectAr } : undefined,
     bio: { ar: row.bioAr },
     booksCount: row._count?.books ?? 0,
     avatarUrl: row.avatarUrl ?? undefined,

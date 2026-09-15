@@ -160,6 +160,7 @@ model Author {
   slug      String   @unique
   nameAr    String
   countryAr String
+  subjectAr String?
   bioAr     String
   avatarUrl String?
   createdAt DateTime @default(now())

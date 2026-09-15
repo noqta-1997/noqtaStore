@@ -384,6 +384,8 @@
       "title": "مدرس جديد",
       "nameAr": "الاسم بالعربية",
       "countryAr": "البلد بالعربية",
+      "subjectAr": "المادة الدراسية",
+      "subjectPlaceholder": "مثل: الرياضيات",
       "bioAr": "النبذة بالعربية",
       "editTitle": "تعديل المدرس",
       "editSubtitle": "تحديث بيانات المدرس",
