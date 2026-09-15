@@ -8,11 +8,12 @@ import { extendTailwindMerge } from "tailwind-merge";
  * them a conflict, and silently drops the earlier one. That is how the primary
  * button lost its foreground colour and rendered dark text on the brand fill.
  *
- * Naming the seven font-size steps explicitly is enough: anything else after
+ * Naming the font-size steps explicitly is enough: anything else after
  * `text-` is then treated as a colour, which is what it is.
  */
 const FONT_SIZES = [
   "display-lg",
+  "display-md",
   "headline-xl",
   "headline-lg",
   "headline-md",

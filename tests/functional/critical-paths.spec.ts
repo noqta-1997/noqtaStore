@@ -28,6 +28,36 @@ test.describe("storefront renders real data", () => {
     await expect(page.locator('a[href^="/categories/"]').first()).toBeVisible();
   });
 
+  /*
+   * The three strips of the hero are separate carousels tied through one
+   * index; this is the contract that they stay together. Driven from the
+   * keyboard rather than by clicking a thumbnail: on a phone the neighbour
+   * is only half in view, and a click on it would have to scroll the strip
+   * behind Embla's back.
+   */
+  test("hero showcase moves as one when the keyboard picks the next jacket", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await settle(page, "main h1");
+
+    const hero = page.locator('section[aria-labelledby="hero-heading"]');
+    const thumbs = hero.locator("button[aria-label]");
+    const slides = hero.locator('[aria-roledescription="slide"]');
+
+    await expect(thumbs.first()).toHaveAttribute("aria-current", "true");
+    await expect(slides.first()).not.toHaveAttribute("inert", "");
+
+    await thumbs.first().focus();
+    // Forward runs with the text, which is right to left here.
+    await page.keyboard.press("ArrowLeft");
+
+    await expect(thumbs.nth(1)).toHaveAttribute("aria-current", "true");
+    await expect(thumbs.first()).not.toHaveAttribute("aria-current", "true");
+    // Only the jacket that is showing is reachable; the rest are inert.
+    await expect(slides.nth(1)).not.toHaveAttribute("inert", "");
+    await expect(slides.first()).toHaveAttribute("inert", "");
+    await expect(hero.locator('[aria-roledescription="slide"]:not([inert])')).toHaveCount(1);
+  });
+
   test("book detail shows title, price and a cart control", async ({ page }) => {
     await page.goto("/books/al-amir-al-saghir", { waitUntil: "domcontentloaded" });
     await settle(page, "main h1");

@@ -277,10 +277,11 @@ export function readPromoContent(settings: Record<string, string>): PromoContent
 /* ------------------------------------------------------------------ */
 
 /**
- * Jackets in one pass of the hero marquee. The row is rendered twice and the
- * track slides by one row, so this number fixes both how much is in view and
- * how far a loop travels — the 48s in `globals.css` was timed against it. It
- * is also how many the panel may pick; a shorter list cycles what it has.
+ * The most jackets the hero's showcase carries. It is what the panel may
+ * pick and what the catalogue rule fetches; the carousel loops whatever it
+ * is given, so a shorter list is a shorter loop rather than a padded one.
+ * Three rows of the thumbnail strip at its widest, which is as many as a
+ * reader will scrub through.
  */
 export const HERO_SHOWCASE_SIZE = 12;
 
@@ -300,7 +301,7 @@ export const HERO_KEYS = {
 export interface HeroContent {
   /** The title the tagline pill links to; `null` leaves it to the catalogue. */
   featuredBookId: string | null;
-  /** Jackets for the marquee in the order they enter; empty leaves it to the catalogue. */
+  /** Jackets for the showcase in the order they play; empty leaves it to the catalogue. */
   showcaseIds: string[];
   primaryHref: string;
   secondaryHref: string;

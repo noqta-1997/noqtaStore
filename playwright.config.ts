@@ -66,6 +66,16 @@ export default defineConfig({
     baseURL: "http://localhost:3000",
     locale: "en-GB",
     timezoneId: "Asia/Baghdad",
+    /*
+     * `animations: "disabled"` below only reaches CSS. The home hero's
+     * showcase is moved from script — Embla plays the next jacket every
+     * three seconds — and the app reads this preference to hold it still, so
+     * a capture lands on the first jacket every time rather than on whichever
+     * one the timer had reached. Nothing else in the app changes shape under
+     * it: the global reduced-motion rule shortens the same animations the
+     * screenshot option already freezes.
+     */
+    contextOptions: { reducedMotion: "reduce" },
     screenshot: "only-on-failure",
     trace: "retain-on-failure",
     video: "off",

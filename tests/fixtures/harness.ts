@@ -85,6 +85,45 @@ export async function settle(page: Page, ready?: string) {
   });
 
   await page.waitForLoadState("load");
+
+  // A carousel is positioned from script once React has hydrated, and Embla
+  // gives its track a 3D transform — a compositing layer — as it does so.
+  // Capturing while that was still to come caught Chromium creating the
+  // layer under the full-page metrics override, after which the strip was
+  // drawn a hundred pixels from where the DOM said it was, for the rest of
+  // the page's life. Wait for the transform; the page is then done moving.
+  await page.waitForFunction(() =>
+    Array.from(
+      document.querySelectorAll('[aria-roledescription="carousel"] [aria-roledescription="slide"]'),
+    ).every((slide) => (slide.parentElement as HTMLElement).style.transform !== ""),
+  );
+
+  // A cover that has loaded but not yet decoded paints softer than the same
+  // cover a frame later — enough to fail the ratio on a tablet capture. Only
+  // the loaded ones: a lazy cover off to the side of a strip never loads,
+  // and waiting on it would never return.
+  await page.evaluate(() =>
+    Promise.race([
+      Promise.all(
+        Array.from(document.images)
+          .filter((img) => img.complete && img.naturalWidth > 0)
+          .map((img) => img.decode().catch(() => undefined)),
+      ),
+      new Promise((resolve) => setTimeout(resolve, 3000)),
+    ]),
+  );
+
+  // Then a few frames of quiet. Chrome rasterises a layer it has just
+  // scrolled past or just composited at a low resolution first and redraws
+  // it sharp a moment later; the hero's jacket, which sits on Embla's
+  // composited track right after the scroll-through above, was captured
+  // soft in one run and sharp in the next.
+  await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve, 300)));
+      }),
+  );
 }
 
 /** Verifies the theme actually took effect, so a silent miss cannot pass. */

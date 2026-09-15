@@ -80,6 +80,14 @@ only rewrites snapshots that already failed, so it will do nothing.
 `next dev`. Comparing them to a production build would report differences that
 belong to the build, not to the migration.
 
+**Script-driven motion is held by `reducedMotion`.** `animations: "disabled"`
+freezes CSS only. The home hero's showcase is scrolled from script (Embla), and
+its autoplay would put a different jacket — or half of one — in every capture.
+The config emulates `prefers-reduced-motion: reduce`, which the showcase reads
+to stay on its first jacket and to jump rather than glide when a thumbnail is
+picked. Anything else that moves from script should read the same preference
+rather than be special-cased here.
+
 ## Pages behind a login
 
 `global-setup.ts` signs in for you, once per run, if the machine has been told

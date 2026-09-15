@@ -123,6 +123,11 @@
   --primary-container-pressed: var(--colorBrandBackgroundPressed);
   --card-hover: var(--colorNeutralBackground1Hover);
   --card-pressed: var(--colorNeutralBackground1Pressed);
+  /* The tint's own hover and pressed steps, for the one place it is a button
+     rather than a chip: the hero's second action. Fluent ships them, so the
+     tint darkens under the pointer in light mode and lightens in dark. */
+  --primary-fixed-hover: var(--colorBrandBackground2Hover);
+  --primary-fixed-pressed: var(--colorBrandBackground2Pressed);
   --line-hover: var(--colorNeutralStroke1Hover);
   --line-pressed: var(--colorNeutralStroke1Pressed);
   /* The accent Fluent grows under a focused field. */
@@ -228,6 +233,8 @@
   --color-primary-container: var(--primary-container);
   --color-on-primary-container: var(--on-primary-container);
   --color-primary-fixed: var(--primary-fixed);
+  --color-primary-fixed-hover: var(--primary-fixed-hover);
+  --color-primary-fixed-pressed: var(--primary-fixed-pressed);
   --color-on-primary-fixed: var(--on-primary-fixed);
 
   --color-gold: var(--gold);
@@ -278,26 +285,6 @@
   --ease-fluent: var(--curveEasyEase);
   --ease-decelerate: var(--curveDecelerateMid);
 
-  /*
-   * The home hero's row of jackets. The track holds the row twice and slides
-   * by exactly one row's width before it resets, which is indistinguishable
-   * from a row that never ends. The slide runs against the writing direction
-   * — the first copy sits at the start edge, so in RTL the track has to move
-   * right for its twin to enter from the left — and `--marquee-shift` is
-   * flipped for that under `html[dir="rtl"]` in the base layer. Twelve
-   * jackets a row over 48s is about 65px a second on a desktop; a phone's
-   * narrower jackets make the same loop a little slower.
-   */
-  --animate-marquee: marquee 48s linear infinite;
-  @keyframes marquee {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(var(--marquee-shift, -50%));
-    }
-  }
-
   /* ---- Typography ----
      One face for the whole store: Almarai. IBM Plex Sans Arabic was removed
      along with the last of the two-family split, so all three role tokens
@@ -328,6 +315,16 @@
   --text-display-lg--line-height: 1.12;
   --text-display-lg--letter-spacing: -0.02em;
   --text-display-lg--font-weight: var(--fontWeightBold);
+
+  /* The display line when it shares its row with something — the home hero
+     sets it beside a jacket, in three fifths of the width. Interpolates from
+     Hero800 to 48px, the desktop size of the block it was cut from; the
+     large step's 68px in that column would run to four lines and outgrow
+     the jacket it sits beside. Registered in `cn()`'s font-size list. */
+  --text-display-md: clamp(var(--fontSizeHero800), 3.4vw, 3rem);
+  --text-display-md--line-height: 1.25;
+  --text-display-md--letter-spacing: -0.01em;
+  --text-display-md--font-weight: var(--fontWeightBold);
 
   /* Page titles. Fluent's Hero800 — the step between a section heading and
      the home page's display line, which inner pages were reaching for with a
@@ -503,11 +500,6 @@
     outline-offset: var(--strokeWidthThin);
     box-shadow: 0 0 0 var(--strokeWidthThin) var(--focus-inner);
     border-radius: var(--borderRadiusXLarge);
-  }
-
-  /* A marquee runs against the writing direction; see `--animate-marquee`. */
-  html[dir="rtl"] {
-    --marquee-shift: 50%;
   }
 
   /* Figures keep tabular spacing so columns of prices still line up. */
