@@ -2,6 +2,7 @@ import { Heart, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 
 import { AccountMenu } from "@/components/layout/account-menu";
+import { CatalogueMenu } from "@/components/layout/catalogue-menu";
 import { Logo } from "@/components/layout/logo";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { SearchBar } from "@/components/layout/search-bar";
@@ -10,18 +11,26 @@ import { CartBadge } from "@/components/commerce/cart-badge";
 import { Container } from "@/components/ui/container";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/get-dictionary";
+import { buildCatalogueMenu } from "@/lib/category-menu";
 import { getMainNav } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
-import type { Category } from "@/types";
+import type { CategoryNode, HandoutCategoryNode } from "@/types";
 
 const iconLinkStyles =
   "relative inline-flex size-10 items-center justify-center rounded-md text-on-surface " +
   "transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-primary";
 
+const navLinkStyles =
+  "inline-block rounded-md px-1 py-2 text-body-md font-medium text-on-surface-variant " +
+  "transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface";
+
 interface StorefrontHeaderProps {
   locale: Locale;
   dictionary: Dictionary;
-  categories: Category[];
+  /** The top-level branches of the books' tree, each with what hangs under it. */
+  categories: CategoryNode[];
+  /** The same for the handouts' own tree. */
+  handoutCategories: HandoutCategoryNode[];
   /** Overrides the shipped copy when the settings screen has been filled in. */
   brand: { name: string; tagline: string };
 }
@@ -36,18 +45,38 @@ interface StorefrontHeaderProps {
  * theme toggle stays the last `button[aria-label]` in the header: that is how
  * the functional suite finds it, and it is the only control here the suite
  * drives.
+ *
+ * The two catalogue links carry their category trees: on a desktop each is a
+ * link with a panel of the tree under it, and in the phone drawer the trees
+ * are listed after the main links. Both are built here, once, as plain data.
  */
 export function StorefrontHeader({
   locale,
   dictionary,
   categories,
+  handoutCategories,
   brand,
 }: StorefrontHeaderProps) {
   const navItems = getMainNav(dictionary.nav);
-  const categoryItems = categories.map((category) => ({
-    href: `/categories/${category.slug}`,
-    label: category.name[locale],
-  }));
+  const menus = {
+    books: buildCatalogueMenu(categories, locale, (slug) => `/categories/${slug}`, {
+      label: dictionary.nav.books,
+      href: "/books",
+      allLabel: dictionary.books.title,
+      othersLabel: dictionary.nav.otherBranches,
+    }),
+    handouts: buildCatalogueMenu(
+      handoutCategories,
+      locale,
+      (slug) => `/handouts/categories/${slug}`,
+      {
+        label: dictionary.nav.handouts,
+        href: "/handouts",
+        allLabel: dictionary.handouts.title,
+        othersLabel: dictionary.nav.otherBranches,
+      },
+    ),
+  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-line-divider bg-surface/95 backdrop-blur">
@@ -60,7 +89,10 @@ export function StorefrontHeader({
       <Container className="flex h-18 items-center gap-3 lg:gap-2">
         <MobileNav
           items={navItems}
-          categories={categoryItems}
+          trees={[
+            { title: dictionary.nav.bookTree, menu: menus.books },
+            { title: dictionary.nav.handoutTree, menu: menus.handouts },
+          ]}
           loginHref={`/login`}
           accountHref={`/account`}
           adminHref={`/admin`}
@@ -68,7 +100,7 @@ export function StorefrontHeader({
             menu: dictionary.common.menu,
             close: dictionary.common.close,
             login: dictionary.common.login,
-            categories: dictionary.nav.categories,
+            wholeBranch: dictionary.nav.wholeBranch,
             theme: dictionary.common.theme,
             account: dictionary.common.account,
             logout: dictionary.account.nav.logout,
@@ -85,12 +117,13 @@ export function StorefrontHeader({
           <ul className="flex items-center gap-0.5">
             {navItems.map((item) => (
               <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="inline-block rounded-md px-1 py-2 text-body-md font-medium text-on-surface-variant transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface"
-                >
-                  {item.label}
-                </Link>
+                {item.tree ? (
+                  <CatalogueMenu menu={menus[item.tree]} linkClassName={navLinkStyles} />
+                ) : (
+                  <Link href={item.href} className={navLinkStyles}>
+                    {item.label}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>

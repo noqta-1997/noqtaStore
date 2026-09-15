@@ -146,7 +146,11 @@
     "authors": "المدرسون",
     "publishers": "المطابع والمكتبات",
     "offers": "العروض",
-    "about": "من نحن"
+    "about": "من نحن",
+    "otherBranches": "تصنيفات أخرى",
+    "bookTree": "تصنيفات الكتب المدرسية",
+    "handoutTree": "تصنيفات الملازم",
+    "wholeBranch": "كل {name}"
   },
   "announcement": {
     "text": "توصيل مجاني لكل المحافظات للطلبات فوق 50,000 د.ع",

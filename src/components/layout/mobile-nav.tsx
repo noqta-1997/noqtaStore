@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, LogOut, Menu } from "lucide-react";
+import { ChevronDown, LayoutDashboard, LogOut, Menu } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -10,17 +10,20 @@ import { createClient } from "@/utils/supabase/client";
 import { buttonStyles } from "@/components/ui/button";
 import { Drawer } from "@/components/ui/drawer";
 import { IconButton } from "@/components/ui/icon-button";
+import type { CatalogueMenu, MenuBranch } from "@/lib/category-menu";
 import type { NavItem } from "@/lib/navigation";
 import { isOwner } from "@/lib/owner";
 
 interface MobileNavProps {
   items: NavItem[];
-  categories: NavItem[];
+  /** One tree per catalogue, listed after the main links under its own title. */
+  trees: { title: string; menu: CatalogueMenu }[];
   labels: {
     menu: string;
     close: string;
     login: string;
-    categories: string;
+    /** "كل {name}" — the link to a whole stage, at the top of its opened list. */
+    wholeBranch: string;
     theme: { toggle: string; light: string; dark: string };
     account: string;
     logout: string;
@@ -32,10 +35,78 @@ interface MobileNavProps {
   adminHref: string;
 }
 
+const branchLinkStyles =
+  "block rounded-md px-3 py-2 text-body-md text-on-surface-variant transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface";
+
+/**
+ * A stage in the drawer: a disclosure that opens on its grades, with a link
+ * to the stage itself as the first row and a grade's branches on the line
+ * under the grade. A branch with nothing under it is a plain link.
+ */
+function BranchDisclosure({
+  branch,
+  wholeLabel,
+  onNavigate,
+}: {
+  branch: MenuBranch;
+  wholeLabel: string;
+  onNavigate: () => void;
+}) {
+  if (!branch.children.length) {
+    return (
+      <Link href={branch.href} onClick={onNavigate} className={branchLinkStyles}>
+        {branch.name}
+      </Link>
+    );
+  }
+
+  return (
+    <details className="group">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 rounded-md px-3 py-2 text-body-md font-semibold text-on-surface transition-colors duration-100 ease-fluent hover:bg-state-hover [&::-webkit-details-marker]:hidden">
+        {branch.name}
+        <ChevronDown
+          aria-hidden
+          className="size-4 shrink-0 text-muted transition-transform duration-100 ease-fluent group-open:rotate-180"
+          strokeWidth={1.75}
+        />
+      </summary>
+      <ul className="mb-1 space-y-0.5 border-s border-line-divider ms-4 ps-1">
+        <li>
+          <Link href={branch.href} onClick={onNavigate} className={branchLinkStyles}>
+            {wholeLabel.replace("{name}", branch.name)}
+          </Link>
+        </li>
+        {branch.children.map((child) => (
+          <li key={child.id}>
+            <Link href={child.href} onClick={onNavigate} className={branchLinkStyles}>
+              {child.name}
+            </Link>
+            {child.children.length ? (
+              <ul className="flex flex-wrap gap-x-1 px-3 pb-1">
+                {child.children.map((leaf) => (
+                  <li key={leaf.id}>
+                    <Link
+                      href={leaf.href}
+                      onClick={onNavigate}
+                      className="inline-block rounded-md px-2 py-1 text-label-md text-muted transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface"
+                    >
+                      {leaf.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
+}
+
 /** Slide-in navigation drawer for small screens. */
 export function MobileNav({
   items,
-  categories,
+  trees,
   labels,
   loginHref,
   accountHref,
@@ -104,20 +175,22 @@ export function MobileNav({
             ))}
           </ul>
 
-          <p className="label-mono mt-5 mb-2 px-3 text-muted">{labels.categories}</p>
-          <ul className="space-y-0.5">
-            {categories.map((category) => (
-              <li key={category.href}>
-                <Link
-                  href={category.href}
-                  onClick={() => setIsOpen(false)}
-                  className="block rounded-md px-3 py-2 text-body-md text-on-surface-variant transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface"
-                >
-                  {category.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {trees.map((tree) => (
+            <section key={tree.title} aria-label={tree.title}>
+              <p className="label-mono mt-5 mb-2 px-3 text-muted">{tree.title}</p>
+              <ul className="space-y-0.5">
+                {[...tree.menu.columns, ...tree.menu.others].map((branch) => (
+                  <li key={branch.id}>
+                    <BranchDisclosure
+                      branch={branch}
+                      wholeLabel={labels.wholeBranch}
+                      onNavigate={() => setIsOpen(false)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
         </nav>
 
         <div className="mt-6 space-y-2 border-t border-line-divider pt-4">

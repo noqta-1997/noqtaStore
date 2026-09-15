@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { StorefrontFooter } from "@/components/layout/storefront-footer";
 import { StorefrontHeader } from "@/components/layout/storefront-header";
-import { getCategoryTree, getStoreIdentity } from "@/data";
+import { getCategoryTree, getHandoutCategoryTree, getStoreIdentity } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 
@@ -13,11 +13,12 @@ export default async function StorefrontLayout({
 }) {
   const locale = defaultLocale;
 
-  /* The header lists the top-level branches; the grades under them come
-     with the menus of the next step. */
-  const [dictionary, categories, identity] = await Promise.all([
+  /* Both trees, whole: the header hangs them under their catalogue links and
+     the phone drawer lists them. */
+  const [dictionary, categories, handoutCategories, identity] = await Promise.all([
     getDictionary(locale),
     getCategoryTree(),
+    getHandoutCategoryTree(),
     getStoreIdentity(),
   ]);
 
@@ -44,6 +45,7 @@ export default async function StorefrontLayout({
         locale={locale}
         dictionary={dictionary}
         categories={categories}
+        handoutCategories={handoutCategories}
         brand={brand}
       />
 
