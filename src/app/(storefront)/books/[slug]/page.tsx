@@ -98,7 +98,7 @@ export default async function BookPage({ params }: BookPageProps) {
 
       <Container className="grid gap-8 py-8 lg:grid-cols-12 lg:gap-12 lg:py-12">
         <div className="lg:col-span-5">
-          <div className="mx-auto max-w-xs lg:sticky lg:top-44 lg:max-w-sm">
+          <div className="mx-auto max-w-xs lg:sticky lg:top-35 lg:max-w-sm">
             {/* The jacket sits on a tinted plate, the same way it does on
                 every shelf card — the detail page is the shelf card enlarged. */}
             <div className="relative rounded-2xl bg-surface-low p-5 sm:p-7">

@@ -16,8 +16,7 @@ interface StorefrontFooterProps {
  * The reference closes on paper rather than on ink: the footer is the same
  * beige as the banded sections, with the wordmark in the accent and the
  * columns in ordinary body text. That is why nothing here reads `--anchor`
- * any more — the one band that stays dark in both themes is the announcement
- * rail at the top of the header.
+ * any more.
  */
 export function StorefrontFooter({
   dictionary,

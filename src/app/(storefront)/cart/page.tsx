@@ -142,7 +142,7 @@ export default async function CartPage({ searchParams }: CartPageProps) {
                   discount,
                   total: subtotal + shipping - discount,
                 }}
-                className="lg:sticky lg:top-44"
+                className="lg:sticky lg:top-35"
                 footer={
                   <Link
                     href={`/checkout`}

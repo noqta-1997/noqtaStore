@@ -87,7 +87,7 @@ export function BookCatalogue({
   return (
     <Container className="grid gap-6 py-8 lg:grid-cols-12 lg:gap-8 lg:py-12">
       <aside className="hidden lg:col-span-3 lg:block">
-        <div className="sticky top-44">{filters}</div>
+        <div className="sticky top-35">{filters}</div>
       </aside>
 
       <div className="space-y-6 lg:col-span-9">

@@ -81,12 +81,6 @@ export function StorefrontHeader({
 
   return (
     <header className="sticky top-0 z-40 border-b border-line-divider bg-surface/95 backdrop-blur">
-      <div className="bg-anchor text-on-anchor">
-        <Container className="flex h-9 items-center justify-center gap-2 text-center">
-          <p className="label-mono truncate">{dictionary.announcement.text}</p>
-        </Container>
-      </div>
-
       <Container className="flex h-18 items-center gap-3 lg:gap-2">
         <MobileNav
           items={navItems}

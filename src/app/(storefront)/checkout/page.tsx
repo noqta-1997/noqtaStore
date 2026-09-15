@@ -289,7 +289,7 @@ export default async function CheckoutPage() {
               discount,
               total: subtotal + shipping - discount,
             }}
-            className="lg:sticky lg:top-44"
+            className="lg:sticky lg:top-35"
             footer={
               <button
                 type="submit"

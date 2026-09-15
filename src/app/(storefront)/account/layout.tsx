@@ -59,7 +59,7 @@ export default async function AccountLayout({
 
       <Container className="grid gap-6 py-8 lg:grid-cols-12 lg:gap-8 lg:py-12">
         <aside className="min-w-0 lg:col-span-3">
-          <div className="rounded-xl border border-line bg-card p-2 lg:sticky lg:top-44">
+          <div className="rounded-xl border border-line bg-card p-2 lg:sticky lg:top-35">
             <AccountNav labels={t.nav} />
           </div>
         </aside>
