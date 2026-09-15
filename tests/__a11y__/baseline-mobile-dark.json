@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-14T17:44:37.017Z",
+  "capturedAt": "2026-09-15T07:10:34.373Z",
   "project": "mobile-dark",
-  "pagesScanned": 18,
+  "pagesScanned": 21,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -65,6 +65,33 @@
       "theme": "dark",
       "project": "mobile-dark",
       "url": "/categories/literature",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "category-branch",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "mobile-dark",
+      "url": "/categories/preparatory",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "handout-categories",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "mobile-dark",
+      "url": "/handouts/categories",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "handout-category-detail",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "mobile-dark",
+      "url": "/handouts/categories/preparatory-6",
       "violations": [],
       "total": 0
     },

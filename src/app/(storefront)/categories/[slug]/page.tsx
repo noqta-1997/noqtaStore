@@ -2,12 +2,15 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { BookCatalogue } from "@/components/book/book-catalogue";
+import { BranchStrip } from "@/components/category/branch-strip";
 import { HandoutShelf } from "@/components/handout/handout-shelf";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { PageHeader } from "@/components/ui/page-header";
 import {
   getCategories,
+  getCategoryAncestors,
   getCategoryBySlug,
+  getHandoutCategoryBySlug,
   getPriceBounds,
   getPublishers,
   queryBooks,
@@ -17,6 +20,7 @@ import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { parseBookQuery, toBookQuery } from "@/lib/book-query";
 import { buildQueryString, type SearchParamsRecord } from "@/lib/search-params";
+import { readSlug } from "@/lib/slug";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -32,7 +36,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const slug = readSlug((await params).slug);
   const category = await getCategoryBySlug(slug);
   if (!category) return {};
 
@@ -43,11 +47,16 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   };
 }
 
+/**
+ * One branch of the tree at any depth. The crumbs walk down from the top;
+ * the branches below, if any, sit as chips above the catalogue; and the
+ * catalogue itself lists everything filed here or anywhere under here.
+ */
 export default async function CategoryPage({
   params,
   searchParams,
 }: CategoryPageProps) {
-  const { slug } = await params;
+  const slug = readSlug((await params).slug);
   const locale = defaultLocale;
 
   const category = await getCategoryBySlug(slug);
@@ -59,20 +68,26 @@ export default async function CategoryPage({
   const parsed = parseBookQuery(await searchParams);
 
   /*
-   * The handouts of the category answer to the same filters as its books, on
-   * a shelf under the catalogue: the first ten, and a link to the handouts
-   * listing scoped the same way for the rest.
+   * The handouts have a tree of their own, seeded alike: when a branch of it
+   * answers to the same slug, its handouts get a shelf under the books, to
+   * the same filters — the first ten, and a link to the handouts listing
+   * scoped the same way for the rest.
    */
-  const [dictionary, categories, publishers, bounds, result, handouts] = await Promise.all([
+  const [dictionary, trail, categories, publishers, bounds, result, twin] = await Promise.all([
     getDictionary(locale),
+    getCategoryAncestors(category),
     getCategories(),
     getPublishers(),
     getPriceBounds(),
     queryBooks(toBookQuery(parsed, { category: slug })),
-    queryHandouts(toBookQuery(parsed, { category: slug, page: 1, perPage: 10 })),
+    getHandoutCategoryBySlug(slug),
   ]);
+  const handouts = twin
+    ? await queryHandouts(toBookQuery(parsed, { category: slug, page: 1, perPage: 10 }))
+    : null;
 
   const handoutsHref = `/handouts${buildQueryString({ ...parsed.values, category: slug })}`;
+  const t = dictionary.categoriesPage;
 
   return (
     <>
@@ -82,7 +97,11 @@ export default async function CategoryPage({
         crumbsLabel={dictionary.common.menu}
         crumbs={[
           { label: dictionary.common.home, href: "/" },
-          { label: dictionary.categoriesPage.title, href: `/categories` },
+          { label: t.title, href: `/categories` },
+          ...trail.map((ancestor) => ({
+            label: ancestor.name[locale],
+            href: `/categories/${ancestor.slug}`,
+          })),
           { label: category.name[locale] },
         ]}
         actions={
@@ -91,6 +110,16 @@ export default async function CategoryPage({
           </span>
         }
       />
+
+      {category.children.length ? (
+        <BranchStrip
+          branches={category.children}
+          locale={locale}
+          title={t.branches}
+          subtitle={t.branchesSubtitle}
+          countLabel={dictionary.home.categories.count}
+        />
+      ) : null}
 
       <BookCatalogue
         locale={locale}
@@ -104,10 +133,10 @@ export default async function CategoryPage({
         showCategory={false}
       />
 
-      {handouts.total > 0 ? (
+      {handouts && handouts.total > 0 ? (
         <HandoutShelf
-          title={dictionary.categoriesPage.handoutsTitle}
-          subtitle={dictionary.categoriesPage.handoutsSubtitle}
+          title={t.handoutsTitle}
+          subtitle={t.handoutsSubtitle}
           handouts={handouts.items}
           locale={locale}
           dictionary={dictionary.common}

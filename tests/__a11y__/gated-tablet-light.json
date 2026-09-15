@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-14T17:46:45.888Z",
+  "capturedAt": "2026-09-15T07:13:06.682Z",
   "project": "tablet-light",
-  "pagesScanned": 17,
+  "pagesScanned": 18,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -119,6 +119,15 @@
       "theme": "light",
       "project": "tablet-light",
       "url": "/admin/authors",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-categories",
+      "locale": "ar",
+      "theme": "light",
+      "project": "tablet-light",
+      "url": "/admin/categories",
       "violations": [],
       "total": 0
     },

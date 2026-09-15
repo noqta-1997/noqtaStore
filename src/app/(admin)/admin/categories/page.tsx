@@ -1,4 +1,6 @@
+import { CornerDownLeft } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@/components/admin/data-table";
@@ -11,6 +13,11 @@ import { getCategories, getCategoryShares } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 import { formatNumber } from "@/lib/format";
+import { readParam, type SearchParamsRecord } from "@/lib/search-params";
+
+interface AdminCategoriesPageProps {
+  searchParams: Promise<SearchParamsRecord>;
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const admin = await getAdminDictionary(defaultLocale);
@@ -18,17 +25,26 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: `${admin.categories.title} — ${admin.brand.panel}` };
 }
 
-export default async function AdminCategoriesPage() {
+/**
+ * The tree as a table: every branch on its own row, indented by how deep it
+ * sits, parents above children. A row's "add under" link reopens this page
+ * with the branch pre-selected as the parent in the form beside the table.
+ */
+export default async function AdminCategoriesPage({
+  searchParams,
+}: AdminCategoriesPageProps) {
   const locale = defaultLocale;
+  const parentId = readParam(await searchParams, "parent");
 
   const [dictionary, admin, categories, shares] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
     getCategories(),
-    getCategoryShares(),
+    getCategoryShares("all"),
   ]);
 
   const t = admin.categories;
+  const shareOf = new Map(shares.map((entry) => [entry.categoryId, entry.share]));
 
   return (
     <>
@@ -47,13 +63,15 @@ export default async function AdminCategoriesPage() {
             </Thead>
             <Tbody>
               {categories.map((category) => {
-                const share =
-                  shares.find((entry) => entry.categoryId === category.id)?.share ?? 0;
+                const share = shareOf.get(category.id) ?? 0;
 
                 return (
                   <Tr key={category.id}>
                     <Td>
-                      <div className="flex items-center gap-3">
+                      <div
+                        className="flex items-center gap-3"
+                        style={{ paddingInlineStart: `${category.depth * 1.75}rem` }}
+                      >
                         <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-primary">
                           <CategoryIcon name={category.icon} className="size-4" />
                         </span>
@@ -61,7 +79,7 @@ export default async function AdminCategoriesPage() {
                           <span className="block font-semibold text-on-surface">
                             {category.name[locale]}
                           </span>
-                          <span className="block max-w-64 truncate text-label-md text-muted">
+                          <span className="block max-w-48 truncate text-label-md text-muted">
                             {category.description[locale]}
                           </span>
                         </span>
@@ -72,7 +90,7 @@ export default async function AdminCategoriesPage() {
                     </Td>
                     <Td>
                       <div className="flex items-center gap-2">
-                        <span className="h-2 w-20 border border-line bg-surface-low">
+                        <span className="h-2 w-16 border border-line bg-surface-low">
                           <span
                             className="block h-full bg-primary-container"
                             style={{ width: `${share * 2.6}%` }}
@@ -84,30 +102,45 @@ export default async function AdminCategoriesPage() {
                       </div>
                     </Td>
                     <Td>
-                      <RowActions
-                        viewHref={`/categories/${category.slug}`}
-                        editHref={`/admin/categories/${category.id}/edit`}
-                        itemName={category.name[locale]}
-                        labels={{
-                          view: admin.common.view,
-                          edit: admin.common.edit,
-                          delete: admin.common.delete,
-                        }}
-                        fallbackError={dictionary.common.toast.actionFailed}
-                        errorMessages={{
-                          inUse: dictionary.common.actionErrors.inUse,
-                          forbidden: dictionary.common.actionErrors.forbidden,
-                        }}
-                      deleteAction={deleteCategory.bind(null, category.id)}
-                        confirm={{
-                          title: dictionary.common.confirm.deleteTitle,
-                          description: dictionary.common.confirm.deleteDescription,
-                          confirm: dictionary.common.confirm.confirm,
-                          cancel: dictionary.common.confirm.cancel,
-                          done: dictionary.common.toast.deleted,
-                          trigger: admin.common.delete,
-                        }}
-                      />
+                      <div className="flex items-center justify-end gap-1">
+                        <Link
+                          href={`/admin/categories?parent=${category.id}#category-form`}
+                          aria-label={t.addChild}
+                          title={t.addChild}
+                          className="inline-flex size-9 shrink-0 items-center justify-center rounded-md text-on-surface transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-primary"
+                        >
+                          <CornerDownLeft
+                            aria-hidden
+                            className="size-4 rtl:-scale-x-100"
+                            strokeWidth={1.75}
+                          />
+                        </Link>
+                        <RowActions
+                          viewHref={`/categories/${category.slug}`}
+                          editHref={`/admin/categories/${category.id}/edit`}
+                          itemName={category.name[locale]}
+                          labels={{
+                            view: admin.common.view,
+                            edit: admin.common.edit,
+                            delete: admin.common.delete,
+                          }}
+                          fallbackError={dictionary.common.toast.actionFailed}
+                          errorMessages={{
+                            inUse: dictionary.common.actionErrors.inUse,
+                            hasChildren: dictionary.common.actionErrors.hasChildren,
+                            forbidden: dictionary.common.actionErrors.forbidden,
+                          }}
+                          deleteAction={deleteCategory.bind(null, category.id)}
+                          confirm={{
+                            title: dictionary.common.confirm.deleteTitle,
+                            description: dictionary.common.confirm.deleteDescription,
+                            confirm: dictionary.common.confirm.confirm,
+                            cancel: dictionary.common.confirm.cancel,
+                            done: dictionary.common.toast.deleted,
+                            trigger: admin.common.delete,
+                          }}
+                        />
+                      </div>
                     </Td>
                   </Tr>
                 );
@@ -116,9 +149,18 @@ export default async function AdminCategoriesPage() {
           </Table>
         </div>
 
-        <Panel title={t.form.title} className="min-w-0 lg:col-span-4">
-          <CategoryForm admin={admin} dictionary={dictionary} />
-        </Panel>
+        {/* The anchor the "add under" links land on; a fresh key resets the form's parent. */}
+        <div id="category-form" className="min-w-0 lg:col-span-4">
+          <Panel title={t.form.title}>
+            <CategoryForm
+              key={parentId || "top"}
+              admin={admin}
+              dictionary={dictionary}
+              categories={categories}
+              defaultParentId={parentId || undefined}
+            />
+          </Panel>
+        </div>
       </div>
     </>
   );

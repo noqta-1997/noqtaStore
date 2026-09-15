@@ -15,12 +15,13 @@ import type { AdminDictionary, Dictionary } from "@/i18n/get-dictionary";
 import type {
   Author,
   BookTag,
-  Category,
+  HandoutCategoryNode,
   HandoutWithRelations,
   Publisher,
 } from "@/types";
 import { ActionForm } from "@/components/ui/action-form";
 import { deleteHandout, saveHandout } from "@/app/actions/admin";
+import { indentFor } from "@/lib/category-tree";
 
 interface HandoutFormProps {
   locale: Locale;
@@ -28,7 +29,8 @@ interface HandoutFormProps {
   /** Storefront dictionary — reused for tag and cover-type labels. */
   dictionary: Dictionary;
   authors: Author[];
-  categories: Category[];
+  /** The handouts' own tree in order; the select indents each branch under its parent. */
+  categories: HandoutCategoryNode[];
   publishers: Publisher[];
   /** Absent when creating a new handout. */
   handout?: HandoutWithRelations;
@@ -100,6 +102,7 @@ export function HandoutForm({
                 </option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
+                    {indentFor(category.depth)}
                     {category.name[locale]}
                   </option>
                 ))}

@@ -51,6 +51,19 @@ export const PAGES: PageCase[] = [
     path: () => "/categories/literature",
     ready: "main",
   },
+  // A stage of the school ladder: the strip of grades above an empty
+  // catalogue, and four levels of crumbs on the handouts' twin below.
+  {
+    id: "category-branch",
+    path: () => "/categories/preparatory",
+    ready: "main",
+  },
+  { id: "handout-categories", path: () => "/handouts/categories", ready: "main" },
+  {
+    id: "handout-category-detail",
+    path: () => "/handouts/categories/preparatory-6",
+    ready: "main",
+  },
   { id: "authors", path: () => "/authors", ready: "main" },
   {
     id: "author-detail",
@@ -135,6 +148,8 @@ export const PAGES: PageCase[] = [
   // form, and the report. admin-books already covers the plain table.
   { id: "admin-orders", path: () => "/admin/orders", gated: true },
   { id: "admin-authors", path: () => "/admin/authors", gated: true },
+  // The tree as a table, indented, beside the form with its parent control.
+  { id: "admin-categories", path: () => "/admin/categories", gated: true },
   { id: "admin-book-new", path: () => "/admin/books/new", gated: true },
   { id: "admin-handout-new", path: () => "/admin/handouts/new", gated: true },
   { id: "admin-handout-reviews", path: () => "/admin/handout-reviews", gated: true },

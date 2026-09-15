@@ -7,9 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/get-dictionary";
+import { indentFor } from "@/lib/category-tree";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { Category, CoverType, Publisher } from "@/types";
+import type { CategoryOption, CoverType, Publisher } from "@/types";
 
 export interface BookFilterValues {
   category?: string;
@@ -29,7 +30,8 @@ interface BookFiltersProps {
   resetHref: string;
   locale: Locale;
   dictionary: Dictionary;
-  categories: Category[];
+  /** Either tree in order; each branch is indented under its parent. */
+  categories: CategoryOption[];
   publishers: Publisher[];
   values: BookFilterValues;
   bounds: { min: number; max: number };
@@ -92,6 +94,7 @@ export function BookFilters({
             <option value="">{t.allCategories}</option>
             {categories.map((category) => (
               <option key={category.id} value={category.slug}>
+                {indentFor(category.depth)}
                 {category.name[locale]}
               </option>
             ))}

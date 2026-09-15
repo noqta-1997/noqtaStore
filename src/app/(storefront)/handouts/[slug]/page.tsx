@@ -88,7 +88,7 @@ export default async function HandoutPage({ params }: HandoutPageProps) {
               { label: dictionary.handouts.title, href: `/handouts` },
               {
                 label: handout.category.name[locale],
-                href: `/categories/${handout.category.slug}`,
+                href: `/handouts/categories/${handout.category.slug}`,
               },
               { label: handout.title[locale] },
             ]}
@@ -129,7 +129,7 @@ export default async function HandoutPage({ params }: HandoutPageProps) {
         <div className="space-y-6 lg:col-span-7">
           <div className="space-y-3">
             <Link
-              href={`/categories/${handout.category.slug}`}
+              href={`/handouts/categories/${handout.category.slug}`}
               className="text-label-md font-semibold text-primary underline-offset-4 hover:underline"
             >
               {handout.category.name[locale]}

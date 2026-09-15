@@ -13,12 +13,12 @@ import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { formatNumber } from "@/lib/format";
 import { buildQueryString } from "@/lib/search-params";
-import type { Category, Publisher } from "@/types";
+import type { CategoryOption, Publisher } from "@/types";
 
 interface HandoutCatalogueProps {
   locale: Locale;
   dictionary: Dictionary;
-  categories: Category[];
+  categories: CategoryOption[];
   publishers: Publisher[];
   bounds: { min: number; max: number };
   result: HandoutQueryResult;

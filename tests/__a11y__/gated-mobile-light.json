@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-14T17:43:57.292Z",
+  "capturedAt": "2026-09-15T07:09:44.815Z",
   "project": "mobile-light",
-  "pagesScanned": 17,
+  "pagesScanned": 18,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -119,6 +119,15 @@
       "theme": "light",
       "project": "mobile-light",
       "url": "/admin/authors",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-categories",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/admin/categories",
       "violations": [],
       "total": 0
     },

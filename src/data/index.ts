@@ -1,9 +1,12 @@
+import { cache } from "react";
+
 import {
   toAddress,
   toAuthor,
   toBook,
   toCategoryWithCount,
   toHandout,
+  toHandoutCategoryWithCount,
   toHandoutReviewWithAuthor,
   toHandoutReviewWithStatus,
   toOrder,
@@ -20,6 +23,13 @@ import {
   type HomeSectionVisibility,
   type ShelfContent,
 } from "@/lib/home-sections";
+import {
+  ancestorsOf,
+  buildTree,
+  flattenTree,
+  rollUp,
+  subtreeOf,
+} from "@/lib/category-tree";
 import { prisma } from "@/lib/prisma";
 import type {
   AdminNotification,
@@ -34,10 +44,14 @@ import type {
   CartLineWithBook,
   CartLineWithHandout,
   Category,
+  CategoryNode,
+  CategoryShare,
   CoverType,
   Customer,
   CustomerStatus,
   CustomerSummary,
+  HandoutCategory,
+  HandoutCategoryNode,
   HandoutReview,
   HandoutReviewWithStatus,
   HandoutWithRelations,
@@ -121,16 +135,23 @@ export interface BookQueryResult {
   pageCount: number;
 }
 
-const orderByForSort: Record<SortKey, Prisma.BookOrderByWithRelationInput> = {
-  relevance: { reviewsCount: "desc" },
-  popular: { reviewsCount: "desc" },
-  newest: { createdAt: "desc" },
-  priceAsc: { price: "asc" },
-  priceDesc: { price: "desc" },
-  rating: { rating: "desc" },
+/*
+ * Every key breaks ties on `createdAt`, as the handouts map does. The books
+ * had no ties in their seed data once; with no reviews in the live table every
+ * title sorts equal on the default key, and Postgres returns equal rows in
+ * whatever order the plan touched them — the category filter changing from a
+ * join to an id list was enough to reshuffle a page.
+ */
+const orderByForSort: Record<SortKey, Prisma.BookOrderByWithRelationInput[]> = {
+  relevance: [{ reviewsCount: "desc" }, { createdAt: "desc" }],
+  popular: [{ reviewsCount: "desc" }, { createdAt: "desc" }],
+  newest: [{ createdAt: "desc" }],
+  priceAsc: [{ price: "asc" }, { createdAt: "desc" }],
+  priceDesc: [{ price: "desc" }, { createdAt: "desc" }],
+  rating: [{ rating: "desc" }, { createdAt: "desc" }],
 };
 
-function bookWhere(query: BookQuery): Prisma.BookWhereInput {
+async function bookWhere(query: BookQuery): Promise<Prisma.BookWhereInput> {
   const where: Prisma.BookWhereInput = {};
 
   if (query.q?.trim()) {
@@ -151,7 +172,9 @@ function bookWhere(query: BookQuery): Prisma.BookWhereInput {
     ];
   }
 
-  if (query.category) where.category = { slug: query.category };
+  /* A branch answers for everything under it: the primary stage lists the
+     books of all six grades, a grade those of both its branches. */
+  if (query.category) where.categoryId = { in: await categorySubtreeIds(query.category) };
   if (query.author) where.author = { slug: query.author };
   if (query.publisher) where.publisher = { slug: query.publisher };
   if (query.cover) where.coverType = query.cover;
@@ -172,7 +195,7 @@ function bookWhere(query: BookQuery): Prisma.BookWhereInput {
 /** The single entry point behind listing, category, search and offers pages. */
 export async function queryBooks(query: BookQuery = {}): Promise<BookQueryResult> {
   const perPage = query.perPage ?? BOOKS_PER_PAGE;
-  const where = bookWhere(query);
+  const where = await bookWhere(query);
 
   const total = await prisma.book.count({ where });
   const pageCount = Math.max(1, Math.ceil(total / perPage));
@@ -202,86 +225,167 @@ export async function getPriceBounds() {
 /* Catalogue                                                           */
 /* ------------------------------------------------------------------ */
 
-export async function getCategories(limit?: number): Promise<Category[]> {
+/*
+ * The category tree is a few dozen rows that every page asks something of —
+ * the filter, the crumbs, the tiles — so a request loads it once and answers
+ * the rest from memory. Siblings come back in the order the panel gave them,
+ * oldest first among equals; a branch's count is rolled up from below.
+ */
+const loadCategoryTree = cache(async (): Promise<CategoryNode[]> => {
   const rows = await prisma.category.findMany({
-    orderBy: { books: { _count: "desc" } },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     include: { _count: { select: { books: true } } },
-    ...(typeof limit === "number" ? { take: limit } : {}),
   });
 
-  return rows.map(toCategoryWithCount);
+  return rollUp(buildTree(rows.map(toCategoryWithCount)), "booksCount");
+});
+
+const loadCategoryIndex = cache(async () => {
+  const nodes = flattenTree(await loadCategoryTree());
+  return {
+    nodes,
+    byId: new Map(nodes.map((node) => [node.id, node])),
+    bySlug: new Map(nodes.map((node) => [node.slug, node])),
+  };
+});
+
+/** The top-level branches, each carrying what hangs under it. */
+export async function getCategoryTree(limit?: number): Promise<CategoryNode[]> {
+  const roots = await loadCategoryTree();
+  return typeof limit === "number" ? roots.slice(0, limit) : roots;
+}
+
+/** Every branch, parents before children, siblings in order. */
+export async function getCategories(): Promise<CategoryNode[]> {
+  return (await loadCategoryIndex()).nodes;
 }
 
 /** Categories in the order their ids were given; a deleted one is skipped. */
-export async function getCategoriesByIds(ids: string[]): Promise<Category[]> {
+export async function getCategoriesByIds(ids: string[]): Promise<CategoryNode[]> {
   if (!ids.length) return [];
 
-  const rows = await prisma.category.findMany({
-    where: { id: { in: ids } },
-    include: { _count: { select: { books: true } } },
-  });
-  const byId = new Map(rows.map((row) => [row.id, toCategoryWithCount(row)]));
-
+  const { byId } = await loadCategoryIndex();
   return ids.flatMap((id) => {
     const category = byId.get(id);
     return category ? [category] : [];
   });
 }
 
-/** The category tiles: the panel's picks, or every category by size. */
-export async function getShelfCategories(content: ShelfContent): Promise<Category[]> {
-  return resolveShelf(content, getCategoriesByIds, getCategories);
+/** The category tiles: the panel's picks, or the top-level branches in order. */
+export async function getShelfCategories(content: ShelfContent): Promise<CategoryNode[]> {
+  return resolveShelf(content, getCategoriesByIds, getCategoryTree);
+}
+
+/** The branches above a category, top-level first — its breadcrumb trail. */
+export async function getCategoryAncestors(category: Category): Promise<CategoryNode[]> {
+  const { byId } = await loadCategoryIndex();
+  const node = byId.get(category.id);
+  return node ? ancestorsOf(node, byId) : [];
+}
+
+/** The ids of a branch and every branch under it; empty for an unknown slug. */
+async function categorySubtreeIds(slug: string): Promise<string[]> {
+  const node = (await loadCategoryIndex()).bySlug.get(slug);
+  return node ? subtreeOf(node).map((entry) => entry.id) : [];
 }
 
 /**
- * What the panel's category picker searches through: by name, largest
- * first, with the tile's icon in place of a jacket.
+ * What the panel's category picker searches through: by name, in tree order,
+ * with the tile's icon in place of a jacket and the branch's place in the
+ * tree in place of its blurb.
  */
 export async function searchCategoryPicks(
   term: string,
   exclude: string[] = [],
   limit = 8,
 ): Promise<PickOption[]> {
-  const rows = await prisma.category.findMany({
-    where: {
-      id: { notIn: exclude },
-      ...(term ? { nameAr: { contains: term, mode: "insensitive" } } : {}),
-    },
-    include: { _count: { select: { books: true } } },
-    orderBy: { books: { _count: "desc" } },
-    take: limit,
-  });
+  const { nodes, byId } = await loadCategoryIndex();
+  const needle = term.trim().toLowerCase();
+  const excluded = new Set(exclude);
 
-  return rows.map((row) => ({
-    id: row.id,
-    label: row.nameAr,
-    sublabel: row.descriptionAr,
-    seed: row.slug,
-    picture: { kind: "icon", name: row.icon },
-  }));
+  return nodes
+    .filter((node) => !excluded.has(node.id))
+    .filter((node) => !needle || node.name.ar.toLowerCase().includes(needle))
+    .slice(0, limit)
+    .map((node) => ({
+      id: node.id,
+      label: node.name.ar,
+      sublabel:
+        ancestorsOf(node, byId)
+          .map((entry) => entry.name.ar)
+          .join(" › ") || node.description.ar,
+      seed: node.slug,
+      picture: { kind: "icon", name: node.icon },
+    }));
 }
 
-export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
-  const row = await prisma.category.findUnique({
-    where: { slug },
-    include: { _count: { select: { books: true } } },
-  });
-
-  return row ? toCategoryWithCount(row) : undefined;
+export async function getCategoryBySlug(slug: string): Promise<CategoryNode | undefined> {
+  return (await loadCategoryIndex()).bySlug.get(slug);
 }
 
-export async function getCategoryById(id: string): Promise<Category | undefined> {
-  const row = await prisma.category.findUnique({
-    where: { id },
-    include: { _count: { select: { books: true } } },
-  });
-
-  return row ? toCategoryWithCount(row) : undefined;
+export async function getCategoryById(id: string): Promise<CategoryNode | undefined> {
+  return (await loadCategoryIndex()).byId.get(id);
 }
 
 export async function getCategoryIds() {
   const rows = await prisma.category.findMany({ select: { id: true } });
   return rows.map((row) => row.id);
+}
+
+/* The handouts' tree: the same shape over its own table, kept apart on purpose. */
+
+const loadHandoutCategoryTree = cache(async (): Promise<HandoutCategoryNode[]> => {
+  const rows = await prisma.handoutCategory.findMany({
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    include: { _count: { select: { handouts: true } } },
+  });
+
+  return rollUp(buildTree(rows.map(toHandoutCategoryWithCount)), "handoutsCount");
+});
+
+const loadHandoutCategoryIndex = cache(async () => {
+  const nodes = flattenTree(await loadHandoutCategoryTree());
+  return {
+    nodes,
+    byId: new Map(nodes.map((node) => [node.id, node])),
+    bySlug: new Map(nodes.map((node) => [node.slug, node])),
+  };
+});
+
+/** The handouts' top-level branches, each carrying what hangs under it. */
+export async function getHandoutCategoryTree(): Promise<HandoutCategoryNode[]> {
+  return loadHandoutCategoryTree();
+}
+
+/** Every handout branch, parents before children, siblings in order. */
+export async function getHandoutCategories(): Promise<HandoutCategoryNode[]> {
+  return (await loadHandoutCategoryIndex()).nodes;
+}
+
+/** The branches above a handout category, top-level first. */
+export async function getHandoutCategoryAncestors(
+  category: HandoutCategory,
+): Promise<HandoutCategoryNode[]> {
+  const { byId } = await loadHandoutCategoryIndex();
+  const node = byId.get(category.id);
+  return node ? ancestorsOf(node, byId) : [];
+}
+
+async function handoutCategorySubtreeIds(slug: string): Promise<string[]> {
+  const node = (await loadHandoutCategoryIndex()).bySlug.get(slug);
+  return node ? subtreeOf(node).map((entry) => entry.id) : [];
+}
+
+export async function getHandoutCategoryBySlug(
+  slug: string,
+): Promise<HandoutCategoryNode | undefined> {
+  return (await loadHandoutCategoryIndex()).bySlug.get(slug);
+}
+
+export async function getHandoutCategoryById(
+  id: string,
+): Promise<HandoutCategoryNode | undefined> {
+  return (await loadHandoutCategoryIndex()).byId.get(id);
 }
 
 export async function getAuthors(limit?: number): Promise<Author[]> {
@@ -529,7 +633,7 @@ export async function searchBookPicks(
   limit = 8,
 ): Promise<PickOption[]> {
   const rows = await prisma.book.findMany({
-    where: { AND: [bookWhere({ q: term }), { id: { notIn: exclude } }] },
+    where: { AND: [await bookWhere({ q: term }), { id: { notIn: exclude } }] },
     include: { author: true },
     orderBy: [{ coverUrl: { sort: "desc", nulls: "last" } }, { reviewsCount: "desc" }],
     take: limit,
@@ -606,7 +710,7 @@ const handoutOrderByForSort: Record<SortKey, Prisma.HandoutOrderByWithRelationIn
   rating: [{ rating: "desc" }, { createdAt: "desc" }],
 };
 
-function handoutWhere(query: HandoutQuery): Prisma.HandoutWhereInput {
+async function handoutWhere(query: HandoutQuery): Promise<Prisma.HandoutWhereInput> {
   const where: Prisma.HandoutWhereInput = {};
 
   if (query.q?.trim()) {
@@ -621,7 +725,11 @@ function handoutWhere(query: HandoutQuery): Prisma.HandoutWhereInput {
     ];
   }
 
-  if (query.category) where.category = { slug: query.category };
+  /* The slug is looked up in the handouts' own tree; a branch answers for
+     everything under it, as in the books' catalogue. */
+  if (query.category) {
+    where.categoryId = { in: await handoutCategorySubtreeIds(query.category) };
+  }
   if (query.author) where.author = { slug: query.author };
   if (query.publisher) where.publisher = { slug: query.publisher };
   if (query.cover) where.coverType = query.cover;
@@ -642,7 +750,7 @@ function handoutWhere(query: HandoutQuery): Prisma.HandoutWhereInput {
 /** The single entry point behind the handouts listing. */
 export async function queryHandouts(query: HandoutQuery = {}): Promise<HandoutQueryResult> {
   const perPage = query.perPage ?? HANDOUTS_PER_PAGE;
-  const where = handoutWhere(query);
+  const where = await handoutWhere(query);
 
   const total = await prisma.handout.count({ where });
   const pageCount = Math.max(1, Math.ceil(total / perPage));
@@ -1220,41 +1328,69 @@ export async function getHandoutSales(handoutId: string) {
   );
 }
 
-export async function getCategoryShares() {
-  const [rows, handoutRows, categories] = await Promise.all([
-    soldItems(),
-    soldHandoutItems(),
-    getCategories(),
-  ]);
+/**
+ * Sales by branch. Each branch's share includes the branches under it, so a
+ * stage answers for its grades. "top" is the dashboard's view — the top-level
+ * branches, largest first; "all" is every branch in tree order, for the
+ * categories table. Books only: the handouts file under their own tree.
+ */
+export async function getCategoryShares(
+  scope: "top" | "all" = "top",
+): Promise<Array<CategoryShare & { category: CategoryNode }>> {
+  const [rows, roots] = await Promise.all([soldItems(), loadCategoryTree()]);
 
-  const totals = new Map<string, number>();
+  const own = new Map<string, number>();
   let grandTotal = 0;
 
   for (const row of rows) {
     const value = row.quantity * row.unitPrice;
-    totals.set(row.book.categoryId, (totals.get(row.book.categoryId) ?? 0) + value);
+    own.set(row.book.categoryId, (own.get(row.book.categoryId) ?? 0) + value);
     grandTotal += value;
   }
 
-  // Handouts sell under the same categories, so their revenue joins the share.
-  for (const row of handoutRows) {
+  const shareOf = (node: CategoryNode): number => {
+    const value = subtreeOf(node).reduce((sum, entry) => sum + (own.get(entry.id) ?? 0), 0);
+    return grandTotal ? Math.round((value / grandTotal) * 100) : 0;
+  };
+
+  const nodes = scope === "top" ? roots : flattenTree(roots);
+  const shares = nodes.map((category) => ({
+    categoryId: category.id,
+    share: shareOf(category),
+    category,
+  }));
+
+  return scope === "top" ? shares.sort((a, b) => b.share - a.share) : shares;
+}
+
+/** `getCategoryShares` over the handouts and their own tree. */
+export async function getHandoutCategoryShares(
+  scope: "top" | "all" = "top",
+): Promise<Array<CategoryShare & { category: HandoutCategoryNode }>> {
+  const [rows, roots] = await Promise.all([soldHandoutItems(), loadHandoutCategoryTree()]);
+
+  const own = new Map<string, number>();
+  let grandTotal = 0;
+
+  for (const row of rows) {
     const value = row.quantity * row.unitPrice;
-    totals.set(
-      row.handout.categoryId,
-      (totals.get(row.handout.categoryId) ?? 0) + value,
-    );
+    own.set(row.handout.categoryId, (own.get(row.handout.categoryId) ?? 0) + value);
     grandTotal += value;
   }
 
-  return categories
-    .map((category) => ({
-      categoryId: category.id,
-      share: grandTotal
-        ? Math.round(((totals.get(category.id) ?? 0) / grandTotal) * 100)
-        : 0,
-      category,
-    }))
-    .sort((a, b) => b.share - a.share);
+  const shareOf = (node: HandoutCategoryNode): number => {
+    const value = subtreeOf(node).reduce((sum, entry) => sum + (own.get(entry.id) ?? 0), 0);
+    return grandTotal ? Math.round((value / grandTotal) * 100) : 0;
+  };
+
+  const nodes = scope === "top" ? roots : flattenTree(roots);
+  const shares = nodes.map((category) => ({
+    categoryId: category.id,
+    share: shareOf(category),
+    category,
+  }));
+
+  return scope === "top" ? shares.sort((a, b) => b.share - a.share) : shares;
 }
 
 export async function getAdminStats() {
@@ -1612,7 +1748,7 @@ export type StockFilter = "all" | "inStock" | "low" | "out";
 export async function getAdminBooks(
   query: AdminListQuery & { stock?: StockFilter } = {},
 ) {
-  const where: Prisma.BookWhereInput = bookWhere({ q: query.q });
+  const where: Prisma.BookWhereInput = await bookWhere({ q: query.q });
 
   if (query.stock === "inStock") where.stock = { gt: LOW_STOCK_THRESHOLD };
   else if (query.stock === "low") where.stock = { gt: 0, lte: LOW_STOCK_THRESHOLD };
@@ -1647,7 +1783,7 @@ export async function getStockCounts() {
 export async function getAdminHandouts(
   query: AdminListQuery & { stock?: StockFilter } = {},
 ) {
-  const where: Prisma.HandoutWhereInput = handoutWhere({ q: query.q });
+  const where: Prisma.HandoutWhereInput = await handoutWhere({ q: query.q });
 
   if (query.stock === "inStock") where.stock = { gt: LOW_STOCK_THRESHOLD };
   else if (query.stock === "low") where.stock = { gt: 0, lte: LOW_STOCK_THRESHOLD };

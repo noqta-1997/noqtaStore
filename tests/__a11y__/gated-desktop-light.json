@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-14T17:49:35.747Z",
+  "capturedAt": "2026-09-15T07:16:26.663Z",
   "project": "desktop-light",
-  "pagesScanned": 17,
+  "pagesScanned": 18,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -119,6 +119,15 @@
       "theme": "light",
       "project": "desktop-light",
       "url": "/admin/authors",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-categories",
+      "locale": "ar",
+      "theme": "light",
+      "project": "desktop-light",
+      "url": "/admin/categories",
       "violations": [],
       "total": 0
     },

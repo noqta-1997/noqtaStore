@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 
-import { getCategoryShares, getSalesSeries, getTopBooks, getTopHandouts } from "@/data";
+import {
+  getCategoryShares,
+  getHandoutCategoryShares,
+  getSalesSeries,
+  getTopBooks,
+  getTopHandouts,
+} from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getCurrentCustomer } from "@/lib/auth";
 
@@ -26,9 +32,10 @@ export async function GET() {
 
   const locale = defaultLocale;
 
-  const [series, shares, top, topHandouts] = await Promise.all([
+  const [series, shares, handoutShares, top, topHandouts] = await Promise.all([
     getSalesSeries(),
     getCategoryShares(),
+    getHandoutCategoryShares(),
     getTopBooks(),
     getTopHandouts(),
   ]);
@@ -45,6 +52,9 @@ export async function GET() {
     [],
     ["category", "share_percent"],
     ...shares.map((entry) => [entry.category.name[locale], entry.share]),
+    [],
+    ["handout_category", "share_percent"],
+    ...handoutShares.map((entry) => [entry.category.name[locale], entry.share]),
   ];
 
   const stamp = new Date().toISOString().slice(0, 10);

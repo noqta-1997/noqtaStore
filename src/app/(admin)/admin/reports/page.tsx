@@ -11,6 +11,7 @@ import { buttonStyles } from "@/components/ui/button";
 import {
   getAdminStats,
   getCategoryShares,
+  getHandoutCategoryShares,
   getSalesSeries,
   getTopBooks,
   getTopHandouts,
@@ -53,11 +54,12 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
   const rawRange = readParam(await searchParams, "range");
   const range = (ranges.includes(rawRange as Range) ? rawRange : "year") as Range;
 
-  const [admin, stats, series, shares, top, topHandouts] = await Promise.all([
+  const [admin, stats, series, shares, handoutShares, top, topHandouts] = await Promise.all([
     getAdminDictionary(locale),
     getAdminStats(),
     getSalesSeries(),
     getCategoryShares(),
+    getHandoutCategoryShares(),
     getTopBooks(),
     getTopHandouts(),
   ]);
@@ -182,6 +184,20 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
               value: share.share,
             }))}
           />
+
+          {/* The handouts file under their own tree, so their share is its own list. */}
+          {handoutShares.some((share) => share.share > 0) ? (
+            <section className="mt-5 space-y-3 border-t border-line-divider pt-4">
+              <h3 className="label-mono text-muted">{t.topCategories.handouts}</h3>
+              <ShareBars
+                caption={t.topCategories.handouts}
+                data={handoutShares.map((share) => ({
+                  label: share.category.name[locale],
+                  value: share.share,
+                }))}
+              />
+            </section>
+          ) : null}
         </Panel>
 
         <Panel

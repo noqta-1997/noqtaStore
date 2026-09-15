@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-14T17:51:01.523Z",
+  "capturedAt": "2026-09-15T07:18:07.074Z",
   "project": "desktop-dark",
-  "pagesScanned": 17,
+  "pagesScanned": 18,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -119,6 +119,15 @@
       "theme": "dark",
       "project": "desktop-dark",
       "url": "/admin/authors",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "admin-categories",
+      "locale": "ar",
+      "theme": "dark",
+      "project": "desktop-dark",
+      "url": "/admin/categories",
       "violations": [],
       "total": 0
     },

@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { CategoryForm } from "@/components/admin/category-form";
 import { Panel } from "@/components/admin/panel";
-import { getCategoryById } from "@/data";
+import { getCategories, getCategoryById } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 
@@ -30,9 +30,10 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
     notFound();
   }
 
-  const [dictionary, admin] = await Promise.all([
+  const [dictionary, admin, categories] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
+    getCategories(),
   ]);
 
   const t = admin.categories.form;
@@ -50,7 +51,12 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
       <AdminPageHeader title={t.editTitle} subtitle={category.name[locale]} />
 
       <Panel title={t.editSubtitle} className="max-w-2xl">
-        <CategoryForm admin={admin} dictionary={dictionary} category={category} />
+        <CategoryForm
+          admin={admin}
+          dictionary={dictionary}
+          categories={categories}
+          category={category}
+        />
       </Panel>
     </>
   );

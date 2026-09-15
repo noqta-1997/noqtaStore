@@ -16,11 +16,12 @@ import type {
   Author,
   BookTag,
   BookWithRelations,
-  Category,
+  CategoryNode,
   Publisher,
 } from "@/types";
 import { ActionForm } from "@/components/ui/action-form";
 import { deleteBook, saveBook } from "@/app/actions/admin";
+import { indentFor } from "@/lib/category-tree";
 
 interface BookFormProps {
   locale: Locale;
@@ -28,7 +29,8 @@ interface BookFormProps {
   /** Storefront dictionary — reused for tag and cover-type labels. */
   dictionary: Dictionary;
   authors: Author[];
-  categories: Category[];
+  /** The tree in order; the select indents each branch under its parent. */
+  categories: CategoryNode[];
   publishers: Publisher[];
   /** Absent when creating a new title. */
   book?: BookWithRelations;
@@ -100,6 +102,7 @@ export function BookForm({
                 </option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
+                    {indentFor(category.depth)}
                     {category.name[locale]}
                   </option>
                 ))}

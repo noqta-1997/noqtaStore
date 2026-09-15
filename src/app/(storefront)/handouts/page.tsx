@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { HandoutCatalogue } from "@/components/handout/handout-catalogue";
 import { PageHeader } from "@/components/ui/page-header";
-import { getCategories, getHandoutPriceBounds, getPublishers, queryHandouts } from "@/data";
+import { getHandoutCategories, getHandoutPriceBounds, getPublishers, queryHandouts } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { parseBookQuery, toBookQuery } from "@/lib/book-query";
@@ -26,7 +26,7 @@ export default async function HandoutsPage({ searchParams }: HandoutsPageProps) 
 
   const [dictionary, categories, publishers, bounds, result] = await Promise.all([
     getDictionary(locale),
-    getCategories(),
+    getHandoutCategories(),
     getPublishers(),
     getHandoutPriceBounds(),
     queryHandouts(toBookQuery(parsed)),

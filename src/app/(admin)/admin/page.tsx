@@ -13,6 +13,7 @@ import {
   getAdminOrders,
   getAdminStats,
   getCategoryShares,
+  getHandoutCategoryShares,
   getLowStockBooks,
   getSalesSeries,
   getTopBooks,
@@ -45,6 +46,7 @@ export default async function AdminDashboardPage() {
     top,
     topHandouts,
     shares,
+    handoutShares,
     lowStock,
     recent,
   ] = await Promise.all([
@@ -55,6 +57,7 @@ export default async function AdminDashboardPage() {
     getTopBooks(),
     getTopHandouts(),
     getCategoryShares(),
+    getHandoutCategoryShares(),
     getLowStockBooks(5),
     getAdminOrders({ perPage: 5 }),
   ]);
@@ -133,6 +136,20 @@ export default async function AdminDashboardPage() {
               value: share.share,
             }))}
           />
+
+          {/* The handouts file under their own tree, so their share is its own list. */}
+          {handoutShares.some((share) => share.share > 0) ? (
+            <section className="mt-5 space-y-3 border-t border-line-divider pt-4">
+              <h3 className="label-mono text-muted">{t.categoryShare.handouts}</h3>
+              <ShareBars
+                caption={t.categoryShare.handouts}
+                data={handoutShares.map((share) => ({
+                  label: share.category.name[locale],
+                  value: share.share,
+                }))}
+              />
+            </section>
+          ) : null}
         </Panel>
       </div>
 

@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-14T17:43:12.064Z",
+  "capturedAt": "2026-09-15T07:08:49.866Z",
   "project": "mobile-light",
-  "pagesScanned": 18,
+  "pagesScanned": 21,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -65,6 +65,33 @@
       "theme": "light",
       "project": "mobile-light",
       "url": "/categories/literature",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "category-branch",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/categories/preparatory",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "handout-categories",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/handouts/categories",
+      "violations": [],
+      "total": 0
+    },
+    {
+      "page": "handout-category-detail",
+      "locale": "ar",
+      "theme": "light",
+      "project": "mobile-light",
+      "url": "/handouts/categories/preparatory-6",
       "violations": [],
       "total": 0
     },

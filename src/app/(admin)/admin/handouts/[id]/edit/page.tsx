@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { HandoutForm } from "@/components/admin/handout-form";
-import { getAuthors, getCategories, getHandoutById, getPublishers } from "@/data";
+import { getAuthors, getHandoutCategories, getHandoutById, getPublishers } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 
@@ -32,7 +32,7 @@ export default async function EditHandoutPage({ params }: EditHandoutPageProps) 
     getAdminDictionary(locale),
     getAuthors(),
     getPublishers(),
-    getCategories(),
+    getHandoutCategories(),
   ]);
 
   return (

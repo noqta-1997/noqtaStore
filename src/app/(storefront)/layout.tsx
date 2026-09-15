@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { StorefrontFooter } from "@/components/layout/storefront-footer";
 import { StorefrontHeader } from "@/components/layout/storefront-header";
-import { getCategories, getStoreIdentity } from "@/data";
+import { getCategoryTree, getStoreIdentity } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 
@@ -13,9 +13,11 @@ export default async function StorefrontLayout({
 }) {
   const locale = defaultLocale;
 
+  /* The header lists the top-level branches; the grades under them come
+     with the menus of the next step. */
   const [dictionary, categories, identity] = await Promise.all([
     getDictionary(locale),
-    getCategories(),
+    getCategoryTree(),
     getStoreIdentity(),
   ]);
 

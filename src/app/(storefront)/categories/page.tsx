@@ -1,15 +1,11 @@
-import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 
-import { BookCover } from "@/components/book/book-cover";
-import { CategoryIcon } from "@/components/ui/category-icon";
+import { BranchCard } from "@/components/category/branch-card";
 import { Container } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
-import { getCategories, queryBooks } from "@/data";
+import { getCategoryTree, queryBooks } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
-import { formatNumber } from "@/lib/format";
 
 export async function generateMetadata(): Promise<Metadata> {
   const dictionary = await getDictionary(defaultLocale);
@@ -17,23 +13,29 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: dictionary.categoriesPage.title };
 }
 
+/**
+ * The tree, one card per top-level branch: a stage with its grades and their
+ * branches listed inside, or one of the older genres on its own. The stages
+ * come first; the genres trail until their titles are re-filed.
+ */
 export default async function CategoriesPage() {
   const locale = defaultLocale;
 
-  const [dictionary, categories] = await Promise.all([
+  const [dictionary, branches] = await Promise.all([
     getDictionary(locale),
-    getCategories(),
+    getCategoryTree(),
   ]);
 
-  /* Three covers per shelf give each card a sense of what's inside. */
+  /* Three covers per card give it a sense of what's inside — drawn from
+     anywhere under the branch, since a stage holds no books of its own. */
   const previews = await Promise.all(
-    categories.map(async (category) => {
+    branches.map(async (branch) => {
       const result = await queryBooks({
-        category: category.slug,
+        category: branch.slug,
         sort: "popular",
         perPage: 3,
       });
-      return { category, books: result.items };
+      return { branch, books: result.items };
     }),
   );
 
@@ -53,57 +55,14 @@ export default async function CategoriesPage() {
 
       <Container className="py-8 lg:py-12">
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {previews.map(({ category, books }) => (
-            <li key={category.id}>
-              <Link
-                href={`/categories/${category.slug}`}
-                className="group flex h-full flex-col gap-4 rounded-xl border border-line bg-card p-5 transition-[box-shadow,background-color] duration-100 ease-fluent hover:bg-card-hover hover:elevation-md focus-within:elevation-md"
-              >
-                <div className="flex items-start gap-3">
-                  <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-primary transition-colors group-hover:bg-primary-container group-hover:text-on-primary-container">
-                    <CategoryIcon name={category.icon} className="size-5" />
-                  </span>
-                  <div className="min-w-0">
-                    <h2 className="font-display text-lg font-bold text-on-surface">
-                      {category.name[locale]}
-                    </h2>
-                    <p className="text-body-md text-muted">
-                      {category.description[locale]}
-                    </p>
-                  </div>
-                </div>
-
-                <ul className="flex gap-2">
-                  {books.map((book) => (
-                    <li key={book.id} className="w-16">
-                      <BookCover
-                        title={book.title[locale]}
-                        author={book.author.name[locale]}
-                        seed={book.slug}
-                        src={book.coverUrl}
-                        sizes="4rem"
-                        className="border border-line"
-                        compact
-                      />
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="mt-auto flex items-center justify-between gap-2 border-t border-line-divider pt-4">
-                  <span className="text-label-sm text-muted" data-numeric>
-                    {formatNumber(category.booksCount, locale)}{" "}
-                    {dictionary.home.categories.count}
-                  </span>
-                  <span className="flex items-center gap-1.5 text-label-md text-on-surface">
-                    {t.browse}
-                    <ArrowRight
-                      aria-hidden
-                      className="size-4 transition-transform duration-100 ease-fluent group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
-                      strokeWidth={1.75}
-                    />
-                  </span>
-                </div>
-              </Link>
+          {previews.map(({ branch, books }) => (
+            <li key={branch.id}>
+              <BranchCard
+                branch={branch}
+                books={books}
+                locale={locale}
+                dictionary={dictionary}
+              />
             </li>
           ))}
         </ul>

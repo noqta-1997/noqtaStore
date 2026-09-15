@@ -3,6 +3,7 @@ import type {
   AuthorModel as AuthorRow,
   BookModel as BookRow,
   CategoryModel as CategoryRow,
+  HandoutCategoryModel as HandoutCategoryRow,
   HandoutModel as HandoutRow,
   HandoutOrderItemModel as HandoutOrderItemRow,
   HandoutReviewModel as HandoutReviewRow,
@@ -17,6 +18,7 @@ import type {
   Author,
   BookWithRelations,
   Category,
+  HandoutCategory,
   HandoutReview,
   HandoutReviewWithStatus,
   HandoutWithRelations,
@@ -48,14 +50,39 @@ export function toCategory(row: CategoryRow): Category & { booksCount: number } 
     name: { ar: row.nameAr },
     description: { ar: row.descriptionAr },
     icon: row.icon,
+    parentId: row.parentId,
+    sortOrder: row.sortOrder,
     booksCount: 0,
   };
 }
 
+/**
+ * The count here is the row's own titles. The tree loader in data/index.ts
+ * is what rolls the branches below into it.
+ */
 export function toCategoryWithCount(
   row: CategoryRow & { _count?: { books: number } },
 ): Category {
   return { ...toCategory(row), booksCount: row._count?.books ?? 0 };
+}
+
+export function toHandoutCategory(row: HandoutCategoryRow): HandoutCategory {
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: { ar: row.nameAr },
+    description: { ar: row.descriptionAr },
+    icon: row.icon,
+    parentId: row.parentId,
+    sortOrder: row.sortOrder,
+    handoutsCount: 0,
+  };
+}
+
+export function toHandoutCategoryWithCount(
+  row: HandoutCategoryRow & { _count?: { handouts: number } },
+): HandoutCategory {
+  return { ...toHandoutCategory(row), handoutsCount: row._count?.handouts ?? 0 };
 }
 
 export function toAuthor(
@@ -123,7 +150,7 @@ export function toBook(row: BookRowWithRelations): BookWithRelations {
 
 export type HandoutRowWithRelations = HandoutRow & {
   author: AuthorRow & { _count?: { books: number } };
-  category: CategoryRow & { _count?: { books: number } };
+  category: HandoutCategoryRow & { _count?: { handouts: number } };
   publisher: PublisherRow & { _count?: { books: number } };
 };
 
@@ -151,7 +178,7 @@ export function toHandout(row: HandoutRowWithRelations): HandoutWithRelations {
     coverUrl: row.coverUrl ?? undefined,
     createdAt: row.createdAt.toISOString().slice(0, 10),
     author: toAuthor(row.author),
-    category: toCategoryWithCount(row.category),
+    category: toHandoutCategoryWithCount(row.category),
     publisher: toPublisher(row.publisher),
   };
 }

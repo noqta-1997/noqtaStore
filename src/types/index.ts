@@ -7,6 +7,10 @@ export type CoverType = "hardcover" | "paperback";
 
 export type BookTag = "bestseller" | "new" | "featured" | "award";
 
+/**
+ * A branch of the school-book tree: a stage, a grade under it, a branch under
+ * that, or any level added later. `parentId` is what makes it a tree.
+ */
 export interface Category {
   id: string;
   slug: string;
@@ -14,7 +18,56 @@ export interface Category {
   description: Localized;
   /** Lucide icon name rendered by the UI layer. */
   icon: string;
+  /** The branch this one hangs under; null for a top-level branch. */
+  parentId: string | null;
+  /** Position among siblings — the grades read in school order. */
+  sortOrder: number;
+  /** Titles filed here and under every branch below. */
   booksCount: number;
+}
+
+/** A category with its place in the tree: how deep it sits and what hangs under it. */
+export interface CategoryNode extends Category {
+  /** 0 for a top-level branch. */
+  depth: number;
+  children: CategoryNode[];
+}
+
+/**
+ * A branch of the handouts' own tree. Shaped like `Category` and read from
+ * its own table: the two catalogues are filed apart.
+ */
+export interface HandoutCategory {
+  id: string;
+  slug: string;
+  name: Localized;
+  description: Localized;
+  /** Lucide icon name rendered by the UI layer. */
+  icon: string;
+  /** The branch this one hangs under; null for a top-level branch. */
+  parentId: string | null;
+  /** Position among siblings — the grades read in school order. */
+  sortOrder: number;
+  /** Handouts filed here and under every branch below. */
+  handoutsCount: number;
+}
+
+/** A handout category with its place in the tree. */
+export interface HandoutCategoryNode extends HandoutCategory {
+  /** 0 for a top-level branch. */
+  depth: number;
+  children: HandoutCategoryNode[];
+}
+
+/**
+ * What a category control needs of a branch — either tree fits. The depth
+ * is what lets a flat select read as a tree.
+ */
+export interface CategoryOption {
+  id: string;
+  slug: string;
+  name: Localized;
+  depth: number;
 }
 
 export interface Author {
@@ -82,8 +135,8 @@ export interface BookWithRelations extends Book {
 
 /**
  * A lecture-note booklet (ملزمة). Shaped exactly like `Book` and stored in
- * its own table; the two catalogues share only authors, categories and
- * publishers.
+ * its own table; the two catalogues share only authors and publishers, and
+ * each files under its own category tree.
  */
 export interface Handout {
   id: string;
@@ -114,7 +167,7 @@ export interface Handout {
 /** A handout joined with its author, category and publisher, ready for the UI. */
 export interface HandoutWithRelations extends Handout {
   author: Author;
-  category: Category;
+  category: HandoutCategory;
   publisher: Publisher;
 }
 

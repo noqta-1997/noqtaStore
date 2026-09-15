@@ -9,6 +9,7 @@ import { Container } from "@/components/ui/container";
 import { EmptyState } from "@/components/ui/empty-state";
 import {
   getCategories,
+  getCategoryTree,
   getPriceBounds,
   getPublishers,
   queryBooks,
@@ -41,9 +42,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
    * catalogue with its pagination; the handouts get a shelf of the first ten
    * and a link to their own listing, which takes the same query string.
    */
-  const [dictionary, categories, publishers, bounds, result, handouts] = await Promise.all([
+  const [dictionary, categories, branches, publishers, bounds, result, handouts] = await Promise.all([
     getDictionary(locale),
     getCategories(),
+    getCategoryTree(5),
     getPublishers(),
     getPriceBounds(),
     term ? queryBooks(toBookQuery(parsed)) : Promise.resolve(null),
@@ -98,7 +100,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           ) : (
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <span className="label-mono text-muted">{t.suggestions}</span>
-              {categories.slice(0, 5).map((category) => (
+              {branches.map((category) => (
                 <Link
                   key={category.id}
                   href={`/search?q=${encodeURIComponent(category.name[locale])}`}

@@ -12,6 +12,7 @@ import { adminOrders, adminReviews, customers, salesSeries } from "../src/data/a
 import { authors } from "../src/data/authors";
 import { books } from "../src/data/books";
 import { categories } from "../src/data/categories";
+import { handoutCategories } from "../src/data/handout-categories";
 import { handouts } from "../src/data/handouts";
 import { reviews } from "../src/data/reviews";
 import { PrismaClient } from "../src/generated/prisma/client";
@@ -60,6 +61,7 @@ async function clear() {
   await prisma.publisher.deleteMany();
   await prisma.author.deleteMany();
   await prisma.category.deleteMany();
+  await prisma.handoutCategory.deleteMany();
   await prisma.coupon.deleteMany();
 }
 
@@ -76,6 +78,8 @@ async function seedCoupons() {
 }
 
 async function seedCatalogue() {
+  /* Both trees list parents before children, and createMany keeps the order,
+     so the parent rows exist by the time the foreign key looks for them. */
   await prisma.category.createMany({
     data: categories.map((category) => ({
       id: category.id,
@@ -83,6 +87,20 @@ async function seedCatalogue() {
       nameAr: category.name.ar,
       descriptionAr: category.description.ar,
       icon: category.icon,
+      parentId: category.parentId,
+      sortOrder: category.sortOrder,
+    })),
+  });
+
+  await prisma.handoutCategory.createMany({
+    data: handoutCategories.map((category) => ({
+      id: category.id,
+      slug: category.slug,
+      nameAr: category.name.ar,
+      descriptionAr: category.description.ar,
+      icon: category.icon,
+      parentId: category.parentId,
+      sortOrder: category.sortOrder,
     })),
   });
 

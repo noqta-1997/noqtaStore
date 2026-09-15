@@ -2,7 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 
-import { searchAuthorPicks, searchBookPicks, searchCategoryPicks } from "@/data";
+import {
+  getCategoryById,
+  getHandoutCategoryById,
+  searchAuthorPicks,
+  searchBookPicks,
+  searchCategoryPicks,
+} from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import {
@@ -36,6 +42,7 @@ import {
 } from "@/lib/home-sections";
 import { isOwner } from "@/lib/owner";
 import { refreshBookRating } from "@/lib/book-rating";
+import { isWithin } from "@/lib/category-tree";
 import { discardCover, readCoverImage, storeCover } from "@/lib/cover-storage";
 import { refreshHandoutRating } from "@/lib/handout-rating";
 import { prisma } from "@/lib/prisma";
@@ -83,6 +90,8 @@ function revalidateCatalogue() {
 function revalidateHandouts() {
   revalidatePath("/handouts", "page");
   revalidatePath("/handouts/[slug]", "page");
+  revalidatePath("/handouts/categories", "page");
+  revalidatePath("/handouts/categories/[slug]", "page");
   revalidatePath("/categories/[slug]", "page");
   revalidatePath("/authors/[slug]", "page");
   revalidatePath("/publishers/[slug]", "page");
@@ -335,11 +344,43 @@ export async function setHandoutReviewStatus(
 /* Categories and authors                                              */
 /* ------------------------------------------------------------------ */
 
+/**
+ * A branch's place in the tree, read from the form: the parent it hangs under
+ * (none for a top-level branch) and its position among its siblings.
+ */
+function readBranchPlacement(formData: FormData) {
+  return {
+    parentId: text(formData, "parentId") || null,
+    sortOrder: number(formData, "sortOrder"),
+  };
+}
+
+/**
+ * A nested branch's slug carries its parent's, so "العلمي" under two grades
+ * does not collide, and so the address says where the branch sits.
+ */
+function branchSlug(nameAr: string, parentSlug: string | null, fallback: string) {
+  const own = slugify(nameAr, fallback);
+  return parentSlug ? `${parentSlug}-${own}` : own;
+}
+
 export async function saveCategory(formData: FormData): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
   const nameAr = text(formData, "nameAr");
   if (!nameAr) return fail("missingTitle");
+
+  const categoryId = text(formData, "categoryId");
+  const { parentId, sortOrder } = readBranchPlacement(formData);
+
+  /* The parent must exist, and a branch cannot hang under itself or under
+     anything below it — that would cut it out of the tree. */
+  const parent = parentId ? await getCategoryById(parentId) : undefined;
+  if (parentId && !parent) return fail("missingRelation");
+  if (categoryId && parent) {
+    const self = await getCategoryById(categoryId);
+    if (self && isWithin(self, parent.id)) return fail("invalidParent");
+  }
 
   /* The slug left the form; see the note in `saveBook` for why it is absent
      from the update payload rather than defaulted into it. */
@@ -347,16 +388,19 @@ export async function saveCategory(formData: FormData): Promise<ActionResult> {
     nameAr,
     descriptionAr: text(formData, "descriptionAr"),
     icon: text(formData, "icon") || "BookOpen",
+    parentId,
+    sortOrder,
   };
-
-  const categoryId = text(formData, "categoryId");
 
   try {
     if (categoryId) {
       await prisma.category.update({ where: { id: categoryId }, data });
     } else {
       await prisma.category.create({
-        data: { ...data, slug: slugify(nameAr, `category-${Date.now()}`) },
+        data: {
+          ...data,
+          slug: branchSlug(nameAr, parent?.slug ?? null, `category-${Date.now()}`),
+        },
       });
     }
   } catch {
@@ -371,6 +415,11 @@ export async function saveCategory(formData: FormData): Promise<ActionResult> {
 export async function deleteCategory(categoryId: string): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
+  /* The branches below go first, then their titles; a branch is never
+     deleted out from under either. */
+  const children = await prisma.category.count({ where: { parentId: categoryId } });
+  if (children > 0) return fail("hasChildren");
+
   const books = await prisma.book.count({ where: { categoryId } });
   if (books > 0) return fail("inUse");
 
@@ -378,6 +427,68 @@ export async function deleteCategory(categoryId: string): Promise<ActionResult> 
 
   revalidateCatalogue();
   revalidatePath("/admin/categories", "page");
+  return ok();
+}
+
+/* The handouts' tree: `saveCategory` and `deleteCategory` over its own table. */
+
+export async function saveHandoutCategory(formData: FormData): Promise<ActionResult> {
+  if (!(await requireManager())) return fail("forbidden");
+
+  const nameAr = text(formData, "nameAr");
+  if (!nameAr) return fail("missingTitle");
+
+  const categoryId = text(formData, "categoryId");
+  const { parentId, sortOrder } = readBranchPlacement(formData);
+
+  const parent = parentId ? await getHandoutCategoryById(parentId) : undefined;
+  if (parentId && !parent) return fail("missingRelation");
+  if (categoryId && parent) {
+    const self = await getHandoutCategoryById(categoryId);
+    if (self && isWithin(self, parent.id)) return fail("invalidParent");
+  }
+
+  const data = {
+    nameAr,
+    descriptionAr: text(formData, "descriptionAr"),
+    icon: text(formData, "icon") || "BookOpen",
+    parentId,
+    sortOrder,
+  };
+
+  try {
+    if (categoryId) {
+      await prisma.handoutCategory.update({ where: { id: categoryId }, data });
+    } else {
+      await prisma.handoutCategory.create({
+        data: {
+          ...data,
+          slug: branchSlug(nameAr, parent?.slug ?? null, `handout-category-${Date.now()}`),
+        },
+      });
+    }
+  } catch {
+    return fail("duplicate");
+  }
+
+  revalidateHandouts();
+  revalidatePath("/admin/handout-categories", "page");
+  return ok();
+}
+
+export async function deleteHandoutCategory(categoryId: string): Promise<ActionResult> {
+  if (!(await requireManager())) return fail("forbidden");
+
+  const children = await prisma.handoutCategory.count({ where: { parentId: categoryId } });
+  if (children > 0) return fail("hasChildren");
+
+  const handouts = await prisma.handout.count({ where: { categoryId } });
+  if (handouts > 0) return fail("inUse");
+
+  await prisma.handoutCategory.delete({ where: { id: categoryId } });
+
+  revalidateHandouts();
+  revalidatePath("/admin/handout-categories", "page");
   return ok();
 }
 

@@ -86,6 +86,9 @@ enum ContactStatus {
 // Catalogue
 // ------------------------------------------------------------------
 
+/// The school-book catalogue's tree: stages hold grades, grades may hold
+/// branches, and any of them may grow another level. A row with no parent
+/// is a top-level branch.
 model Category {
   id            String   @id @default(cuid())
   slug          String   @unique
@@ -93,14 +96,46 @@ model Category {
   descriptionAr String
   /// Lucide icon name; the UI layer owns the mapping.
   icon          String
+  /// The branch this one hangs under; null for a top-level branch.
+  parentId      String?
+  /// Position among siblings — the grades read in school order, not by size.
+  sortOrder     Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: NoAction)
+  children Category[] @relation("CategoryTree")
+
   books Book[]
+
+  @@index([parentId])
+  @@map("categories")
+}
+
+/// The handouts' own tree, shaped exactly like Category and kept in its own
+/// table: the two catalogues are filed apart, so a branch added to one does
+/// not appear in the other.
+model HandoutCategory {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  nameAr        String
+  descriptionAr String
+  /// Lucide icon name; the UI layer owns the mapping.
+  icon          String
+  /// The branch this one hangs under; null for a top-level branch.
+  parentId      String?
+  /// Position among siblings — the grades read in school order, not by size.
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  parent   HandoutCategory?  @relation("HandoutCategoryTree", fields: [parentId], references: [id], onDelete: NoAction)
+  children HandoutCategory[] @relation("HandoutCategoryTree")
 
   handouts Handout[]
 
-  @@map("categories")
+  @@index([parentId])
+  @@map("handout_categories")
 }
 
 model Publisher {
@@ -181,7 +216,8 @@ model Book {
 
 /// Lecture-note booklets (ملازم). A carbon copy of Book kept in its own
 /// table on purpose: the two catalogues are managed and browsed apart, and
-/// share only the author, category and publisher lookups.
+/// share only the author and publisher lookups — each files under its own
+/// category tree.
 model Handout {
   id             String    @id @default(cuid())
   slug           String    @unique
@@ -210,7 +246,7 @@ model Handout {
   updatedAt   DateTime @updatedAt
 
   author        Author                @relation(fields: [authorId], references: [id])
-  category      Category              @relation(fields: [categoryId], references: [id])
+  category      HandoutCategory       @relation(fields: [categoryId], references: [id])
   publisher     Publisher             @relation(fields: [publisherId], references: [id])
   reviews       HandoutReview[]
   orderItems    HandoutOrderItem[]
