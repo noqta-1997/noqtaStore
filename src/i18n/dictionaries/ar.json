@@ -234,9 +234,6 @@
     "maxPrice": "إلى",
     "rating": "التقييم",
     "ratingAndUp": "فأكثر",
-    "coverType": "نوع الغلاف",
-    "hardcover": "غلاف مقوّى",
-    "paperback": "غلاف عادي",
     "availability": "التوفّر",
     "inStockOnly": "المتوفر فقط",
     "onSaleOnly": "عليه خصم فقط",
@@ -272,10 +269,6 @@
       "publishedYear": "سنة النشر",
       "pages": "عدد الصفحات",
       "language": "اللغة",
-      "isbn": "الترقيم الدولي",
-      "coverType": "نوع الغلاف",
-      "weight": "الوزن",
-      "grams": "غرام",
       "page": "صفحة"
     },
     "reviewsSection": {
@@ -309,9 +302,6 @@
     "maxPrice": "إلى",
     "rating": "التقييم",
     "ratingAndUp": "فأكثر",
-    "coverType": "نوع الغلاف",
-    "hardcover": "غلاف مقوّى",
-    "paperback": "غلاف عادي",
     "availability": "التوفّر",
     "inStockOnly": "المتوفر فقط",
     "onSaleOnly": "عليه خصم فقط",
@@ -347,10 +337,6 @@
       "publishedYear": "سنة النشر",
       "pages": "عدد الصفحات",
       "language": "اللغة",
-      "isbn": "الترقيم الدولي",
-      "coverType": "نوع الغلاف",
-      "weight": "الوزن",
-      "grams": "غرام",
       "page": "صفحة"
     },
     "reviewsSection": {
@@ -395,7 +381,6 @@
     "booksBy": "الكتب المدرسية للمدرس",
     "handoutsBy": "ملازم المدرس",
     "viewProfile": "الملف الكامل",
-    "country": "البلد",
     "booksCount": "عدد الكتب المدرسية"
   },
   "publishersPage": {
@@ -403,8 +388,6 @@
     "subtitle": "الجهات التي تأتي منها الكتب المدرسية للمتجر",
     "booksBy": "الكتب المدرسية للمطبعة / المكتبة",
     "handoutsBy": "ملازم المطبعة / المكتبة",
-    "country": "البلد",
-    "founded": "سنة التأسيس",
     "booksCount": "عدد الكتب المدرسية",
     "empty": "لا توجد مطابع أو مكتبات بعد."
   },

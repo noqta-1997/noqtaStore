@@ -29,19 +29,6 @@ export function BookSpecs({ book, locale, dictionary }: BookSpecsProps) {
     { label: t.publishedYear, value: String(book.publishedYear), numeric: true },
     { label: t.pages, value: formatNumber(book.pages, locale), numeric: true },
     { label: t.language, value: book.language[locale] },
-    { label: t.isbn, value: book.isbn, numeric: true },
-    {
-      label: t.coverType,
-      value:
-        book.coverType === "hardcover"
-          ? dictionary.books.hardcover
-          : dictionary.books.paperback,
-    },
-    {
-      label: t.weight,
-      value: `${formatNumber(book.weightGrams, locale)} ${t.grams}`,
-      numeric: true,
-    },
   ];
 
   return (

@@ -29,7 +29,7 @@ export function authorPick(author: Author, locale: Locale, booksLabel: string): 
   return {
     id: author.id,
     label: author.name[locale],
-    sublabel: `${author.country[locale]} · ${formatNumber(author.booksCount, locale)} ${booksLabel}`,
+    sublabel: `${formatNumber(author.booksCount, locale)} ${booksLabel}`,
     seed: author.slug,
     picture: { kind: "portrait" },
   };
@@ -37,16 +37,14 @@ export function authorPick(author: Author, locale: Locale, booksLabel: string): 
 
 /**
  * A publisher as the picker lists it. The row the page loads counts only
- * its school books, so the second line is the country and that count; the
- * search results, which count both kinds, say more.
+ * its school books, so the second line is that count alone; the search
+ * results, which count both kinds, say more.
  */
 export function publisherPick(publisher: Publisher, locale: Locale, booksLabel: string): PickOption {
   return {
     id: publisher.id,
     label: publisher.name[locale],
-    sublabel: [publisher.country[locale], `${formatNumber(publisher.booksCount, locale)} ${booksLabel}`]
-      .filter(Boolean)
-      .join(" · "),
+    sublabel: `${formatNumber(publisher.booksCount, locale)} ${booksLabel}`,
     seed: publisher.slug,
     picture: { kind: "mark" },
   };

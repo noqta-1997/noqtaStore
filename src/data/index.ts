@@ -46,7 +46,6 @@ import type {
   Category,
   CategoryNode,
   CategoryShare,
-  CoverType,
   Customer,
   CustomerStatus,
   CustomerSummary,
@@ -120,7 +119,6 @@ export interface BookQuery {
   minPrice?: number;
   maxPrice?: number;
   rating?: number;
-  cover?: CoverType;
   inStock?: boolean;
   onSale?: boolean;
   sort?: SortKey;
@@ -158,14 +156,13 @@ async function bookWhere(query: BookQuery): Promise<Prisma.BookWhereInput> {
     const term = query.q.trim();
     /*
      * The English columns were dropped with the English site, so a search for
-     * a Latin-script title no longer matches on the title itself. The ISBN
-     * clause is what still answers those queries, and the seeded slugs are
-     * Latin too — a reader who types "1984" or an ISBN still finds the book.
+     * a Latin-script title no longer matches on the title itself. The slug
+     * clause is what still answers those queries: the seeded slugs are Latin,
+     * so a reader who types "1984" still finds the book.
      */
     where.OR = [
       { titleAr: { contains: term, mode: "insensitive" } },
       { slug: { contains: term, mode: "insensitive" } },
-      { isbn: { contains: term } },
       { publisher: { nameAr: { contains: term, mode: "insensitive" } } },
       { author: { nameAr: { contains: term, mode: "insensitive" } } },
       { category: { nameAr: { contains: term, mode: "insensitive" } } },
@@ -177,7 +174,6 @@ async function bookWhere(query: BookQuery): Promise<Prisma.BookWhereInput> {
   if (query.category) where.categoryId = { in: await categorySubtreeIds(query.category) };
   if (query.author) where.author = { slug: query.author };
   if (query.publisher) where.publisher = { slug: query.publisher };
-  if (query.cover) where.coverType = query.cover;
   if (query.inStock) where.stock = { gt: 0 };
   if (query.onSale) where.compareAtPrice = { not: null };
   if (typeof query.rating === "number") where.rating = { gte: query.rating };
@@ -427,8 +423,7 @@ export async function getShelfAuthors(content: ShelfContent): Promise<Author[]> 
 
 /**
  * What the panel's author picker searches through: by name, most books
- * first, each with the card's second line — country and count — so two
- * namesakes can be told apart.
+ * first, each with the card's second line — the count — under the name.
  */
 export async function searchAuthorPicks(
   term: string,
@@ -449,7 +444,7 @@ export async function searchAuthorPicks(
   return rows.map((row) => ({
     id: row.id,
     label: row.nameAr,
-    sublabel: `${row.countryAr} · ${row._count.books} ${booksLabel}`,
+    sublabel: `${row._count.books} ${booksLabel}`,
     seed: row.slug,
     picture: { kind: "portrait" },
   }));
@@ -724,7 +719,6 @@ async function handoutWhere(query: HandoutQuery): Promise<Prisma.HandoutWhereInp
     where.OR = [
       { titleAr: { contains: term, mode: "insensitive" } },
       { slug: { contains: term, mode: "insensitive" } },
-      { isbn: { contains: term } },
       { publisher: { nameAr: { contains: term, mode: "insensitive" } } },
       { author: { nameAr: { contains: term, mode: "insensitive" } } },
       { category: { nameAr: { contains: term, mode: "insensitive" } } },
@@ -738,7 +732,6 @@ async function handoutWhere(query: HandoutQuery): Promise<Prisma.HandoutWhereInp
   }
   if (query.author) where.author = { slug: query.author };
   if (query.publisher) where.publisher = { slug: query.publisher };
-  if (query.cover) where.coverType = query.cover;
   if (query.inStock) where.stock = { gt: 0 };
   if (query.onSale) where.compareAtPrice = { not: null };
   if (typeof query.rating === "number") where.rating = { gte: query.rating };
@@ -1979,12 +1972,9 @@ export async function searchPublisherPicks(
       id: row.id,
       label: row.nameAr,
       sublabel: [
-        row.countryAr,
         `${row._count.books} ${labels.books}`,
         `${row._count.handouts} ${labels.handouts}`,
-      ]
-        .filter(Boolean)
-        .join(" · "),
+      ].join(" · "),
       seed: row.slug,
       picture: { kind: "mark" },
     }));

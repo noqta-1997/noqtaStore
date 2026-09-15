@@ -65,7 +65,6 @@ export function HandoutCatalogue({
       minPrice: values.minPrice,
       maxPrice: values.maxPrice,
       rating: values.rating,
-      cover: values.cover,
       inStock: values.inStock,
       onSale: values.onSale,
       sort: values.sort,

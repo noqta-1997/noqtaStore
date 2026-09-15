@@ -58,7 +58,6 @@ export default async function AuthorPage({ params, searchParams }: AuthorPagePro
   const t = dictionary.authorsPage;
 
   const facts = [
-    { label: t.country, value: author.country[locale] },
     {
       label: t.booksCount,
       value: formatNumber(author.booksCount, locale),

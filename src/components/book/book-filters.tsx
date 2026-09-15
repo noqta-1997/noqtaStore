@@ -10,7 +10,7 @@ import type { Dictionary } from "@/i18n/get-dictionary";
 import { indentFor } from "@/lib/category-tree";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { CategoryOption, CoverType, Publisher } from "@/types";
+import type { CategoryOption, Publisher } from "@/types";
 
 export interface BookFilterValues {
   category?: string;
@@ -18,7 +18,6 @@ export interface BookFilterValues {
   minPrice?: number;
   maxPrice?: number;
   rating?: number;
-  cover?: CoverType;
   inStock: boolean;
   onSale: boolean;
   sort?: string;
@@ -178,14 +177,6 @@ export function BookFilters({
             </label>
           ))}
         </div>
-      </Group>
-
-      <Group title={t.coverType}>
-        <Select name="cover" defaultValue={values.cover ?? ""} aria-label={t.coverType}>
-          <option value="">{t.allCategories}</option>
-          <option value="hardcover">{t.hardcover}</option>
-          <option value="paperback">{t.paperback}</option>
-        </Select>
       </Group>
 
       <Group title={t.availability}>

@@ -16,7 +16,7 @@ import {
 } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
-import { formatNumber, formatYear } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
 import {
   buildQueryString,
   readNumberParam,
@@ -74,18 +74,6 @@ export default async function PublisherPage({
   const t = dictionary.publishersPage;
 
   const facts = [
-    ...(publisher.country[locale]
-      ? [{ label: t.country, value: publisher.country[locale] }]
-      : []),
-    ...(publisher.foundedYear
-      ? [
-          {
-            label: t.founded,
-            value: formatYear(publisher.foundedYear, locale),
-            numeric: true,
-          },
-        ]
-      : []),
     {
       label: t.booksCount,
       value: formatNumber(publisher.booksCount, locale),

@@ -10,7 +10,7 @@ export type SeedHandout = Omit<Handout, "publisherId"> & { publisher: Localized 
 
 /**
  * Three lecture-note booklets (ملازم) so the catalogue has something on its
- * shelves. The 978-9922 prefix is the Iraqi ISBN range.
+ * shelves.
  */
 export const handouts: SeedHandout[] = [
   {
@@ -26,10 +26,7 @@ export const handouts: SeedHandout[] = [
     pages: 120,
     publisher: { ar: "دار الكتب العلمية" },
     publishedYear: 2026,
-    isbn: "9789922000011",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 180,
     description: {
       ar: "شرح مبسّط لمنهج الفيزياء للصف السادس العلمي مع حلول الأسئلة الوزارية للسنوات الخمس الأخيرة.",
     },
@@ -49,10 +46,7 @@ export const handouts: SeedHandout[] = [
     pages: 96,
     publisher: { ar: "دار المدى" },
     publishedYear: 2025,
-    isbn: "9789922000028",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 150,
     description: {
       ar: "ملخّص محاضرات تاريخ العراق من تأسيس الدولة الحديثة حتى نهاية القرن العشرين، مرتّب بحسب فصول المنهج.",
     },
@@ -73,10 +67,7 @@ export const handouts: SeedHandout[] = [
     pages: 150,
     publisher: { ar: "دار الرافدين" },
     publishedYear: 2026,
-    isbn: "9789922000035",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 220,
     description: {
       ar: "نصوص الشعر الحديث المقرّرة مع تحليلها ومقدّمات نقدية موجزة لكل مدرسة أدبية.",
     },

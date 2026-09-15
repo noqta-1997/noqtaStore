@@ -18,14 +18,6 @@ export function formatNumber(value: number, locale: Locale): string {
   }).format(value);
 }
 
-/** Years are labels, not quantities, so they carry no thousands separator. */
-export function formatYear(value: number, locale: Locale): string {
-  return new Intl.NumberFormat(numberLocale[locale], {
-    useGrouping: false,
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
 /** Prices are stored as whole Iraqi dinars — no minor units. */
 export function formatPrice(value: number, locale: Locale): string {
   return `${formatNumber(value, locale)} ${currencySuffix[locale]}`;

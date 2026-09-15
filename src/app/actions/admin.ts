@@ -174,21 +174,14 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
       await prisma.book.update({ where: { id: bookId }, data: { ...data, coverUrl } });
     } else {
       /*
-       * A new row still needs the four: `slug` and `isbn` are unique and
-       * non-null, `weightGrams` is non-null, and `coverType` has a schema
-       * default the create is explicit about. They are derived once, here, and
-       * never touched again — the slug from the title, the ISBN as a
-       * placeholder the owner can correct in the database if a real one
-       * arrives.
+       * A new row still needs its unique slug, derived once from the title
+       * here and never touched again.
        */
       await prisma.book.create({
         data: {
           ...data,
           coverUrl,
           slug: slugify(titleAr, `book-${Date.now()}`),
-          isbn: `TEMP-${Date.now()}`,
-          coverType: "paperback",
-          weightGrams: 0,
         },
       });
     }
@@ -289,9 +282,6 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
           ...data,
           coverUrl,
           slug: slugify(titleAr, `handout-${Date.now()}`),
-          isbn: `TEMP-${Date.now()}`,
-          coverType: "paperback",
-          weightGrams: 0,
         },
       });
     }
@@ -512,9 +502,8 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
   const subjectId = text(formData, "subjectId");
   if (subjectId && !(await getCategoryById(subjectId))) return fail("missingRelation");
 
-  /* Country and slug left the form. `countryAr` is non-null with no schema
-     default, so a create supplies an empty string; an update leaves whatever
-     the row already holds. */
+  /* The slug is not on the form: a create derives it from the name once,
+     and an update leaves it as it is. */
   const data = {
     nameAr,
     subjectId: subjectId || null,
@@ -531,7 +520,6 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
         data: {
           ...data,
           slug: slugify(nameAr, `author-${Date.now()}`),
-          countryAr: "",
         },
       });
     }
@@ -563,9 +551,8 @@ export async function savePublisher(formData: FormData): Promise<ActionResult> {
   const nameAr = text(formData, "nameAr");
   if (!nameAr) return fail("missingTitle");
 
-  /* Country, founding year and slug left the form. `countryAr` defaults to ""
-     in the schema and `foundedYear` is nullable, so a create needs neither;
-     only the unique slug has to be derived. */
+  /* The slug is not on the form: a create derives it from the name once,
+     and an update leaves it as it is. */
   const data = {
     nameAr,
     descriptionAr: text(formData, "descriptionAr"),

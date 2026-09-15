@@ -24,11 +24,6 @@ datasource db {
 // Enums
 // ------------------------------------------------------------------
 
-enum CoverType {
-  hardcover
-  paperback
-}
-
 enum BookTag {
   bestseller
   new
@@ -145,9 +140,7 @@ model Publisher {
   id            String   @id @default(cuid())
   slug          String   @unique
   nameAr        String
-  countryAr     String   @default("")
   descriptionAr String   @default("")
-  foundedYear   Int?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -162,7 +155,6 @@ model Author {
   id        String   @id @default(cuid())
   slug      String   @unique
   nameAr    String
-  countryAr String
   /// The category the teacher's subject is filed under; null when none is on record.
   subjectId String?
   bioAr     String
@@ -190,10 +182,7 @@ model Book {
   stock          Int       @default(0)
   pages          Int
   publishedYear  Int
-  isbn           String    @unique
   languageAr     String    @default("العربية")
-  coverType      CoverType @default(paperback)
-  weightGrams    Int
   coverUrl       String?
   tags           BookTag[] @default([])
 
@@ -236,10 +225,7 @@ model Handout {
   stock          Int       @default(0)
   pages          Int
   publishedYear  Int
-  isbn           String    @unique
   languageAr     String    @default("العربية")
-  coverType      CoverType @default(paperback)
-  weightGrams    Int
   coverUrl       String?
   tags           BookTag[] @default([])
 

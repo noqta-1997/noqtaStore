@@ -10,7 +10,7 @@ const ARABIC: Localized = { ar: "العربية" };
 export type SeedBook = Omit<Book, "publisherId"> & { publisher: Localized };
 
 /**
- * Mock catalogue — physical books only (stock, weight, shipping apply).
+ * Mock catalogue — physical books only (stock and shipping apply).
  * Prices are whole Iraqi dinars.
  */
 export const books: SeedBook[] = [
@@ -28,10 +28,7 @@ export const books: SeedBook[] = [
     pages: 176,
     publisher: { ar: "دار العودة" },
     publishedYear: 1966,
-    isbn: "9789953217123",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 240,
     description: {
       ar: "رواية عن الصدام بين الشرق والغرب، يرويها راوٍ عائد من أوروبا إلى قريته على ضفاف النيل.",
     },
@@ -51,10 +48,7 @@ export const books: SeedBook[] = [
     pages: 552,
     publisher: { ar: "دار الشروق" },
     publishedYear: 1959,
-    isbn: "9789770926512",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 560,
     description: {
       ar: "ملحمة روائية عن حارة مصرية تختصر في أجيالها رحلة الإنسان مع السلطة والإيمان.",
     },
@@ -74,10 +68,7 @@ export const books: SeedBook[] = [
     pages: 288,
     publisher: { ar: "دار الشروق" },
     publishedYear: 1947,
-    isbn: "9789770927311",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 320,
     description: {
       ar: "لوحة اجتماعية نابضة لزقاق قاهري صغير في سنوات الحرب.",
     },
@@ -97,10 +88,7 @@ export const books: SeedBook[] = [
     pages: 112,
     publisher: { ar: "مؤسسة الأبحاث العربية" },
     publishedYear: 1963,
-    isbn: "9789953362114",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 160,
     description: {
       ar: "ثلاثة رجال يعبرون الصحراء بحثًا عن حياة أخرى، في واحدة من أشهر روايات الأدب الفلسطيني.",
     },
@@ -121,10 +109,7 @@ export const books: SeedBook[] = [
     pages: 512,
     publisher: { ar: "دار الشروق" },
     publishedYear: 1994,
-    isbn: "9789770928417",
     language: ARABIC,
-    coverType: "hardcover",
-    weightGrams: 720,
     description: {
       ar: "ثلاث روايات تتابع مصائر عائلة أندلسية بعد سقوط غرناطة.",
     },
@@ -144,10 +129,7 @@ export const books: SeedBook[] = [
     pages: 400,
     publisher: { ar: "دار الشروق" },
     publishedYear: 2010,
-    isbn: "9789770932018",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 470,
     description: {
       ar: "سيرة امرأة فلسطينية تحمل ذاكرة قريتها من الساحل إلى المنافي.",
     },
@@ -169,10 +151,7 @@ export const books: SeedBook[] = [
       ar: "المؤسسة العربية للدراسات والنشر",
     },
     publishedYear: 1984,
-    isbn: "9789953361208",
     language: ARABIC,
-    coverType: "hardcover",
-    weightGrams: 880,
     description: {
       ar: "ملحمة عن اكتشاف النفط وتحوّل الصحراء ومجتمعاتها تحوّلًا لا رجعة فيه.",
     },
@@ -192,10 +171,7 @@ export const books: SeedBook[] = [
     pages: 408,
     publisher: { ar: "دار الآداب" },
     publishedYear: 1993,
-    isbn: "9789953891026",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 450,
     description: {
       ar: "رسّام جزائري يستعيد وطنه وحبه الأول عبر لغة شعرية كثيفة.",
     },
@@ -216,10 +192,7 @@ export const books: SeedBook[] = [
     pages: 352,
     publisher: { ar: "منشورات الجمل" },
     publishedYear: 2013,
-    isbn: "9789933351014",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 400,
     description: {
       ar: "في بغداد ما بعد 2003، يجمع بائع عاديات أشلاء الضحايا فيصنع منها كائنًا يطالب بالثأر.",
     },
@@ -241,10 +214,7 @@ export const books: SeedBook[] = [
       ar: "الدار العربية للعلوم ناشرون",
     },
     publishedYear: 2012,
-    isbn: "9786140112094",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 460,
     description: {
       ar: "شاب من أم فلبينية وأب كويتي يبحث عن مكانه بين هويتين.",
     },
@@ -264,10 +234,7 @@ export const books: SeedBook[] = [
     pages: 380,
     publisher: { ar: "دار الشروق" },
     publishedYear: 2008,
-    isbn: "9789770929315",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 430,
     description: {
       ar: "مخطوطات راهب مصري في القرن الخامس تكشف صراع الإيمان والشك.",
     },
@@ -288,10 +255,7 @@ export const books: SeedBook[] = [
     pages: 432,
     publisher: { ar: "دار المدى" },
     publishedYear: 1967,
-    isbn: "9789933106114",
     language: ARABIC,
-    coverType: "hardcover",
-    weightGrams: 610,
     description: {
       ar: "سبعة أجيال من عائلة بوينديا في قرية ماكوندو، تحفة الواقعية السحرية.",
     },
@@ -311,10 +275,7 @@ export const books: SeedBook[] = [
     pages: 336,
     publisher: { ar: "دار الرافدين" },
     publishedYear: 1949,
-    isbn: "9789922620114",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 380,
     description: {
       ar: "ديستوبيا كلاسيكية عن الرقابة الشاملة وإعادة صياغة الحقيقة.",
     },
@@ -336,10 +297,7 @@ export const books: SeedBook[] = [
       ar: "الدار العربية للعلوم ناشرون",
     },
     publishedYear: 1988,
-    isbn: "9786140110113",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 250,
     description: {
       ar: "راعٍ أندلسي يقطع الصحراء بحثًا عن كنز، فيجد معنى رحلته.",
     },
@@ -359,10 +317,7 @@ export const books: SeedBook[] = [
     pages: 240,
     publisher: { ar: "دار الساقي" },
     publishedYear: 1982,
-    isbn: "9781855162013",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 290,
     description: {
       ar: "سيرة ذاتية صادمة عن الفقر والتشرد والطريق إلى الكتابة.",
     },
@@ -383,10 +338,7 @@ export const books: SeedBook[] = [
     pages: 120,
     publisher: { ar: "دار المدى" },
     publishedYear: 1943,
-    isbn: "9789933107112",
     language: ARABIC,
-    coverType: "hardcover",
-    weightGrams: 210,
     description: {
       ar: "حكاية أمير صغير يزور الكواكب ويعلّمنا ما لا تراه العين.",
     },
@@ -406,10 +358,7 @@ export const books: SeedBook[] = [
     pages: 256,
     publisher: { ar: "مؤسسة هنداوي" },
     publishedYear: 1988,
-    isbn: "9781527310117",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 330,
     description: {
       ar: "من الانفجار الكبير إلى الثقوب السوداء، شرح مبسّط لأسئلة الكون الكبرى.",
     },
@@ -429,10 +378,7 @@ export const books: SeedBook[] = [
     pages: 352,
     publisher: { ar: "دار الشروق" },
     publishedYear: 2002,
-    isbn: "9789770930113",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 400,
     description: {
       ar: "عمارة واحدة في وسط القاهرة تختصر طبقات مجتمع بأكمله.",
     },
@@ -452,10 +398,7 @@ export const books: SeedBook[] = [
     pages: 480,
     publisher: { ar: "دار الشروق" },
     publishedYear: 2012,
-    isbn: "9789770931110",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 520,
     description: {
       ar: "طبيب نفسي يعود إلى العمل فيواجه قضية تقلب حياته رأسًا على عقب.",
     },
@@ -475,10 +418,7 @@ export const books: SeedBook[] = [
     pages: 300,
     publisher: { ar: "دار الشروق" },
     publishedYear: 1987,
-    isbn: "9789770926819",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 340,
     description: {
       ar: "خمسة أجيال مصرية تُروى في مداخل أبجدية قصيرة ومكثفة.",
     },
@@ -498,10 +438,7 @@ export const books: SeedBook[] = [
     pages: 220,
     publisher: { ar: "دار الشروق" },
     publishedYear: 1997,
-    isbn: "9789770929117",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 270,
     description: {
       ar: "شهادة شاعر يعود إلى وطنه بعد ثلاثين عامًا من الغياب.",
     },
@@ -521,10 +458,7 @@ export const books: SeedBook[] = [
     pages: 560,
     publisher: { ar: "المركز الثقافي العربي" },
     publishedYear: 2011,
-    isbn: "9789953685113",
     language: ARABIC,
-    coverType: "hardcover",
-    weightGrams: 690,
     description: {
       ar: "جريمة في أزقة مكة تفتح بابًا على تاريخ المدينة وأسرارها.",
     },
@@ -545,10 +479,7 @@ export const books: SeedBook[] = [
     pages: 800,
     publisher: { ar: "رياض الريس للكتب والنشر" },
     publishedYear: 2009,
-    isbn: "9789953215112",
     language: ARABIC,
-    coverType: "hardcover",
-    weightGrams: 1050,
     description: {
       ar: "الأعمال الشعرية الكاملة في مجلد واحد يجمع مسيرة شاعر بأكملها.",
     },
@@ -568,10 +499,7 @@ export const books: SeedBook[] = [
     pages: 720,
     publisher: { ar: "دار الكتب العلمية" },
     publishedYear: 1377,
-    isbn: "9782745104113",
     language: ARABIC,
-    coverType: "hardcover",
-    weightGrams: 980,
     description: {
       ar: "الأساس الأول لعلم الاجتماع، ومدخل خالد لفهم قيام الدول وسقوطها.",
     },
@@ -592,10 +520,7 @@ export const books: SeedBook[] = [
     pages: 900,
     publisher: { ar: "دار الجيل" },
     publishedYear: 1935,
-    isbn: "9789953110113",
     language: ARABIC,
-    coverType: "hardcover",
-    weightGrams: 1400,
     description: {
       ar: "رحلة موسوعية في تاريخ الحضارات من الشرق القديم إلى العصر الحديث.",
     },
@@ -615,10 +540,7 @@ export const books: SeedBook[] = [
     pages: 600,
     publisher: { ar: "دار المعارف" },
     publishedYear: 1926,
-    isbn: "9789770111134",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 700,
     description: {
       ar: "مدخل ممتع لحياة كبار الفلاسفة وأفكارهم من أفلاطون إلى ديوي.",
     },
@@ -641,10 +563,7 @@ export const books: SeedBook[] = [
     pages: 432,
     publisher: { ar: "مكتبة جرير" },
     publishedYear: 1989,
-    isbn: "9789960490113",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 480,
     description: {
       ar: "إطار عملي لبناء عادات تصنع الفاعلية الشخصية والمهنية.",
     },
@@ -664,10 +583,7 @@ export const books: SeedBook[] = [
     pages: 480,
     publisher: { ar: "دار التنوير" },
     publishedYear: 1980,
-    isbn: "9789778190113",
     language: ARABIC,
-    coverType: "hardcover",
-    weightGrams: 820,
     description: {
       ar: "جولة في المجرات وتاريخ العلم بلغة شاعرية يفهمها الجميع.",
     },
@@ -687,10 +603,7 @@ export const books: SeedBook[] = [
     pages: 240,
     publisher: { ar: "دار المعارف" },
     publishedYear: 750,
-    isbn: "9789770112117",
     language: ARABIC,
-    coverType: "hardcover",
-    weightGrams: 360,
     description: {
       ar: "حكايات على ألسنة الحيوان تحمل حكمة الحكم والسياسة والصداقة.",
     },
@@ -710,10 +623,7 @@ export const books: SeedBook[] = [
     pages: 96,
     publisher: { ar: "مؤسسة الأبحاث العربية" },
     publishedYear: 1969,
-    isbn: "9789953362213",
     language: ARABIC,
-    coverType: "paperback",
-    weightGrams: 150,
     description: {
       ar: "زوجان يعودان بعد عشرين عامًا إلى البيت الذي تركاه، فيجدان أسئلة أثقل من الذكرى.",
     },

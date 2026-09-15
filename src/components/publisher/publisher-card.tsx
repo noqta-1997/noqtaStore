@@ -53,10 +53,6 @@ export function PublisherCard({
         {publisher.name[locale]}
       </span>
 
-      {publisher.country[locale] ? (
-        <span className="text-label-md text-muted">{publisher.country[locale]}</span>
-      ) : null}
-
       <span className="mt-auto pt-2 text-label-md text-muted" data-numeric>
         {formatNumber(publisher.booksCount, locale)} {booksLabel}
       </span>

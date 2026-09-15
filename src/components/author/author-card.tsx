@@ -64,7 +64,6 @@ export function AuthorCard({ author, locale, booksLabel, className }: AuthorCard
           {author.name[locale]}
         </span>
         <span className="truncate text-label-md text-muted">
-          {author.country[locale]} ·{" "}
           <span data-numeric>{formatNumber(author.booksCount, locale)}</span>{" "}
           {booksLabel}
         </span>

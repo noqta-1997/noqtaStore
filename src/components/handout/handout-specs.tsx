@@ -29,19 +29,6 @@ export function HandoutSpecs({ handout, locale, dictionary }: HandoutSpecsProps)
     { label: t.publishedYear, value: String(handout.publishedYear), numeric: true },
     { label: t.pages, value: formatNumber(handout.pages, locale), numeric: true },
     { label: t.language, value: handout.language[locale] },
-    { label: t.isbn, value: handout.isbn, numeric: true },
-    {
-      label: t.coverType,
-      value:
-        handout.coverType === "hardcover"
-          ? dictionary.handouts.hardcover
-          : dictionary.handouts.paperback,
-    },
-    {
-      label: t.weight,
-      value: `${formatNumber(handout.weightGrams, locale)} ${t.grams}`,
-      numeric: true,
-    },
   ];
 
   return (

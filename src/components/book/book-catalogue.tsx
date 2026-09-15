@@ -63,7 +63,6 @@ export function BookCatalogue({
       minPrice: values.minPrice,
       maxPrice: values.maxPrice,
       rating: values.rating,
-      cover: values.cover,
       inStock: values.inStock,
       onSale: values.onSale,
       sort: values.sort,

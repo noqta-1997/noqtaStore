@@ -3,8 +3,6 @@ import type { Locale } from "@/i18n/config";
 /** Every user-facing string in the mock data ships in both locales. */
 export type Localized = Record<Locale, string>;
 
-export type CoverType = "hardcover" | "paperback";
-
 export type BookTag = "bestseller" | "new" | "featured" | "award";
 
 /**
@@ -74,7 +72,6 @@ export interface Author {
   id: string;
   slug: string;
   name: Localized;
-  country: Localized;
   /** The category the teacher's subject is filed under; absent when none is on record. */
   subjectId?: string;
   /** That category's name — carried only where the query loaded it. */
@@ -88,10 +85,8 @@ export interface Publisher {
   id: string;
   slug: string;
   name: Localized;
-  country: Localized;
   description: Localized;
   booksCount: number;
-  foundedYear?: number;
 }
 
 export interface Book {
@@ -109,10 +104,7 @@ export interface Book {
   pages: number;
   publisherId: string;
   publishedYear: number;
-  isbn: string;
   language: Localized;
-  coverType: CoverType;
-  weightGrams: number;
   description: Localized;
   tags: BookTag[];
   /** Optional real cover; a typographic placeholder is drawn when absent. */
@@ -157,10 +149,7 @@ export interface Handout {
   pages: number;
   publisherId: string;
   publishedYear: number;
-  isbn: string;
   language: Localized;
-  coverType: CoverType;
-  weightGrams: number;
   description: Localized;
   tags: BookTag[];
   /** Optional real cover; a typographic placeholder is drawn when absent. */
