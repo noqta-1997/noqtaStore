@@ -134,6 +134,7 @@
       "unknownBook": "أحد الكتب المدرسية المختارة لم يعد في المكتبة",
       "unknownCategory": "أحد التصنيفات المختارة لم يعد موجودًا",
       "unknownAuthor": "أحد المدرسين المختارين لم يعد موجودًا",
+      "unknownPublisher": "إحدى المطابع أو المكتبات المختارة لم تعد موجودة",
       "invalidParent": "لا يمكن وضع التصنيف تحت نفسه أو تحت أحد فروعه",
       "hasChildren": "احذف الفروع المتفرّعة عنه أولًا"
     }
@@ -193,6 +194,12 @@
     "newArrivals": {
       "title": "وصل حديثًا",
       "subtitle": "أحدث ما أضفناه إلى الرفوف"
+    },
+    "publishers": {
+      "handoutsTitle": "ملازم {publisher}",
+      "handoutsSubtitle": "آخر ما وصلنا من ملازمها",
+      "booksTitle": "الكتب المدرسية من {publisher}",
+      "booksSubtitle": "آخر ما وصلنا من كتبها المدرسية"
     },
     "categories": {
       "title": "تصفّح حسب التصنيف",

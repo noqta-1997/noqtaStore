@@ -1863,6 +1863,133 @@ export async function getBooksByPublisher(
   return rows.map(toBook);
 }
 
+/** Publishers in the order their ids were given — the panel's order, like `getBooksByIds`. */
+export async function getPublishersByIds(ids: string[]): Promise<Publisher[]> {
+  if (!ids.length) return [];
+
+  const rows = await prisma.publisher.findMany({
+    where: { id: { in: ids } },
+    include: { _count: { select: { books: true } } },
+  });
+  const byId = new Map(rows.map((row) => [row.id, toPublisher(row)]));
+
+  return ids.flatMap((id) => {
+    const publisher = byId.get(id);
+    return publisher ? [publisher] : [];
+  });
+}
+
+type PublisherRowWithCounts = Prisma.PublisherGetPayload<{
+  include: { _count: { select: { books: true; handouts: true } } };
+}>;
+
+/**
+ * Most in the catalogue first — school books and handouts counted together,
+ * handouts breaking a tie since the presses are what the home section is
+ * for — then by name, so equals keep one order between renders. Ranked in
+ * memory rather than in the query: the table is a few dozen rows at most,
+ * and the database cannot order by the sum of two relation counts.
+ */
+function byCatalogueSize(a: PublisherRowWithCounts, b: PublisherRowWithCounts): number {
+  return (
+    b._count.books + b._count.handouts - (a._count.books + a._count.handouts) ||
+    b._count.handouts - a._count.handouts ||
+    a.nameAr.localeCompare(b.nameAr, "ar")
+  );
+}
+
+/** The publishers with the most titles, leaving out any with nothing to shelve. */
+export async function getFeaturedPublishers(limit?: number): Promise<Publisher[]> {
+  const rows = await prisma.publisher.findMany({
+    include: { _count: { select: { books: true, handouts: true } } },
+  });
+
+  const ranked = rows
+    .filter((row) => row._count.books + row._count.handouts > 0)
+    .sort(byCatalogueSize);
+
+  return (typeof limit === "number" ? ranked.slice(0, limit) : ranked).map(toPublisher);
+}
+
+/** The publishers section: the panel's picks, or the presses with the most titles. */
+export async function getShelfPublishers(content: ShelfContent): Promise<Publisher[]> {
+  return resolveShelf(content, getPublishersByIds, getFeaturedPublishers);
+}
+
+/** One publisher's two shelves on the home page; either may be empty. */
+export interface PublisherShelf {
+  publisher: Publisher;
+  handouts: HandoutWithRelations[];
+  books: BookWithRelations[];
+}
+
+/**
+ * Each publisher's latest handouts and school books, up to `size` of each,
+ * in the order the publishers were given. Fetched from the publisher side
+ * so that one query serves every shelf, however many presses the panel
+ * shows; the nested rows carry the same relations the catalogue's do.
+ */
+export async function getPublisherShelves(
+  publishers: Publisher[],
+  size: number,
+): Promise<PublisherShelf[]> {
+  if (!publishers.length) return [];
+
+  const rows = await prisma.publisher.findMany({
+    where: { id: { in: publishers.map((publisher) => publisher.id) } },
+    include: {
+      handouts: { include: handoutInclude, orderBy: { createdAt: "desc" }, take: size },
+      books: { include: bookInclude, orderBy: { createdAt: "desc" }, take: size },
+    },
+  });
+  const byId = new Map(rows.map((row) => [row.id, row]));
+
+  return publishers.flatMap((publisher) => {
+    const row = byId.get(publisher.id);
+    return row
+      ? [{ publisher, handouts: row.handouts.map(toHandout), books: row.books.map(toBook) }]
+      : [];
+  });
+}
+
+/**
+ * What the publisher picker searches through, ranked the way the section's
+ * own rule is, so that with nothing typed the list opens on the presses the
+ * rule would show. The second line counts both kinds of title, which is what
+ * the manager is choosing between.
+ */
+export async function searchPublisherPicks(
+  term: string,
+  labels: { books: string; handouts: string },
+  exclude: string[] = [],
+  limit = 8,
+): Promise<PickOption[]> {
+  const rows = await prisma.publisher.findMany({
+    where: {
+      id: { notIn: exclude },
+      ...(term ? { nameAr: { contains: term, mode: "insensitive" } } : {}),
+    },
+    include: { _count: { select: { books: true, handouts: true } } },
+  });
+
+  return rows
+    .sort(byCatalogueSize)
+    .slice(0, limit)
+    .map((row) => ({
+      id: row.id,
+      label: row.nameAr,
+      sublabel: [
+        row.countryAr,
+        `${row._count.books} ${labels.books}`,
+        `${row._count.handouts} ${labels.handouts}`,
+      ]
+        .filter(Boolean)
+        .join(" · "),
+      seed: row.slug,
+      picture: { kind: "mark" },
+    }));
+}
+
 /* ------------------------------------------------------------------ */
 /* Store settings                                                      */
 /* ------------------------------------------------------------------ */

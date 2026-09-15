@@ -8,6 +8,7 @@ import {
   searchAuthorPicks,
   searchBookPicks,
   searchCategoryPicks,
+  searchPublisherPicks,
 } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
@@ -85,9 +86,11 @@ function revalidateCatalogue() {
 
 /**
  * The handout pages are cached the same way, and the category, author and
- * publisher pages carry a handouts section under their books.
+ * publisher pages carry a handouts section under their books — as does the
+ * home page, where each featured press shelves its latest handouts.
  */
 function revalidateHandouts() {
+  revalidatePath("/", "page");
   revalidatePath("/handouts", "page");
   revalidatePath("/handouts/[slug]", "page");
   revalidatePath("/handouts/categories", "page");
@@ -1171,6 +1174,7 @@ const countByKind: Record<ShelfKind, (ids: string[]) => Promise<number>> = {
   book: (ids) => prisma.book.count({ where: { id: { in: ids } } }),
   category: (ids) => prisma.category.count({ where: { id: { in: ids } } }),
   author: (ids) => prisma.author.count({ where: { id: { in: ids } } }),
+  publisher: (ids) => prisma.publisher.count({ where: { id: { in: ids } } }),
 };
 
 /** The error each kind reports when a pick has been deleted since the page loaded. */
@@ -1178,6 +1182,7 @@ const missingByKind: Record<ShelfKind, string> = {
   book: "unknownBook",
   category: "unknownCategory",
   author: "unknownAuthor",
+  publisher: "unknownPublisher",
 };
 
 /**
@@ -1258,6 +1263,22 @@ export async function searchHomeAuthors(
   const [safeTerm, safeExclude] = pickerArguments(term, exclude);
   const { home } = await getDictionary(defaultLocale);
   return searchAuthorPicks(safeTerm, home.authors.booksCount, safeExclude);
+}
+
+/** The publisher picker's counterpart, for the presses' shelves. */
+export async function searchHomePublishers(
+  term: string,
+  exclude: string[],
+): Promise<PickOption[]> {
+  if (!(await requireManager())) return [];
+
+  const [safeTerm, safeExclude] = pickerArguments(term, exclude);
+  const { home, searchPage } = await getDictionary(defaultLocale);
+  return searchPublisherPicks(
+    safeTerm,
+    { books: home.authors.booksCount, handouts: searchPage.handoutsCount },
+    safeExclude,
+  );
 }
 
 /** Picker arguments arrive as JSON from the browser, so their shape is checked, not assumed. */

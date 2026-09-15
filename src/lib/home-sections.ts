@@ -15,6 +15,7 @@ export const HOME_SECTIONS = [
   "categories",
   "promo",
   "newArrivals",
+  "publishers",
   "authors",
   "newsletter",
 ] as const;
@@ -79,6 +80,7 @@ export const HOME_TEXT_FIELDS = {
   categories: ["title", "subtitle", "count"],
   promo: ["eyebrow", "title", "description", "cta"],
   newArrivals: ["title", "subtitle"],
+  publishers: ["handoutsTitle", "handoutsSubtitle", "booksTitle", "booksSubtitle"],
   authors: ["title", "subtitle", "booksCount"],
   newsletter: ["title", "description", "placeholder", "cta", "note"],
 } as const satisfies Record<HomeSection, readonly string[]>;
@@ -151,7 +153,7 @@ export type HomeFeature = (typeof HOME_FEATURES)[number];
 /* ------------------------------------------------------------------ */
 
 /** What a shelf holds, which decides what its picker searches. */
-export type ShelfKind = "book" | "category" | "author";
+export type ShelfKind = "book" | "category" | "author" | "publisher";
 
 interface ShelfShape {
   kind: ShelfKind;
@@ -165,14 +167,33 @@ interface ShelfShape {
  * The shelves the panel may fill by hand instead of by rule. Twenty titles
  * is four rows of the widest grid and twelve authors four rows of theirs;
  * the category tiles have always shown every category, so their rule has
- * no count until the panel gives it one.
+ * no count until the panel gives it one. The publishers section counts
+ * presses, not titles: each press it shows gets up to two shelves of its
+ * own, so four of them is already most of a page.
  */
 export const HOME_SHELVES = {
   bestsellers: { kind: "book", limit: 10, max: 20 },
   categories: { kind: "category", limit: null, max: 16 },
   newArrivals: { kind: "book", limit: 5, max: 20 },
+  publishers: { kind: "publisher", limit: 4, max: 12 },
   authors: { kind: "author", limit: 6, max: 12 },
 } as const satisfies Partial<Record<HomeSection, ShelfShape>>;
+
+/**
+ * How many titles each of a publisher's shelves shows: one row of the
+ * widest grid, the same as the new-arrivals shelf it is modelled on. The
+ * "view all" link under the row is the way to the rest.
+ */
+export const PUBLISHER_SHELF_SIZE = 5;
+
+/**
+ * The publisher's name laid into one of the section's strings. The strings
+ * say `{publisher}` where the name goes, so the panel can put it at the
+ * start of a title or the end of one — or leave it out of a subtitle.
+ */
+export function fillPublisherText(template: string, name: string): string {
+  return template.replaceAll("{publisher}", name);
+}
 
 export type HomeShelf = keyof typeof HOME_SHELVES;
 

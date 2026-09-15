@@ -413,7 +413,9 @@ export type PickPicture =
   /** A category: the icon its tile shows. */
   | { kind: "icon"; name: string }
   /** An author: initials in the tone their card uses. */
-  | { kind: "portrait" };
+  | { kind: "portrait" }
+  /** A publisher: the building mark in the tone its card uses. */
+  | { kind: "mark" };
 
 /**
  * A catalogue entry cut down to what a picker in the panel shows: enough to

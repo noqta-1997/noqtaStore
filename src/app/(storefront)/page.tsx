@@ -6,12 +6,15 @@ import { FeaturesStrip } from "@/components/home/features-strip";
 import { Hero } from "@/components/home/hero";
 import { Newsletter } from "@/components/home/newsletter";
 import { PromoBanner } from "@/components/home/promo-banner";
+import { PublisherShelves } from "@/components/home/publisher-shelves";
 import {
   getHeroFeaturedBook,
   getHeroShowcase,
+  getPublisherShelves,
   getShelfAuthors,
   getShelfBooks,
   getShelfCategories,
+  getShelfPublishers,
   getStoreSettings,
 } from "@/data";
 import { defaultLocale } from "@/i18n/config";
@@ -19,6 +22,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import {
   applyHomeTexts,
   homeVisibility,
+  PUBLISHER_SHELF_SIZE,
   readHeroContent,
   readPromoContent,
   readShelfContent,
@@ -44,6 +48,7 @@ export default async function HomePage() {
     showcase,
     bestsellers,
     newArrivals,
+    publisherShelves,
     authors,
   ] = await Promise.all([
     getDictionary(locale),
@@ -54,6 +59,13 @@ export default async function HomePage() {
     show.hero ? getHeroShowcase(hero) : [],
     show.bestsellers ? getShelfBooks("bestsellers", readShelfContent(settings, "bestsellers")) : [],
     show.newArrivals ? getShelfBooks("newArrivals", readShelfContent(settings, "newArrivals")) : [],
+    /* Which presses first, then their titles: the second query needs the
+       first's answer, so the pair is one step of the parallel fetch. */
+    show.publishers
+      ? getShelfPublishers(readShelfContent(settings, "publishers")).then((publishers) =>
+          getPublisherShelves(publishers, PUBLISHER_SHELF_SIZE),
+        )
+      : [],
     show.authors ? getShelfAuthors(readShelfContent(settings, "authors")) : [],
   ]);
 
@@ -111,6 +123,14 @@ export default async function HomePage() {
           dictionary={dictionary.common}
           actionHref={`/books?sort=newest`}
           band
+        />
+      ) : null}
+
+      {show.publishers ? (
+        <PublisherShelves
+          shelves={publisherShelves}
+          locale={locale}
+          dictionary={dictionary}
         />
       ) : null}
 

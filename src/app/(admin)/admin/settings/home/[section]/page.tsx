@@ -16,6 +16,7 @@ import {
   getBookById,
   getBooksByIds,
   getCategoriesByIds,
+  getPublishersByIds,
   getStoreSettings,
 } from "@/data";
 import { defaultLocale, type Locale } from "@/i18n/config";
@@ -36,7 +37,7 @@ import {
   readShelfContent,
   type ShelfKind,
 } from "@/lib/home-sections";
-import { authorPick, bookPick, categoryPick } from "@/lib/picks";
+import { authorPick, bookPick, categoryPick, publisherPick } from "@/lib/picks";
 import type { PickOption } from "@/types";
 
 interface HomeSectionPageProps {
@@ -73,6 +74,10 @@ async function shelfPicks(
     case "author":
       return (await getAuthorsByIds(ids)).map((author) =>
         authorPick(author, locale, texts.authors.booksCount),
+      );
+    case "publisher":
+      return (await getPublishersByIds(ids)).map((publisher) =>
+        publisherPick(publisher, locale, texts.authors.booksCount),
       );
   }
 }
@@ -126,6 +131,8 @@ export default async function HomeSectionPage({ params }: HomeSectionPageProps) 
           name,
           label: t.shelf.texts[name as keyof typeof t.shelf.texts],
           value: homeTextDefault(texts, section, name),
+          /* The presses' strings carry the publisher's name; the hint says how. */
+          hint: section === "publishers" ? t.shelf.placeholderHint : undefined,
         }))}
         content={content}
         picks={picks}

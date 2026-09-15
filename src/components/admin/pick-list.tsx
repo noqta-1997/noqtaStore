@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ChevronUp, Plus, Search, X } from "lucide-react";
+import { Building2, ChevronDown, ChevronUp, Plus, Search, X } from "lucide-react";
 import {
   useEffect,
   useId,
@@ -12,6 +12,7 @@ import {
 
 import { authorTone, getAuthorInitials } from "@/components/author/author-card";
 import { BookCover } from "@/components/book/book-cover";
+import { publisherTone } from "@/components/publisher/publisher-card";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
@@ -273,8 +274,9 @@ export function PickList({ name, initial, max, search, locale, labels }: PickLis
 
 /**
  * The entry's picture at row height: a category's icon in the round plate
- * its tile uses, an author's initials in the tone their card uses, or a
- * jacket 32px wide, so the placeholder drops its lettering.
+ * its tile uses, an author's initials or a publisher's building mark in the
+ * tone their card uses, or a jacket 32px wide, so the placeholder drops its
+ * lettering.
  */
 function Jacket({ option }: { option: PickOption }) {
   const { picture } = option;
@@ -297,6 +299,20 @@ function Jacket({ option }: { option: PickOption }) {
         )}
       >
         {getAuthorInitials(option.label)}
+      </span>
+    );
+  }
+
+  if (picture.kind === "mark") {
+    return (
+      <span
+        aria-hidden
+        className={cn(
+          "flex size-8 shrink-0 items-center justify-center rounded-full",
+          publisherTone(option.seed),
+        )}
+      >
+        <Building2 className="size-4" strokeWidth={1.75} />
       </span>
     );
   }

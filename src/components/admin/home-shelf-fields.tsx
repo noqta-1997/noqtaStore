@@ -1,4 +1,9 @@
-import { searchHomeAuthors, searchHomeBooks, searchHomeCategories } from "@/app/actions/admin";
+import {
+  searchHomeAuthors,
+  searchHomeBooks,
+  searchHomeCategories,
+  searchHomePublishers,
+} from "@/app/actions/admin";
 import { Panel } from "@/components/admin/panel";
 import { PickList, type PickListLabels } from "@/components/admin/pick-list";
 import { ShelfModeFields } from "@/components/admin/shelf-mode-fields";
@@ -20,7 +25,7 @@ interface HomeShelfFieldsProps {
   locale: Locale;
   admin: AdminDictionary;
   /** The shelf's strings as the store shows them now, each with its label. */
-  texts: { name: string; label: string; value: string }[];
+  texts: { name: string; label: string; value: string; hint?: string }[];
   content: ShelfContent;
   /** The picked entries that still exist, in the order they are drawn. */
   picks: PickOption[];
@@ -31,6 +36,7 @@ const searchByKind: Record<ShelfKind, (term: string, exclude: string[]) => Promi
   book: searchHomeBooks,
   category: searchHomeCategories,
   author: searchHomeAuthors,
+  publisher: searchHomePublishers,
 };
 
 /**
@@ -60,7 +66,12 @@ export function HomeShelfFields({
       <Panel title={t.form.texts} subtitle={t.form.textsHint}>
         <div className="grid gap-4 sm:grid-cols-2">
           {texts.map((field) => (
-            <Field key={field.name} label={field.label} htmlFor={`text-${field.name}`}>
+            <Field
+              key={field.name}
+              label={field.label}
+              htmlFor={`text-${field.name}`}
+              hint={field.hint}
+            >
               <Input id={`text-${field.name}`} name={field.name} defaultValue={field.value} />
             </Field>
           ))}
