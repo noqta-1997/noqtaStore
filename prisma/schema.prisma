@@ -106,6 +106,11 @@ model Category {
   /// Teachers whose subject this branch is.
   authors Author[] @relation("AuthorSubject")
 
+  /// A name is unique among siblings: «العلمي» hangs under every preparatory
+  /// grade, but never twice under the same one. The migration declares the
+  /// index NULLS NOT DISTINCT so two top-level branches cannot share a name
+  /// either — Postgres would otherwise treat each null parent as distinct.
+  @@unique([parentId, nameAr])
   @@index([parentId])
   @@map("categories")
 }
@@ -132,6 +137,8 @@ model HandoutCategory {
 
   handouts Handout[]
 
+  /// Same rule as Category, same NULLS NOT DISTINCT in the migration.
+  @@unique([parentId, nameAr])
   @@index([parentId])
   @@map("handout_categories")
 }
@@ -139,7 +146,10 @@ model HandoutCategory {
 model Publisher {
   id            String   @id @default(cuid())
   slug          String   @unique
-  nameAr        String
+  /// The slug alone never caught a repeated name: the seeded slugs are Latin
+  /// and a name typed into the panel makes an Arabic one, so «دار الشروق»
+  /// re-entered used to become a second row. The name itself is the key.
+  nameAr        String   @unique
   descriptionAr String   @default("")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -154,7 +164,9 @@ model Publisher {
 model Author {
   id        String   @id @default(cuid())
   slug      String   @unique
-  nameAr    String
+  /// Unique for the same reason as Publisher.nameAr. Two teachers who really
+  /// share a name are told apart by a suffix in the panel, not by a second row.
+  nameAr    String   @unique
   /// The category the teacher's subject is filed under; null when none is on record.
   subjectId String?
   bioAr     String

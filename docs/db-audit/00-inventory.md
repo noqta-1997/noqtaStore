@@ -2,11 +2,11 @@
 
 > **الغرض:** لقطة وصفية لقاعدة بيانات Supabase الخاصة بالمشروع كما هي فعلياً في لحظة الالتقاط: المخططات، الجداول، عدد الأعمدة والصفوف، المجموعات المنطقية، والمفاتيح الأجنبية. هذا الملف **جرد فقط**: لا يحتوي تحليل أمان أو أداء ولا توصيات؛ تلك موضوع الملفات التالية في `docs/db-audit/`.
 >
-> **تاريخ الالتقاط:** 2026-09-16 08:16:15 UTC (16/09/2026, 11:16:15 بتوقيت بغداد)  
+> **تاريخ الالتقاط:** 2026-09-16 15:42:28 UTC (16/09/2026, 18:42:28 بتوقيت بغداد)  
 > **المشروع:** Supabase `aws-0-eu-central-1.pooler.supabase.com` — قاعدة `postgres`، الدور `postgres`، عبر مجمّع الجلسات (منفذ 5432، أي `DIRECT_URL` في `.env.local`)  
 > **الخادم:** PostgreSQL 17.6 on x86_64-pc-linux-gnu  
 > **حجم القاعدة الكلي:** 13 MB  
-> **حالة المستودع وقت الالتقاط:** الالتزام `1d6cb25` (في الشجرة 4 ملف غير ملتزم).  
+> **حالة المستودع وقت الالتقاط:** الالتزام `53dd191` (في الشجرة 4 ملف غير ملتزم).  
 > **مولَّد بـ** `npm run db:inventory` (`scripts/db-audit-inventory.ts`) — أعد تشغيله لتحديث هذا الملف.
 
 ## كيف تقرأ هذا الملف
@@ -30,7 +30,7 @@
 | مفاتيح أجنبية | 57 (`public` 28، `auth` 24، `storage` 5) |
 | أنواع معدودة (enums) | 21 (`public` 9) |
 | إضافات (extensions) | 5 |
-| إجمالي الصفوف في كل الجداول | 773 |
+| إجمالي الصفوف في كل الجداول | 786 |
 | إجمالي صفوف جداول التطبيق (`public` بدون سجل الترحيل) | 152 |
 
 **حقائق تستحق الانتباه قبل أي شيء آخر** (تفصيلها في القسم 6):
@@ -61,17 +61,17 @@
 
 | # | الجدول | المجموعة | أعمدة | صفوف | تقدير | الحجم | ملاحظة |
 |--:|---|---|--:|--:|--:|--:|---|
-| 1 | `_prisma_migrations` | `MIGRATIONS` | 8 | 13 | 13 | 32 kB | سجل ترحيلات Prisma |
+| 1 | `_prisma_migrations` | `MIGRATIONS` | 8 | 14 | 14 | 32 kB | سجل ترحيلات Prisma |
 | 2 | `addresses` | `CUSTOMERS` | 11 | 1 | 1 | 48 kB |  |
-| 3 | `authors` | `CATALOG` | 8 | 26 | 26 | 96 kB |  |
+| 3 | `authors` | `CATALOG` | 8 | 26 | 26 | 112 kB |  |
 | 4 | `books` | `CATALOG` | 19 | 25 | 25 | 184 kB |  |
 | 5 | `cart_items` | `CART_WISHLIST` | 4 | 0 | 0 | 32 kB |  |
-| 6 | `categories` | `CATALOG` | 9 | 30 | 30 | 104 kB |  |
+| 6 | `categories` | `CATALOG` | 9 | 30 | 30 | 120 kB |  |
 | 7 | `contact_messages` | `MARKETING` | 7 | 0 | 0 | 64 kB |  |
 | 8 | `coupons` | `MARKETING` | 10 | 2 | 2 | 48 kB |  |
 | 9 | `customers` | `CUSTOMERS` | 13 | 2 | 2 | 96 kB |  |
 | 10 | `handout_cart_items` | `CART_WISHLIST` | 4 | 0 | 0 | 32 kB |  |
-| 11 | `handout_categories` | `CATALOG` | 9 | 24 | 24 | 64 kB |  |
+| 11 | `handout_categories` | `CATALOG` | 9 | 24 | 24 | 80 kB |  |
 | 12 | `handout_order_items` | `ORDERS` | 5 | 0 | 0 | 64 kB |  |
 | 13 | `handout_reviews` | `REVIEWS` | 9 | 0 | 0 | 64 kB |  |
 | 14 | `handout_wishlist_items` | `CART_WISHLIST` | 3 | 0 | 1 | 32 kB |  |
@@ -80,7 +80,7 @@
 | 17 | `order_events` | `ORDERS` | 4 | 3 | 3 | 144 kB |  |
 | 18 | `order_items` | `ORDERS` | 5 | 5 | 5 | 136 kB |  |
 | 19 | `orders` | `ORDERS` | 18 | 1 | 1 | 112 kB |  |
-| 20 | `publishers` | `CATALOG` | 6 | 19 | 19 | 80 kB |  |
+| 20 | `publishers` | `CATALOG` | 6 | 19 | 19 | 96 kB |  |
 | 21 | `reviews` | `REVIEWS` | 9 | 0 | 0 | 72 kB |  |
 | 22 | `store_settings` | `SETTINGS` | 3 | 11 | 11 | 64 kB |  |
 | 23 | `wishlist_items` | `CART_WISHLIST` | 3 | 0 | 0 | 32 kB |  |
@@ -96,7 +96,7 @@
 | 3 | `flow_state` | `AUTH_CORE` | 17 | 6 | 6 | 112 kB |  |
 | 4 | `identities` | `AUTH_CORE` | 9 | 2 | 2 | 80 kB |  |
 | 5 | `instances` | `AUTH_CORE` | 5 | 0 | 0 | 16 kB |  |
-| 6 | `mfa_amr_claims` | `AUTH_CORE` | 5 | 117 | 117 | 88 kB |  |
+| 6 | `mfa_amr_claims` | `AUTH_CORE` | 5 | 121 | 121 | 88 kB |  |
 | 7 | `mfa_challenges` | `AUTH_MFA` | 7 | 0 | 0 | 24 kB |  |
 | 8 | `mfa_factors` | `AUTH_MFA` | 13 | 0 | 0 | 56 kB |  |
 | 9 | `mfa_recovery_code_sets` | `AUTH_MFA` | 7 | 0 | 0 | 24 kB |  |
@@ -106,13 +106,13 @@
 | 13 | `oauth_clients` | `AUTH_OAUTH` | 13 | 0 | 0 | 24 kB |  |
 | 14 | `oauth_consents` | `AUTH_OAUTH` | 6 | 0 | 0 | 48 kB |  |
 | 15 | `one_time_tokens` | `AUTH_CORE` | 8 | 0 | 0 | 128 kB |  |
-| 16 | `refresh_tokens` | `AUTH_CORE` | 9 | 130 | 130 | 168 kB |  |
+| 16 | `refresh_tokens` | `AUTH_CORE` | 9 | 134 | 134 | 168 kB |  |
 | 17 | `saml_providers` | `AUTH_SSO` | 9 | 0 | 0 | 32 kB |  |
 | 18 | `saml_relay_states` | `AUTH_SSO` | 8 | 0 | 0 | 40 kB |  |
 | 19 | `schema_migrations` | `MIGRATIONS` | 1 | 82 | 82 | 24 kB |  |
 | 20 | `scim_tokens` | `AUTH_SSO` | 8 | 0 | 0 | 48 kB |  |
 | 21 | `scim_users` | `AUTH_SSO` | 10 | 0 | 0 | 88 kB |  |
-| 22 | `sessions` | `AUTH_CORE` | 15 | 117 | 117 | 128 kB |  |
+| 22 | `sessions` | `AUTH_CORE` | 15 | 121 | 121 | 128 kB |  |
 | 23 | `sso_domains` | `AUTH_SSO` | 5 | 0 | 0 | 32 kB |  |
 | 24 | `sso_providers` | `AUTH_SSO` | 5 | 0 | 0 | 32 kB |  |
 | 25 | `users` | `AUTH_CORE` | 35 | 2 | 2 | 256 kB |  |
@@ -181,14 +181,14 @@
 | `CART_WISHLIST` | السلة والمفضلة | `public` | `cart_items`، `handout_cart_items`، `wishlist_items`، `handout_wishlist_items` | 4 | 0 |
 | `MARKETING` | التسويق والتواصل | `public` | `coupons`، `newsletter_subscribers`، `contact_messages` | 3 | 2 |
 | `SETTINGS` | الإعدادات | `public` | `store_settings` | 1 | 11 |
-| `AUTH_CORE` | الهوية والجلسات | `auth` | `users`، `identities`، `sessions`، `refresh_tokens`، `mfa_amr_claims`، `one_time_tokens`، `flow_state`، `audit_log_entries`، `instances` | 9 | 374 |
+| `AUTH_CORE` | الهوية والجلسات | `auth` | `users`، `identities`، `sessions`، `refresh_tokens`، `mfa_amr_claims`، `one_time_tokens`، `flow_state`، `audit_log_entries`، `instances` | 9 | 386 |
 | `AUTH_MFA` | التحقق متعدد العوامل | `auth` | `mfa_factors`، `mfa_challenges`، `mfa_recovery_code_sets`، `mfa_recovery_codes`، `webauthn_challenges`، `webauthn_credentials` | 6 | 0 |
 | `AUTH_OAUTH` | خادم OAuth ومزوّدوه | `auth` | `oauth_clients`، `oauth_authorizations`، `oauth_consents`، `oauth_client_states`، `custom_oauth_providers` | 5 | 0 |
 | `AUTH_SSO` | SSO / SAML / SCIM | `auth` | `sso_providers`، `sso_domains`، `saml_providers`، `saml_relay_states`، `scim_tokens`، `scim_users` | 6 | 0 |
 | `STORAGE` | تخزين الملفات | `storage` | `buckets`، `buckets_analytics`، `buckets_vectors`، `objects`، `s3_multipart_uploads`، `s3_multipart_uploads_parts`، `vector_indexes` | 7 | 2 |
 | `REALTIME` | البث اللحظي | `realtime` | `messages`، `subscription` | 2 | 0 |
 | `VAULT` | الأسرار | `vault` | `secrets` | 1 | 0 |
-| `MIGRATIONS` | سجلات الترحيل | متعدد | `auth.schema_migrations`، `public._prisma_migrations`، `realtime.schema_migrations`، `storage.migrations` | 4 | 245 |
+| `MIGRATIONS` | سجلات الترحيل | متعدد | `auth.schema_migrations`، `public._prisma_migrations`، `realtime.schema_migrations`، `storage.migrations` | 4 | 246 |
 | `STATS_VIEWS` | views الإحصاء | `extensions` | `pg_stat_statements`، `pg_stat_statements_info` | 2 views | — |
 
 المجموع: 62 جدولاً = كل جداول القاعدة (62). `AUTH` وحدها اسم جامع للمجموعات الأربع `AUTH_*` (26 جدولاً)؛ و`APP` اسم جامع لمجموعات `public` السبع (22 جدولاً بدون سجل الترحيل).
@@ -235,7 +235,7 @@
 بنية Supabase الافتراضية، غير مستخدمة من التطبيق، وفارغة.
 
 #### `MIGRATIONS` — سجلات الترحيل
-أربعة دفاتر مستقلة: `public._prisma_migrations` (13 صفاً — يخصّ التطبيق، الملحق هـ)، و`auth.schema_migrations` (82)، `realtime.schema_migrations` (82)، `storage.migrations` (68) تخصّ خدمات Supabase.
+أربعة دفاتر مستقلة: `public._prisma_migrations` (14 صفاً — يخصّ التطبيق، الملحق هـ)، و`auth.schema_migrations` (82)، `realtime.schema_migrations` (82)، `storage.migrations` (68) تخصّ خدمات Supabase.
 
 ## 5. المفاتيح الأجنبية (كما هي في القاعدة الآن)
 
@@ -331,8 +331,8 @@
 
 | | المستودع (`prisma/migrations/`) | القاعدة (`public._prisma_migrations`) |
 |---|---|---|
-| عدد الترحيلات | 13 | 13 |
-| آخر ترحيل | `20260915200000_drop_catalogue_fields` | `20260915200000_drop_catalogue_fields` (اكتمل 2026-09-16 08:14:49 UTC) |
+| عدد الترحيلات | 14 | 14 |
+| آخر ترحيل | `20260916160000_unique_catalogue_names` | `20260916160000_unique_catalogue_names` (اكتمل 2026-09-16 15:38:36 UTC) |
 
 كل الترحيلات مطبَّقة والسجل يطابق المجلد.
 
@@ -349,7 +349,7 @@
 
 مأخوذ من `pg_attribute` وقت الالتقاط. 🔑 = مفتاح أساسي. `timestamp(3)` = بلا منطقة زمنية.
 
-### `_prisma_migrations` — 8 عموداً، 13 صف، مجموعة `MIGRATIONS`
+### `_prisma_migrations` — 8 عموداً، 14 صف، مجموعة `MIGRATIONS`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -734,6 +734,7 @@
 | 11 | `20260915120000_author_subject` | 2026-09-15 12:37:13 | 1 | — |
 | 12 | `20260915140000_author_subject_category` | 2026-09-15 13:35:28 | 1 | — |
 | 13 | `20260915200000_drop_catalogue_fields` | 2026-09-16 08:14:49 | 1 | — |
+| 14 | `20260916160000_unique_catalogue_names` | 2026-09-16 15:38:36 | 1 | — |
 
 ## الملحق و — طريقة الالتقاط (لإعادة الجرد لاحقاً)
 

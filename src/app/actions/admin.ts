@@ -15,6 +15,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import {
   checkbox,
   fail,
+  name,
   number,
   ok,
   optionalNumber,
@@ -406,7 +407,7 @@ function branchSlug(nameAr: string, parentSlug: string | null, fallback: string)
 export async function saveCategory(formData: FormData): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
-  const nameAr = text(formData, "nameAr");
+  const nameAr = name(formData, "nameAr");
   if (!nameAr) return fail("missingTitle");
 
   const categoryId = text(formData, "categoryId");
@@ -484,7 +485,7 @@ export async function deleteCategory(categoryId: string): Promise<ActionResult> 
 export async function saveHandoutCategory(formData: FormData): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
-  const nameAr = text(formData, "nameAr");
+  const nameAr = name(formData, "nameAr");
   if (!nameAr) return fail("missingTitle");
 
   const categoryId = text(formData, "categoryId");
@@ -549,7 +550,7 @@ export async function deleteHandoutCategory(categoryId: string): Promise<ActionR
 export async function saveAuthor(formData: FormData): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
-  const nameAr = text(formData, "nameAr");
+  const nameAr = name(formData, "nameAr");
   if (!nameAr) return fail("missingTitle");
 
   /* The subject is a branch of the category tree, or nothing. The form only
@@ -613,7 +614,7 @@ export async function deleteAuthor(authorId: string): Promise<ActionResult> {
 export async function savePublisher(formData: FormData): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
-  const nameAr = text(formData, "nameAr");
+  const nameAr = name(formData, "nameAr");
   if (!nameAr) return fail("missingTitle");
 
   /* The slug is not on the form: a create derives it from the name once,
