@@ -559,7 +559,9 @@ model Coupon {
   minSubtotal Int        @default(0)
   active      Boolean    @default(true)
   expiresAt   DateTime?
-  /// Null means unlimited.
+  /// Null means unlimited. A CHECK keeps usedCount at or below it, and
+  /// checkout spends a use with `spendCoupon`, whose WHERE clause is the
+  /// check, so two orders cannot both take the last one.
   usageLimit  Int?
   usedCount   Int        @default(0)
   createdAt   DateTime   @default(now())

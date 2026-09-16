@@ -13,11 +13,19 @@ interface CheckoutFormProps {
     emptyCart: string;
     missingAddress: string;
     stockChanged: string;
+    /** Keyed by the coupon error the action can return. */
+    coupon: Record<"unknownCoupon" | "expiredCoupon" | "couponMinimum", string>;
     signIn: string;
     failure: string;
   };
   className?: string;
   children: ReactNode;
+}
+
+function isCouponError(
+  error: string,
+): error is "unknownCoupon" | "expiredCoupon" | "couponMinimum" {
+  return error === "unknownCoupon" || error === "expiredCoupon" || error === "couponMinimum";
 }
 
 /**
@@ -55,7 +63,9 @@ export function CheckoutForm({
             ? messages.stockChanged
             : result.error === "unauthenticated"
               ? messages.signIn
-              : messages.failure;
+              : isCouponError(result.error)
+                ? messages.coupon[result.error]
+                : messages.failure;
 
     setError(text);
     toast({ title: text, tone: "error" });
@@ -63,6 +73,9 @@ export function CheckoutForm({
     if (result.error === "unauthenticated") {
       router.push(`/login?next=/checkout`);
     }
+
+    // The action dropped the code; the summary must stop showing its discount.
+    if (isCouponError(result.error)) router.refresh();
   };
 
   return (

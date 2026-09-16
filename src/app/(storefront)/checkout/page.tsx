@@ -151,6 +151,11 @@ export default async function CheckoutPage() {
             emptyCart: dictionary.common.toast.emptyCart,
             missingAddress: dictionary.common.toast.missingAddress,
             stockChanged: dictionary.common.toast.stockChanged,
+            coupon: {
+              unknownCoupon: dictionary.common.actionErrors.unknownCoupon,
+              expiredCoupon: dictionary.common.actionErrors.expiredCoupon,
+              couponMinimum: dictionary.common.actionErrors.couponMinimum,
+            },
             signIn: dictionary.common.toast.signInRequired,
             failure: dictionary.common.toast.actionFailed,
           }}

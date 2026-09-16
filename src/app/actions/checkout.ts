@@ -13,7 +13,7 @@ import {
   type ActionResult,
 } from "@/lib/action-result";
 import { getCurrentCustomer } from "@/lib/auth";
-import { COUPON_COOKIE, evaluateCoupon } from "@/lib/coupon";
+import { COUPON_COOKIE, CouponSpent, evaluateCoupon, spendCoupon } from "@/lib/coupon";
 import { prisma } from "@/lib/prisma";
 import { isCheckViolation } from "@/lib/prisma-errors";
 import { ShortStock, takeFromShelf } from "@/lib/shelf";
@@ -97,10 +97,17 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
   const rules = await getShippingRules();
   const shippingCost = shippingCostFor(shippingMethod, subtotal, rules);
 
-  // The code is re-checked here: it may have expired between cart and confirm.
+  // The code is re-checked here: it may have expired between cart and
+  // confirm. If it has, the order is not quietly placed at full price under
+  // a summary that showed a discount — the code is dropped and the customer
+  // is told, so the total they confirm is the total they are charged.
   const jar = await cookies();
   const code = jar.get(COUPON_COOKIE)?.value;
   const applied = code ? await evaluateCoupon(code, subtotal) : null;
+  if (applied && !applied.ok) {
+    jar.delete(COUPON_COOKIE);
+    return fail(applied.error);
+  }
   const discount = applied?.ok ? applied.coupon.discount : 0;
 
   const transaction = prisma.$transaction(async (tx) => {
@@ -151,10 +158,7 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
     await tx.handoutCartItem.deleteMany({ where: { customerId: customer.id } });
 
     if (applied?.ok) {
-      await tx.coupon.update({
-        where: { code: applied.coupon.code },
-        data: { usedCount: { increment: 1 } },
-      });
+      await spendCoupon(tx, applied.coupon.code);
     }
 
     if (checkbox(formData, "saveAddress")) {
@@ -180,7 +184,14 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
   try {
     order = await transaction;
   } catch (error) {
-    if (error instanceof ShortStock || isCheckViolation(error)) return fail("outOfStock");
+    if (error instanceof ShortStock) return fail("outOfStock");
+    // The last use of the code went to another order while this one was
+    // being written: same answer as an expired code, and the same cleanup.
+    if (error instanceof CouponSpent) {
+      jar.delete(COUPON_COOKIE);
+      return fail("expiredCoupon");
+    }
+    if (isCheckViolation(error)) return fail("outOfStock");
     throw error;
   }
 

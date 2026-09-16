@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 
+import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -56,6 +57,43 @@ export async function evaluateCoupon(
     ok: true,
     coupon: { code: coupon.code, discount: discountFor(coupon, subtotal) },
   };
+}
+
+/**
+ * Thrown inside the checkout transaction when the code has no use left, or
+ * stopped being valid, by the time the order is written. The transaction
+ * rolls back with it.
+ */
+export class CouponSpent extends Error {
+  constructor(readonly code: string) {
+    super(`coupon ${code} has no use left`);
+    this.name = "CouponSpent";
+  }
+}
+
+/**
+ * Spends one use of a code, or throws CouponSpent.
+ *
+ * `evaluateCoupon` answered a moment ago, but the last use can go to another
+ * order in between; as with the shelf, the WHERE clause is the check that
+ * holds. Postgres re-evaluates it under the row lock, so of two orders
+ * racing for the last use the second matches nothing. The CHECK constraint
+ * on the table (usedCount <= usageLimit) is the backstop.
+ */
+export async function spendCoupon(tx: Prisma.TransactionClient, code: string): Promise<void> {
+  const spent = await tx.coupon.updateMany({
+    where: {
+      code,
+      active: true,
+      AND: [
+        { OR: [{ expiresAt: null }, { expiresAt: { gte: new Date() } }] },
+        { OR: [{ usageLimit: null }, { usedCount: { lt: tx.coupon.fields.usageLimit } }] },
+      ],
+    },
+    data: { usedCount: { increment: 1 } },
+  });
+
+  if (spent.count !== 1) throw new CouponSpent(code);
 }
 
 /**
