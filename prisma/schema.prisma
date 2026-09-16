@@ -273,8 +273,12 @@ model Handout {
 model Customer {
   id String @id @default(cuid())
 
-  /// Links to Supabase Auth (auth.users.id) once real sign-in is wired.
-  userId String? @unique
+  /// The Supabase Auth account (auth.users.id) behind this reader. The
+  /// column is a real uuid with a foreign key to auth.users, written by hand
+  /// in the migration because that table is outside Prisma's schema: deleting
+  /// the account sets this null, and the next sign-in with the same email
+  /// adopts the row again (see resolveCustomer in src/lib/auth.ts).
+  userId String? @unique @db.Uuid
 
   name      String
   email     String         @unique
