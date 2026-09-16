@@ -21,6 +21,10 @@ export async function addToCart(
   const customerId = await requireCustomerId();
   if (!customerId) return fail("unauthenticated");
 
+  // A cart line holds at least one copy (CHECK on `quantity`); whatever the
+  // caller sent, the request means "add".
+  quantity = Math.max(1, Math.trunc(quantity) || 1);
+
   const book = await prisma.book.findUnique({
     where: { id: bookId },
     select: { stock: true },
@@ -112,6 +116,8 @@ export async function addHandoutToCart(
 ): Promise<ActionResult> {
   const customerId = await requireCustomerId();
   if (!customerId) return fail("unauthenticated");
+
+  quantity = Math.max(1, Math.trunc(quantity) || 1);
 
   const handout = await prisma.handout.findUnique({
     where: { id: handoutId },

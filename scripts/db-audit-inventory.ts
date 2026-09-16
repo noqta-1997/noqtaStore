@@ -131,6 +131,7 @@ type ForeignKeyRow = {
   validated: boolean;
 };
 type PrimaryKeyRow = { schema: string; table: string; name: string; columns: string[] };
+type CheckRow = { schema: string; table: string; name: string; definition: string };
 type EnumRow = { schema: string; name: string; labels: string[] };
 type ExtensionRow = { name: string; version: string; schema: string };
 type IndexRow = { tablename: string; indexname: string; indexdef: string };
@@ -147,6 +148,7 @@ type Capture = {
   columns: ColumnRow[];
   foreignKeys: ForeignKeyRow[];
   primaryKeys: PrimaryKeyRow[];
+  checks: CheckRow[];
   enums: EnumRow[];
   extensions: ExtensionRow[];
   publicIndexes: IndexRow[];
@@ -262,6 +264,14 @@ async function capture(): Promise<Capture> {
       where con.contype = 'p' and ns.nspname not in (${SYSTEM_SCHEMAS})
       order by 1, 2`);
 
+    const checks = await q<CheckRow>(`
+      select ns.nspname as schema, cl.relname as "table", con.conname as name, pg_get_constraintdef(con.oid) as definition
+      from pg_constraint con
+      join pg_class cl on cl.oid = con.conrelid
+      join pg_namespace ns on ns.oid = cl.relnamespace
+      where con.contype = 'c' and ns.nspname not in (${SYSTEM_SCHEMAS})
+      order by 1, 2, 3`);
+
     const enums = await q<EnumRow>(`
       select n.nspname as schema, t.typname as name, array_agg(e.enumlabel::text order by e.enumsortorder) as labels
       from pg_type t
@@ -303,6 +313,7 @@ async function capture(): Promise<Capture> {
       columns,
       foreignKeys,
       primaryKeys,
+      checks,
       enums,
       extensions,
       publicIndexes,
@@ -481,6 +492,7 @@ function render(inv: Capture, schema: PrismaSchema, folders: string[]): string {
   p(`| جداول التطبيق (§public§) | ${bySchema("public").filter(isTable).length} (منها ${publicTables.length} جدول بيانات + §_prisma_migrations§) |`);
   p(`| جداول منصّة Supabase (§auth§ + §storage§ + §realtime§ + §vault§) | ${tables.length - bySchema("public").filter(isTable).length} |`);
   p(`| مفاتيح أجنبية | ${inv.foreignKeys.length} (${["public", "auth", "storage"].map((s) => `§${s}§ ${inv.foreignKeys.filter((f) => f.schema === s).length}`).join("، ")}) |`);
+  p(`| قيود CHECK | ${inv.checks.length} (§public§ ${inv.checks.filter((c) => c.schema === "public").length}) |`);
   p(`| أنواع معدودة (enums) | ${inv.enums.length} (§public§ ${publicEnums.length}) |`);
   p(`| إضافات (extensions) | ${inv.extensions.length} |`);
   p(`| إجمالي الصفوف في كل الجداول | ${num(rows(tables))} |`);
@@ -792,7 +804,9 @@ function render(inv: Capture, schema: PrismaSchema, folders: string[]): string {
   }
 
   // ---- appendix B: primary keys ------------------------------------------
-  p(`## الملحق ب — المفاتيح الأساسية في §public§`);
+  p(`## الملحق ب — المفاتيح الأساسية وقيود CHECK في §public§`);
+  p();
+  p(`### المفاتيح الأساسية`);
   p();
   p(`| الجدول | الأعمدة | النوع |`);
   p(`|---|---|---|`);
@@ -800,6 +814,25 @@ function render(inv: Capture, schema: PrismaSchema, folders: string[]): string {
     const kind =
       k.columns.length > 1 ? "مركّب (جدول ربط)" : k.columns[0] === "id" ? (k.table === "_prisma_migrations" ? "§varchar(36)§" : "§cuid§ نصّي") : `طبيعي (§${k.columns[0]}§)`;
     p(`| §${k.table}§ | ${k.columns.map((c) => `§${c}§`).join("، ")} | ${kind} |`);
+  }
+  p();
+  const publicChecks = inv.checks.filter((c) => c.schema === "public");
+  const otherChecks = inv.checks.filter((c) => c.schema !== "public");
+  p(`### قيود CHECK (${publicChecks.length})`);
+  p();
+  if (publicChecks.length) {
+    p(`Prisma لا يعبّر عن قيد CHECK في §schema.prisma§؛ هذه كُتبت يدوياً في ملفات الترحيل، والمصدر هنا هو §pg_constraint§ لا المخطط.`);
+    p();
+    p(`| الجدول | القيد | التعريف |`);
+    p(`|---|---|---|`);
+    for (const c of publicChecks) p(`| §${c.table}§ | §${c.name}§ | §${c.definition}§ |`);
+  } else {
+    p(`لا قيود CHECK في §public§.`);
+  }
+  if (otherChecks.length) {
+    p();
+    const bySchema = [...new Set(otherChecks.map((c) => c.schema))].map((sch) => `§${sch}§ ${otherChecks.filter((c) => c.schema === sch).length}`);
+    p(`خارج §public§ توجد ${otherChecks.length} قيود CHECK تخصّ خدمات Supabase (${bySchema.join("، ")})، غير مدرجة هنا.`);
   }
   p();
 
@@ -840,7 +873,7 @@ function render(inv: Capture, schema: PrismaSchema, folders: string[]): string {
   p(`  - الجداول: §pg_class§ (§relkind in ('r','p','v','m','f')§) + §pg_stat_all_tables.n_live_tup§ + §pg_total_relation_size§ + §has_table_privilege§.`);
   p(`  - الصفوف الفعلية: §select count(*)§ لكل جدول مقروء يقدَّر بأقل من مليونَي صف.`);
   p(`  - الأعمدة: §pg_attribute§ (§attnum > 0 and not attisdropped§) + §format_type§ + §pg_attrdef§؛ الفهارس: §pg_indexes§.`);
-  p(`  - المفاتيح: §pg_constraint§ (§contype = 'f'§ و§'p'§) مع §confdeltype§/§confupdtype§.`);
+  p(`  - المفاتيح والقيود: §pg_constraint§ (§contype = 'f'§ و§'p'§ و§'c'§) مع §confdeltype§/§confupdtype§ و§pg_get_constraintdef§.`);
   p(`  - الأنواع: §pg_type§ + §pg_enum§؛ الإضافات: §pg_extension§.`);
   p(`- الفرق في القسم 6: مجلدات §prisma/migrations/§ مقابل §_prisma_migrations§، وأعمدة/أنواع §public§ مقابل قراءة مبسّطة لـ§schema.prisma§ (models و§@@map§ و§@map§؛ حقول العلاقات ليست أعمدة).`);
   p(`- المجموعات معرَّفة في أعلى السكربت؛ جدول جديد لا يُعيَّن هناك يظهر تحت §UNGROUPED§ مع تحذير على الطرفية.`);

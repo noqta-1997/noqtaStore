@@ -49,11 +49,13 @@ import { discardCover, readCoverImage, storeCover } from "@/lib/cover-storage";
 import { refreshHandoutRating } from "@/lib/handout-rating";
 import { prisma } from "@/lib/prisma";
 import {
+  isCheckViolation,
   isForeignKeyViolation,
   isMissingRecord,
   isUniqueViolation,
   logActionError,
 } from "@/lib/prisma-errors";
+import { ShortStock, takeFromShelf } from "@/lib/shelf";
 import type {
   BookTag,
   ContactStatus,
@@ -179,6 +181,10 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
     publisherId,
   } as const;
 
+  // The database refuses a shelf below zero (CHECK on `stock`); saying so
+  // here keeps that from reading as an unexpected failure.
+  if (data.stock < 0) return fail("negativeStock");
+
   /*
    * The cover goes up before the row is written: a failed upload then leaves
    * the catalogue untouched, and a failed write removes the file it had just
@@ -294,6 +300,8 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
     categoryId,
     publisherId,
   } as const;
+
+  if (data.stock < 0) return fail("negativeStock");
 
   // Upload first, write second, tidy up whichever one lost — as in `saveBook`.
   let coverUrl: string | undefined;
@@ -707,68 +715,50 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
   if (order.status === status) return ok();
 
   // Leaving `cancelled` makes the order live again and takes the copies back
-  // off the shelf; cancelling one that never shipped returns them.
+  // off the shelf; cancelling one that never shipped returns them. Taking is
+  // decided row by row inside the transaction (`takeFromShelf`), so a copy
+  // sold since the page was rendered fails the whole change, not part of it.
   const reclaiming = order.status === "cancelled";
   const releasing =
     status === "cancelled" && beforeDispatch.includes(order.status);
+  const stockMoves = reclaiming || releasing;
 
-  if (reclaiming) {
-    const books = await prisma.book.findMany({
-      where: { id: { in: order.items.map((item) => item.bookId) } },
-      select: { id: true, stock: true },
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.order.update({ where: { id: orderId }, data: { status } });
+      await tx.orderEvent.create({ data: { orderId, status } });
+
+      if (!stockMoves) return;
+
+      for (const item of order.items) {
+        if (reclaiming) {
+          await takeFromShelf(tx, "book", item.bookId, item.quantity);
+        } else {
+          await tx.book.update({
+            where: { id: item.bookId },
+            data: { stock: { increment: item.quantity } },
+          });
+        }
+      }
+
+      for (const item of order.handoutItems) {
+        if (reclaiming) {
+          await takeFromShelf(tx, "handout", item.handoutId, item.quantity);
+        } else {
+          await tx.handout.update({
+            where: { id: item.handoutId },
+            data: { stock: { increment: item.quantity } },
+          });
+        }
+      }
     });
-    const onShelf = new Map(books.map((book) => [book.id, book.stock]));
-
-    const short = order.items.some(
-      (item) => (onShelf.get(item.bookId) ?? 0) < item.quantity,
-    );
-    if (short) return fail("outOfStock");
-
-    const handouts = await prisma.handout.findMany({
-      where: { id: { in: order.handoutItems.map((item) => item.handoutId) } },
-      select: { id: true, stock: true },
-    });
-    const handoutsOnShelf = new Map(handouts.map((handout) => [handout.id, handout.stock]));
-
-    const handoutShort = order.handoutItems.some(
-      (item) => (handoutsOnShelf.get(item.handoutId) ?? 0) < item.quantity,
-    );
-    if (handoutShort) return fail("outOfStock");
+  } catch (error) {
+    if (error instanceof ShortStock || isCheckViolation(error)) return fail("outOfStock");
+    logActionError("updateOrderStatus", error, { orderId, status });
+    return fail("saveFailed");
   }
 
-  const stockMoves =
-    reclaiming || releasing
-      ? [
-          ...order.items.map((item) =>
-            prisma.book.update({
-              where: { id: item.bookId },
-              data: {
-                stock: reclaiming
-                  ? { decrement: item.quantity }
-                  : { increment: item.quantity },
-              },
-            }),
-          ),
-          ...order.handoutItems.map((item) =>
-            prisma.handout.update({
-              where: { id: item.handoutId },
-              data: {
-                stock: reclaiming
-                  ? { decrement: item.quantity }
-                  : { increment: item.quantity },
-              },
-            }),
-          ),
-        ]
-      : [];
-
-  await prisma.$transaction([
-    prisma.order.update({ where: { id: orderId }, data: { status } }),
-    prisma.orderEvent.create({ data: { orderId, status } }),
-    ...stockMoves,
-  ]);
-
-  if (stockMoves.length) {
+  if (stockMoves) {
     revalidateCatalogue();
     revalidateHandouts();
   }

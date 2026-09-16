@@ -43,6 +43,18 @@ export function isMissingRecord(error: unknown): boolean {
 }
 
 /**
+ * A CHECK constraint refused the row. Prisma has no code of its own for
+ * that — it arrives as the generic P2039 — so the Postgres code (23514) is
+ * read from the driver adapter's cause.
+ */
+export function isCheckViolation(error: unknown): boolean {
+  const meta = shape(error)?.meta as
+    | { driverAdapterError?: { cause?: { originalCode?: unknown } } }
+    | undefined;
+  return meta?.driverAdapterError?.cause?.originalCode === "23514";
+}
+
+/**
  * Puts the real cause of a failed server action in the server log, where a
  * generic "could not save" toast cannot. The admin sees the toast; whoever
  * reads the log sees the Prisma code, the constraint it names, and the

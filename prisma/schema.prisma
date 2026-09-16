@@ -191,6 +191,10 @@ model Book {
   descriptionAr  String
   price          Int
   compareAtPrice Int?
+  /// Copies on the shelf. Never below zero: a CHECK constraint (migration
+  /// 20260917080000_quantity_checks) refuses it, and checkout takes copies
+  /// with `takeFromShelf`, whose WHERE clause is the check, so two orders
+  /// for the last copy cannot both succeed.
   stock          Int       @default(0)
   pages          Int
   publishedYear  Int
@@ -234,6 +238,7 @@ model Handout {
   descriptionAr  String
   price          Int
   compareAtPrice Int?
+  /// Same CHECK and the same `takeFromShelf` as Book.stock.
   stock          Int       @default(0)
   pages          Int
   publishedYear  Int

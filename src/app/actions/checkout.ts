@@ -15,6 +15,8 @@ import {
 import { getCurrentCustomer } from "@/lib/auth";
 import { COUPON_COOKIE, evaluateCoupon } from "@/lib/coupon";
 import { prisma } from "@/lib/prisma";
+import { isCheckViolation } from "@/lib/prisma-errors";
+import { ShortStock, takeFromShelf } from "@/lib/shelf";
 import { getShippingRules, type ShippingRules } from "@/data";
 
 const shippingMethods = ["standard", "express", "pickup"] as const;
@@ -61,6 +63,8 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
 
   if (!lines.length && !handoutLines.length) return fail("emptyCart");
 
+  // A quick answer before the address is even read; the check that holds is
+  // `takeFromShelf` inside the transaction, which cannot be raced.
   const shortage =
     lines.find((line) => line.book.stock < line.quantity) ??
     handoutLines.find((line) => line.handout.stock < line.quantity);
@@ -99,7 +103,7 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
   const applied = code ? await evaluateCoupon(code, subtotal) : null;
   const discount = applied?.ok ? applied.coupon.discount : 0;
 
-  const order = await prisma.$transaction(async (tx) => {
+  const transaction = prisma.$transaction(async (tx) => {
     const created = await tx.order.create({
       data: {
         reference: newReference(),
@@ -136,17 +140,11 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
     });
 
     for (const item of lines) {
-      await tx.book.update({
-        where: { id: item.bookId },
-        data: { stock: { decrement: item.quantity } },
-      });
+      await takeFromShelf(tx, "book", item.bookId, item.quantity);
     }
 
     for (const item of handoutLines) {
-      await tx.handout.update({
-        where: { id: item.handoutId },
-        data: { stock: { decrement: item.quantity } },
-      });
+      await takeFromShelf(tx, "handout", item.handoutId, item.quantity);
     }
 
     await tx.cartItem.deleteMany({ where: { customerId: customer.id } });
@@ -175,6 +173,16 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
 
     return created;
   });
+
+  // The last copy sold to someone else between the cart page and this click
+  // rolls the whole order back — nothing is written, nothing is charged.
+  let order: Awaited<typeof transaction>;
+  try {
+    order = await transaction;
+  } catch (error) {
+    if (error instanceof ShortStock || isCheckViolation(error)) return fail("outOfStock");
+    throw error;
+  }
 
   // A code is spent once; the next order starts without it.
   jar.delete(COUPON_COOKIE);
