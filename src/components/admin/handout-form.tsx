@@ -64,6 +64,7 @@ export function HandoutForm({
       errorMessages={{
         forbidden: dictionary.common.actionErrors.forbidden,
         duplicate: dictionary.common.actionErrors.duplicate,
+        saveFailed: dictionary.common.actionErrors.saveFailed,
         missingTitle: dictionary.common.actionErrors.missingTitle,
         missingRelation: dictionary.common.actionErrors.missingRelation,
         invalidImage: dictionary.common.actionErrors.invalidImage,

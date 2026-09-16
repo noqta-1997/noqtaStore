@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { isOwner } from "@/lib/owner";
 import { prisma } from "@/lib/prisma";
+import { isUniqueViolation } from "@/lib/prisma-errors";
 import { createClient } from "@/utils/supabase/server";
 
 /** The Supabase user for the current request, or null when signed out. */
@@ -11,16 +12,6 @@ export async function getCurrentUser(): Promise<User | null> {
   const supabase = createClient(await cookies());
   const { data } = await supabase.auth.getUser();
   return data.user ?? null;
-}
-
-/** Prisma reports a duplicate key as P2002, whatever the constraint. */
-function isUniqueViolation(error: unknown) {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    (error as { code?: unknown }).code === "P2002"
-  );
 }
 
 /**

@@ -47,6 +47,7 @@ import { isWithin } from "@/lib/category-tree";
 import { discardCover, readCoverImage, storeCover } from "@/lib/cover-storage";
 import { refreshHandoutRating } from "@/lib/handout-rating";
 import { prisma } from "@/lib/prisma";
+import { isUniqueViolation, logActionError } from "@/lib/prisma-errors";
 import type {
   BookTag,
   ContactStatus,
@@ -156,7 +157,8 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
   if (cover.file) {
     try {
       coverUrl = await storeCover("books", cover.file);
-    } catch {
+    } catch (error) {
+      logActionError("saveBook (cover)", error, { bookId: bookId || null });
       return fail("uploadFailed");
     }
   }
@@ -185,9 +187,18 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
         },
       });
     }
-  } catch {
+  } catch (error) {
     await discardCover(coverUrl);
-    return fail("duplicate");
+    /*
+     * Only a unique-constraint violation is the admin's to fix — another
+     * book already slugs to this title. Anything else (a stale relation, a
+     * column the client and the database disagree on, the pooler dropping
+     * the connection) is a fault: say so plainly and keep the cause in the
+     * log instead of dressing it up as a duplicate.
+     */
+    if (isUniqueViolation(error)) return fail("duplicate");
+    logActionError("saveBook", error, { bookId: bookId || null });
+    return fail("saveFailed");
   }
 
   // Nothing refers to the cover this one replaced any more.
@@ -257,7 +268,8 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
   if (cover.file) {
     try {
       coverUrl = await storeCover("handouts", cover.file);
-    } catch {
+    } catch (error) {
+      logActionError("saveHandout (cover)", error, { handoutId: handoutId || null });
       return fail("uploadFailed");
     }
   }
@@ -285,9 +297,12 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
         },
       });
     }
-  } catch {
+  } catch (error) {
     await discardCover(coverUrl);
-    return fail("duplicate");
+    // A duplicate is the admin's to fix; anything else is logged — as in `saveBook`.
+    if (isUniqueViolation(error)) return fail("duplicate");
+    logActionError("saveHandout", error, { handoutId: handoutId || null });
+    return fail("saveFailed");
   }
 
   await discardCover(replaced);
@@ -396,8 +411,10 @@ export async function saveCategory(formData: FormData): Promise<ActionResult> {
         },
       });
     }
-  } catch {
-    return fail("duplicate");
+  } catch (error) {
+    if (isUniqueViolation(error)) return fail("duplicate");
+    logActionError("saveCategory", error, { categoryId: categoryId || null });
+    return fail("saveFailed");
   }
 
   revalidateCatalogue();
@@ -465,8 +482,10 @@ export async function saveHandoutCategory(formData: FormData): Promise<ActionRes
         },
       });
     }
-  } catch {
-    return fail("duplicate");
+  } catch (error) {
+    if (isUniqueViolation(error)) return fail("duplicate");
+    logActionError("saveHandoutCategory", error, { categoryId: categoryId || null });
+    return fail("saveFailed");
   }
 
   revalidateHandouts();
@@ -523,8 +542,10 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
         },
       });
     }
-  } catch {
-    return fail("duplicate");
+  } catch (error) {
+    if (isUniqueViolation(error)) return fail("duplicate");
+    logActionError("saveAuthor", error, { authorId: authorId || null });
+    return fail("saveFailed");
   }
 
   revalidateCatalogue();
@@ -568,8 +589,10 @@ export async function savePublisher(formData: FormData): Promise<ActionResult> {
         data: { ...data, slug: slugify(nameAr, `publisher-${Date.now()}`) },
       });
     }
-  } catch {
-    return fail("duplicate");
+  } catch (error) {
+    if (isUniqueViolation(error)) return fail("duplicate");
+    logActionError("savePublisher", error, { publisherId: publisherId || null });
+    return fail("saveFailed");
   }
 
   revalidateCatalogue();
@@ -846,8 +869,11 @@ export async function saveCoupon(formData: FormData): Promise<ActionResult> {
     } else {
       await prisma.coupon.create({ data });
     }
-  } catch {
-    return fail("duplicate");
+  } catch (error) {
+    // A second coupon with this code is the admin's to fix; anything else is logged.
+    if (isUniqueViolation(error)) return fail("duplicate");
+    logActionError("saveCoupon", error, { couponId: couponId || null });
+    return fail("saveFailed");
   }
 
   revalidatePath("/admin/coupons", "page");
