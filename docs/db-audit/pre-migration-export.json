@@ -1,0 +1,431 @@
+{
+  "exportedAt": "2026-09-16T08:14:21.902Z",
+  "purpose": "Values of the columns dropped by prisma/migrations/20260915200000_drop_catalogue_fields, captured before the migration was applied. Rows are keyed by the same cuid `id` the tables keep, so they can be joined back at any time.",
+  "migration": "20260915200000_drop_catalogue_fields",
+  "database": {
+    "host": "aws-0-eu-central-1.pooler.supabase.com",
+    "database": "postgres"
+  },
+  "tables": {
+    "books": {
+      "table": "books",
+      "columns": [
+        "id",
+        "isbn",
+        "coverType",
+        "weightGrams"
+      ],
+      "rowCount": 25,
+      "tableRowCount": 25,
+      "expectedRowCount": 25,
+      "rows": [
+        {
+          "id": "b1",
+          "isbn": "9789953217123",
+          "coverType": "paperback",
+          "weightGrams": 240
+        },
+        {
+          "id": "b10",
+          "isbn": "9786140112094",
+          "coverType": "paperback",
+          "weightGrams": 460
+        },
+        {
+          "id": "b11",
+          "isbn": "9789770929315",
+          "coverType": "paperback",
+          "weightGrams": 430
+        },
+        {
+          "id": "b12",
+          "isbn": "9789933106114",
+          "coverType": "hardcover",
+          "weightGrams": 610
+        },
+        {
+          "id": "b13",
+          "isbn": "9789922620114",
+          "coverType": "paperback",
+          "weightGrams": 380
+        },
+        {
+          "id": "b14",
+          "isbn": "9786140110113",
+          "coverType": "paperback",
+          "weightGrams": 250
+        },
+        {
+          "id": "b15",
+          "isbn": "9781855162013",
+          "coverType": "paperback",
+          "weightGrams": 290
+        },
+        {
+          "id": "b16",
+          "isbn": "9789933107112",
+          "coverType": "hardcover",
+          "weightGrams": 210
+        },
+        {
+          "id": "b17",
+          "isbn": "9781527310117",
+          "coverType": "paperback",
+          "weightGrams": 330
+        },
+        {
+          "id": "b18",
+          "isbn": "9789770930113",
+          "coverType": "paperback",
+          "weightGrams": 400
+        },
+        {
+          "id": "b2",
+          "isbn": "9789770926512",
+          "coverType": "paperback",
+          "weightGrams": 560
+        },
+        {
+          "id": "b20",
+          "isbn": "9789770926819",
+          "coverType": "paperback",
+          "weightGrams": 340
+        },
+        {
+          "id": "b21",
+          "isbn": "9789770929117",
+          "coverType": "paperback",
+          "weightGrams": 270
+        },
+        {
+          "id": "b22",
+          "isbn": "9789953685113",
+          "coverType": "hardcover",
+          "weightGrams": 690
+        },
+        {
+          "id": "b23",
+          "isbn": "9789953215112",
+          "coverType": "hardcover",
+          "weightGrams": 1050
+        },
+        {
+          "id": "b24",
+          "isbn": "9782745104113",
+          "coverType": "hardcover",
+          "weightGrams": 980
+        },
+        {
+          "id": "b25",
+          "isbn": "9789953110113",
+          "coverType": "hardcover",
+          "weightGrams": 1400
+        },
+        {
+          "id": "b26",
+          "isbn": "9789770111134",
+          "coverType": "paperback",
+          "weightGrams": 700
+        },
+        {
+          "id": "b3",
+          "isbn": "9789770927311",
+          "coverType": "paperback",
+          "weightGrams": 320
+        },
+        {
+          "id": "b4",
+          "isbn": "9789953362114",
+          "coverType": "paperback",
+          "weightGrams": 160
+        },
+        {
+          "id": "b5",
+          "isbn": "9789770928417",
+          "coverType": "hardcover",
+          "weightGrams": 720
+        },
+        {
+          "id": "b6",
+          "isbn": "9789770932018",
+          "coverType": "paperback",
+          "weightGrams": 470
+        },
+        {
+          "id": "b7",
+          "isbn": "9789953361208",
+          "coverType": "hardcover",
+          "weightGrams": 880
+        },
+        {
+          "id": "b8",
+          "isbn": "9789953891026",
+          "coverType": "paperback",
+          "weightGrams": 450
+        },
+        {
+          "id": "cmtj6ksre000104jma4ct9ic8",
+          "isbn": "TEMP-1788298203287",
+          "coverType": "paperback",
+          "weightGrams": 0
+        }
+      ]
+    },
+    "handouts": {
+      "table": "handouts",
+      "columns": [
+        "id",
+        "isbn",
+        "coverType",
+        "weightGrams"
+      ],
+      "rowCount": 3,
+      "tableRowCount": 3,
+      "expectedRowCount": 3,
+      "rows": [
+        {
+          "id": "h1",
+          "isbn": "9789922000011",
+          "coverType": "paperback",
+          "weightGrams": 180
+        },
+        {
+          "id": "h2",
+          "isbn": "9789922000028",
+          "coverType": "paperback",
+          "weightGrams": 150
+        },
+        {
+          "id": "h3",
+          "isbn": "9789922000035",
+          "coverType": "paperback",
+          "weightGrams": 220
+        }
+      ]
+    },
+    "authors": {
+      "table": "authors",
+      "columns": [
+        "id",
+        "countryAr"
+      ],
+      "rowCount": 26,
+      "tableRowCount": 26,
+      "expectedRowCount": 26,
+      "rows": [
+        {
+          "id": "a1",
+          "countryAr": "مصر"
+        },
+        {
+          "id": "a10",
+          "countryAr": "كولومبيا"
+        },
+        {
+          "id": "a11",
+          "countryAr": "بريطانيا"
+        },
+        {
+          "id": "a12",
+          "countryAr": "البرازيل"
+        },
+        {
+          "id": "a13",
+          "countryAr": "المغرب"
+        },
+        {
+          "id": "a14",
+          "countryAr": "فرنسا"
+        },
+        {
+          "id": "a15",
+          "countryAr": "بريطانيا"
+        },
+        {
+          "id": "a16",
+          "countryAr": "مصر"
+        },
+        {
+          "id": "a17",
+          "countryAr": "مصر"
+        },
+        {
+          "id": "a18",
+          "countryAr": "فلسطين"
+        },
+        {
+          "id": "a19",
+          "countryAr": "السعودية"
+        },
+        {
+          "id": "a2",
+          "countryAr": "السودان"
+        },
+        {
+          "id": "a20",
+          "countryAr": "فلسطين"
+        },
+        {
+          "id": "a21",
+          "countryAr": "تونس"
+        },
+        {
+          "id": "a22",
+          "countryAr": "الولايات المتحدة"
+        },
+        {
+          "id": "a23",
+          "countryAr": "الولايات المتحدة"
+        },
+        {
+          "id": "a24",
+          "countryAr": "الولايات المتحدة"
+        },
+        {
+          "id": "a25",
+          "countryAr": "العراق"
+        },
+        {
+          "id": "a3",
+          "countryAr": "فلسطين"
+        },
+        {
+          "id": "a4",
+          "countryAr": "مصر"
+        },
+        {
+          "id": "a5",
+          "countryAr": "السعودية"
+        },
+        {
+          "id": "a6",
+          "countryAr": "الجزائر"
+        },
+        {
+          "id": "a7",
+          "countryAr": "العراق"
+        },
+        {
+          "id": "a8",
+          "countryAr": "الكويت"
+        },
+        {
+          "id": "a9",
+          "countryAr": "مصر"
+        },
+        {
+          "id": "cmtj6gubq000004jybb1rz0tp",
+          "countryAr": "عراق"
+        }
+      ]
+    },
+    "publishers": {
+      "table": "publishers",
+      "columns": [
+        "id",
+        "countryAr",
+        "foundedYear"
+      ],
+      "rowCount": 19,
+      "tableRowCount": 19,
+      "expectedRowCount": 19,
+      "rows": [
+        {
+          "id": "cmtj6ezl4000004jmsml77q9u",
+          "countryAr": "عراق",
+          "foundedYear": 2006
+        },
+        {
+          "id": "pub0c46dfc0dc5767d9ee365",
+          "countryAr": "لبنان ومصر",
+          "foundedYear": null
+        },
+        {
+          "id": "pub0efecaa9fbed1b0308326",
+          "countryAr": "لبنان",
+          "foundedYear": 1956
+        },
+        {
+          "id": "pub328453b7e46616c5c0964",
+          "countryAr": "لبنان",
+          "foundedYear": null
+        },
+        {
+          "id": "pub371c96870287d9045cd38",
+          "countryAr": "مصر والمملكة المتحدة",
+          "foundedYear": 2007
+        },
+        {
+          "id": "pub434433fa2610dd1706877",
+          "countryAr": "لبنان",
+          "foundedYear": null
+        },
+        {
+          "id": "pub51935b44071d375800641",
+          "countryAr": "مصر",
+          "foundedYear": 1968
+        },
+        {
+          "id": "pub82125d90b5a5a23a9fbae",
+          "countryAr": "لبنان",
+          "foundedYear": null
+        },
+        {
+          "id": "pub885422c2c41c5cb652895",
+          "countryAr": "ألمانيا والعراق",
+          "foundedYear": 1983
+        },
+        {
+          "id": "pub8cb1ed6d91d98042a4594",
+          "countryAr": "مصر",
+          "foundedYear": 1890
+        },
+        {
+          "id": "puba3381c339dd4b05f16afd",
+          "countryAr": "المغرب ولبنان",
+          "foundedYear": null
+        },
+        {
+          "id": "pubb0a2229f531b0dcf53281",
+          "countryAr": "السعودية",
+          "foundedYear": 1974
+        },
+        {
+          "id": "pubb31c9549a55d66db2b347",
+          "countryAr": "العراق",
+          "foundedYear": 1994
+        },
+        {
+          "id": "pubce5319ba6a484ee997989",
+          "countryAr": "لبنان",
+          "foundedYear": 1987
+        },
+        {
+          "id": "pubd036df329ac3b7a95689a",
+          "countryAr": "لبنان",
+          "foundedYear": 1975
+        },
+        {
+          "id": "pube24925fa3add434e8a47c",
+          "countryAr": "لبنان",
+          "foundedYear": 1969
+        },
+        {
+          "id": "pubed2161a770715af90125f",
+          "countryAr": "لبنان",
+          "foundedYear": 1986
+        },
+        {
+          "id": "pubee65319650d22a1327931",
+          "countryAr": "العراق",
+          "foundedYear": 2015
+        },
+        {
+          "id": "pubf37c24af72f7f0d196564",
+          "countryAr": "لبنان",
+          "foundedYear": 1971
+        }
+      ]
+    }
+  }
+}

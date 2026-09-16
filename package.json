@@ -14,7 +14,8 @@
     "test:baseline": "playwright test tests/visual --update-snapshots",
     "test:report": "playwright show-report",
     "tokens": "tsx scripts/generate-fluent-tokens.ts",
-    "tokens:check": "tsx scripts/generate-fluent-tokens.ts --check"
+    "tokens:check": "tsx scripts/generate-fluent-tokens.ts --check",
+    "db:inventory": "tsx scripts/db-audit-inventory.ts"
   },
   "dependencies": {
     "@fluentui/react-components": "^9.74.7",
