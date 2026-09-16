@@ -181,9 +181,11 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
     publisherId,
   } as const;
 
-  // The database refuses a shelf below zero (CHECK on `stock`); saying so
-  // here keeps that from reading as an unexpected failure.
+  // The database refuses a shelf below zero and a negative price (CHECKs on
+  // `stock`, `price` and `compareAtPrice`); saying so here keeps that from
+  // reading as an unexpected failure.
   if (data.stock < 0) return fail("negativeStock");
+  if (data.price < 0 || (data.compareAtPrice ?? 0) < 0) return fail("negativePrice");
 
   /*
    * The cover goes up before the row is written: a failed upload then leaves
@@ -302,6 +304,7 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
   } as const;
 
   if (data.stock < 0) return fail("negativeStock");
+  if (data.price < 0 || (data.compareAtPrice ?? 0) < 0) return fail("negativePrice");
 
   // Upload first, write second, tidy up whichever one lost — as in `saveBook`.
   let coverUrl: string | undefined;

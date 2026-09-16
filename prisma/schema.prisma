@@ -343,6 +343,9 @@ model Order {
   customerId String
   status     OrderStatus @default(pending)
 
+  /// Dinars, whole. CHECKs (migration 20260917100000_money_and_rating_checks)
+  /// keep each amount at or above zero, the discount at or below the
+  /// subtotal, and total exactly subtotal + shippingCost - discount.
   subtotal     Int
   shippingCost Int @default(0)
   discount     Int @default(0)

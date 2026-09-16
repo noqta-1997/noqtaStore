@@ -65,6 +65,7 @@ export function HandoutForm({
         forbidden: dictionary.common.actionErrors.forbidden,
         duplicate: dictionary.common.actionErrors.duplicate,
         negativeStock: dictionary.common.actionErrors.negativeStock,
+        negativePrice: dictionary.common.actionErrors.negativePrice,
         saveFailed: dictionary.common.actionErrors.saveFailed,
         missingTitle: dictionary.common.actionErrors.missingTitle,
         missingRelation: dictionary.common.actionErrors.missingRelation,
@@ -190,6 +191,7 @@ export function HandoutForm({
                 name="price"
                 type="number"
                 dir="ltr"
+                min={0}
                 step={500}
                 data-numeric
                 defaultValue={handout?.price}
@@ -206,6 +208,7 @@ export function HandoutForm({
                 name="compareAtPrice"
                 type="number"
                 dir="ltr"
+                min={0}
                 step={500}
                 data-numeric
                 defaultValue={handout?.compareAtPrice}

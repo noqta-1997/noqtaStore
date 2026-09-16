@@ -2,11 +2,11 @@
 
 > **الغرض:** لقطة وصفية لقاعدة بيانات Supabase الخاصة بالمشروع كما هي فعلياً في لحظة الالتقاط: المخططات، الجداول، عدد الأعمدة والصفوف، المجموعات المنطقية، والمفاتيح الأجنبية. هذا الملف **جرد فقط**: لا يحتوي تحليل أمان أو أداء ولا توصيات؛ تلك موضوع الملفات التالية في `docs/db-audit/`.
 >
-> **تاريخ الالتقاط:** 2026-09-16 21:11:21 UTC (17/09/2026, 00:11:21 بتوقيت بغداد)  
+> **تاريخ الالتقاط:** 2026-09-16 21:52:07 UTC (17/09/2026, 00:52:07 بتوقيت بغداد)  
 > **المشروع:** Supabase `aws-0-eu-central-1.pooler.supabase.com` — قاعدة `postgres`، الدور `postgres`، عبر مجمّع الجلسات (منفذ 5432، أي `DIRECT_URL` في `.env.local`)  
 > **الخادم:** PostgreSQL 17.6 on x86_64-pc-linux-gnu  
 > **حجم القاعدة الكلي:** 13 MB  
-> **حالة المستودع وقت الالتقاط:** الالتزام `8061876` (في الشجرة 11 ملف غير ملتزم).  
+> **حالة المستودع وقت الالتقاط:** الالتزام `e4f5b5a` (في الشجرة 6 ملف غير ملتزم).  
 > **مولَّد بـ** `npm run db:inventory` (`scripts/db-audit-inventory.ts`) — أعد تشغيله لتحديث هذا الملف.
 
 ## كيف تقرأ هذا الملف
@@ -28,10 +28,10 @@
 | جداول التطبيق (`public`) | 23 (منها 22 جدول بيانات + `_prisma_migrations`) |
 | جداول منصّة Supabase (`auth` + `storage` + `realtime` + `vault`) | 39 |
 | مفاتيح أجنبية | 58 (`public` 29، `auth` 24، `storage` 5) |
-| قيود CHECK | 58 (`public` 6) |
+| قيود CHECK | 74 (`public` 22) |
 | أنواع معدودة (enums) | 21 (`public` 9) |
 | إضافات (extensions) | 5 |
-| إجمالي الصفوف في كل الجداول | 797 |
+| إجمالي الصفوف في كل الجداول | 807 |
 | إجمالي صفوف جداول التطبيق (`public` بدون سجل الترحيل) | 152 |
 
 لا فرق بين القاعدة والمستودع، ولا ترحيلات معلّقة.
@@ -60,7 +60,7 @@
 
 | # | الجدول | المجموعة | أعمدة | صفوف | تقدير | الحجم | ملاحظة |
 |--:|---|---|--:|--:|--:|--:|---|
-| 1 | `_prisma_migrations` | `MIGRATIONS` | 8 | 16 | 16 | 32 kB | سجل ترحيلات Prisma |
+| 1 | `_prisma_migrations` | `MIGRATIONS` | 8 | 17 | 17 | 32 kB | سجل ترحيلات Prisma |
 | 2 | `addresses` | `CUSTOMERS` | 11 | 1 | 1 | 48 kB |  |
 | 3 | `authors` | `CATALOG` | 8 | 26 | 26 | 112 kB |  |
 | 4 | `books` | `CATALOG` | 19 | 25 | 25 | 184 kB |  |
@@ -95,7 +95,7 @@
 | 3 | `flow_state` | `AUTH_CORE` | 17 | 6 | 6 | 112 kB |  |
 | 4 | `identities` | `AUTH_CORE` | 9 | 2 | 2 | 80 kB |  |
 | 5 | `instances` | `AUTH_CORE` | 5 | 0 | 0 | 16 kB |  |
-| 6 | `mfa_amr_claims` | `AUTH_CORE` | 5 | 124 | 124 | 88 kB |  |
+| 6 | `mfa_amr_claims` | `AUTH_CORE` | 5 | 127 | 127 | 88 kB |  |
 | 7 | `mfa_challenges` | `AUTH_MFA` | 7 | 0 | 0 | 24 kB |  |
 | 8 | `mfa_factors` | `AUTH_MFA` | 13 | 0 | 0 | 56 kB |  |
 | 9 | `mfa_recovery_code_sets` | `AUTH_MFA` | 7 | 0 | 0 | 24 kB |  |
@@ -104,14 +104,14 @@
 | 12 | `oauth_client_states` | `AUTH_OAUTH` | 4 | 0 | 0 | 24 kB |  |
 | 13 | `oauth_clients` | `AUTH_OAUTH` | 13 | 0 | 0 | 24 kB |  |
 | 14 | `oauth_consents` | `AUTH_OAUTH` | 6 | 0 | 0 | 48 kB |  |
-| 15 | `one_time_tokens` | `AUTH_CORE` | 8 | 0 | 0 | 120 kB |  |
-| 16 | `refresh_tokens` | `AUTH_CORE` | 9 | 137 | 137 | 168 kB |  |
+| 15 | `one_time_tokens` | `AUTH_CORE` | 8 | 0 | 0 | 128 kB |  |
+| 16 | `refresh_tokens` | `AUTH_CORE` | 9 | 140 | 140 | 168 kB |  |
 | 17 | `saml_providers` | `AUTH_SSO` | 9 | 0 | 0 | 32 kB |  |
 | 18 | `saml_relay_states` | `AUTH_SSO` | 8 | 0 | 0 | 40 kB |  |
 | 19 | `schema_migrations` | `MIGRATIONS` | 1 | 82 | 82 | 24 kB |  |
 | 20 | `scim_tokens` | `AUTH_SSO` | 8 | 0 | 0 | 48 kB |  |
 | 21 | `scim_users` | `AUTH_SSO` | 10 | 0 | 0 | 88 kB |  |
-| 22 | `sessions` | `AUTH_CORE` | 15 | 124 | 124 | 128 kB |  |
+| 22 | `sessions` | `AUTH_CORE` | 15 | 127 | 127 | 128 kB |  |
 | 23 | `sso_domains` | `AUTH_SSO` | 5 | 0 | 0 | 32 kB |  |
 | 24 | `sso_providers` | `AUTH_SSO` | 5 | 0 | 0 | 32 kB |  |
 | 25 | `users` | `AUTH_CORE` | 35 | 2 | 2 | 256 kB |  |
@@ -180,14 +180,14 @@
 | `CART_WISHLIST` | السلة والمفضلة | `public` | `cart_items`، `handout_cart_items`، `wishlist_items`، `handout_wishlist_items` | 4 | 0 |
 | `MARKETING` | التسويق والتواصل | `public` | `coupons`، `newsletter_subscribers`، `contact_messages` | 3 | 2 |
 | `SETTINGS` | الإعدادات | `public` | `store_settings` | 1 | 11 |
-| `AUTH_CORE` | الهوية والجلسات | `auth` | `users`، `identities`، `sessions`، `refresh_tokens`، `mfa_amr_claims`، `one_time_tokens`، `flow_state`، `audit_log_entries`، `instances` | 9 | 395 |
+| `AUTH_CORE` | الهوية والجلسات | `auth` | `users`، `identities`، `sessions`، `refresh_tokens`، `mfa_amr_claims`، `one_time_tokens`، `flow_state`، `audit_log_entries`، `instances` | 9 | 404 |
 | `AUTH_MFA` | التحقق متعدد العوامل | `auth` | `mfa_factors`، `mfa_challenges`، `mfa_recovery_code_sets`، `mfa_recovery_codes`، `webauthn_challenges`، `webauthn_credentials` | 6 | 0 |
 | `AUTH_OAUTH` | خادم OAuth ومزوّدوه | `auth` | `oauth_clients`، `oauth_authorizations`، `oauth_consents`، `oauth_client_states`، `custom_oauth_providers` | 5 | 0 |
 | `AUTH_SSO` | SSO / SAML / SCIM | `auth` | `sso_providers`، `sso_domains`، `saml_providers`، `saml_relay_states`، `scim_tokens`، `scim_users` | 6 | 0 |
 | `STORAGE` | تخزين الملفات | `storage` | `buckets`، `buckets_analytics`، `buckets_vectors`، `objects`، `s3_multipart_uploads`، `s3_multipart_uploads_parts`، `vector_indexes` | 7 | 2 |
 | `REALTIME` | البث اللحظي | `realtime` | `messages`، `subscription` | 2 | 0 |
 | `VAULT` | الأسرار | `vault` | `secrets` | 1 | 0 |
-| `MIGRATIONS` | سجلات الترحيل | متعدد | `auth.schema_migrations`، `public._prisma_migrations`، `realtime.schema_migrations`، `storage.migrations` | 4 | 248 |
+| `MIGRATIONS` | سجلات الترحيل | متعدد | `auth.schema_migrations`، `public._prisma_migrations`، `realtime.schema_migrations`، `storage.migrations` | 4 | 249 |
 | `STATS_VIEWS` | views الإحصاء | `extensions` | `pg_stat_statements`، `pg_stat_statements_info` | 2 views | — |
 
 المجموع: 62 جدولاً = كل جداول القاعدة (62). `AUTH` وحدها اسم جامع للمجموعات الأربع `AUTH_*` (26 جدولاً)؛ و`APP` اسم جامع لمجموعات `public` السبع (22 جدولاً بدون سجل الترحيل).
@@ -234,7 +234,7 @@
 بنية Supabase الافتراضية، غير مستخدمة من التطبيق، وفارغة.
 
 #### `MIGRATIONS` — سجلات الترحيل
-أربعة دفاتر مستقلة: `public._prisma_migrations` (16 صفاً — يخصّ التطبيق، الملحق هـ)، و`auth.schema_migrations` (82)، `realtime.schema_migrations` (82)، `storage.migrations` (68) تخصّ خدمات Supabase.
+أربعة دفاتر مستقلة: `public._prisma_migrations` (17 صفاً — يخصّ التطبيق، الملحق هـ)، و`auth.schema_migrations` (82)، `realtime.schema_migrations` (82)، `storage.migrations` (68) تخصّ خدمات Supabase.
 
 ## 5. المفاتيح الأجنبية (كما هي في القاعدة الآن)
 
@@ -330,8 +330,8 @@
 
 | | المستودع (`prisma/migrations/`) | القاعدة (`public._prisma_migrations`) |
 |---|---|---|
-| عدد الترحيلات | 16 | 16 |
-| آخر ترحيل | `20260917080000_quantity_checks` | `20260917080000_quantity_checks` (اكتمل 2026-09-16 21:09:25 UTC) |
+| عدد الترحيلات | 17 | 17 |
+| آخر ترحيل | `20260917100000_money_and_rating_checks` | `20260917100000_money_and_rating_checks` (اكتمل 2026-09-16 21:49:38 UTC) |
 
 كل الترحيلات مطبَّقة والسجل يطابق المجلد.
 
@@ -348,7 +348,7 @@
 
 مأخوذ من `pg_attribute` وقت الالتقاط. 🔑 = مفتاح أساسي. `timestamp(3)` = بلا منطقة زمنية.
 
-### `_prisma_migrations` — 8 عموداً، 16 صف، مجموعة `MIGRATIONS`
+### `_prisma_migrations` — 8 عموداً، 17 صف، مجموعة `MIGRATIONS`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -682,18 +682,34 @@
 | `store_settings` | `key` | طبيعي (`key`) |
 | `wishlist_items` | `customerId`، `bookId` | مركّب (جدول ربط) |
 
-### قيود CHECK (6)
+### قيود CHECK (22)
 
 Prisma لا يعبّر عن قيد CHECK في `schema.prisma`؛ هذه كُتبت يدوياً في ملفات الترحيل، والمصدر هنا هو `pg_constraint` لا المخطط.
 
 | الجدول | القيد | التعريف |
 |---|---|---|
+| `books` | `books_compareAtPrice_check` | `CHECK ((("compareAtPrice" IS NULL) OR ("compareAtPrice" >= 0)))` |
+| `books` | `books_price_check` | `CHECK ((price >= 0))` |
+| `books` | `books_rating_check` | `CHECK (((rating >= (0)::double precision) AND (rating <= (5)::double precision)))` |
+| `books` | `books_reviewsCount_check` | `CHECK (("reviewsCount" >= 0))` |
 | `books` | `books_stock_check` | `CHECK ((stock >= 0))` |
 | `cart_items` | `cart_items_quantity_check` | `CHECK ((quantity > 0))` |
+| `coupons` | `coupons_limits_check` | `CHECK ((("minSubtotal" >= 0) AND (("usageLimit" IS NULL) OR ("usageLimit" > 0)) AND ("usedCount" >= 0)))` |
+| `coupons` | `coupons_value_check` | `CHECK (((value > 0) AND ((type <> 'percentage'::"CouponType") OR (value <= 100))))` |
 | `handout_cart_items` | `handout_cart_items_quantity_check` | `CHECK ((quantity > 0))` |
 | `handout_order_items` | `handout_order_items_quantity_check` | `CHECK ((quantity > 0))` |
+| `handout_order_items` | `handout_order_items_unitPrice_check` | `CHECK (("unitPrice" >= 0))` |
+| `handout_reviews` | `handout_reviews_rating_check` | `CHECK (((rating >= 1) AND (rating <= 5)))` |
+| `handouts` | `handouts_compareAtPrice_check` | `CHECK ((("compareAtPrice" IS NULL) OR ("compareAtPrice" >= 0)))` |
+| `handouts` | `handouts_price_check` | `CHECK ((price >= 0))` |
+| `handouts` | `handouts_rating_check` | `CHECK (((rating >= (0)::double precision) AND (rating <= (5)::double precision)))` |
+| `handouts` | `handouts_reviewsCount_check` | `CHECK (("reviewsCount" >= 0))` |
 | `handouts` | `handouts_stock_check` | `CHECK ((stock >= 0))` |
 | `order_items` | `order_items_quantity_check` | `CHECK ((quantity > 0))` |
+| `order_items` | `order_items_unitPrice_check` | `CHECK (("unitPrice" >= 0))` |
+| `orders` | `orders_amounts_check` | `CHECK (((subtotal >= 0) AND ("shippingCost" >= 0) AND (discount >= 0) AND (discount <= subtotal)))` |
+| `orders` | `orders_total_check` | `CHECK ((total = ((subtotal + "shippingCost") - discount)))` |
+| `reviews` | `reviews_rating_check` | `CHECK (((rating >= 1) AND (rating <= 5)))` |
 
 خارج `public` توجد 52 قيود CHECK تخصّ خدمات Supabase (`auth` 47، `realtime` 2، `storage` 3)، غير مدرجة هنا.
 
@@ -753,6 +769,7 @@ Prisma لا يعبّر عن قيد CHECK في `schema.prisma`؛ هذه كُتب�
 | 14 | `20260916160000_unique_catalogue_names` | 2026-09-16 15:38:36 | 1 | — |
 | 15 | `20260916170000_customers_user_fk` | 2026-09-16 16:00:44 | 1 | — |
 | 16 | `20260917080000_quantity_checks` | 2026-09-16 21:09:25 | 1 | — |
+| 17 | `20260917100000_money_and_rating_checks` | 2026-09-16 21:49:38 | 1 | — |
 
 ## الملحق و — طريقة الالتقاط (لإعادة الجرد لاحقاً)
 
