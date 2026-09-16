@@ -198,6 +198,8 @@ export default async function AdminHandoutsPage({
                         errorMessages={{
                           inUse: dictionary.common.actionErrors.inUse,
                           forbidden: dictionary.common.actionErrors.forbidden,
+                          notFound: dictionary.common.actionErrors.notFound,
+                          deleteFailed: dictionary.common.actionErrors.deleteFailed,
                         }}
                         deleteAction={deleteHandout.bind(null, handout.id)}
                         confirm={{

@@ -111,6 +111,8 @@ export default async function AdminAuthorsPage({
                       errorMessages={{
                         inUse: dictionary.common.actionErrors.inUse,
                         forbidden: dictionary.common.actionErrors.forbidden,
+                        notFound: dictionary.common.actionErrors.notFound,
+                        deleteFailed: dictionary.common.actionErrors.deleteFailed,
                       }}
                       deleteAction={deleteAuthor.bind(null, author.id)}
                       confirm={{

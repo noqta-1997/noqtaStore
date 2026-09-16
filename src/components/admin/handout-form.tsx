@@ -266,6 +266,8 @@ export function HandoutForm({
             errorMessages={{
               inUse: dictionary.common.actionErrors.inUse,
               forbidden: dictionary.common.actionErrors.forbidden,
+              notFound: dictionary.common.actionErrors.notFound,
+              deleteFailed: dictionary.common.actionErrors.deleteFailed,
             }}
             itemName={handout?.title[locale]}
             labels={{

@@ -26,6 +26,23 @@ export function isUniqueViolation(error: unknown): boolean {
 }
 
 /**
+ * P2003: a foreign key refused the write. On a delete that is a row in
+ * another table still pointing at this one (`RESTRICT`/`NO ACTION`); the
+ * constraint's name is in `meta.driverAdapterError.cause.constraint.index`.
+ */
+export function isForeignKeyViolation(error: unknown): boolean {
+  return prismaErrorCode(error) === "P2003";
+}
+
+/**
+ * P2025: the row a `delete`/`update` was addressed to is not there — usually
+ * because another admin removed it after this page was rendered.
+ */
+export function isMissingRecord(error: unknown): boolean {
+  return prismaErrorCode(error) === "P2025";
+}
+
+/**
  * Puts the real cause of a failed server action in the server log, where a
  * generic "could not save" toast cannot. The admin sees the toast; whoever
  * reads the log sees the Prisma code, the constraint it names, and the

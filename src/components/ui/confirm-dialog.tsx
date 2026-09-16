@@ -62,8 +62,17 @@ export function ConfirmDialog({
       return;
     }
 
+    /* The action reports through its result; if it throws instead (a lost
+       connection, a bug), the dialog still closes and says so rather than
+       staying open with its button disabled. */
     setPending(true);
-    const result = await action();
+    let result: ActionResult;
+    try {
+      result = await action();
+    } catch (error) {
+      console.error("[confirm-dialog] action threw", error);
+      result = { ok: false, error: "thrown" };
+    }
     setPending(false);
     setOpen(false);
 

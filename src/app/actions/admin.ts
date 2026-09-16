@@ -47,7 +47,12 @@ import { isWithin } from "@/lib/category-tree";
 import { discardCover, readCoverImage, storeCover } from "@/lib/cover-storage";
 import { refreshHandoutRating } from "@/lib/handout-rating";
 import { prisma } from "@/lib/prisma";
-import { isUniqueViolation, logActionError } from "@/lib/prisma-errors";
+import {
+  isForeignKeyViolation,
+  isMissingRecord,
+  isUniqueViolation,
+  logActionError,
+} from "@/lib/prisma-errors";
 import type {
   BookTag,
   ContactStatus,
@@ -101,6 +106,32 @@ function revalidateHandouts() {
   revalidatePath("/publishers/[slug]", "page");
   revalidatePath("/admin/handouts", "page");
   revalidatePath("/admin/handout-reviews", "page");
+}
+
+/**
+ * Runs a delete and reports the two ways the database refuses one as action
+ * errors rather than exceptions. The row being gone already (P2025 — another
+ * tab got there first) is `notFound`; a row elsewhere still pointing at it
+ * (P2003) is `inUse`. The counts each delete action runs first name the
+ * reason before anything is attempted, but a copy can be ordered between the
+ * count and the delete, so the key is what actually holds — and a P2003 that
+ * reaches here is also logged, because it means the guards above it and the
+ * database disagree about who points at this row. Anything else is logged
+ * and reported as `deleteFailed`.
+ */
+async function attemptDelete<T>(
+  action: string,
+  context: Record<string, string | number | null>,
+  run: () => Promise<T>,
+): Promise<{ ok: true; row: T } | { ok: false; error: string }> {
+  try {
+    return { ok: true, row: await run() };
+  } catch (error) {
+    if (isMissingRecord(error)) return { ok: false, error: "notFound" };
+    logActionError(action, error, context);
+    if (isForeignKeyViolation(error)) return { ok: false, error: "inUse" };
+    return { ok: false, error: "deleteFailed" };
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -215,11 +246,11 @@ export async function deleteBook(bookId: string): Promise<ActionResult> {
   const ordered = await prisma.orderItem.count({ where: { bookId } });
   if (ordered > 0) return fail("inUse");
 
-  const deleted = await prisma.book.delete({
-    where: { id: bookId },
-    select: { coverUrl: true },
-  });
-  await discardCover(deleted.coverUrl);
+  const deleted = await attemptDelete("deleteBook", { bookId }, () =>
+    prisma.book.delete({ where: { id: bookId }, select: { coverUrl: true } }),
+  );
+  if (!deleted.ok) return deleted;
+  await discardCover(deleted.row.coverUrl);
 
   revalidateCatalogue();
   revalidatePath("/admin/books", "page");
@@ -317,11 +348,11 @@ export async function deleteHandout(handoutId: string): Promise<ActionResult> {
   const ordered = await prisma.handoutOrderItem.count({ where: { handoutId } });
   if (ordered > 0) return fail("inUse");
 
-  const deleted = await prisma.handout.delete({
-    where: { id: handoutId },
-    select: { coverUrl: true },
-  });
-  await discardCover(deleted.coverUrl);
+  const deleted = await attemptDelete("deleteHandout", { handoutId }, () =>
+    prisma.handout.delete({ where: { id: handoutId }, select: { coverUrl: true } }),
+  );
+  if (!deleted.ok) return deleted;
+  await discardCover(deleted.row.coverUrl);
 
   revalidateHandouts();
   return ok();
@@ -438,7 +469,10 @@ export async function deleteCategory(categoryId: string): Promise<ActionResult> 
   const teachers = await prisma.author.count({ where: { subjectId: categoryId } });
   if (teachers > 0) return fail("inUse");
 
-  await prisma.category.delete({ where: { id: categoryId } });
+  const deleted = await attemptDelete("deleteCategory", { categoryId }, () =>
+    prisma.category.delete({ where: { id: categoryId } }),
+  );
+  if (!deleted.ok) return deleted;
 
   revalidateCatalogue();
   revalidatePath("/admin/categories", "page");
@@ -502,7 +536,10 @@ export async function deleteHandoutCategory(categoryId: string): Promise<ActionR
   const handouts = await prisma.handout.count({ where: { categoryId } });
   if (handouts > 0) return fail("inUse");
 
-  await prisma.handoutCategory.delete({ where: { id: categoryId } });
+  const deleted = await attemptDelete("deleteHandoutCategory", { categoryId }, () =>
+    prisma.handoutCategory.delete({ where: { id: categoryId } }),
+  );
+  if (!deleted.ok) return deleted;
 
   revalidateHandouts();
   revalidatePath("/admin/handout-categories", "page");
@@ -556,10 +593,17 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
 export async function deleteAuthor(authorId: string): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
+  /* A teacher is held by either catalogue: the handouts key is as RESTRICT
+     as the books one, and a teacher with only handouts is the common case. */
   const books = await prisma.book.count({ where: { authorId } });
   if (books > 0) return fail("inUse");
+  const handouts = await prisma.handout.count({ where: { authorId } });
+  if (handouts > 0) return fail("inUse");
 
-  await prisma.author.delete({ where: { id: authorId } });
+  const deleted = await attemptDelete("deleteAuthor", { authorId }, () =>
+    prisma.author.delete({ where: { id: authorId } }),
+  );
+  if (!deleted.ok) return deleted;
 
   revalidateCatalogue();
   revalidatePath("/admin/authors", "page");
@@ -603,10 +647,16 @@ export async function savePublisher(formData: FormData): Promise<ActionResult> {
 export async function deletePublisher(publisherId: string): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
+  /* Both catalogues hold a press — see `deleteAuthor`. */
   const books = await prisma.book.count({ where: { publisherId } });
   if (books > 0) return fail("inUse");
+  const handouts = await prisma.handout.count({ where: { publisherId } });
+  if (handouts > 0) return fail("inUse");
 
-  await prisma.publisher.delete({ where: { id: publisherId } });
+  const deleted = await attemptDelete("deletePublisher", { publisherId }, () =>
+    prisma.publisher.delete({ where: { id: publisherId } }),
+  );
+  if (!deleted.ok) return deleted;
 
   revalidateCatalogue();
   revalidatePath("/admin/publishers", "page");
@@ -755,25 +805,28 @@ export async function deleteOrder(orderId: string): Promise<ActionResult> {
 
   const releasing = beforeDispatch.includes(order.status);
 
-  await prisma.$transaction([
-    prisma.order.delete({ where: { id: orderId } }),
-    ...(releasing
-      ? order.items.map((item) =>
-          prisma.book.update({
-            where: { id: item.bookId },
-            data: { stock: { increment: item.quantity } },
-          }),
-        )
-      : []),
-    ...(releasing
-      ? order.handoutItems.map((item) =>
-          prisma.handout.update({
-            where: { id: item.handoutId },
-            data: { stock: { increment: item.quantity } },
-          }),
-        )
-      : []),
-  ]);
+  const deleted = await attemptDelete("deleteOrder", { orderId }, () =>
+    prisma.$transaction([
+      prisma.order.delete({ where: { id: orderId } }),
+      ...(releasing
+        ? order.items.map((item) =>
+            prisma.book.update({
+              where: { id: item.bookId },
+              data: { stock: { increment: item.quantity } },
+            }),
+          )
+        : []),
+      ...(releasing
+        ? order.handoutItems.map((item) =>
+            prisma.handout.update({
+              where: { id: item.handoutId },
+              data: { stock: { increment: item.quantity } },
+            }),
+          )
+        : []),
+    ]),
+  );
+  if (!deleted.ok) return deleted;
 
   if (releasing) {
     revalidateCatalogue();

@@ -130,6 +130,8 @@ export default async function AdminHandoutCategoriesPage({
                             inUse: dictionary.common.actionErrors.inUse,
                             hasChildren: dictionary.common.actionErrors.hasChildren,
                             forbidden: dictionary.common.actionErrors.forbidden,
+                            notFound: dictionary.common.actionErrors.notFound,
+                            deleteFailed: dictionary.common.actionErrors.deleteFailed,
                           }}
                           deleteAction={deleteHandoutCategory.bind(null, category.id)}
                           confirm={{

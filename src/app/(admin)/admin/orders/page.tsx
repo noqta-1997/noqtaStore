@@ -199,6 +199,7 @@ export default async function AdminOrdersPage({
                           notFound: dictionary.common.actionErrors.notFound,
                           deliveredProtected:
                             dictionary.common.actionErrors.deliveredProtected,
+                          deleteFailed: dictionary.common.actionErrors.deleteFailed,
                         }}
                         deleteAction={deleteOrder.bind(null, order.id)}
                         /*
