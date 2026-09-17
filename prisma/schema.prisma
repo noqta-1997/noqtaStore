@@ -110,6 +110,9 @@ model Category {
   /// grade, but never twice under the same one. The migration declares the
   /// index NULLS NOT DISTINCT so two top-level branches cannot share a name
   /// either — Postgres would otherwise treat each null parent as distinct.
+  /// A second, spelling-blind key (migration 20260917160000_normalized_name_keys,
+  /// which Prisma cannot declare) compares `arabic_key(nameAr)` instead, so
+  /// «العلمى» is not a new sibling of «العلمي».
   @@unique([parentId, nameAr])
   @@index([parentId])
   @@map("categories")
@@ -137,7 +140,8 @@ model HandoutCategory {
 
   handouts Handout[]
 
-  /// Same rule as Category, same NULLS NOT DISTINCT in the migration.
+  /// Same rule as Category, same NULLS NOT DISTINCT and the same
+  /// spelling-blind key in the migrations.
   @@unique([parentId, nameAr])
   @@index([parentId])
   @@map("handout_categories")
@@ -148,7 +152,10 @@ model Publisher {
   slug          String   @unique
   /// The slug alone never caught a repeated name: the seeded slugs are Latin
   /// and a name typed into the panel makes an Arabic one, so «دار الشروق»
-  /// re-entered used to become a second row. The name itself is the key.
+  /// re-entered used to become a second row. The name itself is the key —
+  /// and, in the database, so is its spelling-blind form: a unique index on
+  /// `arabic_key(nameAr)` (migration 20260917160000_normalized_name_keys,
+  /// which Prisma cannot declare) treats «مكتبة» and «مكتبه» as one name.
   nameAr        String   @unique
   descriptionAr String   @default("")
   createdAt     DateTime @default(now())
@@ -164,8 +171,9 @@ model Publisher {
 model Author {
   id        String   @id @default(cuid())
   slug      String   @unique
-  /// Unique for the same reason as Publisher.nameAr. Two teachers who really
-  /// share a name are told apart by a suffix in the panel, not by a second row.
+  /// Unique for the same reason as Publisher.nameAr, spelling-blind key
+  /// included. Two teachers who really share a name are told apart by a
+  /// suffix in the panel, not by a second row.
   nameAr    String   @unique
   /// The category the teacher's subject is filed under; null when none is on record.
   subjectId String?

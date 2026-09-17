@@ -135,6 +135,7 @@ type CheckRow = { schema: string; table: string; name: string; definition: strin
 type EnumRow = { schema: string; name: string; labels: string[] };
 type ExtensionRow = { name: string; version: string; schema: string };
 type IndexRow = { tablename: string; indexname: string; indexdef: string };
+type FunctionRow = { name: string; args: string; returns: string; volatility: string; language: string };
 type MigrationRow = { migration_name: string; finished_at: Date | null; applied_steps_count: number; rolled_back_at: Date | null };
 type BucketRow = { id: string; public: boolean; type: string; created_at: Date; objects: string };
 
@@ -152,6 +153,7 @@ type Capture = {
   enums: EnumRow[];
   extensions: ExtensionRow[];
   publicIndexes: IndexRow[];
+  publicFunctions: FunctionRow[];
   prismaMigrations: MigrationRow[];
   buckets: BucketRow[];
   customers: { total: number; withUserId: number };
@@ -284,6 +286,11 @@ async function capture(): Promise<Capture> {
       `select e.extname as name, e.extversion as version, n.nspname as schema from pg_extension e join pg_namespace n on n.oid = e.extnamespace order by 1`,
     );
     const publicIndexes = await q<IndexRow>(`select tablename, indexname, indexdef from pg_indexes where schemaname = 'public' order by 1, 2`);
+    const publicFunctions = await q<FunctionRow>(`
+      select p.proname as name, pg_get_function_identity_arguments(p.oid) as args, pg_get_function_result(p.oid) as returns,
+             case p.provolatile when 'i' then 'immutable' when 's' then 'stable' else 'volatile' end as volatility, l.lanname as language
+      from pg_proc p join pg_namespace n on n.oid = p.pronamespace join pg_language l on l.oid = p.prolang
+      where n.nspname = 'public' order by 1`);
 
     let prismaMigrations: MigrationRow[] = [];
     try {
@@ -317,6 +324,7 @@ async function capture(): Promise<Capture> {
       enums,
       extensions,
       publicIndexes,
+      publicFunctions,
       prismaMigrations,
       buckets,
       customers: { total: Number(customerRow.total), withUserId: Number(customerRow.with_user_id) },
@@ -879,6 +887,18 @@ function render(inv: Capture, schema: PrismaSchema, folders: string[]): string {
   p(`| الإضافة | الإصدار | المخطط |`);
   p(`|---|---|---|`);
   for (const e of inv.extensions) p(`| §${e.name}§ | ${e.version} | §${e.schema}§ |`);
+  p();
+  p(`### دوال §public§ (${inv.publicFunctions.length})`);
+  p();
+  if (inv.publicFunctions.length) {
+    p(`من §pg_proc§. Prisma لا يعبّر عن الدوال؛ هذه كُتبت في ملفات الترحيل يدوياً، وتستعملها الفهارس التعبيرية في الملحق ب.`);
+    p();
+    p(`| الدالة | المعاملات | تعيد | الثبات | اللغة |`);
+    p(`|---|---|---|---|---|`);
+    for (const f of inv.publicFunctions) p(`| §${f.name}§ | §${f.args}§ | §${f.returns}§ | ${f.volatility} | ${f.language} |`);
+  } else {
+    p(`لا دوال في §public§.`);
+  }
   p();
 
   // ---- appendix E: migration ledger --------------------------------------
