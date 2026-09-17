@@ -1,4 +1,11 @@
 /**
+ * The store's clock. Dates that name a day — an order's reference — are
+ * read in Baghdad, not in UTC: at one in the morning the day has changed
+ * for the customer but not yet on the server.
+ */
+export const STORE_TIME_ZONE = "Asia/Baghdad";
+
+/**
  * Iraqi governorates, used by address forms across the storefront.
  *
  * Plain Arabic strings since English was removed. The English name used to be

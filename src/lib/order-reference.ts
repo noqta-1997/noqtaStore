@@ -1,6 +1,15 @@
 import { randomInt } from "node:crypto";
 
+import { STORE_TIME_ZONE } from "@/lib/constants";
 import { isUniqueViolation, violatedConstraint } from "@/lib/prisma-errors";
+
+/** YYYYMMDD in the store's own time zone; `en-CA` prints ISO order. */
+const storeDay = new Intl.DateTimeFormat("en-CA", {
+  timeZone: STORE_TIME_ZONE,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
 
 /** The unique index on Order.reference, as Postgres names it. */
 const REFERENCE_INDEX = "orders_reference_key";
@@ -10,15 +19,15 @@ export const REFERENCE_ATTEMPTS = 5;
 
 /**
  * A reference a customer can read out over the phone: the day the order was
- * placed and six random digits. Nothing here makes it unique — the index on
- * the column does — so a collision is expected now and then, and
- * `withOrderReference` is where it is handled. Six digits give a day 900,000
- * references; the four this started with gave 9,000, and on a day with a
- * hundred orders the odds of two drawing the same were better than one in
- * three.
+ * placed, on Baghdad's calendar, and six random digits. Nothing here makes
+ * it unique — the index on the column does — so a collision is expected now
+ * and then, and `withOrderReference` is where it is handled. Six digits give
+ * a day 900,000 references; the four this started with gave 9,000, and on a
+ * day with a hundred orders the odds of two drawing the same were better
+ * than one in three.
  */
 export function newOrderReference(now = new Date()): string {
-  const day = now.toISOString().slice(0, 10).replace(/-/g, "");
+  const day = storeDay.format(now).replace(/-/g, "");
   return `NQ-${day}-${randomInt(100000, 1000000)}`;
 }
 
