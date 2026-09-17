@@ -448,6 +448,9 @@ model Review {
 
   /// One review per book per reader.
   @@unique([bookId, customerId])
+  /// The unique index above leads with bookId, so it serves a book page but
+  /// not "my reviews", nor the cascade when a customer row goes.
+  @@index([customerId])
   @@index([status])
   @@map("reviews")
 }
@@ -461,6 +464,8 @@ model WishlistItem {
   book     Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
   @@id([customerId, bookId])
+  /// The key leads with customerId; deleting a book has to find its rows by bookId.
+  @@index([bookId])
   @@map("wishlist_items")
 }
 
@@ -474,6 +479,8 @@ model CartItem {
   book     Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
   @@id([customerId, bookId])
+  /// Same as WishlistItem: the cascade from a deleted book looks up bookId.
+  @@index([bookId])
   @@map("cart_items")
 }
 
@@ -497,6 +504,8 @@ model HandoutReview {
 
   /// One review per handout per reader.
   @@unique([handoutId, customerId])
+  /// Same as Review: the unique index does not serve a lookup by customer.
+  @@index([customerId])
   @@index([status])
   @@map("handout_reviews")
 }
@@ -510,6 +519,8 @@ model HandoutWishlistItem {
   handout  Handout  @relation(fields: [handoutId], references: [id], onDelete: Cascade)
 
   @@id([customerId, handoutId])
+  /// Same as WishlistItem, for the handout's cascade.
+  @@index([handoutId])
   @@map("handout_wishlist_items")
 }
 
@@ -523,6 +534,8 @@ model HandoutCartItem {
   handout  Handout  @relation(fields: [handoutId], references: [id], onDelete: Cascade)
 
   @@id([customerId, handoutId])
+  /// Same as CartItem, for the handout's cascade.
+  @@index([handoutId])
   @@map("handout_cart_items")
 }
 

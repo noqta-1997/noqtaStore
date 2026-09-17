@@ -836,6 +836,35 @@ function render(inv: Capture, schema: PrismaSchema, folders: string[]): string {
   }
   p();
 
+  // Every index in public, as pg_indexes prints it, and whether each foreign
+  // key's columns lead one of them — a btree serves only a prefix, so a key
+  // that sits second in a composite index is not covered by it.
+  const secondary = inv.publicIndexes.filter((i) => !inv.primaryKeys.some((k) => k.schema === "public" && k.name === i.indexname));
+  const leadingColumns = (indexdef: string) =>
+    (/\((.*?)\)/.exec(indexdef.replace(/^.* USING \w+ /, ""))?.[1] ?? "")
+      .split(",")
+      .map((c) => c.trim().replace(/^"|"$/g, ""));
+  const covers = (table: string, columns: string[]) =>
+    inv.publicIndexes.filter((i) => i.tablename === table).some((i) => {
+      const lead = leadingColumns(i.indexdef);
+      return columns.every((c, n) => lead[n] === c);
+    });
+  const uncovered = inv.foreignKeys.filter((f) => f.schema === "public" && !covers(f.table, f.columns));
+  p(`### الفهارس غير الأساسية (${secondary.length})`);
+  p();
+  p(`من §pg_indexes§. الفهارس الفريدة تحمل §UNIQUE§، والجزئية شرط §WHERE§؛ ما لا يعبّر عنه Prisma (الجزئي، و§NULLS NOT DISTINCT§) مكتوب في ملفات الترحيل يدوياً.`);
+  p();
+  p(`| الجدول | الفهرس | التعريف |`);
+  p(`|---|---|---|`);
+  for (const i of secondary) p(`| §${i.tablename}§ | §${i.indexname}§ | §${i.indexdef.replace(/^CREATE (UNIQUE )?INDEX \S+ ON public\.\S+ USING btree /, "$1")}§ |`);
+  p();
+  p(
+    uncovered.length
+      ? `**مفاتيح أجنبية بلا فهرس يقودها عمودها:** ${uncovered.map((f) => `§${f.table}(${f.columns.join("، ")})§`).join("، ")}.`
+      : `كل مفتاح أجنبي في §public§ (${inv.foreignKeys.filter((f) => f.schema === "public").length}) يقود عمودُه فهرساً.`,
+  );
+  p();
+
   // ---- appendix C: enums -------------------------------------------------
   p(`## الملحق ج — الأنواع المعدودة (Enums)`);
   p();
@@ -873,7 +902,7 @@ function render(inv: Capture, schema: PrismaSchema, folders: string[]): string {
   p(`  - الجداول: §pg_class§ (§relkind in ('r','p','v','m','f')§) + §pg_stat_all_tables.n_live_tup§ + §pg_total_relation_size§ + §has_table_privilege§.`);
   p(`  - الصفوف الفعلية: §select count(*)§ لكل جدول مقروء يقدَّر بأقل من مليونَي صف.`);
   p(`  - الأعمدة: §pg_attribute§ (§attnum > 0 and not attisdropped§) + §format_type§ + §pg_attrdef§؛ الفهارس: §pg_indexes§.`);
-  p(`  - المفاتيح والقيود: §pg_constraint§ (§contype = 'f'§ و§'p'§ و§'c'§) مع §confdeltype§/§confupdtype§ و§pg_get_constraintdef§.`);
+  p(`  - المفاتيح والقيود: §pg_constraint§ (§contype = 'f'§ و§'p'§ و§'c'§) مع §confdeltype§/§confupdtype§ و§pg_get_constraintdef§؛ الفهارس: §pg_indexes§ (§schemaname = 'public'§).`);
   p(`  - الأنواع: §pg_type§ + §pg_enum§؛ الإضافات: §pg_extension§.`);
   p(`- الفرق في القسم 6: مجلدات §prisma/migrations/§ مقابل §_prisma_migrations§، وأعمدة/أنواع §public§ مقابل قراءة مبسّطة لـ§schema.prisma§ (models و§@@map§ و§@map§؛ حقول العلاقات ليست أعمدة).`);
   p(`- المجموعات معرَّفة في أعلى السكربت؛ جدول جديد لا يُعيَّن هناك يظهر تحت §UNGROUPED§ مع تحذير على الطرفية.`);
