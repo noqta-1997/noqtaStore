@@ -67,6 +67,7 @@ export default async function AdminAuthorsPage({
               <Tr>
                 <Th>{t.table.author}</Th>
                 <Th>{t.table.books}</Th>
+                <Th>{t.table.handouts}</Th>
                 <Th className="text-end">{admin.common.actions}</Th>
               </Tr>
             </Thead>
@@ -96,6 +97,9 @@ export default async function AdminAuthorsPage({
                   </Td>
                   <Td data-numeric>
                     {formatNumber(author.booksCount, locale)}
+                  </Td>
+                  <Td data-numeric>
+                    {formatNumber(author.handoutsCount, locale)}
                   </Td>
                   <Td>
                     <RowActions

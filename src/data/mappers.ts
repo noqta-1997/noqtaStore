@@ -86,7 +86,10 @@ export function toHandoutCategoryWithCount(
 }
 
 export function toAuthor(
-  row: AuthorRow & { _count?: { books: number }; subject?: CategoryRow | null },
+  row: AuthorRow & {
+    _count?: { books: number; handouts?: number };
+    subject?: CategoryRow | null;
+  },
 ): Author {
   return {
     id: row.id,
@@ -96,12 +99,13 @@ export function toAuthor(
     subject: row.subject ? { ar: row.subject.nameAr } : undefined,
     bio: { ar: row.bioAr },
     booksCount: row._count?.books ?? 0,
+    handoutsCount: row._count?.handouts ?? 0,
     avatarUrl: row.avatarUrl ?? undefined,
   };
 }
 
 export function toPublisher(
-  row: PublisherRow & { _count?: { books: number } },
+  row: PublisherRow & { _count?: { books: number; handouts?: number } },
 ): Publisher {
   return {
     id: row.id,
@@ -109,6 +113,7 @@ export function toPublisher(
     name: { ar: row.nameAr },
     description: { ar: row.descriptionAr },
     booksCount: row._count?.books ?? 0,
+    handoutsCount: row._count?.handouts ?? 0,
   };
 }
 

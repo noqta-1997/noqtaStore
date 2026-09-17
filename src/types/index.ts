@@ -78,6 +78,8 @@ export interface Author {
   subject?: Localized;
   bio: Localized;
   booksCount: number;
+  /** Handouts by this teacher — the other half of what the panel refuses to delete under. */
+  handoutsCount: number;
   avatarUrl?: string;
 }
 
@@ -87,6 +89,8 @@ export interface Publisher {
   name: Localized;
   description: Localized;
   booksCount: number;
+  /** Handouts from this press — the other half of what the panel refuses to delete under. */
+  handoutsCount: number;
 }
 
 export interface Book {

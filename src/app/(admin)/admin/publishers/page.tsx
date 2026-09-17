@@ -67,6 +67,7 @@ export default async function AdminPublishersPage({
               <Tr>
                 <Th>{t.table.name}</Th>
                 <Th>{t.table.books}</Th>
+                <Th>{t.table.handouts}</Th>
                 <Th className="text-end">{admin.common.actions}</Th>
               </Tr>
             </Thead>
@@ -96,6 +97,9 @@ export default async function AdminPublishersPage({
                   </Td>
                   <Td data-numeric>
                     {formatNumber(publisher.booksCount, locale)}
+                  </Td>
+                  <Td data-numeric>
+                    {formatNumber(publisher.handoutsCount, locale)}
                   </Td>
                   <Td>
                     <RowActions

@@ -384,15 +384,18 @@ export async function getHandoutCategoryById(
   return (await loadHandoutCategoryIndex()).byId.get(id);
 }
 
-/** The book count, and the branch the teacher's subject points at. */
+/** Both counts, and the branch the teacher's subject points at. */
 const authorInclude = {
-  _count: { select: { books: true } },
+  _count: { select: { books: true, handouts: true } },
   subject: true,
 } as const;
 
 export async function getAuthors(limit?: number): Promise<Author[]> {
   const rows = await prisma.author.findMany({
-    orderBy: { books: { _count: "desc" } },
+    // Most books first, then by name, so equals keep one order between
+    // renders: Postgres hands ties back in whatever order the plan produced,
+    // and the plan changed the day a second count joined the query.
+    orderBy: [{ books: { _count: "desc" } }, { nameAr: "asc" }],
     include: authorInclude,
     ...(typeof limit === "number" ? { take: limit } : {}),
   });
@@ -437,7 +440,7 @@ export async function searchAuthorPicks(
       ...(term ? { nameAr: { contains: term, mode: "insensitive" } } : {}),
     },
     include: { _count: { select: { books: true } } },
-    orderBy: { books: { _count: "desc" } },
+    orderBy: [{ books: { _count: "desc" } }, { nameAr: "asc" }],
     take: limit,
   });
 
@@ -1818,9 +1821,14 @@ export async function getHandoutStockCounts() {
 /* Publishers                                                          */
 /* ------------------------------------------------------------------ */
 
+/** Both counts: the panel's table shows them side by side. */
+const publisherInclude = {
+  _count: { select: { books: true, handouts: true } },
+} as const;
+
 export async function getPublishers(): Promise<Publisher[]> {
   const rows = await prisma.publisher.findMany({
-    include: { _count: { select: { books: true } } },
+    include: publisherInclude,
     orderBy: [{ books: { _count: "desc" } }, { nameAr: "asc" }],
   });
 
@@ -1830,7 +1838,7 @@ export async function getPublishers(): Promise<Publisher[]> {
 export async function getPublisherBySlug(slug: string): Promise<Publisher | null> {
   const row = await prisma.publisher.findUnique({
     where: { slug },
-    include: { _count: { select: { books: true } } },
+    include: publisherInclude,
   });
 
   return row ? toPublisher(row) : null;
@@ -1839,7 +1847,7 @@ export async function getPublisherBySlug(slug: string): Promise<Publisher | null
 export async function getPublisherById(id: string): Promise<Publisher | null> {
   const row = await prisma.publisher.findUnique({
     where: { id },
-    include: { _count: { select: { books: true } } },
+    include: publisherInclude,
   });
 
   return row ? toPublisher(row) : null;

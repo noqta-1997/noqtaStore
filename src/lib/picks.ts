@@ -36,9 +36,8 @@ export function authorPick(author: Author, locale: Locale, booksLabel: string): 
 }
 
 /**
- * A publisher as the picker lists it. The row the page loads counts only
- * its school books, so the second line is that count alone; the search
- * results, which count both kinds, say more.
+ * A publisher as the picker lists it. The second line is the school-book
+ * count, which is what `booksLabel` names; the search results say more.
  */
 export function publisherPick(publisher: Publisher, locale: Locale, booksLabel: string): PickOption {
   return {
