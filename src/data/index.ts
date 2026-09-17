@@ -15,6 +15,7 @@ import {
   toReviewWithStatus,
 } from "@/data/mappers";
 import type { Prisma } from "@/generated/prisma/client";
+import { escapeLike } from "@/lib/arabic";
 import { getCurrentCustomer } from "@/lib/auth";
 import {
   homeVisibility,
@@ -149,24 +150,41 @@ const orderByForSort: Record<SortKey, Prisma.BookOrderByWithRelationInput[]> = {
   rating: [{ rating: "desc" }, { createdAt: "desc" }],
 };
 
+/**
+ * The ids of the books a search term matches.
+ *
+ * Prisma's `contains` compares letters, and Arabic spells one word several
+ * ways: a reader who types «احمد» found nothing by «أحمد». The comparison is
+ * made in SQL over `arabic_key()`, the same spelling-blind form the unique
+ * keys use (migration 20260917160000_normalized_name_keys), on the title and
+ * on the teacher, press and branch names — the term folded the same way.
+ * The English columns were dropped with the English site, so a Latin-script
+ * title no longer matches on the title itself; the slug clause is what still
+ * answers those queries: the seeded slugs are Latin, so "1984" finds the
+ * book. The ids then go into an ordinary `where`, which is what keeps the
+ * filters, the count and the pagination as they were.
+ */
+async function searchBookIds(term: string): Promise<string[]> {
+  const pattern = `%${escapeLike(term)}%`;
+  const rows = await prisma.$queryRaw<{ id: string }[]>`
+    SELECT b.id
+    FROM books b
+    JOIN authors a ON a.id = b."authorId"
+    JOIN publishers p ON p.id = b."publisherId"
+    JOIN categories c ON c.id = b."categoryId"
+    WHERE arabic_key(b."titleAr") LIKE arabic_key(${pattern}) ESCAPE '\\'
+       OR lower(b.slug) LIKE lower(${pattern}) ESCAPE '\\'
+       OR arabic_key(a."nameAr") LIKE arabic_key(${pattern}) ESCAPE '\\'
+       OR arabic_key(p."nameAr") LIKE arabic_key(${pattern}) ESCAPE '\\'
+       OR arabic_key(c."nameAr") LIKE arabic_key(${pattern}) ESCAPE '\\'`;
+  return rows.map((row) => row.id);
+}
+
 async function bookWhere(query: BookQuery): Promise<Prisma.BookWhereInput> {
   const where: Prisma.BookWhereInput = {};
 
   if (query.q?.trim()) {
-    const term = query.q.trim();
-    /*
-     * The English columns were dropped with the English site, so a search for
-     * a Latin-script title no longer matches on the title itself. The slug
-     * clause is what still answers those queries: the seeded slugs are Latin,
-     * so a reader who types "1984" still finds the book.
-     */
-    where.OR = [
-      { titleAr: { contains: term, mode: "insensitive" } },
-      { slug: { contains: term, mode: "insensitive" } },
-      { publisher: { nameAr: { contains: term, mode: "insensitive" } } },
-      { author: { nameAr: { contains: term, mode: "insensitive" } } },
-      { category: { nameAr: { contains: term, mode: "insensitive" } } },
-    ];
+    where.id = { in: await searchBookIds(query.q.trim()) };
   }
 
   /* A branch answers for everything under it: the primary stage lists the
@@ -714,18 +732,28 @@ const handoutOrderByForSort: Record<SortKey, Prisma.HandoutOrderByWithRelationIn
   rating: [{ rating: "desc" }, { createdAt: "desc" }],
 };
 
+/** The handouts' `searchBookIds`, over their own tree. */
+async function searchHandoutIds(term: string): Promise<string[]> {
+  const pattern = `%${escapeLike(term)}%`;
+  const rows = await prisma.$queryRaw<{ id: string }[]>`
+    SELECT h.id
+    FROM handouts h
+    JOIN authors a ON a.id = h."authorId"
+    JOIN publishers p ON p.id = h."publisherId"
+    JOIN handout_categories c ON c.id = h."categoryId"
+    WHERE arabic_key(h."titleAr") LIKE arabic_key(${pattern}) ESCAPE '\\'
+       OR lower(h.slug) LIKE lower(${pattern}) ESCAPE '\\'
+       OR arabic_key(a."nameAr") LIKE arabic_key(${pattern}) ESCAPE '\\'
+       OR arabic_key(p."nameAr") LIKE arabic_key(${pattern}) ESCAPE '\\'
+       OR arabic_key(c."nameAr") LIKE arabic_key(${pattern}) ESCAPE '\\'`;
+  return rows.map((row) => row.id);
+}
+
 async function handoutWhere(query: HandoutQuery): Promise<Prisma.HandoutWhereInput> {
   const where: Prisma.HandoutWhereInput = {};
 
   if (query.q?.trim()) {
-    const term = query.q.trim();
-    where.OR = [
-      { titleAr: { contains: term, mode: "insensitive" } },
-      { slug: { contains: term, mode: "insensitive" } },
-      { publisher: { nameAr: { contains: term, mode: "insensitive" } } },
-      { author: { nameAr: { contains: term, mode: "insensitive" } } },
-      { category: { nameAr: { contains: term, mode: "insensitive" } } },
-    ];
+    where.id = { in: await searchHandoutIds(query.q.trim()) };
   }
 
   /* The slug is looked up in the handouts' own tree; a branch answers for

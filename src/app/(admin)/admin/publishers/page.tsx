@@ -10,6 +10,7 @@ import { RowActions } from "@/components/admin/row-actions";
 import { TableToolbar } from "@/components/admin/table-toolbar";
 import { publisherTone } from "@/components/publisher/publisher-card";
 import { getPublishers } from "@/data";
+import { arabicKey } from "@/lib/arabic";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 import { formatNumber } from "@/lib/format";
@@ -39,11 +40,10 @@ export default async function AdminPublishersPage({
     getPublishers(),
   ]);
 
+  // Spelling-blind, like the key that refuses a second «مكتبة» spelled «مكتبه».
   const publishers = term
     ? allPublishers.filter((publisher) =>
-        `${publisher.name.ar} ${publisher.slug}`
-          .toLowerCase()
-          .includes(term.toLowerCase()),
+        arabicKey(`${publisher.name.ar} ${publisher.slug}`).includes(arabicKey(term)),
       )
     : allPublishers;
 

@@ -9,6 +9,7 @@ import { deleteAuthor } from "@/app/actions/admin";
 import { TableToolbar } from "@/components/admin/table-toolbar";
 import { authorTone, getAuthorInitials } from "@/components/author/author-card";
 import { getAuthors, getCategories } from "@/data";
+import { arabicKey } from "@/lib/arabic";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 import { formatNumber } from "@/lib/format";
@@ -39,11 +40,10 @@ export default async function AdminAuthorsPage({
     getCategories(),
   ]);
 
+  // Spelling-blind, like the key that refuses a second «أحمد» spelled «احمد».
   const authors = term
     ? allAuthors.filter((author) =>
-        `${author.name.ar} ${author.slug}`
-          .toLowerCase()
-          .includes(term.toLowerCase()),
+        arabicKey(`${author.name.ar} ${author.slug}`).includes(arabicKey(term)),
       )
     : allAuthors;
 
