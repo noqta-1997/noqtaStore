@@ -97,6 +97,39 @@ export async function spendCoupon(tx: Prisma.TransactionClient, code: string): P
 }
 
 /**
+ * Gives a use back when the order that spent it falls through. A code
+ * deleted since, or already at zero, is left alone: there is nothing to
+ * return it to.
+ */
+export async function refundCouponUse(tx: Prisma.TransactionClient, code: string): Promise<void> {
+  await tx.coupon.updateMany({
+    where: { code, usedCount: { gt: 0 } },
+    data: { usedCount: { decrement: 1 } },
+  });
+}
+
+/**
+ * Takes the use again when a cancelled order is brought back. Only the
+ * limit is checked — the order was placed while the code was valid, and an
+ * expiry since does not unmake it — and a code deleted since counts nothing.
+ * The use gone to another order in between is the one refusal, CouponSpent.
+ */
+export async function respendCoupon(tx: Prisma.TransactionClient, code: string): Promise<void> {
+  const coupon = await tx.coupon.findUnique({ where: { code }, select: { id: true } });
+  if (!coupon) return;
+
+  const spent = await tx.coupon.updateMany({
+    where: {
+      code,
+      OR: [{ usageLimit: null }, { usedCount: { lt: tx.coupon.fields.usageLimit } }],
+    },
+    data: { usedCount: { increment: 1 } },
+  });
+
+  if (spent.count !== 1) throw new CouponSpent(code);
+}
+
+/**
  * The coupon currently in effect for this subtotal, or null. A code that has
  * stopped being valid simply drops out of the totals instead of erroring.
  */

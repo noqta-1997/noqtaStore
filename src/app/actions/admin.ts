@@ -56,6 +56,7 @@ import {
   logActionError,
 } from "@/lib/prisma-errors";
 import { revalidateCatalogue, revalidateHandouts } from "@/lib/revalidate";
+import { CouponSpent, refundCouponUse, respendCoupon } from "@/lib/coupon";
 import { ShortStock, takeFromShelf } from "@/lib/shelf";
 import type {
   BookTag,
@@ -680,6 +681,7 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
     where: { id: orderId },
     select: {
       status: true,
+      couponCode: true,
       items: { select: { bookId: true, quantity: true } },
       handoutItems: { select: { handoutId: true, quantity: true } },
     },
@@ -700,6 +702,15 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
     await prisma.$transaction(async (tx) => {
       await tx.order.update({ where: { id: orderId }, data: { status } });
       await tx.orderEvent.create({ data: { orderId, status } });
+
+      // The coupon's use goes the way of the sale: a cancelled order gives it
+      // back whatever stage it reached — the sale fell through — and an order
+      // brought back from `cancelled` takes it again, or is refused when the
+      // use has gone to another order since.
+      if (order.couponCode) {
+        if (status === "cancelled") await refundCouponUse(tx, order.couponCode);
+        else if (reclaiming) await respendCoupon(tx, order.couponCode);
+      }
 
       if (!stockMoves) return;
 
@@ -727,6 +738,7 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
     });
   } catch (error) {
     if (error instanceof ShortStock || isCheckViolation(error)) return fail("outOfStock");
+    if (error instanceof CouponSpent) return fail("couponSpent");
     logActionError("updateOrderStatus", error, { orderId, status });
     return fail("saveFailed");
   }
@@ -760,6 +772,7 @@ export async function deleteOrder(orderId: string): Promise<ActionResult> {
     where: { id: orderId },
     select: {
       status: true,
+      couponCode: true,
       items: { select: { bookId: true, quantity: true } },
       handoutItems: { select: { handoutId: true, quantity: true } },
     },
@@ -768,10 +781,20 @@ export async function deleteOrder(orderId: string): Promise<ActionResult> {
   if (order.status === "delivered") return fail("deliveredProtected");
 
   const releasing = beforeDispatch.includes(order.status);
+  // A cancelled order gave its coupon use back already; any other still holds it.
+  const refunding = order.couponCode !== null && order.status !== "cancelled";
 
   const deleted = await attemptDelete("deleteOrder", { orderId }, () =>
     prisma.$transaction([
       prisma.order.delete({ where: { id: orderId } }),
+      ...(refunding
+        ? [
+            prisma.coupon.updateMany({
+              where: { code: order.couponCode!, usedCount: { gt: 0 } },
+              data: { usedCount: { decrement: 1 } },
+            }),
+          ]
+        : []),
       ...(releasing
         ? order.items.map((item) =>
             prisma.book.update({

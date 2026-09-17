@@ -120,6 +120,7 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
         shippingCost,
         discount,
         total: subtotal + shippingCost - discount,
+        couponCode: applied?.ok ? applied.coupon.code : null,
         paymentMethod,
         shippingMethod,
         shippingName: fullName,

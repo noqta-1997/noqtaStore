@@ -366,6 +366,11 @@ model Order {
   paymentMethod  PaymentMethod
   shippingMethod ShippingMethod
 
+  /// The code whose use this order spent, so cancelling the order can give
+  /// the use back and bringing it back can take it again. Null when none
+  /// was applied — and on orders placed before the column existed.
+  couponCode String?
+
   /// The delivery address is snapshotted: editing a saved address later
   /// must not rewrite the history of an order already placed.
   shippingName        String
