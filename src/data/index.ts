@@ -435,17 +435,28 @@ const authorInclude = {
   subject: true,
 } as const;
 
-export async function getAuthors(limit?: number): Promise<Author[]> {
-  const rows = await prisma.author.findMany({
-    // Most books first, then by name, so equals keep one order between
-    // renders: Postgres hands ties back in whatever order the plan produced,
-    // and the plan changed the day a second count joined the query.
-    orderBy: [{ books: { _count: "desc" } }, { nameAr: "asc" }],
-    include: authorInclude,
-    ...(typeof limit === "number" ? { take: limit } : {}),
-  });
+type AuthorRowWithCounts = Prisma.AuthorGetPayload<{ include: typeof authorInclude }>;
 
-  return rows.map(toAuthor);
+/**
+ * Most in the catalogue first — school books and handouts counted together,
+ * books breaking a tie — then by name, so equals keep one order between
+ * renders: Postgres hands ties back in whatever order the plan produced.
+ * Ranked in memory, as the presses are: the database cannot order by the
+ * sum of two relation counts, and the table is a few dozen rows.
+ */
+function byTitlesWritten(a: AuthorRowWithCounts, b: AuthorRowWithCounts): number {
+  return (
+    b._count.books + b._count.handouts - (a._count.books + a._count.handouts) ||
+    b._count.books - a._count.books ||
+    a.nameAr.localeCompare(b.nameAr, "ar")
+  );
+}
+
+export async function getAuthors(limit?: number): Promise<Author[]> {
+  const rows = await prisma.author.findMany({ include: authorInclude });
+  const ranked = rows.sort(byTitlesWritten);
+
+  return (typeof limit === "number" ? ranked.slice(0, limit) : ranked).map(toAuthor);
 }
 
 /** Authors in the order their ids were given; a deleted one is skipped. */
