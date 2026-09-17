@@ -89,13 +89,17 @@ export default async function ProfilePage() {
             <Field label={t.fullName} htmlFor="name">
               <Input id="name" name="name" defaultValue={customer.name} />
             </Field>
-            <Field label={t.email} htmlFor="email">
+            {/* The address belongs to the sign-in account and follows it on
+                every sign-in (resolveCustomer); it is shown, not edited. The
+                field used to look editable and `updateProfile` dropped it. */}
+            <Field label={t.email} htmlFor="email" hint={t.emailHint}>
               <Input
                 id="email"
-                name="email"
                 type="email"
                 dir="ltr"
                 defaultValue={customer.email}
+                readOnly
+                className="read-only:bg-surface-low"
               />
             </Field>
             <Field label={t.phone} htmlFor="phone">
