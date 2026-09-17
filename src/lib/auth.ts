@@ -16,13 +16,6 @@ export async function getCurrentUser(): Promise<User | null> {
 }
 
 /**
- * Maps a Supabase identity onto a Customer row.
- *
- * A reader who signs up with an email that already exists in the catalogue
- * adopts that record — orders, wishlist and reviews carry over rather than
- * starting a second, empty account for the same person.
- */
-/**
  * The owner is an admin by definition and nobody else is, whatever the rows
  * happen to say. Enforced in both directions on every sign-in, so a stray
  * admin cannot outlive one visit.
@@ -43,11 +36,90 @@ async function pinOwnerRole<T extends { id: string; email: string; role: string 
   return updated as unknown as T;
 }
 
-async function resolveCustomer(user: User) {
-  const linked = await prisma.customer.findUnique({ where: { userId: user.id } });
-  if (linked) return pinOwnerRole(linked);
+/** The email a row carries when its account has none the store can use. */
+function placeholderEmail(userId: string) {
+  return `${userId}@placeholder.local`;
+}
 
-  const email = user.email?.toLowerCase();
+/**
+ * The email the auth server holds for an account right now. A customer row
+ * keeps a copy of it; this is the original the copy is checked against.
+ * `auth.users` is outside Prisma's schema — the foreign key on `userId` was
+ * written by hand for the same reason — so it is read with plain SQL.
+ */
+async function authEmailOf(userId: string): Promise<string | null> {
+  const rows = await prisma.$queryRaw<{ email: string | null }[]>`
+    SELECT email FROM auth.users WHERE id = ${userId}::uuid
+  `;
+  return rows[0]?.email?.toLowerCase() ?? null;
+}
+
+/**
+ * Brings a linked row's email up to date with its account's. When another
+ * row already holds the new address (a seeded or guest row, say) the copy is
+ * left as it was and the log says so: folding two rows into one is not
+ * something a sign-in should do on its own.
+ */
+async function followAuthEmail<T extends { id: string; email: string }>(
+  row: T,
+  email: string | null,
+): Promise<T> {
+  if (!email || row.email === email) return row;
+
+  try {
+    const updated = await prisma.customer.update({
+      where: { id: row.id },
+      data: { email },
+    });
+    return updated as unknown as T;
+  } catch (error) {
+    if (!isUniqueViolation(error)) throw error;
+    // Expected now and then, and handled: a line, not a stack, per request.
+    console.warn(`[auth] customer ${row.id} keeps ${row.email}: ${email} is another row's`);
+    return row;
+  }
+}
+
+/**
+ * Moves another account's row off an email that account no longer has.
+ *
+ * Auth emails are unique, so a row linked to account A and carrying the
+ * email account B signs in with can only be A's copy gone stale — A changed
+ * address and has not been back since. The row is brought up to date the way
+ * A's own sign-in would bring it, and if A's current address is taken too it
+ * is parked on a placeholder until then. Either way the email is free for B.
+ */
+async function releaseEmail(row: { id: string; userId: string; email: string }) {
+  const current = await authEmailOf(row.userId);
+  const parked = placeholderEmail(row.userId);
+  const target = current && current !== row.email ? current : parked;
+
+  try {
+    await prisma.customer.update({ where: { id: row.id }, data: { email: target } });
+  } catch (error) {
+    if (!isUniqueViolation(error) || target === parked) throw error;
+    console.warn(`[auth] customer ${row.id} parked: ${target} is another row's`);
+    await prisma.customer.update({ where: { id: row.id }, data: { email: parked } });
+  }
+}
+
+/**
+ * Maps a Supabase identity onto a Customer row.
+ *
+ * The account id is the identity; the email is a copy of the account's,
+ * refreshed on every sign-in. A reader who signs up with an email that
+ * already exists in the catalogue, on a row no account has claimed, adopts
+ * that record — orders, wishlist and reviews carry over rather than starting
+ * a second, empty account for the same person. A row another account has
+ * claimed is never handed over: it used to be, and a reader who signed up
+ * with an address a previous account had since given up was shown that
+ * account's orders and addresses as their own.
+ */
+async function resolveCustomer(user: User) {
+  const email = user.email?.toLowerCase() ?? null;
+
+  const linked = await prisma.customer.findUnique({ where: { userId: user.id } });
+  if (linked) return pinOwnerRole(await followAuthEmail(linked, email));
 
   if (email) {
     const existing = await prisma.customer.findUnique({ where: { email } });
@@ -61,7 +133,9 @@ async function resolveCustomer(user: User) {
       );
     }
 
-    if (existing) return pinOwnerRole(existing);
+    if (existing?.userId) {
+      await releaseEmail({ id: existing.id, userId: existing.userId, email: existing.email });
+    }
   }
 
   const metadata = user.user_metadata ?? {};
@@ -69,7 +143,7 @@ async function resolveCustomer(user: User) {
   const data = {
     userId: user.id,
     name: typeof metadata.full_name === "string" ? metadata.full_name : (email ?? ""),
-    email: email ?? `${user.id}@placeholder.local`,
+    email: email ?? placeholderEmail(user.id),
     phone: typeof metadata.phone === "string" ? metadata.phone : "",
   };
 
@@ -94,10 +168,13 @@ async function resolveCustomer(user: User) {
     });
 
     if (!winner) throw error;
+    if (winner.userId === user.id) return pinOwnerRole(winner);
+
+    // Another account's row on this email, written since the release above:
+    // not this reader's to take. Reported rather than adopted.
+    if (winner.userId) throw error;
 
     // The email row may have been written without the link; claim it.
-    if (winner.userId) return pinOwnerRole(winner);
-
     return pinOwnerRole(
       await prisma.customer.update({
         where: { id: winner.id },
