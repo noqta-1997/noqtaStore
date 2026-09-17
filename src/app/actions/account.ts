@@ -11,7 +11,7 @@ import {
 } from "@/lib/action-result";
 import { refreshBookRating } from "@/lib/book-rating";
 import { refreshHandoutRating } from "@/lib/handout-rating";
-import { getCurrentCustomer } from "@/lib/auth";
+import { getCurrentCustomer, getCustomerInGoodStanding } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 async function requireCustomerId() {
@@ -154,8 +154,10 @@ export async function savePreferences(formData: FormData): Promise<ActionResult>
  * decides whether it appears on the book page.
  */
 export async function submitReview(formData: FormData): Promise<ActionResult> {
-  const customerId = await requireCustomerId();
-  if (!customerId) return fail("unauthenticated");
+  // A blocked account keeps its lists and its history, but is not heard.
+  const standing = await getCustomerInGoodStanding();
+  if (!standing.ok) return fail(standing.error);
+  const customerId = standing.customer.id;
 
   const bookId = text(formData, "bookId");
   const rating = Number(text(formData, "rating"));
@@ -207,8 +209,9 @@ export async function deleteOwnHandoutReview(reviewId: string): Promise<ActionRe
 
 /** A reader's own handout review; `pending` until the moderation queue decides. */
 export async function submitHandoutReview(formData: FormData): Promise<ActionResult> {
-  const customerId = await requireCustomerId();
-  if (!customerId) return fail("unauthenticated");
+  const standing = await getCustomerInGoodStanding();
+  if (!standing.ok) return fail(standing.error);
+  const customerId = standing.customer.id;
 
   const handoutId = text(formData, "handoutId");
   const rating = Number(text(formData, "rating"));

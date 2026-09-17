@@ -1,3 +1,5 @@
+import { Ban } from "lucide-react";
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { AccountNav } from "@/components/account/account-nav";
@@ -54,6 +56,24 @@ export default async function AccountLayout({
               </p>
             </div>
           </div>
+
+          {/* The panel blocked this account. Said once, here, over every
+              account page; the till and the review form refuse on their own. */}
+          {customer.status === "blocked" ? (
+            <p
+              role="status"
+              className="flex items-start gap-2 rounded-xl border border-line bg-error-container px-4 py-3 text-body-md text-on-error-container"
+            >
+              <Ban aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={1.75} />
+              <span>
+                <strong className="font-semibold">{dictionary.common.blockedAccount.title}.</strong>{" "}
+                {dictionary.common.blockedAccount.body}{" "}
+                <Link href="/contact" className="font-semibold underline underline-offset-4">
+                  {dictionary.common.blockedAccount.contact}
+                </Link>
+              </span>
+            </p>
+          ) : null}
         </Container>
       </section>
 

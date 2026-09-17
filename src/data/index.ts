@@ -882,6 +882,7 @@ export async function getCustomer(): Promise<Customer> {
     phone: row.phone,
     birthDate: row.birthDate?.toISOString().slice(0, 10) ?? "",
     memberSince: row.createdAt.toISOString().slice(0, 10),
+    status: row.status,
     preferences: {
       newsletter: row.newsletterOptIn,
       offers: row.offersOptIn,

@@ -16,6 +16,7 @@ interface CheckoutFormProps {
     /** Keyed by the coupon error the action can return. */
     coupon: Record<"unknownCoupon" | "expiredCoupon" | "couponMinimum", string>;
     signIn: string;
+    blocked: string;
     failure: string;
   };
   className?: string;
@@ -61,11 +62,13 @@ export function CheckoutForm({
           ? messages.missingAddress
           : result.error === "outOfStock"
             ? messages.stockChanged
-            : result.error === "unauthenticated"
-              ? messages.signIn
-              : isCouponError(result.error)
-                ? messages.coupon[result.error]
-                : messages.failure;
+            : result.error === "blocked"
+              ? messages.blocked
+              : result.error === "unauthenticated"
+                ? messages.signIn
+                : isCouponError(result.error)
+                  ? messages.coupon[result.error]
+                  : messages.failure;
 
     setError(text);
     toast({ title: text, tone: "error" });

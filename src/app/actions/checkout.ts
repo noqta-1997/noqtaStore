@@ -10,7 +10,7 @@ import {
   text,
   type ActionResult,
 } from "@/lib/action-result";
-import { getCurrentCustomer } from "@/lib/auth";
+import { getCustomerInGoodStanding } from "@/lib/auth";
 import { COUPON_COOKIE, CouponSpent, evaluateCoupon, spendCoupon } from "@/lib/coupon";
 import { withOrderReference } from "@/lib/order-reference";
 import { prisma } from "@/lib/prisma";
@@ -40,8 +40,10 @@ function shippingCostFor(
  * all inside one transaction so a failure leaves nothing half-written.
  */
 export async function placeOrder(formData: FormData): Promise<ActionResult> {
-  const customer = await getCurrentCustomer();
-  if (!customer) return fail("unauthenticated");
+  // Nobody signed in, or an account the panel has blocked: no order either way.
+  const standing = await getCustomerInGoodStanding();
+  if (!standing.ok) return fail(standing.error);
+  const { customer } = standing;
 
   // Both halves of the cart go into one order.
   const [lines, handoutLines] = await Promise.all([

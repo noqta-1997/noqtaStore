@@ -40,6 +40,7 @@ export const customer: Customer = {
   phone: "+964 770 123 4567",
   birthDate: "1994-04-12",
   memberSince: "2024-11-03",
+  status: "active",
   addresses,
   preferences: {
     newsletter: true,

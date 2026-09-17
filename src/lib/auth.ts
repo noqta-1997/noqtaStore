@@ -2,6 +2,7 @@ import type { User } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import type { Customer as CustomerRow } from "@/generated/prisma/client";
 import { isOwner } from "@/lib/owner";
 import { prisma } from "@/lib/prisma";
 import { isUniqueViolation } from "@/lib/prisma-errors";
@@ -110,6 +111,27 @@ async function resolveCustomer(user: User) {
 export async function getCurrentCustomer() {
   const user = await getCurrentUser();
   return user ? resolveCustomer(user) : null;
+}
+
+/**
+ * The customer behind an order or a review, or why the store will not take
+ * one from this session: nobody is signed in, or the account is blocked.
+ *
+ * A block is a refusal at the till and at the review form, not a locked
+ * door. `customers.status` used to be a label the panel set and nothing
+ * read, so a blocked reader went on ordering; now the two things a reader
+ * does that reach other people — buying and publishing — ask here first.
+ * Browsing, the cart, the wishlist, the account pages and the order history
+ * stay open: the row is still theirs, and so is what they bought.
+ */
+export async function getCustomerInGoodStanding(): Promise<
+  | { ok: true; customer: CustomerRow }
+  | { ok: false; error: "unauthenticated" | "blocked" }
+> {
+  const customer = await getCurrentCustomer();
+  if (!customer) return { ok: false, error: "unauthenticated" };
+  if (customer.status === "blocked") return { ok: false, error: "blocked" };
+  return { ok: true, customer };
 }
 
 /**

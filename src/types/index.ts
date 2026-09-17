@@ -204,6 +204,8 @@ export interface Customer {
   phone: string;
   birthDate: string;
   memberSince: string;
+  /** Set from the panel. A blocked account browses, but neither orders nor reviews. */
+  status: CustomerStatus;
   addresses: Address[];
   preferences: {
     newsletter: boolean;

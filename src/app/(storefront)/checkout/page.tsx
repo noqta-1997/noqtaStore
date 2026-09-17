@@ -1,4 +1,4 @@
-import { Banknote, CreditCard, Store, Truck, Wallet, Zap } from "lucide-react";
+import { Ban, Banknote, CreditCard, Store, Truck, Wallet, Zap } from "lucide-react";
 import type { Metadata } from "next";
 
 import { BookCover } from "@/components/book/book-cover";
@@ -7,6 +7,7 @@ import { OrderSummary } from "@/components/commerce/order-summary";
 import { buttonStyles } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Container } from "@/components/ui/container";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Field } from "@/components/ui/field";
 import { ValidatedField } from "@/components/ui/validated-field";
 import { Input } from "@/components/ui/input";
@@ -58,18 +59,40 @@ export default async function CheckoutPage() {
   const locale = defaultLocale;
 
   // Placing an order needs an account, so the page asks for one up front.
-  await requireCustomer();
-
-  const [dictionary, lines, handoutLines, shippingRules, paymentDefault] =
-    await Promise.all([
-      getDictionary(locale),
-      getCart(),
-      getHandoutCart(),
-      getShippingRules(),
-      getDefaultPaymentMethod(),
-    ]);
-
+  const customer = await requireCustomer();
+  const dictionary = await getDictionary(locale);
   const t = dictionary.checkout;
+
+  // The panel blocked this account: the till is closed to it, so the form is
+  // not drawn at all. `placeOrder` refuses as well, for a page opened before.
+  if (customer.status === "blocked") {
+    return (
+      <>
+        <section className="border-b border-line-divider bg-surface-low">
+          <Container className="py-8 lg:py-10">
+            <h1 className="text-headline-lg">{t.title}</h1>
+          </Container>
+        </section>
+
+        <Container className="py-8 lg:py-12">
+          <EmptyState
+            icon={Ban}
+            title={dictionary.common.blockedAccount.title}
+            description={dictionary.common.blockedAccount.body}
+            actionLabel={dictionary.common.blockedAccount.contact}
+            actionHref="/contact"
+          />
+        </Container>
+      </>
+    );
+  }
+
+  const [lines, handoutLines, shippingRules, paymentDefault] = await Promise.all([
+    getCart(),
+    getHandoutCart(),
+    getShippingRules(),
+    getDefaultPaymentMethod(),
+  ]);
   const subtotal =
     lines.reduce((total, line) => total + line.lineTotal, 0) +
     handoutLines.reduce((total, line) => total + line.lineTotal, 0);
@@ -157,6 +180,7 @@ export default async function CheckoutPage() {
               couponMinimum: dictionary.common.actionErrors.couponMinimum,
             },
             signIn: dictionary.common.toast.signInRequired,
+            blocked: dictionary.common.actionErrors.blocked,
             failure: dictionary.common.toast.actionFailed,
           }}
         >
