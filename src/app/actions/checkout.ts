@@ -1,7 +1,5 @@
 "use server";
 
-import { randomInt } from "node:crypto";
-
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
@@ -14,6 +12,7 @@ import {
 } from "@/lib/action-result";
 import { getCurrentCustomer } from "@/lib/auth";
 import { COUPON_COOKIE, CouponSpent, evaluateCoupon, spendCoupon } from "@/lib/coupon";
+import { withOrderReference } from "@/lib/order-reference";
 import { prisma } from "@/lib/prisma";
 import { isCheckViolation } from "@/lib/prisma-errors";
 import { ShortStock, takeFromShelf } from "@/lib/shelf";
@@ -33,11 +32,6 @@ function shippingCostFor(
   if (method === "pickup") return 0;
   if (method === "express") return rules.expressCost;
   return subtotal >= rules.freeThreshold ? 0 : rules.standardCost;
-}
-
-function newReference() {
-  const today = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-  return `NQ-${today}-${randomInt(1000, 9999)}`;
 }
 
 /**
@@ -110,10 +104,13 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
   }
   const discount = applied?.ok ? applied.coupon.discount : 0;
 
-  const transaction = prisma.$transaction(async (tx) => {
+  // The reference is drawn outside the transaction and the whole transaction
+  // is run again under a new one if the database already holds it; see
+  // `withOrderReference` for why the insert alone cannot be retried.
+  const writeOrder = (reference: string) => prisma.$transaction(async (tx) => {
     const created = await tx.order.create({
       data: {
-        reference: newReference(),
+        reference,
         customerId: customer.id,
         status: "pending",
         subtotal,
@@ -180,9 +177,9 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
 
   // The last copy sold to someone else between the cart page and this click
   // rolls the whole order back — nothing is written, nothing is charged.
-  let order: Awaited<typeof transaction>;
+  let order: Awaited<ReturnType<typeof writeOrder>>;
   try {
-    order = await transaction;
+    order = await withOrderReference(writeOrder);
   } catch (error) {
     if (error instanceof ShortStock) return fail("outOfStock");
     // The last use of the code went to another order while this one was

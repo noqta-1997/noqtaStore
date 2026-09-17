@@ -43,6 +43,19 @@ export function isMissingRecord(error: unknown): boolean {
 }
 
 /**
+ * The index or constraint a P2002/P2003 blames, as Postgres names it
+ * (`orders_reference_key`), or null when the error does not say. The driver
+ * adapter keeps it at `meta.driverAdapterError.cause.constraint.index`.
+ */
+export function violatedConstraint(error: unknown): string | null {
+  const meta = shape(error)?.meta as
+    | { driverAdapterError?: { cause?: { constraint?: { index?: unknown } } } }
+    | undefined;
+  const index = meta?.driverAdapterError?.cause?.constraint?.index;
+  return typeof index === "string" ? index : null;
+}
+
+/**
  * A CHECK constraint refused the row. Prisma has no code of its own for
  * that — it arrives as the generic P2039 — so the Postgres code (23514) is
  * read from the driver adapter's cause.
