@@ -9,10 +9,12 @@ import {
   text,
   type ActionResult,
 } from "@/lib/action-result";
+import { makeDefaultAddress, saveAddressRow } from "@/lib/addresses";
 import { refreshBookRating } from "@/lib/book-rating";
 import { refreshHandoutRating } from "@/lib/handout-rating";
 import { getCurrentCustomer, getCustomerInGoodStanding } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { logActionError } from "@/lib/prisma-errors";
 
 async function requireCustomerId() {
   const customer = await getCurrentCustomer();
@@ -62,25 +64,12 @@ export async function saveAddress(formData: FormData): Promise<ActionResult> {
 
   const addressId = text(formData, "addressId");
 
-  await prisma.$transaction(async (tx) => {
-    if (fields.isDefault) {
-      await tx.address.updateMany({
-        where: { customerId },
-        data: { isDefault: false },
-      });
-    }
-
-    if (addressId) {
-      // The customerId in the filter stops one reader editing another's row.
-      await tx.address.updateMany({
-        where: { id: addressId, customerId },
-        data: fields,
-      });
-      return;
-    }
-
-    await tx.address.create({ data: { ...fields, customerId } });
-  });
+  try {
+    await saveAddressRow(customerId, fields, addressId || undefined);
+  } catch (error) {
+    logActionError("saveAddress", error, { addressId: addressId || null });
+    return fail("saveFailed");
+  }
 
   revalidatePath("/account/addresses", "page");
   return ok();
@@ -100,13 +89,12 @@ export async function setDefaultAddress(addressId: string): Promise<ActionResult
   const customerId = await requireCustomerId();
   if (!customerId) return fail("unauthenticated");
 
-  await prisma.$transaction([
-    prisma.address.updateMany({ where: { customerId }, data: { isDefault: false } }),
-    prisma.address.updateMany({
-      where: { id: addressId, customerId },
-      data: { isDefault: true },
-    }),
-  ]);
+  try {
+    await makeDefaultAddress(customerId, addressId);
+  } catch (error) {
+    logActionError("setDefaultAddress", error, { addressId });
+    return fail("saveFailed");
+  }
 
   revalidatePath("/account/addresses", "page");
   return ok();

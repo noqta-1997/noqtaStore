@@ -2,11 +2,11 @@
 
 > **الغرض:** لقطة وصفية لقاعدة بيانات Supabase الخاصة بالمشروع كما هي فعلياً في لحظة الالتقاط: المخططات، الجداول، عدد الأعمدة والصفوف، المجموعات المنطقية، والمفاتيح الأجنبية. هذا الملف **جرد فقط**: لا يحتوي تحليل أمان أو أداء ولا توصيات؛ تلك موضوع الملفات التالية في `docs/db-audit/`.
 >
-> **تاريخ الالتقاط:** 2026-09-16 22:04:51 UTC (17/09/2026, 01:04:51 بتوقيت بغداد)  
+> **تاريخ الالتقاط:** 2026-09-17 13:59:43 UTC (17/09/2026, 16:59:43 بتوقيت بغداد)  
 > **المشروع:** Supabase `aws-0-eu-central-1.pooler.supabase.com` — قاعدة `postgres`، الدور `postgres`، عبر مجمّع الجلسات (منفذ 5432، أي `DIRECT_URL` في `.env.local`)  
 > **الخادم:** PostgreSQL 17.6 on x86_64-pc-linux-gnu  
 > **حجم القاعدة الكلي:** 13 MB  
-> **حالة المستودع وقت الالتقاط:** الالتزام `574bc24` (في الشجرة 6 ملف غير ملتزم).  
+> **حالة المستودع وقت الالتقاط:** الالتزام `2518e88` (في الشجرة 4 ملف غير ملتزم).  
 > **مولَّد بـ** `npm run db:inventory` (`scripts/db-audit-inventory.ts`) — أعد تشغيله لتحديث هذا الملف.
 
 ## كيف تقرأ هذا الملف
@@ -31,8 +31,8 @@
 | قيود CHECK | 75 (`public` 23) |
 | أنواع معدودة (enums) | 21 (`public` 9) |
 | إضافات (extensions) | 5 |
-| إجمالي الصفوف في كل الجداول | 814 |
-| إجمالي صفوف جداول التطبيق (`public` بدون سجل الترحيل) | 152 |
+| إجمالي الصفوف في كل الجداول | 831 |
+| إجمالي صفوف جداول التطبيق (`public` بدون سجل الترحيل) | 153 |
 
 لا فرق بين القاعدة والمستودع، ولا ترحيلات معلّقة.
 
@@ -60,15 +60,15 @@
 
 | # | الجدول | المجموعة | أعمدة | صفوف | تقدير | الحجم | ملاحظة |
 |--:|---|---|--:|--:|--:|--:|---|
-| 1 | `_prisma_migrations` | `MIGRATIONS` | 8 | 18 | 18 | 32 kB | سجل ترحيلات Prisma |
-| 2 | `addresses` | `CUSTOMERS` | 11 | 1 | 1 | 48 kB |  |
+| 1 | `_prisma_migrations` | `MIGRATIONS` | 8 | 19 | 19 | 32 kB | سجل ترحيلات Prisma |
+| 2 | `addresses` | `CUSTOMERS` | 11 | 2 | 2 | 64 kB |  |
 | 3 | `authors` | `CATALOG` | 8 | 26 | 26 | 112 kB |  |
 | 4 | `books` | `CATALOG` | 19 | 25 | 25 | 184 kB |  |
-| 5 | `cart_items` | `CART_WISHLIST` | 4 | 0 | 0 | 32 kB |  |
+| 5 | `cart_items` | `CART_WISHLIST` | 4 | 0 | 0 | 48 kB |  |
 | 6 | `categories` | `CATALOG` | 9 | 30 | 30 | 120 kB |  |
 | 7 | `contact_messages` | `MARKETING` | 7 | 0 | 0 | 64 kB |  |
 | 8 | `coupons` | `MARKETING` | 10 | 2 | 2 | 48 kB |  |
-| 9 | `customers` | `CUSTOMERS` | 13 | 2 | 2 | 64 kB |  |
+| 9 | `customers` | `CUSTOMERS` | 13 | 2 | 2 | 96 kB |  |
 | 10 | `handout_cart_items` | `CART_WISHLIST` | 4 | 0 | 0 | 32 kB |  |
 | 11 | `handout_categories` | `CATALOG` | 9 | 24 | 24 | 80 kB |  |
 | 12 | `handout_order_items` | `ORDERS` | 5 | 0 | 0 | 64 kB |  |
@@ -93,9 +93,9 @@
 | 1 | `audit_log_entries` | `AUTH_CORE` | 5 | 0 | 0 | 24 kB |  |
 | 2 | `custom_oauth_providers` | `AUTH_OAUTH` | 25 | 0 | 0 | 56 kB |  |
 | 3 | `flow_state` | `AUTH_CORE` | 17 | 6 | 6 | 112 kB |  |
-| 4 | `identities` | `AUTH_CORE` | 9 | 2 | 2 | 80 kB |  |
+| 4 | `identities` | `AUTH_CORE` | 9 | 2 | 3 | 80 kB |  |
 | 5 | `instances` | `AUTH_CORE` | 5 | 0 | 0 | 16 kB |  |
-| 6 | `mfa_amr_claims` | `AUTH_CORE` | 5 | 129 | 129 | 88 kB |  |
+| 6 | `mfa_amr_claims` | `AUTH_CORE` | 5 | 134 | 135 | 88 kB |  |
 | 7 | `mfa_challenges` | `AUTH_MFA` | 7 | 0 | 0 | 24 kB |  |
 | 8 | `mfa_factors` | `AUTH_MFA` | 13 | 0 | 0 | 56 kB |  |
 | 9 | `mfa_recovery_code_sets` | `AUTH_MFA` | 7 | 0 | 0 | 24 kB |  |
@@ -105,16 +105,16 @@
 | 13 | `oauth_clients` | `AUTH_OAUTH` | 13 | 0 | 0 | 24 kB |  |
 | 14 | `oauth_consents` | `AUTH_OAUTH` | 6 | 0 | 0 | 48 kB |  |
 | 15 | `one_time_tokens` | `AUTH_CORE` | 8 | 0 | 0 | 128 kB |  |
-| 16 | `refresh_tokens` | `AUTH_CORE` | 9 | 142 | 142 | 168 kB |  |
+| 16 | `refresh_tokens` | `AUTH_CORE` | 9 | 147 | 148 | 168 kB |  |
 | 17 | `saml_providers` | `AUTH_SSO` | 9 | 0 | 0 | 32 kB |  |
 | 18 | `saml_relay_states` | `AUTH_SSO` | 8 | 0 | 0 | 40 kB |  |
 | 19 | `schema_migrations` | `MIGRATIONS` | 1 | 82 | 82 | 24 kB |  |
 | 20 | `scim_tokens` | `AUTH_SSO` | 8 | 0 | 0 | 48 kB |  |
 | 21 | `scim_users` | `AUTH_SSO` | 10 | 0 | 0 | 88 kB |  |
-| 22 | `sessions` | `AUTH_CORE` | 15 | 129 | 129 | 128 kB |  |
+| 22 | `sessions` | `AUTH_CORE` | 15 | 134 | 135 | 128 kB |  |
 | 23 | `sso_domains` | `AUTH_SSO` | 5 | 0 | 0 | 32 kB |  |
 | 24 | `sso_providers` | `AUTH_SSO` | 5 | 0 | 0 | 32 kB |  |
-| 25 | `users` | `AUTH_CORE` | 35 | 2 | 2 | 256 kB |  |
+| 25 | `users` | `AUTH_CORE` | 35 | 2 | 3 | 256 kB |  |
 | 26 | `webauthn_challenges` | `AUTH_MFA` | 6 | 0 | 0 | 32 kB |  |
 | 27 | `webauthn_credentials` | `AUTH_MFA` | 14 | 0 | 0 | 32 kB |  |
 
@@ -174,20 +174,20 @@
 | الرمز | الاسم | المخطط | الجداول | العدد | الصفوف |
 |---|---|---|---|--:|--:|
 | `CATALOG` | الكتالوج | `public` | `categories`، `handout_categories`، `publishers`، `authors`، `books`، `handouts` | 6 | 127 |
-| `CUSTOMERS` | العملاء والعناوين | `public` | `customers`، `addresses` | 2 | 3 |
+| `CUSTOMERS` | العملاء والعناوين | `public` | `customers`، `addresses` | 2 | 4 |
 | `ORDERS` | الطلبات | `public` | `orders`، `order_items`، `handout_order_items`، `order_events` | 4 | 9 |
 | `REVIEWS` | المراجعات | `public` | `reviews`، `handout_reviews` | 2 | 0 |
 | `CART_WISHLIST` | السلة والمفضلة | `public` | `cart_items`، `handout_cart_items`، `wishlist_items`، `handout_wishlist_items` | 4 | 0 |
 | `MARKETING` | التسويق والتواصل | `public` | `coupons`، `newsletter_subscribers`، `contact_messages` | 3 | 2 |
 | `SETTINGS` | الإعدادات | `public` | `store_settings` | 1 | 11 |
-| `AUTH_CORE` | الهوية والجلسات | `auth` | `users`، `identities`، `sessions`، `refresh_tokens`، `mfa_amr_claims`، `one_time_tokens`، `flow_state`، `audit_log_entries`، `instances` | 9 | 410 |
+| `AUTH_CORE` | الهوية والجلسات | `auth` | `users`، `identities`، `sessions`، `refresh_tokens`، `mfa_amr_claims`، `one_time_tokens`، `flow_state`، `audit_log_entries`، `instances` | 9 | 425 |
 | `AUTH_MFA` | التحقق متعدد العوامل | `auth` | `mfa_factors`، `mfa_challenges`، `mfa_recovery_code_sets`، `mfa_recovery_codes`، `webauthn_challenges`، `webauthn_credentials` | 6 | 0 |
 | `AUTH_OAUTH` | خادم OAuth ومزوّدوه | `auth` | `oauth_clients`، `oauth_authorizations`، `oauth_consents`، `oauth_client_states`، `custom_oauth_providers` | 5 | 0 |
 | `AUTH_SSO` | SSO / SAML / SCIM | `auth` | `sso_providers`، `sso_domains`، `saml_providers`، `saml_relay_states`، `scim_tokens`، `scim_users` | 6 | 0 |
 | `STORAGE` | تخزين الملفات | `storage` | `buckets`، `buckets_analytics`، `buckets_vectors`، `objects`، `s3_multipart_uploads`، `s3_multipart_uploads_parts`، `vector_indexes` | 7 | 2 |
 | `REALTIME` | البث اللحظي | `realtime` | `messages`، `subscription` | 2 | 0 |
 | `VAULT` | الأسرار | `vault` | `secrets` | 1 | 0 |
-| `MIGRATIONS` | سجلات الترحيل | متعدد | `auth.schema_migrations`، `public._prisma_migrations`، `realtime.schema_migrations`، `storage.migrations` | 4 | 250 |
+| `MIGRATIONS` | سجلات الترحيل | متعدد | `auth.schema_migrations`، `public._prisma_migrations`، `realtime.schema_migrations`، `storage.migrations` | 4 | 251 |
 | `STATS_VIEWS` | views الإحصاء | `extensions` | `pg_stat_statements`، `pg_stat_statements_info` | 2 views | — |
 
 المجموع: 62 جدولاً = كل جداول القاعدة (62). `AUTH` وحدها اسم جامع للمجموعات الأربع `AUTH_*` (26 جدولاً)؛ و`APP` اسم جامع لمجموعات `public` السبع (22 جدولاً بدون سجل الترحيل).
@@ -234,7 +234,7 @@
 بنية Supabase الافتراضية، غير مستخدمة من التطبيق، وفارغة.
 
 #### `MIGRATIONS` — سجلات الترحيل
-أربعة دفاتر مستقلة: `public._prisma_migrations` (18 صفاً — يخصّ التطبيق، الملحق هـ)، و`auth.schema_migrations` (82)، `realtime.schema_migrations` (82)، `storage.migrations` (68) تخصّ خدمات Supabase.
+أربعة دفاتر مستقلة: `public._prisma_migrations` (19 صفاً — يخصّ التطبيق، الملحق هـ)، و`auth.schema_migrations` (82)، `realtime.schema_migrations` (82)، `storage.migrations` (68) تخصّ خدمات Supabase.
 
 ## 5. المفاتيح الأجنبية (كما هي في القاعدة الآن)
 
@@ -330,8 +330,8 @@
 
 | | المستودع (`prisma/migrations/`) | القاعدة (`public._prisma_migrations`) |
 |---|---|---|
-| عدد الترحيلات | 18 | 18 |
-| آخر ترحيل | `20260917120000_coupon_usage_check` | `20260917120000_coupon_usage_check` (اكتمل 2026-09-16 22:02:16 UTC) |
+| عدد الترحيلات | 19 | 19 |
+| آخر ترحيل | `20260917140000_one_default_address` | `20260917140000_one_default_address` (اكتمل 2026-09-17 13:56:34 UTC) |
 
 كل الترحيلات مطبَّقة والسجل يطابق المجلد.
 
@@ -348,7 +348,7 @@
 
 مأخوذ من `pg_attribute` وقت الالتقاط. 🔑 = مفتاح أساسي. `timestamp(3)` = بلا منطقة زمنية.
 
-### `_prisma_migrations` — 8 عموداً، 18 صف، مجموعة `MIGRATIONS`
+### `_prisma_migrations` — 8 عموداً، 19 صف، مجموعة `MIGRATIONS`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -361,7 +361,7 @@
 | 7 | `started_at` | `timestamp with time zone` | لا | `now()` |
 | 8 | `applied_steps_count` | `integer` | لا | `0` |
 
-### `addresses` — 11 عموداً، 1 صف، مجموعة `CUSTOMERS`
+### `addresses` — 11 عموداً، 2 صف، مجموعة `CUSTOMERS`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -772,6 +772,7 @@ Prisma لا يعبّر عن قيد CHECK في `schema.prisma`؛ هذه كُتب�
 | 16 | `20260917080000_quantity_checks` | 2026-09-16 21:09:25 | 1 | — |
 | 17 | `20260917100000_money_and_rating_checks` | 2026-09-16 21:49:38 | 1 | — |
 | 18 | `20260917120000_coupon_usage_check` | 2026-09-16 22:02:16 | 1 | — |
+| 19 | `20260917140000_one_default_address` | 2026-09-17 13:56:34 | 1 | — |
 
 ## الملحق و — طريقة الالتقاط (لإعادة الجرد لاحقاً)
 
