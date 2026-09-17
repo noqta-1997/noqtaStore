@@ -15,7 +15,7 @@ import {
   toReviewWithStatus,
 } from "@/data/mappers";
 import type { Prisma } from "@/generated/prisma/client";
-import { escapeLike } from "@/lib/arabic";
+import { arabicKey, escapeLike } from "@/lib/arabic";
 import { getCurrentCustomer } from "@/lib/auth";
 import {
   homeVisibility,
@@ -180,6 +180,33 @@ async function searchBookIds(term: string): Promise<string[]> {
   return rows.map((row) => row.id);
 }
 
+/**
+ * The Arabic columns the panel searches by name, per table, and the ids of
+ * the rows a term matches over `arabic_key()` — the same comparison the
+ * catalogue search makes. The table and its columns come from this list,
+ * never from a caller; the term is bound.
+ */
+const arabicSearchColumns = {
+  authors: ['"nameAr"'],
+  publishers: ['"nameAr"'],
+  customers: ["name"],
+  contact_messages: ["name", "subject", "message"],
+} as const;
+
+async function idsMatchingArabic(
+  table: keyof typeof arabicSearchColumns,
+  term: string,
+): Promise<string[]> {
+  const clauses = arabicSearchColumns[table]
+    .map((column) => `arabic_key(${column}) LIKE arabic_key($1) ESCAPE '\\'`)
+    .join(" OR ");
+  const rows = await prisma.$queryRawUnsafe<{ id: string }[]>(
+    `SELECT id FROM ${table} WHERE ${clauses}`,
+    `%${escapeLike(term)}%`,
+  );
+  return rows.map((row) => row.id);
+}
+
 async function bookWhere(query: BookQuery): Promise<Prisma.BookWhereInput> {
   const where: Prisma.BookWhereInput = {};
 
@@ -314,12 +341,12 @@ export async function searchCategoryPicks(
   limit = 8,
 ): Promise<PickOption[]> {
   const { nodes, byId } = await loadCategoryIndex();
-  const needle = term.trim().toLowerCase();
+  const needle = arabicKey(term);
   const excluded = new Set(exclude);
 
   return nodes
     .filter((node) => !excluded.has(node.id))
-    .filter((node) => !needle || node.name.ar.toLowerCase().includes(needle))
+    .filter((node) => !needle || arabicKey(node.name.ar).includes(needle))
     .slice(0, limit)
     .map((node) => ({
       id: node.id,
@@ -454,8 +481,10 @@ export async function searchAuthorPicks(
 ): Promise<PickOption[]> {
   const rows = await prisma.author.findMany({
     where: {
-      id: { notIn: exclude },
-      ...(term ? { nameAr: { contains: term, mode: "insensitive" } } : {}),
+      id: {
+        notIn: exclude,
+        ...(term.trim() ? { in: await idsMatchingArabic("authors", term.trim()) } : {}),
+      },
     },
     include: { _count: { select: { books: true } } },
     orderBy: [{ books: { _count: "desc" } }, { nameAr: "asc" }],
@@ -1540,7 +1569,7 @@ export async function getAdminOrders(query: AdminListQuery = {}) {
     const term = query.q.trim();
     where.OR = [
       { reference: { contains: term, mode: "insensitive" } },
-      { customer: { name: { contains: term, mode: "insensitive" } } },
+      { customerId: { in: await idsMatchingArabic("customers", term) } },
       { customer: { phone: { contains: term } } },
     ];
   }
@@ -1621,7 +1650,7 @@ export async function getCustomers(query: AdminListQuery = {}) {
   if (query.q?.trim()) {
     const term = query.q.trim();
     where.OR = [
-      { name: { contains: term, mode: "insensitive" } },
+      { id: { in: await idsMatchingArabic("customers", term) } },
       { email: { contains: term, mode: "insensitive" } },
       { phone: { contains: term } },
     ];
@@ -1696,8 +1725,8 @@ export async function getAdminReviews(query: AdminListQuery = {}) {
   if (query.q?.trim()) {
     const term = query.q.trim();
     where.OR = [
-      { customer: { name: { contains: term, mode: "insensitive" } } },
-      { book: { titleAr: { contains: term, mode: "insensitive" } } },
+      { customerId: { in: await idsMatchingArabic("customers", term) } },
+      { bookId: { in: await searchBookIds(term) } },
     ];
   }
 
@@ -1738,8 +1767,8 @@ export async function getAdminHandoutReviews(query: AdminListQuery = {}) {
   if (query.q?.trim()) {
     const term = query.q.trim();
     where.OR = [
-      { customer: { name: { contains: term, mode: "insensitive" } } },
-      { handout: { titleAr: { contains: term, mode: "insensitive" } } },
+      { customerId: { in: await idsMatchingArabic("customers", term) } },
+      { handoutId: { in: await searchHandoutIds(term) } },
     ];
   }
 
@@ -1996,8 +2025,10 @@ export async function searchPublisherPicks(
 ): Promise<PickOption[]> {
   const rows = await prisma.publisher.findMany({
     where: {
-      id: { notIn: exclude },
-      ...(term ? { nameAr: { contains: term, mode: "insensitive" } } : {}),
+      id: {
+        notIn: exclude,
+        ...(term.trim() ? { in: await idsMatchingArabic("publishers", term.trim()) } : {}),
+      },
     },
     include: { _count: { select: { books: true, handouts: true } } },
   });
@@ -2111,10 +2142,8 @@ export async function getContactMessages(query: AdminListQuery = {}) {
   if (query.q?.trim()) {
     const term = query.q.trim();
     where.OR = [
-      { name: { contains: term, mode: "insensitive" } },
+      { id: { in: await idsMatchingArabic("contact_messages", term) } },
       { email: { contains: term, mode: "insensitive" } },
-      { subject: { contains: term, mode: "insensitive" } },
-      { message: { contains: term, mode: "insensitive" } },
     ];
   }
 
