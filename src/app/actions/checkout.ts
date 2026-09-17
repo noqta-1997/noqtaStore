@@ -15,6 +15,7 @@ import { COUPON_COOKIE, CouponSpent, evaluateCoupon, spendCoupon } from "@/lib/c
 import { withOrderReference } from "@/lib/order-reference";
 import { prisma } from "@/lib/prisma";
 import { isCheckViolation } from "@/lib/prisma-errors";
+import { revalidateCatalogue, revalidateHandouts } from "@/lib/revalidate";
 import { ShortStock, takeFromShelf } from "@/lib/shelf";
 import { getShippingRules, type ShippingRules } from "@/data";
 
@@ -197,8 +198,17 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
   // A code is spent once; the next order starts without it.
   jar.delete(COUPON_COOKIE);
 
-  revalidatePath("/[locale]/cart", "page");
-  revalidatePath("/[locale]/account/orders", "page");
+  // The cart is empty, the order is on both lists, and the copies have left
+  // the shelf the catalogue pages show — the same pages the panel refreshes
+  // when it cancels an order and puts them back. (These two used to name
+  // `/[locale]/…`, a segment that no longer exists, so nothing was refreshed.)
+  revalidatePath("/cart");
+  revalidatePath("/checkout");
+  revalidatePath("/account/orders");
+  revalidatePath("/admin/orders");
+  revalidatePath("/admin");
+  if (lines.length) revalidateCatalogue();
+  if (handoutLines.length) revalidateHandouts();
 
   return ok(order.reference);
 }

@@ -25,6 +25,7 @@ export async function subscribeNewsletter(
     update: { locale },
   });
 
+  revalidatePath("/admin/messages");
   return ok();
 }
 
@@ -43,6 +44,8 @@ export async function sendContactMessage(
     data: { name, email, subject, message },
   });
 
-  revalidatePath("/[locale]/admin", "page");
+  // The inbox, and the subscriber list beside it. (This named `/[locale]/admin`
+  // until the locale segment went; the panel never heard about a message.)
+  revalidatePath("/admin/messages");
   return ok();
 }

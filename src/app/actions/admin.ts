@@ -55,6 +55,7 @@ import {
   isUniqueViolation,
   logActionError,
 } from "@/lib/prisma-errors";
+import { revalidateCatalogue, revalidateHandouts } from "@/lib/revalidate";
 import { ShortStock, takeFromShelf } from "@/lib/shelf";
 import type {
   BookTag,
@@ -78,37 +79,6 @@ function slugify(value: string, fallback: string) {
     .replace(/^-+|-+$/g, "");
 
   return slug || fallback;
-}
-
-/** Storefront pages are cached, so catalogue writes must invalidate them. */
-function revalidateCatalogue() {
-  revalidatePath("/", "page");
-  revalidatePath("/books", "page");
-  revalidatePath("/books/[slug]", "page");
-  revalidatePath("/categories", "page");
-  revalidatePath("/categories/[slug]", "page");
-  revalidatePath("/authors", "page");
-  revalidatePath("/authors/[slug]", "page");
-  revalidatePath("/publishers", "page");
-  revalidatePath("/publishers/[slug]", "page");
-}
-
-/**
- * The handout pages are cached the same way, and the category, author and
- * publisher pages carry a handouts section under their books — as does the
- * home page, where each featured press shelves its latest handouts.
- */
-function revalidateHandouts() {
-  revalidatePath("/", "page");
-  revalidatePath("/handouts", "page");
-  revalidatePath("/handouts/[slug]", "page");
-  revalidatePath("/handouts/categories", "page");
-  revalidatePath("/handouts/categories/[slug]", "page");
-  revalidatePath("/categories/[slug]", "page");
-  revalidatePath("/authors/[slug]", "page");
-  revalidatePath("/publishers/[slug]", "page");
-  revalidatePath("/admin/handouts", "page");
-  revalidatePath("/admin/handout-reviews", "page");
 }
 
 /**
@@ -245,7 +215,7 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
   await discardCover(replaced);
 
   revalidateCatalogue();
-  revalidatePath("/admin/books", "page");
+  revalidatePath("/admin/books");
   return ok();
 }
 
@@ -262,7 +232,7 @@ export async function deleteBook(bookId: string): Promise<ActionResult> {
   await discardCover(deleted.row.coverUrl);
 
   revalidateCatalogue();
-  revalidatePath("/admin/books", "page");
+  revalidatePath("/admin/books");
   return ok();
 }
 
@@ -461,7 +431,7 @@ export async function saveCategory(formData: FormData): Promise<ActionResult> {
   }
 
   revalidateCatalogue();
-  revalidatePath("/admin/categories", "page");
+  revalidatePath("/admin/categories");
   return ok();
 }
 
@@ -487,7 +457,7 @@ export async function deleteCategory(categoryId: string): Promise<ActionResult> 
   if (!deleted.ok) return deleted;
 
   revalidateCatalogue();
-  revalidatePath("/admin/categories", "page");
+  revalidatePath("/admin/categories");
   return ok();
 }
 
@@ -535,7 +505,7 @@ export async function saveHandoutCategory(formData: FormData): Promise<ActionRes
   }
 
   revalidateHandouts();
-  revalidatePath("/admin/handout-categories", "page");
+  revalidatePath("/admin/handout-categories");
   return ok();
 }
 
@@ -554,7 +524,7 @@ export async function deleteHandoutCategory(categoryId: string): Promise<ActionR
   if (!deleted.ok) return deleted;
 
   revalidateHandouts();
-  revalidatePath("/admin/handout-categories", "page");
+  revalidatePath("/admin/handout-categories");
   return ok();
 }
 
@@ -598,7 +568,7 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
   }
 
   revalidateCatalogue();
-  revalidatePath("/admin/authors", "page");
+  revalidatePath("/admin/authors");
   return ok();
 }
 
@@ -618,7 +588,7 @@ export async function deleteAuthor(authorId: string): Promise<ActionResult> {
   if (!deleted.ok) return deleted;
 
   revalidateCatalogue();
-  revalidatePath("/admin/authors", "page");
+  revalidatePath("/admin/authors");
   return ok();
 }
 
@@ -652,7 +622,7 @@ export async function savePublisher(formData: FormData): Promise<ActionResult> {
   }
 
   revalidateCatalogue();
-  revalidatePath("/admin/publishers", "page");
+  revalidatePath("/admin/publishers");
   return ok();
 }
 
@@ -671,7 +641,7 @@ export async function deletePublisher(publisherId: string): Promise<ActionResult
   if (!deleted.ok) return deleted;
 
   revalidateCatalogue();
-  revalidatePath("/admin/publishers", "page");
+  revalidatePath("/admin/publishers");
   return ok();
 }
 
@@ -765,8 +735,8 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
     revalidateCatalogue();
     revalidateHandouts();
   }
-  revalidatePath("/admin/orders", "page");
-  revalidatePath("/account/orders", "page");
+  revalidatePath("/admin/orders");
+  revalidatePath("/account/orders");
   return ok();
 }
 
@@ -826,8 +796,8 @@ export async function deleteOrder(orderId: string): Promise<ActionResult> {
     revalidateCatalogue();
     revalidateHandouts();
   }
-  revalidatePath("/admin/orders", "page");
-  revalidatePath("/account/orders", "page");
+  revalidatePath("/admin/orders");
+  revalidatePath("/account/orders");
   return ok();
 }
 
@@ -848,7 +818,7 @@ export async function setReviewStatus(
     await refreshBookRating(tx, review.bookId);
   });
 
-  revalidatePath("/admin/reviews", "page");
+  revalidatePath("/admin/reviews");
   revalidateCatalogue();
   return ok();
 }
@@ -870,7 +840,7 @@ export async function toggleCustomerBlock(customerId: string): Promise<ActionRes
     data: { status: customer.status === "active" ? "blocked" : "active" },
   });
 
-  revalidatePath("/admin/customers", "page");
+  revalidatePath("/admin/customers");
   return ok();
 }
 
@@ -923,7 +893,7 @@ export async function saveCoupon(formData: FormData): Promise<ActionResult> {
     return fail("saveFailed");
   }
 
-  revalidatePath("/admin/coupons", "page");
+  revalidatePath("/admin/coupons");
   return ok();
 }
 
@@ -933,7 +903,7 @@ export async function deleteCoupon(couponId: string): Promise<ActionResult> {
   const removed = await prisma.coupon.deleteMany({ where: { id: couponId } });
   if (!removed.count) return fail("notFound");
 
-  revalidatePath("/admin/coupons", "page");
+  revalidatePath("/admin/coupons");
   return ok();
 }
 
@@ -951,7 +921,7 @@ export async function toggleCoupon(couponId: string): Promise<ActionResult> {
     data: { active: !coupon.active },
   });
 
-  revalidatePath("/admin/coupons", "page");
+  revalidatePath("/admin/coupons");
   return ok();
 }
 
@@ -971,7 +941,7 @@ export async function setMessageStatus(
   });
   if (!updated.count) return fail("notFound");
 
-  revalidatePath("/admin/messages", "page");
+  revalidatePath("/admin/messages");
   return ok();
 }
 
@@ -981,7 +951,7 @@ export async function deleteContactMessage(messageId: string): Promise<ActionRes
   const removed = await prisma.contactMessage.deleteMany({ where: { id: messageId } });
   if (!removed.count) return fail("notFound");
 
-  revalidatePath("/admin/messages", "page");
+  revalidatePath("/admin/messages");
   return ok();
 }
 
@@ -991,7 +961,7 @@ export async function removeSubscriber(email: string): Promise<ActionResult> {
   const removed = await prisma.newsletterSubscriber.deleteMany({ where: { email } });
   if (!removed.count) return fail("notFound");
 
-  revalidatePath("/admin/messages", "page");
+  revalidatePath("/admin/messages");
   return ok();
 }
 
@@ -1058,20 +1028,20 @@ export async function saveSettings(formData: FormData): Promise<ActionResult> {
     ),
   );
 
-  revalidatePath("/admin/settings", "page");
+  revalidatePath("/admin/settings");
 
   if (section === "shipping") {
-    revalidatePath("/cart", "page");
-    revalidatePath("/checkout", "page");
+    revalidatePath("/cart");
+    revalidatePath("/checkout");
   }
 
   if (section === "payments") {
-    revalidatePath("/checkout", "page");
+    revalidatePath("/checkout");
   }
 
   if (section === "adminNotifications") {
     // The bell lives in the admin layout, so the page alone is not enough.
-    revalidatePath("/admin", "layout");
+    revalidatePath("/(admin)/admin", "layout");
   }
 
   if (section === "store") {
@@ -1107,9 +1077,9 @@ export async function setHomeSectionVisibility(
     update: { value },
   });
 
-  revalidatePath("/admin/settings", "page");
+  revalidatePath("/admin/settings");
   // The home page is prerendered and otherwise waits out its revalidate window.
-  revalidatePath("/", "page");
+  revalidatePath("/");
 
   return ok();
 }
@@ -1168,10 +1138,10 @@ export async function saveHomeSection(formData: FormData): Promise<ActionResult>
     ),
   );
 
-  revalidatePath("/admin/settings", "page");
-  revalidatePath("/admin/settings/home/[section]", "page");
+  revalidatePath("/admin/settings");
+  revalidatePath("/(admin)/admin/settings/home/[section]", "page");
   // The home page is prerendered and otherwise waits out its revalidate window.
-  revalidatePath("/", "page");
+  revalidatePath("/");
 
   return ok();
 }

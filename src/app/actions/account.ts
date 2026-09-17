@@ -39,7 +39,7 @@ export async function updateProfile(formData: FormData): Promise<ActionResult> {
     },
   });
 
-  revalidatePath("/account", "page");
+  revalidatePath("/account");
   return ok();
 }
 
@@ -71,7 +71,7 @@ export async function saveAddress(formData: FormData): Promise<ActionResult> {
     return fail("saveFailed");
   }
 
-  revalidatePath("/account/addresses", "page");
+  revalidatePath("/account/addresses");
   return ok();
 }
 
@@ -81,7 +81,7 @@ export async function deleteAddress(addressId: string): Promise<ActionResult> {
 
   await prisma.address.deleteMany({ where: { id: addressId, customerId } });
 
-  revalidatePath("/account/addresses", "page");
+  revalidatePath("/account/addresses");
   return ok();
 }
 
@@ -96,7 +96,7 @@ export async function setDefaultAddress(addressId: string): Promise<ActionResult
     return fail("saveFailed");
   }
 
-  revalidatePath("/account/addresses", "page");
+  revalidatePath("/account/addresses");
   return ok();
 }
 
@@ -116,7 +116,7 @@ export async function deleteOwnReview(reviewId: string): Promise<ActionResult> {
     await refreshBookRating(tx, review.bookId);
   });
 
-  revalidatePath("/account/reviews", "page");
+  revalidatePath("/account/reviews");
   return ok();
 }
 
@@ -133,7 +133,7 @@ export async function savePreferences(formData: FormData): Promise<ActionResult>
     },
   });
 
-  revalidatePath("/account", "page");
+  revalidatePath("/account");
   return ok();
 }
 
@@ -166,8 +166,8 @@ export async function submitReview(formData: FormData): Promise<ActionResult> {
     data: { bookId, customerId, rating, title, body },
   });
 
-  revalidatePath("/account/reviews", "page");
-  revalidatePath("/admin/reviews", "page");
+  revalidatePath("/account/reviews");
+  revalidatePath("/admin/reviews");
   return ok();
 }
 
