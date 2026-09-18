@@ -2,11 +2,11 @@
 
 > **الغرض:** لقطة وصفية لقاعدة بيانات Supabase الخاصة بالمشروع كما هي فعلياً في لحظة الالتقاط: المخططات، الجداول، عدد الأعمدة والصفوف، المجموعات المنطقية، والمفاتيح الأجنبية. هذا الملف **جرد فقط**: لا يحتوي تحليل أمان أو أداء ولا توصيات؛ تلك موضوع الملفات التالية في `docs/db-audit/`.
 >
-> **تاريخ الالتقاط:** 2026-09-17 21:51:13 UTC (18/09/2026, 00:51:13 بتوقيت بغداد)  
+> **تاريخ الالتقاط:** 2026-09-18 07:17:44 UTC (18/09/2026, 10:17:44 بتوقيت بغداد)  
 > **المشروع:** Supabase `aws-0-eu-central-1.pooler.supabase.com` — قاعدة `postgres`، الدور `postgres`، عبر مجمّع الجلسات (منفذ 5432، أي `DIRECT_URL` في `.env.local`)  
 > **الخادم:** PostgreSQL 17.6 on x86_64-pc-linux-gnu  
 > **حجم القاعدة الكلي:** 20 MB  
-> **حالة المستودع وقت الالتقاط:** الالتزام `ff36c3d` (في الشجرة 10 ملف غير ملتزم).  
+> **حالة المستودع وقت الالتقاط:** الالتزام `63622bd` (في الشجرة 2 ملف غير ملتزم).  
 > **مولَّد بـ** `npm run db:inventory` (`scripts/db-audit-inventory.ts`) — أعد تشغيله لتحديث هذا الملف.
 
 ## كيف تقرأ هذا الملف
@@ -29,9 +29,10 @@
 | جداول منصّة Supabase (`auth` + `storage` + `realtime` + `vault`) | 39 |
 | مفاتيح أجنبية | 58 (`public` 29، `auth` 24، `storage` 5) |
 | قيود CHECK | 75 (`public` 23) |
+| جداول `public` مكشوفة عبر REST لدور `anon`/`authenticated` | 0 |
 | أنواع معدودة (enums) | 21 (`public` 9) |
 | إضافات (extensions) | 5 |
-| إجمالي الصفوف في كل الجداول | 877 |
+| إجمالي الصفوف في كل الجداول | 891 |
 | إجمالي صفوف جداول التطبيق (`public` بدون سجل الترحيل) | 157 |
 
 لا فرق بين القاعدة والمستودع، ولا ترحيلات معلّقة.
@@ -60,7 +61,7 @@
 
 | # | الجدول | المجموعة | أعمدة | صفوف | تقدير | الحجم | ملاحظة |
 |--:|---|---|--:|--:|--:|--:|---|
-| 1 | `_prisma_migrations` | `MIGRATIONS` | 8 | 22 | 22 | 32 kB | سجل ترحيلات Prisma |
+| 1 | `_prisma_migrations` | `MIGRATIONS` | 8 | 23 | 23 | 32 kB | سجل ترحيلات Prisma |
 | 2 | `addresses` | `CUSTOMERS` | 11 | 6 | 6 | 64 kB |  |
 | 3 | `authors` | `CATALOG` | 8 | 26 | 26 | 128 kB |  |
 | 4 | `books` | `CATALOG` | 19 | 25 | 25 | 184 kB |  |
@@ -84,6 +85,8 @@
 | 22 | `store_settings` | `SETTINGS` | 3 | 11 | 11 | 64 kB |  |
 | 23 | `wishlist_items` | `CART_WISHLIST` | 3 | 0 | 0 | 40 kB |  |
 
+RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لدور `anon` أو `authenticated` على أيّ منها: واجهة Supabase REST لا تصل إلى هذه الجداول (منذ الترحيل `20260918110000_lock_public_api`). كل جدول جديد يحتاج `ENABLE ROW LEVEL SECURITY` في ترحيله، وإلا سُمّي هنا.
+
 ### 3.2 `auth` — Supabase Auth (27)
 
 جداول GoTrue القياسية؛ يديرها Supabase ولا يلمسها التطبيق مباشرة (يقرأها عبر `@supabase/ssr`). المستخدمون الحاليون: 2، هوياتهم: `google` (2) (`auth.identities`).
@@ -95,7 +98,7 @@
 | 3 | `flow_state` | `AUTH_CORE` | 17 | 6 | 6 | 112 kB |  |
 | 4 | `identities` | `AUTH_CORE` | 9 | 2 | 2 | 80 kB |  |
 | 5 | `instances` | `AUTH_CORE` | 5 | 0 | 0 | 16 kB |  |
-| 6 | `mfa_amr_claims` | `AUTH_CORE` | 5 | 147 | 147 | 88 kB |  |
+| 6 | `mfa_amr_claims` | `AUTH_CORE` | 5 | 151 | 151 | 88 kB |  |
 | 7 | `mfa_challenges` | `AUTH_MFA` | 7 | 0 | 0 | 24 kB |  |
 | 8 | `mfa_factors` | `AUTH_MFA` | 13 | 0 | 0 | 56 kB |  |
 | 9 | `mfa_recovery_code_sets` | `AUTH_MFA` | 7 | 0 | 0 | 24 kB |  |
@@ -105,13 +108,13 @@
 | 13 | `oauth_clients` | `AUTH_OAUTH` | 13 | 0 | 0 | 24 kB |  |
 | 14 | `oauth_consents` | `AUTH_OAUTH` | 6 | 0 | 0 | 48 kB |  |
 | 15 | `one_time_tokens` | `AUTH_CORE` | 8 | 0 | 0 | 128 kB |  |
-| 16 | `refresh_tokens` | `AUTH_CORE` | 9 | 160 | 160 | 168 kB |  |
+| 16 | `refresh_tokens` | `AUTH_CORE` | 9 | 164 | 164 | 176 kB |  |
 | 17 | `saml_providers` | `AUTH_SSO` | 9 | 0 | 0 | 32 kB |  |
 | 18 | `saml_relay_states` | `AUTH_SSO` | 8 | 0 | 0 | 40 kB |  |
 | 19 | `schema_migrations` | `MIGRATIONS` | 1 | 82 | 82 | 24 kB |  |
 | 20 | `scim_tokens` | `AUTH_SSO` | 8 | 0 | 0 | 48 kB |  |
 | 21 | `scim_users` | `AUTH_SSO` | 10 | 0 | 0 | 88 kB |  |
-| 22 | `sessions` | `AUTH_CORE` | 15 | 147 | 147 | 128 kB |  |
+| 22 | `sessions` | `AUTH_CORE` | 15 | 151 | 151 | 128 kB |  |
 | 23 | `sso_domains` | `AUTH_SSO` | 5 | 0 | 0 | 32 kB |  |
 | 24 | `sso_providers` | `AUTH_SSO` | 5 | 0 | 0 | 32 kB |  |
 | 25 | `users` | `AUTH_CORE` | 35 | 2 | 2 | 256 kB |  |
@@ -140,7 +143,7 @@
 | # | الجدول | المجموعة | أعمدة | صفوف | تقدير | الحجم | ملاحظة |
 |--:|---|---|--:|--:|--:|--:|---|
 | 1 | `messages` | `REALTIME` | 10 | 0 | 0 | 0 bytes | مقسَّم (partitioned) |
-| 2 | `schema_migrations` | `MIGRATIONS` | 2 | 82 | 82 | 24 kB |  |
+| 2 | `schema_migrations` | `MIGRATIONS` | 2 | 83 | 83 | 24 kB |  |
 | 3 | `subscription` | `REALTIME` | 9 | 0 | 0 | 32 kB |  |
 
 ### 3.5 `vault` — Supabase Vault (2)
@@ -180,14 +183,14 @@
 | `CART_WISHLIST` | السلة والمفضلة | `public` | `cart_items`، `handout_cart_items`، `wishlist_items`، `handout_wishlist_items` | 4 | 0 |
 | `MARKETING` | التسويق والتواصل | `public` | `coupons`، `newsletter_subscribers`، `contact_messages` | 3 | 2 |
 | `SETTINGS` | الإعدادات | `public` | `store_settings` | 1 | 11 |
-| `AUTH_CORE` | الهوية والجلسات | `auth` | `users`، `identities`، `sessions`، `refresh_tokens`، `mfa_amr_claims`، `one_time_tokens`، `flow_state`، `audit_log_entries`، `instances` | 9 | 464 |
+| `AUTH_CORE` | الهوية والجلسات | `auth` | `users`، `identities`، `sessions`، `refresh_tokens`، `mfa_amr_claims`، `one_time_tokens`، `flow_state`، `audit_log_entries`، `instances` | 9 | 476 |
 | `AUTH_MFA` | التحقق متعدد العوامل | `auth` | `mfa_factors`، `mfa_challenges`، `mfa_recovery_code_sets`، `mfa_recovery_codes`، `webauthn_challenges`، `webauthn_credentials` | 6 | 0 |
 | `AUTH_OAUTH` | خادم OAuth ومزوّدوه | `auth` | `oauth_clients`، `oauth_authorizations`، `oauth_consents`، `oauth_client_states`، `custom_oauth_providers` | 5 | 0 |
 | `AUTH_SSO` | SSO / SAML / SCIM | `auth` | `sso_providers`، `sso_domains`، `saml_providers`، `saml_relay_states`، `scim_tokens`، `scim_users` | 6 | 0 |
 | `STORAGE` | تخزين الملفات | `storage` | `buckets`، `buckets_analytics`، `buckets_vectors`، `objects`، `s3_multipart_uploads`، `s3_multipart_uploads_parts`، `vector_indexes` | 7 | 2 |
 | `REALTIME` | البث اللحظي | `realtime` | `messages`، `subscription` | 2 | 0 |
 | `VAULT` | الأسرار | `vault` | `secrets` | 1 | 0 |
-| `MIGRATIONS` | سجلات الترحيل | متعدد | `auth.schema_migrations`، `public._prisma_migrations`، `realtime.schema_migrations`، `storage.migrations` | 4 | 254 |
+| `MIGRATIONS` | سجلات الترحيل | متعدد | `auth.schema_migrations`، `public._prisma_migrations`، `realtime.schema_migrations`، `storage.migrations` | 4 | 256 |
 | `STATS_VIEWS` | views الإحصاء | `extensions` | `pg_stat_statements`، `pg_stat_statements_info` | 2 views | — |
 
 المجموع: 62 جدولاً = كل جداول القاعدة (62). `AUTH` وحدها اسم جامع للمجموعات الأربع `AUTH_*` (26 جدولاً)؛ و`APP` اسم جامع لمجموعات `public` السبع (22 جدولاً بدون سجل الترحيل).
@@ -234,7 +237,7 @@
 بنية Supabase الافتراضية، غير مستخدمة من التطبيق، وفارغة.
 
 #### `MIGRATIONS` — سجلات الترحيل
-أربعة دفاتر مستقلة: `public._prisma_migrations` (22 صفاً — يخصّ التطبيق، الملحق هـ)، و`auth.schema_migrations` (82)، `realtime.schema_migrations` (82)، `storage.migrations` (68) تخصّ خدمات Supabase.
+أربعة دفاتر مستقلة: `public._prisma_migrations` (23 صفاً — يخصّ التطبيق، الملحق هـ)، و`auth.schema_migrations` (82)، `realtime.schema_migrations` (83)، `storage.migrations` (68) تخصّ خدمات Supabase.
 
 ## 5. المفاتيح الأجنبية (كما هي في القاعدة الآن)
 
@@ -330,8 +333,8 @@
 
 | | المستودع (`prisma/migrations/`) | القاعدة (`public._prisma_migrations`) |
 |---|---|---|
-| عدد الترحيلات | 22 | 22 |
-| آخر ترحيل | `20260918090000_order_coupon_code` | `20260918090000_order_coupon_code` (اكتمل 2026-09-17 21:45:33 UTC) |
+| عدد الترحيلات | 23 | 23 |
+| آخر ترحيل | `20260918110000_lock_public_api` | `20260918110000_lock_public_api` (اكتمل 2026-09-18 07:14:54 UTC) |
 
 كل الترحيلات مطبَّقة والسجل يطابق المجلد.
 
@@ -348,7 +351,7 @@
 
 مأخوذ من `pg_attribute` وقت الالتقاط. 🔑 = مفتاح أساسي. `timestamp(3)` = بلا منطقة زمنية.
 
-### `_prisma_migrations` — 8 عموداً، 22 صف، مجموعة `MIGRATIONS`
+### `_prisma_migrations` — 8 عموداً، 23 صف، مجموعة `MIGRATIONS`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -845,6 +848,7 @@ Prisma لا يعبّر عن قيد CHECK في `schema.prisma`؛ هذه كُتب�
 | 20 | `20260917150000_foreign_key_indexes` | 2026-09-17 15:15:54 | 1 | — |
 | 21 | `20260917160000_normalized_name_keys` | 2026-09-17 20:40:09 | 1 | — |
 | 22 | `20260918090000_order_coupon_code` | 2026-09-17 21:45:33 | 1 | — |
+| 23 | `20260918110000_lock_public_api` | 2026-09-18 07:14:54 | 1 | — |
 
 ## الملحق و — طريقة الالتقاط (لإعادة الجرد لاحقاً)
 

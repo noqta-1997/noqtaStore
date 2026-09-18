@@ -105,6 +105,10 @@ type RelationRow = {
   n_live_tup: string | null;
   total_size: string;
   can_select: boolean;
+  /** Row level security on (tables only). */
+  rls: boolean;
+  /** The API roles Supabase hands to browsers hold some privilege on it. */
+  api_open: boolean;
   exact_rows: number | null;
   count_note?: string;
 };
@@ -195,7 +199,10 @@ async function capture(): Promise<Capture> {
              c.reltuples::bigint as reltuples,
              s.n_live_tup as n_live_tup,
              pg_size_pretty(pg_total_relation_size(c.oid)) as total_size,
-             has_table_privilege(c.oid, 'SELECT') as can_select
+             has_table_privilege(c.oid, 'SELECT') as can_select,
+             c.relrowsecurity as rls,
+             (has_table_privilege('anon', c.oid, 'SELECT, INSERT, UPDATE, DELETE')
+              or has_table_privilege('authenticated', c.oid, 'SELECT, INSERT, UPDATE, DELETE')) as api_open
       from pg_class c
       join pg_namespace n on n.oid = c.relnamespace
       left join pg_stat_all_tables s on s.relid = c.oid
@@ -501,6 +508,7 @@ function render(inv: Capture, schema: PrismaSchema, folders: string[]): string {
   p(`| جداول منصّة Supabase (§auth§ + §storage§ + §realtime§ + §vault§) | ${tables.length - bySchema("public").filter(isTable).length} |`);
   p(`| مفاتيح أجنبية | ${inv.foreignKeys.length} (${["public", "auth", "storage"].map((s) => `§${s}§ ${inv.foreignKeys.filter((f) => f.schema === s).length}`).join("، ")}) |`);
   p(`| قيود CHECK | ${inv.checks.length} (§public§ ${inv.checks.filter((c) => c.schema === "public").length}) |`);
+  p(`| جداول §public§ مكشوفة عبر REST لدور §anon§/§authenticated§ | ${bySchema("public").filter((r) => (r.kind === "r" || r.kind === "p") && (!r.rls || r.api_open)).length} |`);
   p(`| أنواع معدودة (enums) | ${inv.enums.length} (§public§ ${publicEnums.length}) |`);
   p(`| إضافات (extensions) | ${inv.extensions.length} |`);
   p(`| إجمالي الصفوف في كل الجداول | ${num(rows(tables))} |`);
@@ -566,6 +574,19 @@ function render(inv: Capture, schema: PrismaSchema, folders: string[]): string {
   p(`كلها من إنشاء Prisma Migrate. المفاتيح الأساسية نصّية (§cuid§) إلا ما ذُكر في الملحق ب. تعريف الأعمدة الكامل في الملحق أ.`);
   p();
   relationTable(bySchema("public"));
+
+  // Supabase publishes `public` over PostgREST to the anon and authenticated
+  // roles; a table is closed to them only with row level security on and no
+  // privilege granted. Since migration 20260918110000_lock_public_api every
+  // table is; one created later has to enable it itself, so it is named here.
+  const apiTables = bySchema("public").filter((r) => r.kind === "r" || r.kind === "p");
+  const exposed = apiTables.filter((r) => !r.rls || r.api_open);
+  p(
+    exposed.length
+      ? `**مكشوف عبر واجهة Supabase (REST) لدور §anon§/§authenticated§:** ${exposed.map((r) => `§${r.name}§ (${[!r.rls ? "بلا RLS" : "", r.api_open ? "بصلاحيات" : ""].filter(Boolean).join("، ")})`).join("، ")}. كل جدول جديد يحتاج §ENABLE ROW LEVEL SECURITY§ في ترحيله.`
+      : `RLS مفعّل على الجداول الـ${apiTables.length} كلها ولا صلاحية لدور §anon§ أو §authenticated§ على أيّ منها: واجهة Supabase REST لا تصل إلى هذه الجداول (منذ الترحيل §20260918110000_lock_public_api§). كل جدول جديد يحتاج §ENABLE ROW LEVEL SECURITY§ في ترحيله، وإلا سُمّي هنا.`,
+  );
+  p();
 
   const users = table("auth", "users")?.exact_rows ?? 0;
   p(`### 3.2 §auth§ — Supabase Auth (${bySchema("auth").length})`);
