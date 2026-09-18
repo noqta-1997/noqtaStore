@@ -67,6 +67,9 @@ export function ActionForm({
     const message = errorMessages?.[result.error] ?? fallbackError;
     setError(message);
     toast({ title: message, tone: "error" });
+
+    // The row this form edits was removed meanwhile; show the page as it is.
+    if (result.error === "notFound") router.refresh();
   };
 
   return (

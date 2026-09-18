@@ -86,6 +86,10 @@ export function ConfirmDialog({
       title: errorMessages?.[result.error] ?? fallbackError ?? labels.title,
       tone: "error",
     });
+
+    // The row was gone before the click — another tab removed it. The list
+    // still shows it until it is drawn again, so draw it again now.
+    if (result.error === "notFound") router.refresh();
   };
 
   return (

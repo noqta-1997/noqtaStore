@@ -41,6 +41,8 @@ export function BlockCustomerButton({
         title: result.error === "selfBlock" ? selfBlockMessage : failureMessage,
         tone: "error",
       });
+      // The customer was removed meanwhile; the table still lists them.
+      if (result.error === "notFound") router.refresh();
       return;
     }
 
