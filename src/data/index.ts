@@ -104,6 +104,17 @@ async function optionalCustomerId(): Promise<string | null> {
 
 const bookInclude = { author: true, category: true, publisher: true } as const;
 
+/**
+ * The storefront's view of the books table: every title the panel has not
+ * archived. Each read a customer can reach filters on it, counts included;
+ * the panel's own table, order history and the sales reports do not, since
+ * an archived title is still one the shop has sold.
+ */
+const onShelf = { archivedAt: null } satisfies Prisma.BookWhereInput;
+
+/** The handouts' `onShelf`: what the panel has not archived. */
+const handoutOnShelf = { archivedAt: null } satisfies Prisma.HandoutWhereInput;
+
 export type SortKey =
   | "relevance"
   | "newest"
@@ -208,7 +219,7 @@ async function idsMatchingArabic(
 }
 
 async function bookWhere(query: BookQuery): Promise<Prisma.BookWhereInput> {
-  const where: Prisma.BookWhereInput = {};
+  const where: Prisma.BookWhereInput = { ...onShelf };
 
   if (query.q?.trim()) {
     where.id = { in: await searchBookIds(query.q.trim()) };
@@ -255,6 +266,7 @@ export async function queryBooks(query: BookQuery = {}): Promise<BookQueryResult
 
 export async function getPriceBounds() {
   const result = await prisma.book.aggregate({
+    where: onShelf,
     _min: { price: true },
     _max: { price: true },
   });
@@ -275,7 +287,7 @@ export async function getPriceBounds() {
 const loadCategoryTree = cache(async (): Promise<CategoryNode[]> => {
   const rows = await prisma.category.findMany({
     orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    include: { _count: { select: { books: true } } },
+    include: { _count: { select: { books: { where: onShelf } } } },
   });
 
   return rollUp(buildTree(rows.map(toCategoryWithCount)), "booksCount");
@@ -378,7 +390,7 @@ export async function getCategoryIds() {
 const loadHandoutCategoryTree = cache(async (): Promise<HandoutCategoryNode[]> => {
   const rows = await prisma.handoutCategory.findMany({
     orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    include: { _count: { select: { handouts: true } } },
+    include: { _count: { select: { handouts: { where: handoutOnShelf } } } },
   });
 
   return rollUp(buildTree(rows.map(toHandoutCategoryWithCount)), "handoutsCount");
@@ -431,7 +443,7 @@ export async function getHandoutCategoryById(
 
 /** Both counts, and the branch the teacher's subject points at. */
 const authorInclude = {
-  _count: { select: { books: true, handouts: true } },
+  _count: { select: { books: { where: onShelf }, handouts: { where: handoutOnShelf } } },
   subject: true,
 } as const;
 
@@ -497,7 +509,7 @@ export async function searchAuthorPicks(
         ...(term.trim() ? { in: await idsMatchingArabic("authors", term.trim()) } : {}),
       },
     },
-    include: { _count: { select: { books: true } } },
+    include: { _count: { select: { books: { where: onShelf } } } },
     orderBy: [{ books: { _count: "desc" } }, { nameAr: "asc" }],
     take: limit,
   });
@@ -536,6 +548,7 @@ export async function getAuthorIds() {
 
 export async function getBooks(limit?: number): Promise<BookWithRelations[]> {
   const rows = await prisma.book.findMany({
+    where: onShelf,
     include: bookInclude,
     orderBy: { createdAt: "desc" },
     ...(typeof limit === "number" ? { take: limit } : {}),
@@ -549,7 +562,7 @@ export async function getBooksByTag(
   limit?: number,
 ): Promise<BookWithRelations[]> {
   const rows = await prisma.book.findMany({
-    where: { tags: { has: tag } },
+    where: { ...onShelf, tags: { has: tag } },
     include: bookInclude,
     orderBy: { reviewsCount: "desc" },
     ...(typeof limit === "number" ? { take: limit } : {}),
@@ -560,6 +573,7 @@ export async function getBooksByTag(
 
 export async function getNewArrivals(limit = 8): Promise<BookWithRelations[]> {
   const rows = await prisma.book.findMany({
+    where: onShelf,
     include: bookInclude,
     orderBy: { createdAt: "desc" },
     take: limit,
@@ -570,7 +584,7 @@ export async function getNewArrivals(limit = 8): Promise<BookWithRelations[]> {
 
 export async function getBestsellers(limit = 10): Promise<BookWithRelations[]> {
   const rows = await prisma.book.findMany({
-    where: { tags: { has: "bestseller" } },
+    where: { ...onShelf, tags: { has: "bestseller" } },
     include: bookInclude,
     orderBy: { reviewsCount: "desc" },
     take: limit,
@@ -587,6 +601,7 @@ export async function getBestsellers(limit = 10): Promise<BookWithRelations[]> {
  */
 export async function getShowcaseBooks(limit = 12): Promise<BookWithRelations[]> {
   const rows = await prisma.book.findMany({
+    where: onShelf,
     include: bookInclude,
     orderBy: [{ coverUrl: { sort: "desc", nulls: "last" } }, { reviewsCount: "desc" }],
     take: limit,
@@ -604,7 +619,7 @@ export async function getHeroFeaturedBook(
 ): Promise<BookWithRelations | undefined> {
   if (content.featuredBookId) {
     const picked = await getBookById(content.featuredBookId);
-    if (picked) return picked;
+    if (picked && !picked.archived) return picked;
   }
 
   const [tagged] = await getBooksByTag("featured", 1);
@@ -642,7 +657,7 @@ export async function getShelfBooks(
 
 export async function getDiscountedBooks(limit?: number): Promise<BookWithRelations[]> {
   const rows = await prisma.book.findMany({
-    where: { compareAtPrice: { not: null } },
+    where: { ...onShelf, compareAtPrice: { not: null } },
     include: bookInclude,
     orderBy: { createdAt: "desc" },
     ...(typeof limit === "number" ? { take: limit } : {}),
@@ -654,7 +669,7 @@ export async function getDiscountedBooks(limit?: number): Promise<BookWithRelati
 export async function getBookBySlug(
   slug: string,
 ): Promise<BookWithRelations | undefined> {
-  const row = await prisma.book.findUnique({ where: { slug }, include: bookInclude });
+  const row = await prisma.book.findUnique({ where: { slug, ...onShelf }, include: bookInclude });
   return row ? toBook(row) : undefined;
 }
 
@@ -672,7 +687,7 @@ export async function getBooksByIds(ids: string[]): Promise<BookWithRelations[]>
   if (!ids.length) return [];
 
   const rows = await prisma.book.findMany({
-    where: { id: { in: ids } },
+    where: { ...onShelf, id: { in: ids } },
     include: bookInclude,
   });
   const byId = new Map(rows.map((row) => [row.id, toBook(row)]));
@@ -711,7 +726,7 @@ export async function searchBookPicks(
 }
 
 export async function getBookSlugs(): Promise<string[]> {
-  const rows = await prisma.book.findMany({ select: { slug: true } });
+  const rows = await prisma.book.findMany({ where: onShelf, select: { slug: true } });
   return rows.map((row) => row.slug);
 }
 
@@ -725,7 +740,7 @@ export async function getRelatedBooks(
   limit = 5,
 ): Promise<BookWithRelations[]> {
   const rows = await prisma.book.findMany({
-    where: { categoryId: book.categoryId, id: { not: book.id } },
+    where: { ...onShelf, categoryId: book.categoryId, id: { not: book.id } },
     include: bookInclude,
     orderBy: { reviewsCount: "desc" },
     take: limit,
@@ -790,7 +805,7 @@ async function searchHandoutIds(term: string): Promise<string[]> {
 }
 
 async function handoutWhere(query: HandoutQuery): Promise<Prisma.HandoutWhereInput> {
-  const where: Prisma.HandoutWhereInput = {};
+  const where: Prisma.HandoutWhereInput = { ...handoutOnShelf };
 
   if (query.q?.trim()) {
     where.id = { in: await searchHandoutIds(query.q.trim()) };
@@ -839,6 +854,7 @@ export async function queryHandouts(query: HandoutQuery = {}): Promise<HandoutQu
 
 export async function getHandoutPriceBounds() {
   const result = await prisma.handout.aggregate({
+    where: handoutOnShelf,
     _min: { price: true },
     _max: { price: true },
   });
@@ -849,7 +865,10 @@ export async function getHandoutPriceBounds() {
 export async function getHandoutBySlug(
   slug: string,
 ): Promise<HandoutWithRelations | undefined> {
-  const row = await prisma.handout.findUnique({ where: { slug }, include: handoutInclude });
+  const row = await prisma.handout.findUnique({
+    where: { slug, ...handoutOnShelf },
+    include: handoutInclude,
+  });
   return row ? toHandout(row) : undefined;
 }
 
@@ -859,7 +878,7 @@ export async function getHandoutById(id: string): Promise<HandoutWithRelations |
 }
 
 export async function getHandoutSlugs(): Promise<string[]> {
-  const rows = await prisma.handout.findMany({ select: { slug: true } });
+  const rows = await prisma.handout.findMany({ where: handoutOnShelf, select: { slug: true } });
   return rows.map((row) => row.slug);
 }
 
@@ -868,7 +887,7 @@ export async function getRelatedHandouts(
   limit = 5,
 ): Promise<HandoutWithRelations[]> {
   const rows = await prisma.handout.findMany({
-    where: { categoryId: handout.categoryId, id: { not: handout.id } },
+    where: { ...handoutOnShelf, categoryId: handout.categoryId, id: { not: handout.id } },
     include: handoutInclude,
     orderBy: { reviewsCount: "desc" },
     take: limit,
@@ -886,7 +905,7 @@ export async function getHandoutsByAuthor(
   authorSlug: string,
 ): Promise<HandoutWithRelations[]> {
   const rows = await prisma.handout.findMany({
-    where: { author: { slug: authorSlug } },
+    where: { ...handoutOnShelf, author: { slug: authorSlug } },
     include: handoutInclude,
     orderBy: handoutOrderByForSort.popular,
   });
@@ -898,7 +917,7 @@ export async function getHandoutsByPublisher(
   publisherSlug: string,
 ): Promise<HandoutWithRelations[]> {
   const rows = await prisma.handout.findMany({
-    where: { publisher: { slug: publisherSlug } },
+    where: { ...handoutOnShelf, publisher: { slug: publisherSlug } },
     include: handoutInclude,
     orderBy: handoutOrderByForSort.newest,
   });
@@ -972,7 +991,7 @@ export async function getCart(): Promise<CartLineWithBook[]> {
   if (!customerId) return [];
 
   const rows = await prisma.cartItem.findMany({
-    where: { customerId },
+    where: { customerId, book: onShelf },
     include: { book: { include: bookInclude } },
   });
 
@@ -993,7 +1012,7 @@ export async function getHandoutCart(): Promise<CartLineWithHandout[]> {
   if (!customerId) return [];
 
   const rows = await prisma.handoutCartItem.findMany({
-    where: { customerId },
+    where: { customerId, handout: handoutOnShelf },
     include: { handout: { include: handoutInclude } },
   });
 
@@ -1043,7 +1062,7 @@ export async function getWishlist(): Promise<BookWithRelations[]> {
   if (!customerId) return [];
 
   const rows = await prisma.wishlistItem.findMany({
-    where: { customerId },
+    where: { customerId, book: onShelf },
     include: { book: { include: bookInclude } },
     orderBy: { createdAt: "desc" },
   });
@@ -1056,7 +1075,7 @@ export async function getHandoutWishlist(): Promise<HandoutWithRelations[]> {
   if (!customerId) return [];
 
   const rows = await prisma.handoutWishlistItem.findMany({
-    where: { customerId },
+    where: { customerId, handout: handoutOnShelf },
     include: { handout: { include: handoutInclude } },
     orderBy: { createdAt: "desc" },
   });
@@ -1487,7 +1506,7 @@ export async function getAdminStats() {
         },
       }),
       prisma.customer.count(),
-      prisma.book.count(),
+      prisma.book.count({ where: onShelf }),
       prisma.customer.count({ where: { createdAt: { lt: monthStart } } }),
     ]);
 
@@ -1513,6 +1532,7 @@ export async function getAdminStats() {
 
 export async function getLowStockBooks(limit = 5): Promise<BookWithRelations[]> {
   const rows = await prisma.book.findMany({
+    where: onShelf,
     include: bookInclude,
     orderBy: { stock: "asc" },
     take: limit,
@@ -1813,7 +1833,8 @@ export async function getHandoutReviewCounts() {
   };
 }
 
-export type StockFilter = "all" | "inStock" | "low" | "out";
+/** The book table's tabs: stock levels of what is on sale, then the archive. */
+export type StockFilter = "all" | "inStock" | "low" | "out" | "archived";
 
 /** Catalogue listing for the admin table — searchable and stock-aware. */
 export async function getAdminBooks(
@@ -1821,7 +1842,8 @@ export async function getAdminBooks(
 ) {
   const where: Prisma.BookWhereInput = await bookWhere({ q: query.q });
 
-  if (query.stock === "inStock") where.stock = { gt: LOW_STOCK_THRESHOLD };
+  if (query.stock === "archived") where.archivedAt = { not: null };
+  else if (query.stock === "inStock") where.stock = { gt: LOW_STOCK_THRESHOLD };
   else if (query.stock === "low") where.stock = { gt: 0, lte: LOW_STOCK_THRESHOLD };
   else if (query.stock === "out") where.stock = 0;
 
@@ -1840,14 +1862,15 @@ export async function getAdminBooks(
 }
 
 export async function getStockCounts() {
-  const [all, inStock, low, out] = await Promise.all([
-    prisma.book.count(),
-    prisma.book.count({ where: { stock: { gt: LOW_STOCK_THRESHOLD } } }),
-    prisma.book.count({ where: { stock: { gt: 0, lte: LOW_STOCK_THRESHOLD } } }),
-    prisma.book.count({ where: { stock: 0 } }),
+  const [all, inStock, low, out, archived] = await Promise.all([
+    prisma.book.count({ where: onShelf }),
+    prisma.book.count({ where: { ...onShelf, stock: { gt: LOW_STOCK_THRESHOLD } } }),
+    prisma.book.count({ where: { ...onShelf, stock: { gt: 0, lte: LOW_STOCK_THRESHOLD } } }),
+    prisma.book.count({ where: { ...onShelf, stock: 0 } }),
+    prisma.book.count({ where: { archivedAt: { not: null } } }),
   ]);
 
-  return { all, inStock, low, out };
+  return { all, inStock, low, out, archived };
 }
 
 /** Handout listing for the admin table — searchable and stock-aware. */
@@ -1856,7 +1879,8 @@ export async function getAdminHandouts(
 ) {
   const where: Prisma.HandoutWhereInput = await handoutWhere({ q: query.q });
 
-  if (query.stock === "inStock") where.stock = { gt: LOW_STOCK_THRESHOLD };
+  if (query.stock === "archived") where.archivedAt = { not: null };
+  else if (query.stock === "inStock") where.stock = { gt: LOW_STOCK_THRESHOLD };
   else if (query.stock === "low") where.stock = { gt: 0, lte: LOW_STOCK_THRESHOLD };
   else if (query.stock === "out") where.stock = 0;
 
@@ -1875,14 +1899,15 @@ export async function getAdminHandouts(
 }
 
 export async function getHandoutStockCounts() {
-  const [all, inStock, low, out] = await Promise.all([
-    prisma.handout.count(),
-    prisma.handout.count({ where: { stock: { gt: LOW_STOCK_THRESHOLD } } }),
-    prisma.handout.count({ where: { stock: { gt: 0, lte: LOW_STOCK_THRESHOLD } } }),
-    prisma.handout.count({ where: { stock: 0 } }),
+  const [all, inStock, low, out, archived] = await Promise.all([
+    prisma.handout.count({ where: handoutOnShelf }),
+    prisma.handout.count({ where: { ...handoutOnShelf, stock: { gt: LOW_STOCK_THRESHOLD } } }),
+    prisma.handout.count({ where: { ...handoutOnShelf, stock: { gt: 0, lte: LOW_STOCK_THRESHOLD } } }),
+    prisma.handout.count({ where: { ...handoutOnShelf, stock: 0 } }),
+    prisma.handout.count({ where: { archivedAt: { not: null } } }),
   ]);
 
-  return { all, inStock, low, out };
+  return { all, inStock, low, out, archived };
 }
 
 /* ------------------------------------------------------------------ */
@@ -1891,7 +1916,7 @@ export async function getHandoutStockCounts() {
 
 /** Both counts: the panel's table shows them side by side. */
 const publisherInclude = {
-  _count: { select: { books: true, handouts: true } },
+  _count: { select: { books: { where: onShelf }, handouts: { where: handoutOnShelf } } },
 } as const;
 
 export async function getPublishers(): Promise<Publisher[]> {
@@ -1925,7 +1950,7 @@ export async function getBooksByPublisher(
   publisherId: string,
 ): Promise<BookWithRelations[]> {
   const rows = await prisma.book.findMany({
-    where: { publisherId },
+    where: { ...onShelf, publisherId },
     include: bookInclude,
     orderBy: { createdAt: "desc" },
   });
@@ -1939,7 +1964,7 @@ export async function getPublishersByIds(ids: string[]): Promise<Publisher[]> {
 
   const rows = await prisma.publisher.findMany({
     where: { id: { in: ids } },
-    include: { _count: { select: { books: true } } },
+    include: { _count: { select: { books: { where: onShelf } } } },
   });
   const byId = new Map(rows.map((row) => [row.id, toPublisher(row)]));
 
@@ -1971,7 +1996,7 @@ function byCatalogueSize(a: PublisherRowWithCounts, b: PublisherRowWithCounts): 
 /** The publishers with the most titles, leaving out any with nothing to shelve. */
 export async function getFeaturedPublishers(limit?: number): Promise<Publisher[]> {
   const rows = await prisma.publisher.findMany({
-    include: { _count: { select: { books: true, handouts: true } } },
+    include: { _count: { select: { books: { where: onShelf }, handouts: { where: handoutOnShelf } } } },
   });
 
   const ranked = rows
@@ -2008,8 +2033,13 @@ export async function getPublisherShelves(
   const rows = await prisma.publisher.findMany({
     where: { id: { in: publishers.map((publisher) => publisher.id) } },
     include: {
-      handouts: { include: handoutInclude, orderBy: { createdAt: "desc" }, take: size },
-      books: { include: bookInclude, orderBy: { createdAt: "desc" }, take: size },
+      handouts: {
+        where: handoutOnShelf,
+        include: handoutInclude,
+        orderBy: { createdAt: "desc" },
+        take: size,
+      },
+      books: { where: onShelf, include: bookInclude, orderBy: { createdAt: "desc" }, take: size },
     },
   });
   const byId = new Map(rows.map((row) => [row.id, row]));
@@ -2041,7 +2071,7 @@ export async function searchPublisherPicks(
         ...(term.trim() ? { in: await idsMatchingArabic("publishers", term.trim()) } : {}),
       },
     },
-    include: { _count: { select: { books: true, handouts: true } } },
+    include: { _count: { select: { books: { where: onShelf }, handouts: { where: handoutOnShelf } } } },
   });
 
   return rows
@@ -2321,7 +2351,7 @@ export async function getAdminNotifications(): Promise<{
         : [],
       wants("notifyStock")
         ? prisma.book.findMany({
-            where: { stock: { lte: LOW_STOCK_THRESHOLD } },
+            where: { ...onShelf, stock: { lte: LOW_STOCK_THRESHOLD } },
             orderBy: { stock: "asc" },
             take: NOTIFICATIONS_PER_KIND,
           })
@@ -2336,7 +2366,7 @@ export async function getAdminNotifications(): Promise<{
         ? prisma.handoutReview.count({ where: { status: "pending" } })
         : 0,
       wants("notifyStock")
-        ? prisma.book.count({ where: { stock: { lte: LOW_STOCK_THRESHOLD } } })
+        ? prisma.book.count({ where: { ...onShelf, stock: { lte: LOW_STOCK_THRESHOLD } } })
         : 0,
     ]);
 

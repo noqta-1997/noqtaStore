@@ -223,8 +223,9 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
 export async function deleteBook(bookId: string): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
+  // An ordered book stays for the order's sake; archiving is how it leaves.
   const ordered = await prisma.orderItem.count({ where: { bookId } });
-  if (ordered > 0) return fail("inUse");
+  if (ordered > 0) return fail("archiveInstead");
 
   const deleted = await attemptDelete("deleteBook", { bookId }, () =>
     prisma.book.delete({ where: { id: bookId }, select: { coverUrl: true } }),
@@ -234,6 +235,42 @@ export async function deleteBook(bookId: string): Promise<ActionResult> {
 
   revalidateCatalogue();
   revalidatePath("/admin/books");
+  return ok();
+}
+
+/**
+ * Takes a book off sale, or puts it back, without deleting it.
+ *
+ * The row stays — orders, reviews and the sales reports keep pointing at it —
+ * and the storefront stops reading it (`onShelf` in `src/data`). Copies in
+ * customers' carts go with the archiving, in the same transaction: the cart
+ * page would hide the line anyway, and a line nobody can see must not reach
+ * checkout. Wishlists are only hidden, so restoring brings them back.
+ */
+export async function setBookArchived(
+  bookId: string,
+  archived: boolean,
+): Promise<ActionResult> {
+  if (!(await requireManager())) return fail("forbidden");
+
+  try {
+    await prisma.$transaction([
+      prisma.book.update({
+        where: { id: bookId },
+        data: { archivedAt: archived ? new Date() : null },
+      }),
+      ...(archived ? [prisma.cartItem.deleteMany({ where: { bookId } })] : []),
+    ]);
+  } catch (error) {
+    if (isMissingRecord(error)) return fail("notFound");
+    logActionError("setBookArchived", error, { bookId, archived: String(archived) });
+    return fail("saveFailed");
+  }
+
+  revalidateCatalogue();
+  revalidatePath("/cart");
+  revalidatePath("/admin/books");
+  revalidatePath(`/admin/books/${bookId}`);
   return ok();
 }
 
@@ -328,8 +365,9 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
 export async function deleteHandout(handoutId: string): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
+  // As with books: an ordered handout stays, and archiving is how it leaves.
   const ordered = await prisma.handoutOrderItem.count({ where: { handoutId } });
-  if (ordered > 0) return fail("inUse");
+  if (ordered > 0) return fail("archiveInstead");
 
   const deleted = await attemptDelete("deleteHandout", { handoutId }, () =>
     prisma.handout.delete({ where: { id: handoutId }, select: { coverUrl: true } }),
@@ -338,6 +376,34 @@ export async function deleteHandout(handoutId: string): Promise<ActionResult> {
   await discardCover(deleted.row.coverUrl);
 
   revalidateHandouts();
+  return ok();
+}
+
+/** `setBookArchived` over the handouts table and its cart. */
+export async function setHandoutArchived(
+  handoutId: string,
+  archived: boolean,
+): Promise<ActionResult> {
+  if (!(await requireManager())) return fail("forbidden");
+
+  try {
+    await prisma.$transaction([
+      prisma.handout.update({
+        where: { id: handoutId },
+        data: { archivedAt: archived ? new Date() : null },
+      }),
+      ...(archived ? [prisma.handoutCartItem.deleteMany({ where: { handoutId } })] : []),
+    ]);
+  } catch (error) {
+    if (isMissingRecord(error)) return fail("notFound");
+    logActionError("setHandoutArchived", error, { handoutId, archived: String(archived) });
+    return fail("saveFailed");
+  }
+
+  revalidateHandouts();
+  revalidatePath("/cart");
+  revalidatePath("/admin/handouts");
+  revalidatePath(`/admin/handouts/${handoutId}`);
   return ok();
 }
 
@@ -1187,7 +1253,8 @@ async function readHeroForm(formData: FormData): Promise<SectionRows> {
 
   const wanted = [...new Set([featuredBookId, ...showcaseIds].filter(Boolean))];
   if (wanted.length) {
-    const found = await prisma.book.count({ where: { id: { in: wanted } } });
+    // An archived title is off sale; the hero cannot show it either.
+    const found = await prisma.book.count({ where: { id: { in: wanted }, archivedAt: null } });
     if (found !== wanted.length) return { ok: false, error: "unknownBook" };
   }
 
@@ -1224,7 +1291,7 @@ function readPromoForm(formData: FormData): SectionRows {
 
 /** How many of the ids name a row of the shelf's kind. */
 const countByKind: Record<ShelfKind, (ids: string[]) => Promise<number>> = {
-  book: (ids) => prisma.book.count({ where: { id: { in: ids } } }),
+  book: (ids) => prisma.book.count({ where: { id: { in: ids }, archivedAt: null } }),
   category: (ids) => prisma.category.count({ where: { id: { in: ids } } }),
   author: (ids) => prisma.author.count({ where: { id: { in: ids } } }),
   publisher: (ids) => prisma.publisher.count({ where: { id: { in: ids } } }),

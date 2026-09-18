@@ -26,7 +26,7 @@ export async function addToCart(
   quantity = Math.max(1, Math.trunc(quantity) || 1);
 
   const book = await prisma.book.findUnique({
-    where: { id: bookId },
+    where: { id: bookId, archivedAt: null },
     select: { stock: true },
   });
 
@@ -120,7 +120,7 @@ export async function addHandoutToCart(
   quantity = Math.max(1, Math.trunc(quantity) || 1);
 
   const handout = await prisma.handout.findUnique({
-    where: { id: handoutId },
+    where: { id: handoutId, archivedAt: null },
     select: { stock: true },
   });
 
@@ -208,16 +208,19 @@ export async function addWishlistToCart(): Promise<ActionResult> {
   const [saved, savedHandouts] = await Promise.all([
     prisma.wishlistItem.findMany({
       where: { customerId },
-      include: { book: { select: { id: true, stock: true } } },
+      include: { book: { select: { id: true, stock: true, archivedAt: true } } },
     }),
     prisma.handoutWishlistItem.findMany({
       where: { customerId },
-      include: { handout: { select: { id: true, stock: true } } },
+      include: { handout: { select: { id: true, stock: true, archivedAt: true } } },
     }),
   ]);
 
-  const available = saved.filter((item) => item.book.stock > 0);
-  const availableHandouts = savedHandouts.filter((item) => item.handout.stock > 0);
+  // An archived title is off sale even while it waits in a wishlist.
+  const available = saved.filter((item) => item.book.stock > 0 && !item.book.archivedAt);
+  const availableHandouts = savedHandouts.filter(
+    (item) => item.handout.stock > 0 && !item.handout.archivedAt,
+  );
 
   await prisma.$transaction([
     ...available.map((item) =>
@@ -252,15 +255,20 @@ export async function reorder(orderId: string): Promise<ActionResult> {
   const order = await prisma.order.findFirst({
     where: { id: orderId, customerId },
     include: {
-      items: { include: { book: { select: { id: true, stock: true } } } },
-      handoutItems: { include: { handout: { select: { id: true, stock: true } } } },
+      items: { include: { book: { select: { id: true, stock: true, archivedAt: true } } } },
+      handoutItems: {
+        include: { handout: { select: { id: true, stock: true, archivedAt: true } } },
+      },
     },
   });
 
   if (!order) return fail("notFound");
 
-  const available = order.items.filter((item) => item.book.stock > 0);
-  const availableHandouts = order.handoutItems.filter((item) => item.handout.stock > 0);
+  // Archived titles count as withdrawn: skipped like a sold-out one.
+  const available = order.items.filter((item) => item.book.stock > 0 && !item.book.archivedAt);
+  const availableHandouts = order.handoutItems.filter(
+    (item) => item.handout.stock > 0 && !item.handout.archivedAt,
+  );
   if (!available.length && !availableHandouts.length) return fail("outOfStock");
 
   await prisma.$transaction([

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { ArchiveButton } from "@/components/admin/archive-button";
 import { Panel } from "@/components/admin/panel";
 import { StatCard } from "@/components/admin/stat-card";
 import { BookCover } from "@/components/book/book-cover";
@@ -60,13 +61,34 @@ export default async function AdminHandoutPage({ params }: AdminHandoutPageProps
         subtitle={`${dictionary.common.by} ${handout.author.name[locale]}`}
         actions={
           <>
-            <Link
-              href={`/handouts/${handout.slug}`}
-              className={buttonStyles({ variant: "secondary", size: "md" })}
-            >
-              <ExternalLink aria-hidden className="size-4 rtl:-scale-x-100" strokeWidth={1.75} />
-              {t.viewInStore}
-            </Link>
+            <ArchiveButton
+              kind="handout"
+              id={handout.id}
+              archived={Boolean(handout.archived)}
+              withText
+              labels={{
+                archive: admin.handouts.archive.archive,
+                restore: admin.handouts.archive.restore,
+                archived: admin.handouts.archive.archived,
+                restored: admin.handouts.archive.restored,
+                failure: dictionary.common.toast.actionFailed,
+              }}
+              errorMessages={{
+                forbidden: dictionary.common.actionErrors.forbidden,
+                notFound: dictionary.common.actionErrors.notFound,
+                saveFailed: dictionary.common.actionErrors.saveFailed,
+              }}
+            />
+            {/* An archived handout has no store page to open. */}
+            {handout.archived ? null : (
+              <Link
+                href={`/handouts/${handout.slug}`}
+                className={buttonStyles({ variant: "secondary", size: "md" })}
+              >
+                <ExternalLink aria-hidden className="size-4 rtl:-scale-x-100" strokeWidth={1.75} />
+                {t.viewInStore}
+              </Link>
+            )}
             <Link
               href={`/admin/handouts/${handout.id}/edit`}
               className={buttonStyles({ size: "md" })}
@@ -77,6 +99,15 @@ export default async function AdminHandoutPage({ params }: AdminHandoutPageProps
           </>
         }
       />
+
+      {handout.archived ? (
+        <p
+          role="status"
+          className="rounded-md border border-line bg-surface-low px-4 py-3 text-body-md text-on-surface"
+        >
+          {admin.handouts.archive.notice}
+        </p>
+      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard

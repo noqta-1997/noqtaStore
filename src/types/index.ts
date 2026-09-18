@@ -113,6 +113,8 @@ export interface Book {
   tags: BookTag[];
   /** Optional real cover; a typographic placeholder is drawn when absent. */
   coverUrl?: string;
+  /** Taken off sale by the panel; the storefront never lists it. */
+  archived?: boolean;
   createdAt: string;
 }
 
@@ -158,6 +160,8 @@ export interface Handout {
   tags: BookTag[];
   /** Optional real cover; a typographic placeholder is drawn when absent. */
   coverUrl?: string;
+  /** Taken off sale by the panel; the storefront never lists it. */
+  archived?: boolean;
   createdAt: string;
 }
 

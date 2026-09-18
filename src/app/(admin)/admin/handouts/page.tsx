@@ -3,11 +3,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { ArchiveButton } from "@/components/admin/archive-button";
 import { SortableTh, Table, Tbody, Td, Th, Thead, Tr } from "@/components/admin/data-table";
 import { RowActions } from "@/components/admin/row-actions";
 import { deleteHandout } from "@/app/actions/admin";
 import { TableToolbar, type ToolbarTab } from "@/components/admin/table-toolbar";
 import { BookCover } from "@/components/book/book-cover";
+import { Badge } from "@/components/ui/badge";
 import { buttonStyles } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
@@ -34,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: `${admin.handouts.title} — ${admin.brand.panel}` };
 }
 
-const stockFilters: StockFilter[] = ["all", "inStock", "low", "out"];
+const stockFilters: StockFilter[] = ["all", "inStock", "low", "out", "archived"];
 
 export default async function AdminHandoutsPage({
   searchParams,
@@ -74,6 +76,7 @@ export default async function AdminHandoutsPage({
     { value: "inStock", label: t.stockStatus.inStock, count: counts.inStock },
     { value: "low", label: t.stockStatus.low, count: counts.low },
     { value: "out", label: t.stockStatus.out, count: counts.out },
+    { value: "archived", label: t.archive.tab, count: counts.archived },
   ].map((tab) => ({
     ...tab,
     href: `${base}${buildQueryString({
@@ -160,6 +163,11 @@ export default async function AdminHandoutsPage({
                           >
                             {handout.title[locale]}
                           </Link>
+                          {handout.archived ? (
+                            <Badge tone="muted" className="mt-1">
+                              {t.archive.badge}
+                            </Badge>
+                          ) : null}
                         </span>
                       </div>
                     </Td>
@@ -185,6 +193,24 @@ export default async function AdminHandoutsPage({
                       <Rating value={handout.rating} locale={locale} />
                     </Td>
                     <Td>
+                      <div className="flex items-center justify-end gap-1">
+                      <ArchiveButton
+                        kind="handout"
+                        id={handout.id}
+                        archived={Boolean(handout.archived)}
+                        labels={{
+                          archive: t.archive.archive,
+                          restore: t.archive.restore,
+                          archived: t.archive.archived,
+                          restored: t.archive.restored,
+                          failure: dictionary.common.toast.actionFailed,
+                        }}
+                        errorMessages={{
+                          forbidden: dictionary.common.actionErrors.forbidden,
+                          notFound: dictionary.common.actionErrors.notFound,
+                          saveFailed: dictionary.common.actionErrors.saveFailed,
+                        }}
+                      />
                       <RowActions
                         viewHref={`${base}/${handout.id}`}
                         editHref={`${base}/${handout.id}/edit`}
@@ -197,6 +223,7 @@ export default async function AdminHandoutsPage({
                         fallbackError={dictionary.common.toast.actionFailed}
                         errorMessages={{
                           inUse: dictionary.common.actionErrors.inUse,
+                          archiveInstead: dictionary.common.actionErrors.archiveInstead,
                           forbidden: dictionary.common.actionErrors.forbidden,
                           notFound: dictionary.common.actionErrors.notFound,
                           deleteFailed: dictionary.common.actionErrors.deleteFailed,
@@ -211,6 +238,7 @@ export default async function AdminHandoutsPage({
                           trigger: admin.common.delete,
                         }}
                       />
+                      </div>
                     </Td>
                   </Tr>
                 );

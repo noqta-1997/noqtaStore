@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { ArchiveButton } from "@/components/admin/archive-button";
 import { Panel } from "@/components/admin/panel";
 import { StatCard } from "@/components/admin/stat-card";
 import { BookCover } from "@/components/book/book-cover";
@@ -62,13 +63,34 @@ export default async function AdminBookPage({ params }: AdminBookPageProps) {
         subtitle={`${dictionary.common.by} ${book.author.name[locale]}`}
         actions={
           <>
-            <Link
-              href={`/books/${book.slug}`}
-              className={buttonStyles({ variant: "secondary", size: "md" })}
-            >
-              <ExternalLink aria-hidden className="size-4 rtl:-scale-x-100" strokeWidth={1.75} />
-              {t.viewInStore}
-            </Link>
+            <ArchiveButton
+              kind="book"
+              id={book.id}
+              archived={Boolean(book.archived)}
+              withText
+              labels={{
+                archive: admin.books.archive.archive,
+                restore: admin.books.archive.restore,
+                archived: admin.books.archive.archived,
+                restored: admin.books.archive.restored,
+                failure: dictionary.common.toast.actionFailed,
+              }}
+              errorMessages={{
+                forbidden: dictionary.common.actionErrors.forbidden,
+                notFound: dictionary.common.actionErrors.notFound,
+                saveFailed: dictionary.common.actionErrors.saveFailed,
+              }}
+            />
+            {/* An archived title has no store page to open. */}
+            {book.archived ? null : (
+              <Link
+                href={`/books/${book.slug}`}
+                className={buttonStyles({ variant: "secondary", size: "md" })}
+              >
+                <ExternalLink aria-hidden className="size-4 rtl:-scale-x-100" strokeWidth={1.75} />
+                {t.viewInStore}
+              </Link>
+            )}
             <Link
               href={`/admin/books/${book.id}/edit`}
               className={buttonStyles({ size: "md" })}
@@ -79,6 +101,15 @@ export default async function AdminBookPage({ params }: AdminBookPageProps) {
           </>
         }
       />
+
+      {book.archived ? (
+        <p
+          role="status"
+          className="rounded-md border border-line bg-surface-low px-4 py-3 text-body-md text-on-surface"
+        >
+          {admin.books.archive.notice}
+        </p>
+      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
