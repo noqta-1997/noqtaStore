@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { CoverField } from "@/components/admin/cover-field";
+import { EmptyListHint } from "@/components/admin/empty-list-hint";
 import { Panel } from "@/components/admin/panel";
 import { BookCover } from "@/components/book/book-cover";
 import { Button, buttonStyles } from "@/components/ui/button";
@@ -82,8 +83,25 @@ export function HandoutForm({
             <Field label={t.fields.titleAr} htmlFor="titleAr">
               <Input id="titleAr" name="titleAr" defaultValue={handout?.title.ar} required />
             </Field>
-            <Field label={t.fields.author} htmlFor="authorId">
-              <Select id="authorId" name="authorId" defaultValue={handout?.authorId ?? ""}>
+            <Field
+              label={t.fields.author}
+              htmlFor="authorId"
+              hint={
+                authors.length ? undefined : (
+                  <EmptyListHint
+                    text={t.hints.noAuthors}
+                    href="/admin/authors"
+                    page={admin.nav.authors}
+                  />
+                )
+              }
+            >
+              <Select
+                id="authorId"
+                name="authorId"
+                defaultValue={handout?.authorId ?? ""}
+                required
+              >
                 <option value="" disabled>
                   —
                 </option>
@@ -94,11 +112,24 @@ export function HandoutForm({
                 ))}
               </Select>
             </Field>
-            <Field label={t.fields.category} htmlFor="categoryId">
+            <Field
+              label={t.fields.category}
+              htmlFor="categoryId"
+              hint={
+                categories.length ? undefined : (
+                  <EmptyListHint
+                    text={t.hints.noCategories}
+                    href="/admin/handout-categories"
+                    page={admin.nav.handoutCategories}
+                  />
+                )
+              }
+            >
               <Select
                 id="categoryId"
                 name="categoryId"
                 defaultValue={handout?.categoryId ?? ""}
+                required
               >
                 <option value="" disabled>
                   —
@@ -129,11 +160,24 @@ export function HandoutForm({
 
         <Panel title={t.sections.publishing}>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label={t.fields.publisher} htmlFor="publisherId">
+            <Field
+              label={t.fields.publisher}
+              htmlFor="publisherId"
+              hint={
+                publishers.length ? undefined : (
+                  <EmptyListHint
+                    text={t.hints.noPublishers}
+                    href="/admin/publishers"
+                    page={admin.nav.publishers}
+                  />
+                )
+              }
+            >
               <Select
                 id="publisherId"
                 name="publisherId"
                 defaultValue={handout?.publisherId ?? ""}
+                required
               >
                 <option value="" disabled>
                   —

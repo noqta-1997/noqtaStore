@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils";
 interface FieldProps {
   label: string;
   htmlFor: string;
-  hint?: string;
+  /** Usually a sentence; a node when part of it is a link. */
+  hint?: ReactNode;
   error?: string;
   optional?: string;
   /** Renders Fluent's required marker after the label. */
