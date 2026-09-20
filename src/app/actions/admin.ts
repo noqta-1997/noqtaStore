@@ -45,7 +45,12 @@ import {
 import { isOwner } from "@/lib/owner";
 import { refreshBookRating } from "@/lib/book-rating";
 import { isWithin } from "@/lib/category-tree";
-import { discardCover, readCoverImage, storeCover } from "@/lib/cover-storage";
+import {
+  discardCover,
+  readCoverImage,
+  storeCover,
+  StorageNotConfiguredError,
+} from "@/lib/cover-storage";
 import { refreshHandoutRating } from "@/lib/handout-rating";
 import { prisma } from "@/lib/prisma";
 import {
@@ -170,6 +175,8 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
       coverUrl = await storeCover("books", cover.file);
     } catch (error) {
       logActionError("saveBook (cover)", error, { bookId: bookId || null });
+      // A server without the key is told so; anything else may pass on a retry.
+      if (error instanceof StorageNotConfiguredError) return fail("storageNotConfigured");
       return fail("uploadFailed");
     }
   }
@@ -321,6 +328,7 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
       coverUrl = await storeCover("handouts", cover.file);
     } catch (error) {
       logActionError("saveHandout (cover)", error, { handoutId: handoutId || null });
+      if (error instanceof StorageNotConfiguredError) return fail("storageNotConfigured");
       return fail("uploadFailed");
     }
   }

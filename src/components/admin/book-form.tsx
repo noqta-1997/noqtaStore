@@ -73,6 +73,7 @@ export function BookForm({
             invalidImage: dictionary.common.actionErrors.invalidImage,
             imageTooLarge: dictionary.common.actionErrors.imageTooLarge,
             uploadFailed: dictionary.common.actionErrors.uploadFailed,
+            storageNotConfigured: dictionary.common.actionErrors.storageNotConfigured,
           }}
     >
       {book ? <input type="hidden" name="bookId" value={book.id} /> : null}

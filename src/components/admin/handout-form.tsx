@@ -73,6 +73,7 @@ export function HandoutForm({
         invalidImage: dictionary.common.actionErrors.invalidImage,
         imageTooLarge: dictionary.common.actionErrors.imageTooLarge,
         uploadFailed: dictionary.common.actionErrors.uploadFailed,
+        storageNotConfigured: dictionary.common.actionErrors.storageNotConfigured,
       }}
     >
       {handout ? <input type="hidden" name="handoutId" value={handout.id} /> : null}

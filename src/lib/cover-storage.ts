@@ -42,6 +42,19 @@ export function readCoverImage(form: FormData, name = "coverImage"): CoverImage 
   return problem ? { ok: false, error: problem } : { ok: true, file: value };
 }
 
+/**
+ * The server has no service-role key, so no upload can even be attempted.
+ * Its own class so the action can tell "this server is not set up for
+ * covers" — a fixed fact about the deployment — from an upload that failed
+ * and may succeed on a retry.
+ */
+export class StorageNotConfiguredError extends Error {
+  constructor(variable: string) {
+    super(`${variable} is missing — set it in .env.local, or in the host's environment`);
+    this.name = "StorageNotConfiguredError";
+  }
+}
+
 let client: SupabaseClient | undefined;
 
 function storage() {
@@ -49,9 +62,8 @@ function storage() {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!url || !key) {
-      throw new Error("SUPABASE_SERVICE_ROLE_KEY is missing — check .env.local");
-    }
+    if (!url) throw new StorageNotConfiguredError("NEXT_PUBLIC_SUPABASE_URL");
+    if (!key) throw new StorageNotConfiguredError("SUPABASE_SERVICE_ROLE_KEY");
 
     // A service-role client holds no user session, so there is nothing to
     // persist or refresh; both would only try to reach `localStorage`.
@@ -125,17 +137,18 @@ export async function storeCover(
 /**
  * Deletes a cover this module stored. Best effort: a file left behind costs
  * storage and nothing else, whereas failing a save over it would cost the
- * edit. A URL from anywhere else — a seeded cover on another host — is left
- * alone, since it is not ours to remove.
+ * edit — and on a server without the key, failing a delete or an archive
+ * over it would cost those. A URL from anywhere else — a seeded cover on
+ * another host — is left alone, since it is not ours to remove.
  */
 export async function discardCover(url: string | null | undefined): Promise<void> {
   if (!url) return;
 
-  // Built the way the stored URL was built, encoding included.
-  const prefix = storage().from(COVER_BUCKET).getPublicUrl("").data.publicUrl;
-  if (!url.startsWith(prefix)) return;
-
   try {
+    // Built the way the stored URL was built, encoding included.
+    const prefix = storage().from(COVER_BUCKET).getPublicUrl("").data.publicUrl;
+    if (!url.startsWith(prefix)) return;
+
     await storage()
       .from(COVER_BUCKET)
       .remove([decodeURIComponent(url.slice(prefix.length))]);
