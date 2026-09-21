@@ -89,6 +89,13 @@ export function AccountMenu({ labels }: AccountMenuProps) {
     };
   }, []);
 
+  /*
+   * Both states are icon-only until `xl`, one step later than the header's
+   * inline nav appears at `lg`: with the search field still on its own row,
+   * the eight links and the wordmark leave a 1024px viewport no room for a
+   * labelled sign-in button or a name beside the avatar — they were the
+   * controls that folded first.
+   */
   if (!displayName) {
     return (
       <>
@@ -97,7 +104,7 @@ export function AccountMenu({ labels }: AccountMenuProps) {
           className={buttonStyles({
             variant: "secondary",
             size: "md",
-            className: "ms-1 hidden lg:inline-flex",
+            className: "ms-1 hidden xl:inline-flex",
           })}
         >
           <UserRound aria-hidden className="size-4" strokeWidth={1.75} />
@@ -108,7 +115,7 @@ export function AccountMenu({ labels }: AccountMenuProps) {
           href={`/login`}
           aria-label={labels.account}
           title={labels.account}
-          className="inline-flex size-10 items-center justify-center border border-transparent text-on-surface transition-colors hover:border-line hover:bg-state-hover lg:hidden"
+          className="inline-flex size-10 items-center justify-center border border-transparent text-on-surface transition-colors hover:border-line hover:bg-state-hover xl:hidden"
         >
           <UserRound aria-hidden className="size-5" strokeWidth={1.75} />
         </Link>
@@ -143,7 +150,7 @@ export function AccountMenu({ labels }: AccountMenuProps) {
         <button
           type="button"
           /*
-           * The name and the chevron are hidden below `lg`, which left the
+           * The name and the chevron are hidden below `xl`, which leaves the
            * avatar — and the avatar is aria-hidden, so the button had no
            * accessible name at all on a phone. It went unseen because the
            * public pages are scanned signed out, where this branch does not
@@ -161,12 +168,12 @@ export function AccountMenu({ labels }: AccountMenuProps) {
           >
             {displayName.slice(0, 1)}
           </span>
-          <span className="hidden max-w-28 truncate text-body-md text-on-surface lg:inline">
+          <span className="hidden max-w-28 truncate text-body-md text-on-surface xl:inline">
             {displayName}
           </span>
           <ChevronDown
             aria-hidden
-            className="hidden size-4 text-muted lg:block"
+            className="hidden size-4 text-muted xl:block"
             strokeWidth={1.75}
           />
         </button>

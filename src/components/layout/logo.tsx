@@ -16,6 +16,13 @@ interface LogoProps {
  * circle, standing in for the dot the name means. It is the real artwork now.
  * The name keeps its own colour rather than being baked into the image, so it
  * still answers to the theme and to the type scale.
+ *
+ * The tagline sits under the name between `sm` and `lg` and stays out of the
+ * desktop row: from `lg` the header lays the wordmark, eight links and the
+ * reader's controls on one 1216px line with nothing to spare, and the tagline
+ * is the one element whose length the settings screen leaves free — the
+ * shipped copy fit, a longer one folded the links onto two lines. The
+ * reference draws the wordmark alone there.
  */
 export function Logo({ name, tagline, className }: LogoProps) {
   return (
@@ -33,7 +40,7 @@ export function Logo({ name, tagline, className }: LogoProps) {
           {name}
         </span>
         {tagline ? (
-          <span className="mt-1 hidden text-label-sm text-muted sm:block">
+          <span className="mt-1 hidden text-label-sm text-muted sm:block lg:hidden">
             {tagline}
           </span>
         ) : null}

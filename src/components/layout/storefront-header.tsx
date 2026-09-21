@@ -21,7 +21,7 @@ const iconLinkStyles =
   "transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-primary";
 
 const navLinkStyles =
-  "inline-block rounded-md px-1 py-2 text-body-md font-medium text-on-surface-variant " +
+  "inline-block rounded-md px-1 py-2 text-body-md font-medium whitespace-nowrap text-on-surface-variant " +
   "transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-on-surface";
 
 interface StorefrontHeaderProps {
@@ -45,6 +45,13 @@ interface StorefrontHeaderProps {
  * theme toggle stays the last `button[aria-label]` in the header: that is how
  * the functional suite finds it, and it is the only control here the suite
  * drives.
+ *
+ * The row has no width to spare — Arabic fills it — and the browser's way
+ * of coping was to fold the longest labels onto two lines, which a header
+ * screenshot barely shows. The links are `whitespace-nowrap`, so that can
+ * never happen again; what yields instead is the tagline under the
+ * wordmark, the one element whose length the settings screen leaves free,
+ * and `Logo` keeps it out of the row wherever the links are on it.
  *
  * The two catalogue items carry their category trees: on a desktop each is a
  * menu that cascades through the stages and grades, and in the phone drawer
