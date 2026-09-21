@@ -31,6 +31,16 @@ export function Table({
   return (
     <div
       data-density={density}
+      /*
+       * The box scrolls sideways on a phone, and a scrolling box a keyboard
+       * cannot reach is content a keyboard cannot see. A row's link usually
+       * takes focus in and drags the columns into view with it, but a table
+       * with no links — the sales ranking on a quiet month — offered nothing
+       * to land on, and axe called it (`scrollable-region-focusable`). A tab
+       * stop on the box itself lets the arrow keys scroll it, and the global
+       * `:focus-visible` ring shows where focus is.
+       */
+      tabIndex={0}
       className={cn(
         /*
          * Square on all four corners.
