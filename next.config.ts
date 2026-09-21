@@ -11,7 +11,26 @@ import { COVER_PUBLIC_PATH } from "./src/lib/cover-image";
  */
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
+/**
+ * The response headers every page carries. No Content-Security-Policy yet:
+ * the theme script in the root layout is inline and would need a nonce on
+ * every request, which would end the static rendering the storefront is
+ * built around. These three cost nothing and close the obvious doors — the
+ * store is never framed, and nothing it serves is meant to be sniffed into
+ * another type.
+ */
+const securityHeaders = [
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+];
+
 const nextConfig: NextConfig = {
+  // The framework's name is nobody's business.
+  poweredByHeader: false,
+  async headers() {
+    return [{ source: "/(.*)", headers: securityHeaders }];
+  },
   images: {
     remotePatterns: supabaseUrl
       ? [
