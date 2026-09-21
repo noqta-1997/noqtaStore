@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import { BookCover } from "@/components/book/book-cover";
 import { PriceTag } from "@/components/commerce/price-tag";
+import { PurchaseControls } from "@/components/commerce/purchase-controls";
 import { HandoutAddToCartButton } from "@/components/handout/handout-add-to-cart-button";
 import { HandoutReviews } from "@/components/handout/handout-reviews";
 import { HandoutShelf } from "@/components/handout/handout-shelf";
@@ -13,7 +14,6 @@ import { HandoutWishlistButton } from "@/components/handout/handout-wishlist-but
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Container } from "@/components/ui/container";
-import { QuantityStepper } from "@/components/ui/quantity-stepper";
 import { Rating } from "@/components/ui/rating";
 import { Surface } from "@/components/ui/surface";
 import { Tabs } from "@/components/ui/tabs";
@@ -175,24 +175,24 @@ export default async function HandoutPage({ params }: HandoutPageProps) {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <QuantityStepper
-                max={Math.max(handout.stock, 1)}
+              {/* One number for both: what the stepper shows is what the
+                  button adds. */}
+              <PurchaseControls
+                kind="handout"
+                id={handout.id}
+                stock={handout.stock}
+                disabled={isSoldOut}
                 labels={{
                   quantity: dictionary.common.quantity,
                   increase: dictionary.common.increase,
                   decrease: dictionary.common.decrease,
+                  addToCart: dictionary.common.addToCart,
+                  toastTitle: dictionary.common.toast.addedToCart,
+                  toastNote: dictionary.common.toast.addedToCartNote,
+                  signIn: dictionary.common.toast.signInRequired,
+                  outOfStock: dictionary.common.outOfStock,
+                  failure: dictionary.common.toast.actionFailed,
                 }}
-              />
-              <HandoutAddToCartButton
-                handoutId={handout.id}
-                size="lg"
-                disabled={isSoldOut}
-                label={dictionary.common.addToCart}
-                toastTitle={dictionary.common.toast.addedToCart}
-                toastNote={dictionary.common.toast.addedToCartNote}
-                signInMessage={dictionary.common.toast.signInRequired}
-                outOfStockMessage={dictionary.common.outOfStock}
-                failureMessage={dictionary.common.toast.actionFailed}
                 className="flex-1"
               />
               <HandoutWishlistButton

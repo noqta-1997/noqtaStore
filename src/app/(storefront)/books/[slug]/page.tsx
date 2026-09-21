@@ -9,11 +9,11 @@ import { BookShelf } from "@/components/book/book-shelf";
 import { BookSpecs } from "@/components/book/book-specs";
 import { AddToCartButton } from "@/components/commerce/add-to-cart-button";
 import { PriceTag } from "@/components/commerce/price-tag";
+import { PurchaseControls } from "@/components/commerce/purchase-controls";
 import { WishlistButton } from "@/components/commerce/wishlist-button";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Container } from "@/components/ui/container";
-import { QuantityStepper } from "@/components/ui/quantity-stepper";
 import { Rating } from "@/components/ui/rating";
 import { Surface } from "@/components/ui/surface";
 import { Tabs } from "@/components/ui/tabs";
@@ -174,24 +174,24 @@ export default async function BookPage({ params }: BookPageProps) {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <QuantityStepper
-                max={Math.max(book.stock, 1)}
+              {/* One number for both: what the stepper shows is what the
+                  button adds. */}
+              <PurchaseControls
+                kind="book"
+                id={book.id}
+                stock={book.stock}
+                disabled={isSoldOut}
                 labels={{
                   quantity: dictionary.common.quantity,
                   increase: dictionary.common.increase,
                   decrease: dictionary.common.decrease,
+                  addToCart: dictionary.common.addToCart,
+                  toastTitle: dictionary.common.toast.addedToCart,
+                  toastNote: dictionary.common.toast.addedToCartNote,
+                  signIn: dictionary.common.toast.signInRequired,
+                  outOfStock: dictionary.common.outOfStock,
+                  failure: dictionary.common.toast.actionFailed,
                 }}
-              />
-              <AddToCartButton
-                bookId={book.id}
-                size="lg"
-                disabled={isSoldOut}
-                label={dictionary.common.addToCart}
-                toastTitle={dictionary.common.toast.addedToCart}
-                toastNote={dictionary.common.toast.addedToCartNote}
-                signInMessage={dictionary.common.toast.signInRequired}
-                outOfStockMessage={dictionary.common.outOfStock}
-                failureMessage={dictionary.common.toast.actionFailed}
                 className="flex-1"
               />
               <WishlistButton

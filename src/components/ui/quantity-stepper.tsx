@@ -15,6 +15,8 @@ interface QuantityStepperProps {
   labels: { quantity: string; increase: string; decrease: string };
   /** When set, changes are written to that cart line instead of staying local. */
   bookId?: string;
+  /** Told the new value at once, for a local stepper feeding another control. */
+  onChange?: (value: number) => void;
   className?: string;
 }
 
@@ -27,6 +29,7 @@ export function QuantityStepper({
   max = 99,
   labels,
   bookId,
+  onChange,
   className,
 }: QuantityStepperProps) {
   const [value, setValue] = useState(defaultValue);
@@ -43,6 +46,7 @@ export function QuantityStepper({
 
   const change = (next: number) => {
     setValue(next);
+    onChange?.(next);
     if (!bookId) return;
 
     if (timer.current) clearTimeout(timer.current);
