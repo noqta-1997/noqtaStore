@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { setDefaultAddress } from "@/app/actions/account";
+import { runAction } from "@/lib/action-result";
 import { useToast } from "@/components/ui/toast";
 
 interface SetDefaultAddressButtonProps {
@@ -25,7 +26,7 @@ export function SetDefaultAddressButton({
 
   const onClick = async () => {
     setPending(true);
-    const result = await setDefaultAddress(addressId);
+    const result = await runAction(setDefaultAddress(addressId));
     setPending(false);
 
     toast(

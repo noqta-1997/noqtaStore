@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { addHandoutToCart } from "@/app/actions/cart";
+import { runAction } from "@/lib/action-result";
 import { Button, type ButtonSize } from "@/components/ui/button";
 import { notifyCartChanged } from "@/lib/cart-signal";
 import { useToast } from "@/components/ui/toast";
@@ -49,7 +50,7 @@ export function HandoutAddToCartButton({
 
   const onClick = async () => {
     setPending(true);
-    const result = await addHandoutToCart(handoutId, quantity);
+    const result = await runAction(addHandoutToCart(handoutId, quantity));
     setPending(false);
 
     if (result.ok) {

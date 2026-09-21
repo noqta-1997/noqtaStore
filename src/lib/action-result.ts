@@ -38,3 +38,23 @@ export function optionalNumber(form: FormData, name: string): number | null {
 export function checkbox(form: FormData, name: string): boolean {
   return form.get(name) !== null;
 }
+
+/**
+ * Awaits a server action from the browser and never throws.
+ *
+ * An action answers through its result, but the call itself can still fail —
+ * the connection dropped, the server refused the body, the action hit an
+ * error it did not expect. Every button that awaited one directly was left
+ * disabled with no message when that happened: `setPending(false)` came
+ * after the `await`, and the rejection skipped it. Here that failure comes
+ * back as a result like any other, under the `request` code, so the caller
+ * shows its usual failure toast and its button comes back.
+ */
+export async function runAction(call: Promise<ActionResult>): Promise<ActionResult> {
+  try {
+    return await call;
+  } catch (error) {
+    console.error("[actions] call failed before it could answer", error);
+    return fail("request");
+  }
+}

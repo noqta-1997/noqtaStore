@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { removeFromCart } from "@/app/actions/cart";
+import { runAction } from "@/lib/action-result";
 import { useToast } from "@/components/ui/toast";
 import { notifyCartChanged } from "@/lib/cart-signal";
 
@@ -29,7 +30,7 @@ export function RemoveCartItemButton({
 
   const onClick = async () => {
     setPending(true);
-    const result = await removeFromCart(bookId);
+    const result = await runAction(removeFromCart(bookId));
     setPending(false);
 
     if (!result.ok) {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { toggleWishlist } from "@/app/actions/cart";
+import { runAction } from "@/lib/action-result";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { setWishlistSaved, useWishlistIds } from "@/lib/wishlist-store";
@@ -45,7 +46,7 @@ export function WishlistButton({
     setWishlistSaved(bookId, optimistic);
     setPending(true);
 
-    const result = await toggleWishlist(bookId);
+    const result = await runAction(toggleWishlist(bookId));
     setPending(false);
 
     if (!result.ok) {

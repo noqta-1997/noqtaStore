@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { removeHandoutFromCart } from "@/app/actions/cart";
+import { runAction } from "@/lib/action-result";
 import { useToast } from "@/components/ui/toast";
 import { notifyCartChanged } from "@/lib/cart-signal";
 
@@ -30,7 +31,7 @@ export function HandoutRemoveCartItemButton({
 
   const onClick = async () => {
     setPending(true);
-    const result = await removeHandoutFromCart(handoutId);
+    const result = await runAction(removeHandoutFromCart(handoutId));
     setPending(false);
 
     if (!result.ok) {

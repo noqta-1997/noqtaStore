@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { setHandoutReviewStatus } from "@/app/actions/admin";
+import { runAction } from "@/lib/action-result";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import type { ReviewStatus } from "@/types";
@@ -35,7 +36,7 @@ export function HandoutReviewModeration({
 
   const moderate = async (next: ReviewStatus) => {
     setPending(true);
-    const result = await setHandoutReviewStatus(reviewId, next);
+    const result = await runAction(setHandoutReviewStatus(reviewId, next));
     setPending(false);
 
     if (!result.ok) {

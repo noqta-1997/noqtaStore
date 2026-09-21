@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { toggleCustomerBlock } from "@/app/actions/admin";
+import { runAction } from "@/lib/action-result";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +34,7 @@ export function BlockCustomerButton({
 
   const onClick = async () => {
     setPending(true);
-    const result = await toggleCustomerBlock(customerId);
+    const result = await runAction(toggleCustomerBlock(customerId));
     setPending(false);
 
     if (!result.ok) {

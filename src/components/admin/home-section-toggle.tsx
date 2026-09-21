@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { setHomeSectionVisibility } from "@/app/actions/admin";
+import { runAction } from "@/lib/action-result";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import type { HomeSection } from "@/lib/home-sections";
@@ -48,7 +49,7 @@ export function HomeSectionToggle({
 
   const onClick = async () => {
     setPending(true);
-    const result = await setHomeSectionVisibility(section, !visible);
+    const result = await runAction(setHomeSectionVisibility(section, !visible));
     setPending(false);
 
     if (!result.ok) {

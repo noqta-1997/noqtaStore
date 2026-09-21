@@ -7,7 +7,7 @@ import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { useToast } from "@/components/ui/toast";
-import type { ActionResult } from "@/lib/action-result";
+import { runAction, type ActionResult } from "@/lib/action-result";
 import { cn } from "@/lib/utils";
 
 export interface ConfirmLabels {
@@ -63,16 +63,11 @@ export function ConfirmDialog({
     }
 
     /* The action reports through its result; if it throws instead (a lost
-       connection, a bug), the dialog still closes and says so rather than
-       staying open with its button disabled. */
+       connection, a bug), `runAction` turns that into a failed result, so the
+       dialog still closes and says so rather than staying open with its
+       button disabled. */
     setPending(true);
-    let result: ActionResult;
-    try {
-      result = await action();
-    } catch (error) {
-      console.error("[confirm-dialog] action threw", error);
-      result = { ok: false, error: "thrown" };
-    }
+    const result = await runAction(action());
     setPending(false);
     setOpen(false);
 

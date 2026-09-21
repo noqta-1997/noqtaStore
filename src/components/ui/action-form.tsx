@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent, type ReactNode } from "react";
 
 import { useToast } from "@/components/ui/toast";
-import type { ActionResult } from "@/lib/action-result";
+import { runAction, type ActionResult } from "@/lib/action-result";
 
 interface ActionFormProps {
   /** A server action, usually pre-bound to the row it edits. */
@@ -15,6 +15,11 @@ interface ActionFormProps {
   /** Maps an action's error code to a human sentence. */
   errorMessages?: Record<string, string>;
   redirectTo?: string;
+  /**
+   * Error codes that mean the page is stale — the row it edits was removed
+   * or changed elsewhere — so the page is drawn again after the toast.
+   */
+  refreshOnErrors?: string[];
   resetOnSuccess?: boolean;
   className?: string;
   children: ReactNode;
@@ -30,6 +35,7 @@ export function ActionForm({
   fallbackError,
   errorMessages,
   redirectTo,
+  refreshOnErrors = ["notFound"],
   resetOnSuccess = false,
   className,
   children,
@@ -41,19 +47,17 @@ export function ActionForm({
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    // A second Enter or click while the first is still on its way would run
+    // the action twice — two identical rows, two orders.
+    if (pending) return;
     setError(null);
     setPending(true);
 
     const form = event.currentTarget;
-    let result: ActionResult;
-    try {
-      result = await action(new FormData(form));
-    } catch {
-      // The request itself failed — offline, or a body the server refused
-      // before the action ran, such as a cover past the size limit. Reported
-      // like any other failed action rather than left hanging.
-      result = { ok: false, error: "request" };
-    }
+    // A call that fails before the action answers — offline, or a body the
+    // server refused, such as a cover past the size limit — comes back as
+    // the `request` error rather than an exception left hanging.
+    const result: ActionResult = await runAction(action(new FormData(form)));
     setPending(false);
 
     if (result.ok) {
@@ -68,8 +72,9 @@ export function ActionForm({
     setError(message);
     toast({ title: message, tone: "error" });
 
-    // The row this form edits was removed meanwhile; show the page as it is.
-    if (result.error === "notFound") router.refresh();
+    // The row this form edits was removed or changed meanwhile; show the
+    // page as it is now.
+    if (refreshOnErrors.includes(result.error)) router.refresh();
   };
 
   return (

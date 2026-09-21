@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { reorder } from "@/app/actions/cart";
+import { runAction } from "@/lib/action-result";
 import { buttonStyles } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { notifyCartChanged } from "@/lib/cart-signal";
@@ -33,7 +34,7 @@ export function ReorderButton({
 
   const onClick = async () => {
     setPending(true);
-    const result = await reorder(orderId);
+    const result = await runAction(reorder(orderId));
     setPending(false);
 
     if (!result.ok) {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { toggleCoupon } from "@/app/actions/admin";
+import { runAction } from "@/lib/action-result";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 
@@ -37,7 +38,7 @@ export function CouponToggle({
 
   const onClick = async () => {
     setPending(true);
-    const result = await toggleCoupon(couponId);
+    const result = await runAction(toggleCoupon(couponId));
     setPending(false);
 
     if (!result.ok) {

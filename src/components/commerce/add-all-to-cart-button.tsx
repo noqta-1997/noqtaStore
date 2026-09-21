@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { addWishlistToCart } from "@/app/actions/cart";
+import { runAction } from "@/lib/action-result";
 import { Button } from "@/components/ui/button";
 import { notifyCartChanged } from "@/lib/cart-signal";
 import { useToast } from "@/components/ui/toast";
@@ -27,7 +28,7 @@ export function AddAllToCartButton({
 
   const onClick = async () => {
     setPending(true);
-    const result = await addWishlistToCart();
+    const result = await runAction(addWishlistToCart());
     setPending(false);
 
     if (!result.ok) {

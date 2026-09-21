@@ -8,7 +8,7 @@ import { setMessageStatus } from "@/app/actions/admin";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog, type ConfirmLabels } from "@/components/ui/confirm-dialog";
 import { useToast } from "@/components/ui/toast";
-import type { ActionResult } from "@/lib/action-result";
+import { runAction, type ActionResult } from "@/lib/action-result";
 import type { ContactStatus } from "@/types";
 
 interface MessageActionsProps {
@@ -46,7 +46,7 @@ export function MessageActions({
 
   const toggle = async () => {
     setPending(true);
-    const result = await setMessageStatus(messageId, next);
+    const result = await runAction(setMessageStatus(messageId, next));
     setPending(false);
 
     if (!result.ok) {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { toggleHandoutWishlist } from "@/app/actions/cart";
+import { runAction } from "@/lib/action-result";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { setWishlistSaved, useWishlistIds } from "@/lib/wishlist-store";
@@ -49,7 +50,7 @@ export function HandoutWishlistButton({
     setWishlistSaved(handoutId, optimistic);
     setPending(true);
 
-    const result = await toggleHandoutWishlist(handoutId);
+    const result = await runAction(toggleHandoutWishlist(handoutId));
     setPending(false);
 
     if (!result.ok) {
