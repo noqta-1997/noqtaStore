@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent, type ReactNode } from "react";
 
 import { placeOrder } from "@/app/actions/checkout";
+import { CHECKOUT_FORM_ID, useCheckoutState } from "@/components/commerce/checkout-state";
 import { useToast } from "@/components/ui/toast";
+import { runAction } from "@/lib/action-result";
 
 interface CheckoutFormProps {
   messages: {
@@ -31,7 +33,9 @@ function isCouponError(
 
 /**
  * The submit button lives in the summary sidebar, outside this element, and
- * reaches it through `form="checkout-form"`.
+ * reaches it through `form="checkout-form"`. Both read `pending` from
+ * `CheckoutProvider`: the button to disable itself, this form to refuse a
+ * submit that arrives while the first is still being written.
  */
 export function CheckoutForm({
   messages,
@@ -40,20 +44,30 @@ export function CheckoutForm({
 }: CheckoutFormProps) {
   const router = useRouter();
   const toast = useToast();
+  const { pending, setPending } = useCheckoutState();
   const [error, setError] = useState<string | null>(null);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    // Two submits in flight would be two orders: `placeOrder` empties the
+    // cart, but only once the first transaction commits, and the second can
+    // read the cart before that.
+    if (pending) return;
     setError(null);
+    setPending(true);
 
-    const result = await placeOrder(new FormData(event.currentTarget));
+    const result = await runAction(placeOrder(new FormData(event.currentTarget)));
 
     if (result.ok) {
+      // Stays pending: the page is being left, and the button must not come
+      // back for a click between the toast and the confirmation page.
       toast({ title: messages.placed, description: result.message });
       router.push(`/checkout/success?order=${result.message}`);
       router.refresh();
       return;
     }
+
+    setPending(false);
 
     const text =
       result.error === "emptyCart"
@@ -79,10 +93,13 @@ export function CheckoutForm({
 
     // The action dropped the code; the summary must stop showing its discount.
     if (isCouponError(result.error)) router.refresh();
+    // The cart changed under the page — a line sold out, or it was emptied
+    // in another tab. Draw it as it is now.
+    if (result.error === "outOfStock" || result.error === "emptyCart") router.refresh();
   };
 
   return (
-    <form id="checkout-form" className={className} onSubmit={onSubmit}>
+    <form id={CHECKOUT_FORM_ID} className={className} onSubmit={onSubmit} aria-busy={pending}>
       {error ? (
         <p
           role="alert"

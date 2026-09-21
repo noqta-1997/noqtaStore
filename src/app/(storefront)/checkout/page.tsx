@@ -1,10 +1,14 @@
-import { Ban, Banknote, CreditCard, Store, Truck, Wallet, Zap } from "lucide-react";
+import { Ban, Banknote, CreditCard, ShoppingCart, Store, Truck, Wallet, Zap } from "lucide-react";
 import type { Metadata } from "next";
 
 import { BookCover } from "@/components/book/book-cover";
 import { CheckoutForm } from "@/components/commerce/checkout-form";
-import { OrderSummary } from "@/components/commerce/order-summary";
-import { buttonStyles } from "@/components/ui/button";
+import {
+  CheckoutProvider,
+  CheckoutSubmitButton,
+  CheckoutTotals,
+} from "@/components/commerce/checkout-state";
+import { OrderSummary, summaryLabels } from "@/components/commerce/order-summary";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Container } from "@/components/ui/container";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -100,6 +104,39 @@ export default async function CheckoutPage() {
     subtotal >= shippingRules.freeThreshold ? 0 : shippingRules.standardCost;
   const discount = (await getAppliedCoupon(subtotal))?.discount ?? 0;
 
+  // Nothing to pay for: the form used to be drawn anyway, and submitting it
+  // only produced an "empty cart" toast. The cart page's own empty state
+  // says where to go instead.
+  if (!lines.length && !handoutLines.length) {
+    return (
+      <>
+        <section className="border-b border-line-divider bg-surface-low">
+          <Container className="py-8 lg:py-10">
+            <h1 className="text-headline-lg">{t.title}</h1>
+          </Container>
+        </section>
+
+        <Container className="py-8 lg:py-12">
+          <EmptyState
+            icon={ShoppingCart}
+            title={dictionary.cart.empty.title}
+            description={dictionary.cart.empty.description}
+            actionLabel={dictionary.cart.empty.action}
+            actionHref="/books"
+          />
+        </Container>
+      </>
+    );
+  }
+
+  // What each method costs, for the summary to follow the reader's pick.
+  // Same figures the option cards print; `placeOrder` computes its own.
+  const shippingByMethod: Record<string, number> = {
+    standard: shipping,
+    express: shippingRules.expressCost,
+    ...(shippingRules.enablePickup ? { pickup: 0 } : {}),
+  };
+
   const shippingOptions = [
     {
       id: "standard",
@@ -167,225 +204,223 @@ export default async function CheckoutPage() {
       </section>
 
       <Container className="grid gap-6 py-8 lg:grid-cols-12 lg:gap-8 lg:py-12">
-        <CheckoutForm
-          className="min-w-0 space-y-6 lg:col-span-7 xl:col-span-8"
-          messages={{
-            placed: dictionary.common.toast.orderPlaced,
-            emptyCart: dictionary.common.toast.emptyCart,
-            missingAddress: dictionary.common.toast.missingAddress,
-            stockChanged: dictionary.common.toast.stockChanged,
-            coupon: {
-              unknownCoupon: dictionary.common.actionErrors.unknownCoupon,
-              expiredCoupon: dictionary.common.actionErrors.expiredCoupon,
-              couponMinimum: dictionary.common.actionErrors.couponMinimum,
-            },
-            signIn: dictionary.common.toast.signInRequired,
-            blocked: dictionary.common.actionErrors.blocked,
-            failure: dictionary.common.toast.actionFailed,
-          }}
-        >
-          <SectionCard title={t.addressSection} index={1}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <ValidatedField
-                id="fullName"
-                name="fullName"
-                autoComplete="name"
-                required
-                label={t.fullName}
-                messages={dictionary.common.validation}
-              />
-              <ValidatedField
-                id="phone"
-                name="phone"
-                type="tel"
-                dir="ltr"
-                inputMode="tel"
-                placeholder="+964 7XX XXX XXXX"
-                autoComplete="tel"
-                required
-                label={t.phone}
-                messages={dictionary.common.validation}
-              />
-              <Field
-                label={t.altPhone}
-                htmlFor="altPhone"
-                optional={dictionary.common.optional}
-              >
-                <Input id="altPhone" name="altPhone" type="tel" dir="ltr" />
-              </Field>
-              <Field label={t.governorate} htmlFor="governorate">
-                <Select id="governorate" name="governorate" defaultValue="" required>
-                  <option value="" disabled>
-                    {t.selectGovernorate}
-                  </option>
-                  {governorates.map((name) => (
-                    <option key={name} value={name}>
-                      {name}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-              <ValidatedField
-                id="city"
-                name="city"
-                autoComplete="address-level2"
-                required
-                label={t.city}
-                messages={dictionary.common.validation}
-                className="sm:col-span-2"
-              />
-              <ValidatedField
-                id="addressLine"
-                name="addressLine"
-                required
-                label={t.addressLine}
-                messages={dictionary.common.validation}
-                className="sm:col-span-2"
-              />
-              <Field
-                label={t.notes}
-                htmlFor="notes"
-                optional={dictionary.common.optional}
-                className="sm:col-span-2"
-              >
-                <Textarea id="notes" name="notes" rows={3} />
-              </Field>
-            </div>
-
-            <Checkbox
-              id="saveAddress"
-              name="saveAddress"
-              defaultChecked
-              label={t.saveAddress}
-            />
-          </SectionCard>
-
-          <SectionCard title={t.shippingSection} index={2}>
-            <div className="space-y-3">
-              {shippingOptions.map((option) => (
-                <RadioCard
-                  key={option.id}
-                  id={`shipping-${option.id}`}
-                  name="shippingMethod"
-                  value={option.id}
-                  defaultChecked={option.defaultChecked}
-                  icon={option.icon}
-                  title={option.title}
-                  note={option.note}
-                  trailing={
-                    <span
-                      className="shrink-0 text-label-md font-semibold text-on-surface"
-                      data-numeric
-                    >
-                      {option.price === 0
-                        ? dictionary.common.free
-                        : formatPrice(option.price, locale)}
-                    </span>
-                  }
-                />
-              ))}
-            </div>
-          </SectionCard>
-
-          <SectionCard title={t.paymentSection} index={3}>
-            <div className="space-y-3">
-              {paymentOptions.map((option) => (
-                <RadioCard
-                  key={option.id}
-                  id={`payment-${option.id}`}
-                  name="paymentMethod"
-                  value={option.id}
-                  defaultChecked={option.defaultChecked}
-                  disabled={option.disabled}
-                  icon={option.icon}
-                  title={option.title}
-                  note={option.note}
-                />
-              ))}
-            </div>
-            <p className="text-label-sm text-muted">{t.termsNote}</p>
-          </SectionCard>
-        </CheckoutForm>
-
-        <div className="min-w-0 lg:col-span-5 xl:col-span-4">
-          <OrderSummary
-            title={t.orderSummary}
-            locale={locale}
-            dictionary={dictionary.common}
-            totals={{
-              subtotal,
-              shipping,
-              discount,
-              total: subtotal + shipping - discount,
+        <CheckoutProvider>
+          <CheckoutForm
+            className="min-w-0 space-y-6 lg:col-span-7 xl:col-span-8"
+            messages={{
+              placed: dictionary.common.toast.orderPlaced,
+              emptyCart: dictionary.common.toast.emptyCart,
+              missingAddress: dictionary.common.toast.missingAddress,
+              stockChanged: dictionary.common.toast.stockChanged,
+              coupon: {
+                unknownCoupon: dictionary.common.actionErrors.unknownCoupon,
+                expiredCoupon: dictionary.common.actionErrors.expiredCoupon,
+                couponMinimum: dictionary.common.actionErrors.couponMinimum,
+              },
+              signIn: dictionary.common.toast.signInRequired,
+              blocked: dictionary.common.actionErrors.blocked,
+              failure: dictionary.common.toast.actionFailed,
             }}
-            className="lg:sticky lg:top-35"
-            footer={
-              <button
-                type="submit"
-                form="checkout-form"
-                className={buttonStyles({ size: "lg", fullWidth: true })}
-              >
-                {t.placeOrder}
-              </button>
-            }
           >
-            <p className="label-mono mb-3 text-muted">{t.itemsInOrder}</p>
-            <ul className="space-y-3">
-              {lines.map((line) => (
-                <li key={line.bookId} className="flex items-center gap-3">
-                  <span className="w-10 shrink-0">
-                    <BookCover
-                      title={line.book.title[locale]}
-                      author={line.book.author.name[locale]}
-                      seed={line.book.slug}
-                      src={line.book.coverUrl}
-                      sizes="2.5rem"
-                      className="border border-line"
-                      compact
-                    />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-label-md text-on-surface">
-                      {line.book.title[locale]}
+            <SectionCard title={t.addressSection} index={1}>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <ValidatedField
+                  id="fullName"
+                  name="fullName"
+                  autoComplete="name"
+                  required
+                  label={t.fullName}
+                  messages={dictionary.common.validation}
+                />
+                <ValidatedField
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  dir="ltr"
+                  inputMode="tel"
+                  placeholder="+964 7XX XXX XXXX"
+                  autoComplete="tel"
+                  required
+                  label={t.phone}
+                  messages={dictionary.common.validation}
+                />
+                <Field
+                  label={t.altPhone}
+                  htmlFor="altPhone"
+                  optional={dictionary.common.optional}
+                >
+                  <Input id="altPhone" name="altPhone" type="tel" dir="ltr" />
+                </Field>
+                <Field label={t.governorate} htmlFor="governorate">
+                  <Select id="governorate" name="governorate" defaultValue="" required>
+                    <option value="" disabled>
+                      {t.selectGovernorate}
+                    </option>
+                    {governorates.map((name) => (
+                      <option key={name} value={name}>
+                        {name}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
+                <ValidatedField
+                  id="city"
+                  name="city"
+                  autoComplete="address-level2"
+                  required
+                  label={t.city}
+                  messages={dictionary.common.validation}
+                  className="sm:col-span-2"
+                />
+                <ValidatedField
+                  id="addressLine"
+                  name="addressLine"
+                  required
+                  label={t.addressLine}
+                  messages={dictionary.common.validation}
+                  className="sm:col-span-2"
+                />
+                <Field
+                  label={t.notes}
+                  htmlFor="notes"
+                  optional={dictionary.common.optional}
+                  className="sm:col-span-2"
+                >
+                  <Textarea id="notes" name="notes" rows={3} />
+                </Field>
+              </div>
+
+              <Checkbox
+                id="saveAddress"
+                name="saveAddress"
+                defaultChecked
+                label={t.saveAddress}
+              />
+            </SectionCard>
+
+            <SectionCard title={t.shippingSection} index={2}>
+              <div className="space-y-3">
+                {shippingOptions.map((option) => (
+                  <RadioCard
+                    key={option.id}
+                    id={`shipping-${option.id}`}
+                    name="shippingMethod"
+                    value={option.id}
+                    defaultChecked={option.defaultChecked}
+                    icon={option.icon}
+                    title={option.title}
+                    note={option.note}
+                    trailing={
+                      <span
+                        className="shrink-0 text-label-md font-semibold text-on-surface"
+                        data-numeric
+                      >
+                        {option.price === 0
+                          ? dictionary.common.free
+                          : formatPrice(option.price, locale)}
+                      </span>
+                    }
+                  />
+                ))}
+              </div>
+            </SectionCard>
+
+            <SectionCard title={t.paymentSection} index={3}>
+              <div className="space-y-3">
+                {paymentOptions.map((option) => (
+                  <RadioCard
+                    key={option.id}
+                    id={`payment-${option.id}`}
+                    name="paymentMethod"
+                    value={option.id}
+                    defaultChecked={option.defaultChecked}
+                    disabled={option.disabled}
+                    icon={option.icon}
+                    title={option.title}
+                    note={option.note}
+                  />
+                ))}
+              </div>
+              <p className="text-label-sm text-muted">{t.termsNote}</p>
+            </SectionCard>
+          </CheckoutForm>
+
+          <div className="min-w-0 lg:col-span-5 xl:col-span-4">
+            <OrderSummary
+              title={t.orderSummary}
+              locale={locale}
+              dictionary={dictionary.common}
+              totalsSlot={
+                <CheckoutTotals
+                  subtotal={subtotal}
+                  discount={discount}
+                  shippingByMethod={shippingByMethod}
+                  defaultMethod="standard"
+                  locale={locale}
+                  labels={summaryLabels(dictionary.common)}
+                />
+              }
+              className="lg:sticky lg:top-35"
+              footer={<CheckoutSubmitButton label={t.placeOrder} />}
+            >
+              <p className="label-mono mb-3 text-muted">{t.itemsInOrder}</p>
+              <ul className="space-y-3">
+                {lines.map((line) => (
+                  <li key={line.bookId} className="flex items-center gap-3">
+                    <span className="w-10 shrink-0">
+                      <BookCover
+                        title={line.book.title[locale]}
+                        author={line.book.author.name[locale]}
+                        seed={line.book.slug}
+                        src={line.book.coverUrl}
+                        sizes="2.5rem"
+                        className="border border-line"
+                        compact
+                      />
                     </span>
-                    <span className="block text-label-sm text-muted" data-numeric>
-                      × {line.quantity}
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-label-md text-on-surface">
+                        {line.book.title[locale]}
+                      </span>
+                      <span className="block text-label-sm text-muted" data-numeric>
+                        × {line.quantity}
+                      </span>
                     </span>
-                  </span>
-                  <span className="shrink-0 text-label-md" data-numeric>
-                    {formatPrice(line.lineTotal, locale)}
-                  </span>
-                </li>
-              ))}
-              {handoutLines.map((line) => (
-                <li key={line.handoutId} className="flex items-center gap-3">
-                  <span className="w-10 shrink-0">
-                    <BookCover
-                      title={line.handout.title[locale]}
-                      author={line.handout.author.name[locale]}
-                      seed={line.handout.slug}
-                      src={line.handout.coverUrl}
-                      sizes="2.5rem"
-                      className="border border-line"
-                      compact
-                    />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-label-md text-on-surface">
-                      {line.handout.title[locale]}
+                    <span className="shrink-0 text-label-md" data-numeric>
+                      {formatPrice(line.lineTotal, locale)}
                     </span>
-                    <span className="block text-label-sm text-muted" data-numeric>
-                      × {line.quantity}
+                  </li>
+                ))}
+                {handoutLines.map((line) => (
+                  <li key={line.handoutId} className="flex items-center gap-3">
+                    <span className="w-10 shrink-0">
+                      <BookCover
+                        title={line.handout.title[locale]}
+                        author={line.handout.author.name[locale]}
+                        seed={line.handout.slug}
+                        src={line.handout.coverUrl}
+                        sizes="2.5rem"
+                        className="border border-line"
+                        compact
+                      />
                     </span>
-                  </span>
-                  <span className="shrink-0 text-label-md" data-numeric>
-                    {formatPrice(line.lineTotal, locale)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </OrderSummary>
-        </div>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-label-md text-on-surface">
+                        {line.handout.title[locale]}
+                      </span>
+                      <span className="block text-label-sm text-muted" data-numeric>
+                        × {line.quantity}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-label-md" data-numeric>
+                      {formatPrice(line.lineTotal, locale)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </OrderSummary>
+          </div>
+        </CheckoutProvider>
       </Container>
     </>
   );

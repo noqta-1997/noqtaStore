@@ -10,6 +10,8 @@ import {
   text,
   type ActionResult,
 } from "@/lib/action-result";
+import { defaultLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/get-dictionary";
 import { getCustomerInGoodStanding } from "@/lib/auth";
 import { COUPON_COOKIE, CouponSpent, evaluateCoupon, spendCoupon } from "@/lib/coupon";
 import { withOrderReference } from "@/lib/order-reference";
@@ -67,11 +69,16 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
     handoutLines.find((line) => line.handout.stock < line.quantity);
   if (shortage) return fail("outOfStock");
 
+  const rules = await getShippingRules();
+
+  // Pickup is an option only while the settings screen offers it; a form
+  // that names it after it was switched off is charged the standard rate.
   const rawShipping = text(formData, "shippingMethod") as ShippingMethod;
   const rawPayment = text(formData, "paymentMethod") as PaymentMethod;
-  const shippingMethod = shippingMethods.includes(rawShipping)
-    ? rawShipping
-    : "standard";
+  const shippingMethod =
+    shippingMethods.includes(rawShipping) && (rawShipping !== "pickup" || rules.enablePickup)
+      ? rawShipping
+      : "standard";
   const paymentMethod = paymentMethods.includes(rawPayment) ? rawPayment : "cod";
 
   const fullName = text(formData, "fullName");
@@ -91,8 +98,18 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
       (total, item) => total + item.handout.price * item.quantity,
       0,
     );
-  const rules = await getShippingRules();
   const shippingCost = shippingCostFor(shippingMethod, subtotal, rules);
+
+  // The order has one phone column. The optional second number the form asks
+  // for used to be read by nothing and vanished on submit; it goes into the
+  // courier notes, labelled, where the panel already shows them.
+  const altPhone = text(formData, "altPhone");
+  const notes = [
+    text(formData, "notes"),
+    altPhone ? `${(await getDictionary(defaultLocale)).checkout.altPhone}: ${altPhone}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
 
   // The code is re-checked here: it may have expired between cart and
   // confirm. If it has, the order is not quietly placed at full price under
@@ -128,7 +145,7 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
         shippingGovernorate: governorate,
         shippingCity: city,
         shippingLine: line,
-        notes: text(formData, "notes") || null,
+        notes: notes || null,
         items: {
           create: lines.map((item) => ({
             bookId: item.bookId,
