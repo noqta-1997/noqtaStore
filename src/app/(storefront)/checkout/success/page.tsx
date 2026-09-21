@@ -10,7 +10,7 @@ import { getOrderById, getOrders } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { requireCustomer } from "@/lib/auth";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatDate, formatPrice, storeDateKey } from "@/lib/format";
 import { readParam, type SearchParamsRecord } from "@/lib/search-params";
 
 interface SuccessPageProps {
@@ -50,9 +50,7 @@ export default async function OrderSuccessPage({
     {
       label: t.estimatedDelivery,
       value: formatDate(
-        new Date(new Date(order.createdAt).getTime() + 4 * 86_400_000)
-          .toISOString()
-          .slice(0, 10),
+        storeDateKey(new Date(new Date(order.createdAt).getTime() + 4 * 86_400_000)),
         locale,
       ),
     },

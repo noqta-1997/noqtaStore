@@ -31,6 +31,7 @@ import {
   rollUp,
   subtreeOf,
 } from "@/lib/category-tree";
+import { storeDateKey } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 import type {
   AdminNotification,
@@ -971,7 +972,7 @@ export async function getCustomer(): Promise<Customer> {
     email: row.email,
     phone: row.phone,
     birthDate: row.birthDate?.toISOString().slice(0, 10) ?? "",
-    memberSince: row.createdAt.toISOString().slice(0, 10),
+    memberSince: storeDateKey(row.createdAt),
     status: row.status,
     preferences: {
       newsletter: row.newsletterOptIn,
@@ -1561,7 +1562,7 @@ function toCustomerSummary(
     city: { ar: row.city ?? "" },
     ordersCount: totals.ordersCount,
     totalSpent: totals.totalSpent,
-    joinedAt: row.createdAt.toISOString().slice(0, 10),
+    joinedAt: storeDateKey(row.createdAt),
     status: row.status,
   };
 }
@@ -2205,7 +2206,7 @@ export async function getContactMessages(query: AdminListQuery = {}) {
     subject: row.subject,
     message: row.message,
     status: row.status,
-    createdAt: row.createdAt.toISOString().slice(0, 10),
+    createdAt: storeDateKey(row.createdAt),
   }));
 
   return { items, total, page, pageCount };
@@ -2243,7 +2244,7 @@ export async function getNewsletterSubscribers(query: AdminListQuery = {}) {
   const items: NewsletterSubscriber[] = rows.map((row) => ({
     email: row.email,
     locale: row.locale,
-    createdAt: row.createdAt.toISOString().slice(0, 10),
+    createdAt: storeDateKey(row.createdAt),
   }));
 
   return { items, total, page, pageCount };
@@ -2271,7 +2272,7 @@ function toCoupon(row: {
     value: row.value,
     minSubtotal: row.minSubtotal,
     active: row.active,
-    expiresAt: row.expiresAt?.toISOString().slice(0, 10) ?? "",
+    expiresAt: row.expiresAt ? storeDateKey(row.expiresAt) : "",
     usageLimit: row.usageLimit,
     usedCount: row.usedCount,
   };

@@ -27,6 +27,7 @@ import {
   formatMonth,
   formatNumber,
   formatPrice,
+  storeDateKey,
 } from "@/lib/format";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -335,7 +336,7 @@ export default async function AdminDashboardPage() {
       </Panel>
 
       <p className="text-label-md text-muted">
-        {admin.common.today}: <span data-numeric>{formatDate("2026-08-29", locale)}</span>
+        {admin.common.today}: <span data-numeric>{formatDate(storeDateKey(), locale)}</span>
       </p>
     </>
   );

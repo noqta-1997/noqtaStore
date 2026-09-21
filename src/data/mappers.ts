@@ -28,6 +28,7 @@ import type {
   Review,
   ReviewWithStatus,
 } from "@/types";
+import { storeDateKey } from "@/lib/format";
 
 /**
  * Translates database rows into the shapes the UI already speaks, so the
@@ -143,7 +144,7 @@ export function toBook(row: BookRowWithRelations): BookWithRelations {
     tags: row.tags,
     coverUrl: row.coverUrl ?? undefined,
     archived: row.archivedAt !== null,
-    createdAt: row.createdAt.toISOString().slice(0, 10),
+    createdAt: storeDateKey(row.createdAt),
     author: toAuthor(row.author),
     category: toCategoryWithCount(row.category),
     publisher: toPublisher(row.publisher),
@@ -176,7 +177,7 @@ export function toHandout(row: HandoutRowWithRelations): HandoutWithRelations {
     tags: row.tags,
     coverUrl: row.coverUrl ?? undefined,
     archived: row.archivedAt !== null,
-    createdAt: row.createdAt.toISOString().slice(0, 10),
+    createdAt: storeDateKey(row.createdAt),
     author: toAuthor(row.author),
     category: toHandoutCategoryWithCount(row.category),
     publisher: toPublisher(row.publisher),
@@ -204,7 +205,7 @@ export function toReview(row: ReviewRow): Review {
     rating: row.rating,
     title: mirror(row.title),
     body: mirror(row.body),
-    createdAt: row.createdAt.toISOString().slice(0, 10),
+    createdAt: storeDateKey(row.createdAt),
   };
 }
 
@@ -232,7 +233,7 @@ export function toHandoutReview(row: HandoutReviewRow): HandoutReview {
     rating: row.rating,
     title: mirror(row.title),
     body: mirror(row.body),
-    createdAt: row.createdAt.toISOString().slice(0, 10),
+    createdAt: storeDateKey(row.createdAt),
   };
 }
 
@@ -262,7 +263,7 @@ export function toOrder(row: OrderRowWithRelations): Order {
   return {
     id: row.id,
     reference: row.reference,
-    createdAt: row.createdAt.toISOString().slice(0, 10),
+    createdAt: storeDateKey(row.createdAt),
     status: row.status,
     items: row.items.map((item) => ({
       bookId: item.bookId,
@@ -294,7 +295,7 @@ export function toOrder(row: OrderRowWithRelations): Order {
       .sort((a, b) => a.occurredAt.getTime() - b.occurredAt.getTime())
       .map((event) => ({
         status: event.status,
-        date: event.occurredAt.toISOString().slice(0, 10),
+        date: storeDateKey(event.occurredAt),
         done: event.occurredAt.getTime() <= Date.now(),
       })),
   };

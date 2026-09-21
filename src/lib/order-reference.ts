@@ -1,15 +1,7 @@
 import { randomInt } from "node:crypto";
 
-import { STORE_TIME_ZONE } from "@/lib/constants";
+import { storeDateKey } from "@/lib/format";
 import { isUniqueViolation, violatedConstraint } from "@/lib/prisma-errors";
-
-/** YYYYMMDD in the store's own time zone; `en-CA` prints ISO order. */
-const storeDay = new Intl.DateTimeFormat("en-CA", {
-  timeZone: STORE_TIME_ZONE,
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-});
 
 /** The unique index on Order.reference, as Postgres names it. */
 const REFERENCE_INDEX = "orders_reference_key";
@@ -27,7 +19,7 @@ export const REFERENCE_ATTEMPTS = 5;
  * than one in three.
  */
 export function newOrderReference(now = new Date()): string {
-  const day = storeDay.format(now).replace(/-/g, "");
+  const day = storeDateKey(now).replace(/-/g, "");
   return `NQ-${day}-${randomInt(100000, 1000000)}`;
 }
 

@@ -12,7 +12,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { getCoupons } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
-import { formatDate, formatNumber, formatPrice } from "@/lib/format";
+import { formatDate, formatNumber, formatPrice, storeDateKey } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -31,7 +31,7 @@ export default async function AdminCouponsPage() {
   ]);
 
   const t = admin.coupons;
-  const today = new Date().toISOString().slice(0, 10);
+  const today = storeDateKey();
 
   return (
     <>
