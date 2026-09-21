@@ -126,11 +126,28 @@ export async function settle(page: Page, ready?: string) {
   );
 }
 
-/** Verifies the theme actually took effect, so a silent miss cannot pass. */
+/**
+ * Verifies the theme actually took effect, so a silent miss cannot pass.
+ *
+ * On a page the server rendered, the boot script has set the attribute
+ * before `domcontentloaded` and the first read is the only one. A real 404
+ * is different: Next answers a `notFound()` thrown outside a Suspense
+ * boundary with an empty error document that the client fills in, and the
+ * inline script never runs there — the app applies the stored theme itself
+ * once it has rendered. So the check waits, briefly, for the attribute to
+ * appear rather than reading it once at a moment that document cannot meet.
+ */
 export async function assertTheme(page: Page, theme: Theme) {
-  const applied = await page.evaluate(
-    () => document.documentElement.getAttribute("data-theme"),
-  );
+  const read = () =>
+    page.evaluate(() => document.documentElement.getAttribute("data-theme"));
+
+  let applied = await read();
+  const deadline = Date.now() + 5_000;
+
+  while (applied !== theme && Date.now() < deadline) {
+    await page.waitForTimeout(100);
+    applied = await read();
+  }
 
   if (applied !== theme) {
     throw new Error(`theme not applied: expected ${theme}, got ${applied ?? "none"}`);

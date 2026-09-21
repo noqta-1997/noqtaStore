@@ -11,7 +11,7 @@ import {
 import { useServerInsertedHTML } from "next/navigation";
 import { useMemo, useRef, useState, type ReactNode } from "react";
 
-import { useTheme } from "@/components/theme/use-theme";
+import { useStoredThemeFallback, useTheme } from "@/components/theme/use-theme";
 import { noqtaBrand } from "@/theme/noqta-brand";
 import {
   noqtaPaperDark,
@@ -46,6 +46,8 @@ export function FluentShell({ dir, children }: FluentShellProps) {
   const flushed = useRef(new Set<string>());
   // Same store the toggle writes to, so the islands never lag the page.
   const theme = useTheme();
+  // For the documents the boot script never ran in — see the hook.
+  useStoredThemeFallback();
 
   /*
    * `useServerInsertedHTML` fires once per streaming flush. The pattern the

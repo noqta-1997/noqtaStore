@@ -524,14 +524,14 @@ export async function searchAuthorPicks(
   }));
 }
 
-export async function getAuthorBySlug(slug: string): Promise<Author | undefined> {
+export const getAuthorBySlug = cache(async (slug: string): Promise<Author | undefined> => {
   const row = await prisma.author.findUnique({
     where: { slug },
     include: authorInclude,
   });
 
   return row ? toAuthor(row) : undefined;
-}
+});
 
 export async function getAuthorById(id: string): Promise<Author | undefined> {
   const row = await prisma.author.findUnique({
@@ -667,12 +667,17 @@ export async function getDiscountedBooks(limit?: number): Promise<BookWithRelati
   return rows.map(toBook);
 }
 
-export async function getBookBySlug(
-  slug: string,
-): Promise<BookWithRelations | undefined> {
-  const row = await prisma.book.findUnique({ where: { slug, ...onShelf }, include: bookInclude });
-  return row ? toBook(row) : undefined;
-}
+/**
+ * The by-slug reads are memoised per request: a detail page asks three times
+ * — the segment layout that decides 404, `generateMetadata`, and the page —
+ * and one row is enough for all of them.
+ */
+export const getBookBySlug = cache(
+  async (slug: string): Promise<BookWithRelations | undefined> => {
+    const row = await prisma.book.findUnique({ where: { slug, ...onShelf }, include: bookInclude });
+    return row ? toBook(row) : undefined;
+  },
+);
 
 export async function getBookById(id: string): Promise<BookWithRelations | undefined> {
   const row = await prisma.book.findUnique({ where: { id }, include: bookInclude });
@@ -863,15 +868,15 @@ export async function getHandoutPriceBounds() {
   return { min: result._min.price ?? 0, max: result._max.price ?? 0 };
 }
 
-export async function getHandoutBySlug(
-  slug: string,
-): Promise<HandoutWithRelations | undefined> {
-  const row = await prisma.handout.findUnique({
-    where: { slug, ...handoutOnShelf },
-    include: handoutInclude,
-  });
-  return row ? toHandout(row) : undefined;
-}
+export const getHandoutBySlug = cache(
+  async (slug: string): Promise<HandoutWithRelations | undefined> => {
+    const row = await prisma.handout.findUnique({
+      where: { slug, ...handoutOnShelf },
+      include: handoutInclude,
+    });
+    return row ? toHandout(row) : undefined;
+  },
+);
 
 export async function getHandoutById(id: string): Promise<HandoutWithRelations | undefined> {
   const row = await prisma.handout.findUnique({ where: { id }, include: handoutInclude });
@@ -1929,14 +1934,14 @@ export async function getPublishers(): Promise<Publisher[]> {
   return rows.map(toPublisher);
 }
 
-export async function getPublisherBySlug(slug: string): Promise<Publisher | null> {
+export const getPublisherBySlug = cache(async (slug: string): Promise<Publisher | null> => {
   const row = await prisma.publisher.findUnique({
     where: { slug },
     include: publisherInclude,
   });
 
   return row ? toPublisher(row) : null;
-}
+});
 
 export async function getPublisherById(id: string): Promise<Publisher | null> {
   const row = await prisma.publisher.findUnique({

@@ -108,3 +108,52 @@ export function AdminSkeleton() {
     </>
   );
 }
+
+/**
+ * A detail page: the crumb band, the jacket on its plate beside the title
+ * block and the buy box. The catalogue skeleton used to cover `books/[slug]`
+ * too (its `loading.tsx` sat one level up, before the catalogue moved into
+ * its own route group), so a single title loaded behind a grid of eight
+ * cards — the wrong shape, briefly, on every jacket a reader opened.
+ */
+export function DetailSkeleton() {
+  return (
+    <>
+      <div className="border-b border-line-divider bg-surface-low">
+        <Container className="py-4">
+          <Skeleton className="h-3 w-64 max-w-full" />
+        </Container>
+      </div>
+
+      <Container className="grid gap-8 py-8 lg:grid-cols-12 lg:gap-12 lg:py-12">
+        <div className="lg:col-span-5">
+          <div className="mx-auto max-w-xs rounded-2xl bg-surface-low p-5 sm:p-7 lg:max-w-sm">
+            <Skeleton className="aspect-[2/3] w-full rounded-lg" />
+          </div>
+        </div>
+
+        <div className="space-y-6 lg:col-span-7">
+          <div className="space-y-3">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-9 w-3/4" />
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+
+          <div className="space-y-4 rounded-xl border border-line bg-card p-5">
+            <Skeleton className="h-7 w-32" />
+            <div className="flex flex-wrap items-center gap-3">
+              <Skeleton className="h-9 w-28" />
+              <Skeleton className="h-10 flex-1" />
+              <Skeleton className="size-12 rounded-full" />
+            </div>
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-2/3" />
+          </div>
+
+          <Skeleton className="h-64 w-full rounded-xl" />
+        </div>
+      </Container>
+    </>
+  );
+}

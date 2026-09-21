@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useLayoutEffect, useSyncExternalStore } from "react";
 
 import { THEME_STORAGE_KEY } from "@/lib/theme";
 
@@ -50,4 +50,34 @@ export function setTheme(next: Theme) {
     /* storage unavailable — the choice just won't persist */
   }
   listeners.forEach((listener) => listener());
+}
+
+/**
+ * The boot script in the root layout applies the stored choice before first
+ * paint — when it runs at all. A `notFound()` thrown outside a Suspense
+ * boundary makes Next answer with its error shell instead of the page: an
+ * empty document the browser fills in from the RSC payload, and in a client
+ * render an inline `<script>` is created but never executed. Every 404 page
+ * therefore came up in the OS theme, whatever the reader had chosen. This is
+ * the same rule run once more from the client, before that first paint, for
+ * the case where the script never ran; on a normally served page the
+ * attribute is already there and nothing happens.
+ */
+export function useStoredThemeFallback() {
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    if (root.getAttribute("data-theme")) return;
+
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem(THEME_STORAGE_KEY);
+    } catch {
+      return;
+    }
+
+    if (stored === "dark" || stored === "light") {
+      root.setAttribute("data-theme", stored);
+      listeners.forEach((listener) => listener());
+    }
+  }, []);
 }
