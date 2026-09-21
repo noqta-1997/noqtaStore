@@ -91,22 +91,25 @@ rather than be special-cased here.
 ## Pages behind a login
 
 `global-setup.ts` signs in for you, once per run, if the machine has been told
-how. Add two lines to `.env.local` — the same gitignored file the app already
-keeps its Supabase keys in:
+how. It needs one line in `.env.local` — the same gitignored file the app
+already keeps its Supabase keys in:
 
 ```
-E2E_EMAIL=<the account to capture as>
-E2E_PASSWORD=<its password>
+SUPABASE_SERVICE_ROLE_KEY=<the project's service-role key>
 ```
 
 Nothing else is needed: the session is minted at the start of every run and
 saved to `tests/.auth/user.json`, so an expired one repairs itself instead of
-failing the suite a month later. Without both variables the step is skipped
-and says so.
+failing the suite a month later. Without the key the step is skipped and says
+so.
 
-It drives the real login form rather than writing a cookie by hand. Auth is a
-hosted Supabase project, and a forged session would prove the forgery works,
-not that signing in does.
+There is no login form to drive any more — sign-in is Google only, and Google
+refuses an automation-controlled browser — so the session is issued the way
+Supabase issues one for a custom email provider: `generateLink` produces a
+single-use token for the owner's address and `verifyOtp` exchanges it. That is
+a real token from the real auth server, written into the cookie by the same
+`@supabase/ssr` version the app reads it back with, not a forged cookie. (An
+`E2E_EMAIL`/`E2E_PASSWORD` pair used to be read here; it does nothing now.)
 
 **Which account matters.** `src/lib/owner.ts` pins the admin role to one
 literal address, and `pinOwnerRole` demotes everyone else on every sign-in —
