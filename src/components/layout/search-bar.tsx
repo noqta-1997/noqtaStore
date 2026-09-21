@@ -1,4 +1,5 @@
 import { Search } from "lucide-react";
+import Form from "next/form";
 
 import { cn } from "@/lib/utils";
 
@@ -26,7 +27,15 @@ interface SearchBarProps {
   className?: string;
 }
 
-/** Header search — a rounded well with a single warm action. */
+/**
+ * Header search — a rounded well with a single warm action.
+ *
+ * It is `next/form`, not a `<form>`: submitting one walks the router to the
+ * results page, with the query folded into the URL exactly as a GET would,
+ * so the header stays put and the results page's skeleton shows while the
+ * search runs. A plain form was a document load — the store rebuilt from
+ * the top for every query typed into its own header.
+ */
 export function SearchBar({
   placeholder,
   label,
@@ -38,7 +47,7 @@ export function SearchBar({
   className,
 }: SearchBarProps) {
   return (
-    <form
+    <Form
       action={action}
       role="search"
       className={cn(
@@ -80,6 +89,6 @@ export function SearchBar({
           {label}
         </button>
       )}
-    </form>
+    </Form>
   );
 }

@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { Star } from "lucide-react";
+import Form from "next/form";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -55,8 +56,11 @@ function Group({
 }
 
 /**
- * A plain GET form: filtering works with the browser alone, and every
- * state is a shareable URL. No client JavaScript involved.
+ * A GET form: filtering works with the browser alone, and every state is a
+ * shareable URL. It is `next/form`, so with JavaScript the submit is a
+ * client-side navigation — the listing's skeleton shows while the filtered
+ * page arrives, instead of the document being reloaded from the top — and
+ * without it the browser submits the same query the same way.
  */
 export function BookFilters({
   action,
@@ -73,9 +77,8 @@ export function BookFilters({
   const t = dictionary.books;
 
   return (
-    <form
+    <Form
       action={action}
-      method="get"
       className={cn("space-y-5 rounded-xl border border-line bg-card p-5", className)}
     >
       {values.q ? <input type="hidden" name="q" value={values.q} /> : null}
@@ -209,6 +212,6 @@ export function BookFilters({
           {dictionary.common.clear}
         </Link>
       </div>
-    </form>
+    </Form>
   );
 }

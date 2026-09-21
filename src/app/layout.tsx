@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 
 import { FluentShell } from "@/components/fluent/fluent-shell";
+import { NavigationProgress } from "@/components/layout/navigation-progress";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
 import { ToastProvider } from "@/components/ui/toast";
 import { getStoreIdentity } from "@/data";
@@ -93,6 +94,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-dvh antialiased">
+        {/* Reads the URL to know when a navigation has landed; a boundary
+            keeps that read from making the whole document dynamic. */}
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         <FluentShell dir={localeDirection[defaultLocale]}>
           <ToastProvider dismissLabel={dictionary.common.toast.dismiss}>
             {children}

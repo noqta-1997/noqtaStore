@@ -1,4 +1,5 @@
 import { ExternalLink, Search } from "lucide-react";
+import Form from "next/form";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -74,8 +75,8 @@ export default async function AdminLayout({
               closeLabel={dictionary.common.close}
             />
 
-            <form
-              action={`/admin/books`}
+            <Form
+              action="/admin/books"
               className="hidden h-10 min-w-0 max-w-md flex-1 items-center rounded-full border border-line bg-card ps-4 sm:flex"
             >
               <Search aria-hidden className="size-4 shrink-0 text-muted" strokeWidth={1.75} />
@@ -89,7 +90,7 @@ export default async function AdminLayout({
                 placeholder={admin.topbar.search}
                 className="h-full w-full min-w-0 bg-transparent px-2 text-sm text-on-surface placeholder:text-muted focus:outline-none"
               />
-            </form>
+            </Form>
 
             <div className="ms-auto flex items-center gap-1">
               <Link

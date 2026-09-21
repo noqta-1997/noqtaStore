@@ -4,7 +4,6 @@ import {
   Menu,
   MenuDivider,
   MenuItem,
-  MenuItemLink,
   MenuList,
   MenuPopover,
   MenuTrigger,
@@ -23,6 +22,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { MenuLink } from "@/components/layout/menu-link";
 import { buttonStyles } from "@/components/ui/button";
 import { isOwner } from "@/lib/owner";
 import { cn } from "@/lib/utils";
@@ -191,26 +191,26 @@ export function AccountMenu({ labels }: AccountMenuProps) {
         <MenuList>
           {isOwner(email) ? (
             <>
-              <MenuItemLink
+              <MenuLink
                 icon={
                   <LayoutDashboard aria-hidden className="size-4" strokeWidth={1.75} />
                 }
                 href={`/admin`}
               >
                 {labels.adminPanel}
-              </MenuItemLink>
+              </MenuLink>
               <MenuDivider />
             </>
           ) : null}
 
           {items.map((item) => (
-            <MenuItemLink
+            <MenuLink
               key={item.href}
               icon={<item.icon aria-hidden className="size-4" strokeWidth={1.75} />}
               href={item.href}
             >
               {item.label}
-            </MenuItemLink>
+            </MenuLink>
           ))}
 
           <MenuDivider />

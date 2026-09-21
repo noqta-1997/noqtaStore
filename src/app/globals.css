@@ -424,6 +424,61 @@
   }
 }
 
+/*
+ * The line along the top of the viewport while the router is between
+ * pages: Fluent's indeterminate progress bar — a third of the track sliding
+ * across it and around again — run in the reading direction, since the
+ * whole store reads right to left. The track itself is what the component
+ * mounts; the bar is its one child.
+ *
+ * It arrives late on purpose. A navigation served from the cache commits
+ * within a few frames, and a line that flashed for each of those would be
+ * noise, so the track stays invisible for the first 150ms and fades in only
+ * once the wait has become one. A reader who asked for less motion gets the
+ * whole track filled and still, instead of a bar frozen mid-slide.
+ */
+@utility navigation-progress {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 50;
+  height: var(--strokeWidthThick);
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  animation: navigation-progress-reveal 150ms var(--curveEasyEase) 150ms forwards;
+
+  & > span {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 33%;
+    background-color: var(--primary-container);
+    animation: navigation-progress-slide 1.5s var(--curveEasyEase) infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    & > span {
+      width: 100%;
+    }
+  }
+}
+
+@keyframes navigation-progress-reveal {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes navigation-progress-slide {
+  from {
+    inset-inline-start: -33%;
+  }
+  to {
+    inset-inline-start: 100%;
+  }
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;

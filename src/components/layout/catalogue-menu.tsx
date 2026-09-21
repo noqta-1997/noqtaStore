@@ -6,12 +6,12 @@ import {
   MenuGroup,
   MenuGroupHeader,
   MenuItem,
-  MenuItemLink,
   MenuList,
   MenuPopover,
   MenuTrigger,
 } from "@fluentui/react-components";
 
+import { MenuLink } from "@/components/layout/menu-link";
 import type { CatalogueMenu as CatalogueMenuModel, MenuBranch } from "@/lib/category-menu";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +32,7 @@ interface CatalogueMenuProps {
  */
 function BranchEntry({ branch, wholeLabel }: { branch: MenuBranch; wholeLabel: string }) {
   if (!branch.children.length) {
-    return <MenuItemLink href={branch.href}>{branch.name}</MenuItemLink>;
+    return <MenuLink href={branch.href}>{branch.name}</MenuLink>;
   }
 
   return (
@@ -42,7 +42,7 @@ function BranchEntry({ branch, wholeLabel }: { branch: MenuBranch; wholeLabel: s
       </MenuTrigger>
       <MenuPopover>
         <MenuList>
-          <MenuItemLink href={branch.href}>{wholeLabel.replace("{name}", branch.name)}</MenuItemLink>
+          <MenuLink href={branch.href}>{wholeLabel.replace("{name}", branch.name)}</MenuLink>
           <MenuDivider />
           {branch.children.map((child) => (
             <BranchEntry key={child.id} branch={child} wholeLabel={wholeLabel} />
@@ -80,7 +80,7 @@ export function CatalogueMenu({ menu, wholeLabel, linkClassName }: CatalogueMenu
 
       <MenuPopover>
         <MenuList>
-          <MenuItemLink href={menu.href}>{menu.allLabel}</MenuItemLink>
+          <MenuLink href={menu.href}>{menu.allLabel}</MenuLink>
           <MenuDivider />
 
           {menu.columns.map((branch) => (
@@ -93,9 +93,9 @@ export function CatalogueMenu({ menu, wholeLabel, linkClassName }: CatalogueMenu
               <MenuGroup>
                 <MenuGroupHeader>{menu.othersLabel}</MenuGroupHeader>
                 {menu.others.map((branch) => (
-                  <MenuItemLink key={branch.id} href={branch.href}>
+                  <MenuLink key={branch.id} href={branch.href}>
                     {branch.name}
-                  </MenuItemLink>
+                  </MenuLink>
                 ))}
               </MenuGroup>
             </>

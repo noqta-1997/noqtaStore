@@ -1,4 +1,5 @@
 import { Search } from "lucide-react";
+import Form from "next/form";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,8 @@ interface TableToolbarProps {
 }
 
 /**
- * Search + status tabs above a table. The search is a plain GET form and
+ * Search + status tabs above a table. The search is a GET form (`next/form`,
+ * so the submit is a client-side navigation behind the panel's skeleton) and
  * the tabs are links, so every table state is a shareable URL.
  */
 export function TableToolbar({
@@ -72,7 +74,7 @@ export function TableToolbar({
         <span />
       )}
 
-      <form action={action} method="get" className="flex min-w-0 items-center gap-2">
+      <Form action={action} className="flex min-w-0 items-center gap-2">
         {Object.entries(hiddenFields ?? {}).map(([name, value]) =>
           value ? <input key={name} type="hidden" name={name} value={value} /> : null,
         )}
@@ -94,7 +96,7 @@ export function TableToolbar({
         <Button type="submit" variant="secondary" size="sm" className="h-10 shrink-0 rounded-full">
           {searchLabel}
         </Button>
-      </form>
+      </Form>
     </div>
   );
 }
