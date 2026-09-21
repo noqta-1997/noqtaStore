@@ -137,6 +137,7 @@ export function StorefrontHeader({
 
         <div className="ms-auto flex items-center gap-0.5 lg:ms-0 lg:gap-1">
           <SearchBar
+            id="site-search-inline"
             action={`/search`}
             label={dictionary.common.search}
             placeholder={dictionary.common.searchPlaceholder}

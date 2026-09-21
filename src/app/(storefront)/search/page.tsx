@@ -66,6 +66,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <h1 className="text-headline-lg">{t.title}</h1>
 
           <SearchBar
+            id="search-query"
             action={`/search`}
             label={dictionary.common.search}
             placeholder={t.placeholder}

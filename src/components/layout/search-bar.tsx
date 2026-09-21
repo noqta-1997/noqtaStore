@@ -6,6 +6,14 @@ interface SearchBarProps {
   placeholder: string;
   label: string;
   action: string;
+  /**
+   * The field's id, which the label points at. The header draws this form
+   * twice — a pill in the row on wide screens and a full field under it on
+   * narrow ones — and the search page draws it a third time, so each caller
+   * names its own: with one shared id every label pointed at the first
+   * field in the document, a hidden one.
+   */
+  id?: string;
   defaultValue?: string;
   /** Larger variant used on the search results page. */
   size?: "md" | "lg";
@@ -23,6 +31,7 @@ export function SearchBar({
   placeholder,
   label,
   action,
+  id = "site-search",
   defaultValue,
   size = "md",
   compact = false,
@@ -39,7 +48,7 @@ export function SearchBar({
         className,
       )}
     >
-      <label htmlFor="site-search" className="sr-only">
+      <label htmlFor={id} className="sr-only">
         {label}
       </label>
       <Search
@@ -48,7 +57,7 @@ export function SearchBar({
         strokeWidth={1.75}
       />
       <input
-        id="site-search"
+        id={id}
         name="q"
         type="search"
         placeholder={placeholder}
