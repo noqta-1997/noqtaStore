@@ -144,6 +144,7 @@ export default async function AdminBookPage({ params }: AdminBookPageProps) {
                 seed={book.slug}
                 src={book.coverUrl}
                 sizes="8rem"
+                priority
                 className="rounded-md elevation-sm"
               />
             </div>

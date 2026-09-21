@@ -142,6 +142,7 @@ export default async function AdminHandoutPage({ params }: AdminHandoutPageProps
                 seed={handout.slug}
                 src={handout.coverUrl}
                 sizes="8rem"
+                priority
                 className="rounded-md elevation-sm"
               />
             </div>

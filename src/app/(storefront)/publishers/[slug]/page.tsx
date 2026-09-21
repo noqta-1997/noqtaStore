@@ -186,6 +186,7 @@ export default async function PublisherPage({
               handouts={handouts}
               locale={locale}
               dictionary={dictionary.common}
+              priority={result.items.length === 0}
             />
           </Container>
         </div>

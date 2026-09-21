@@ -166,6 +166,8 @@ export default async function AuthorPage({ params, searchParams }: AuthorPagePro
               handouts={handouts}
               locale={locale}
               dictionary={dictionary.common}
+              // With no books above them these are the first jackets on screen.
+              priority={result.items.length === 0}
             />
           </Container>
         </div>
