@@ -82,6 +82,7 @@ export default async function ProfilePage() {
           fallbackError={dictionary.common.toast.actionFailed}
           errorMessages={{
             missingName: dictionary.common.actionErrors.missingName,
+            invalidDate: dictionary.common.actionErrors.invalidDate,
             unauthenticated: dictionary.common.toast.signInRequired,
           }}
         >

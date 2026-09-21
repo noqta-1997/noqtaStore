@@ -14,7 +14,7 @@ import { refreshBookRating } from "@/lib/book-rating";
 import { refreshHandoutRating } from "@/lib/handout-rating";
 import { getCurrentCustomer, getCustomerInGoodStanding } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { logActionError } from "@/lib/prisma-errors";
+import { isForeignKeyViolation, isUniqueViolation, logActionError } from "@/lib/prisma-errors";
 
 async function requireCustomerId() {
   const customer = await getCurrentCustomer();
@@ -28,14 +28,19 @@ export async function updateProfile(formData: FormData): Promise<ActionResult> {
   const name = text(formData, "name");
   if (!name) return fail("missingName");
 
-  const birthDate = text(formData, "birthDate");
+  // The field is `type="date"`, so the browser sends ISO or nothing; a value
+  // the parser cannot read (an edited request) is refused rather than handed
+  // to the database as an invalid date.
+  const rawBirthDate = text(formData, "birthDate");
+  const birthDate = rawBirthDate ? new Date(rawBirthDate) : null;
+  if (birthDate && Number.isNaN(birthDate.getTime())) return fail("invalidDate");
 
   await prisma.customer.update({
     where: { id: customerId },
     data: {
       name,
       phone: text(formData, "phone"),
-      birthDate: birthDate ? new Date(birthDate) : null,
+      birthDate,
     },
   });
 
@@ -162,9 +167,20 @@ export async function submitReview(formData: FormData): Promise<ActionResult> {
   });
   if (existing) return fail("alreadyReviewed");
 
-  await prisma.review.create({
-    data: { bookId, customerId, rating, title, body },
-  });
+  try {
+    await prisma.review.create({
+      data: { bookId, customerId, rating, title, body },
+    });
+  } catch (error) {
+    // The form posted twice before the first answer came back: the row the
+    // check above did not see is this reader's own, written a moment ago.
+    if (isUniqueViolation(error)) return fail("alreadyReviewed");
+    // A book id that is not in the catalogue — the page was stale, or the
+    // hidden field was edited.
+    if (isForeignKeyViolation(error)) return fail("notFound");
+    logActionError("submitReview", error, { bookId });
+    return fail("saveFailed");
+  }
 
   revalidatePath("/account/reviews");
   revalidatePath("/admin/reviews");
@@ -216,9 +232,16 @@ export async function submitHandoutReview(formData: FormData): Promise<ActionRes
   });
   if (existing) return fail("alreadyReviewed");
 
-  await prisma.handoutReview.create({
-    data: { handoutId, customerId, rating, title, body },
-  });
+  try {
+    await prisma.handoutReview.create({
+      data: { handoutId, customerId, rating, title, body },
+    });
+  } catch (error) {
+    if (isUniqueViolation(error)) return fail("alreadyReviewed");
+    if (isForeignKeyViolation(error)) return fail("notFound");
+    logActionError("submitHandoutReview", error, { handoutId });
+    return fail("saveFailed");
+  }
 
   revalidatePath("/account/reviews");
   revalidatePath("/admin/handout-reviews");

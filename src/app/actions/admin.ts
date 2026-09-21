@@ -42,6 +42,7 @@ import {
   type HomeShelf,
   type ShelfKind,
 } from "@/lib/home-sections";
+import { STORE_UTC_OFFSET } from "@/lib/constants";
 import { isOwner } from "@/lib/owner";
 import { refreshBookRating } from "@/lib/book-rating";
 import { isWithin } from "@/lib/category-tree";
@@ -743,6 +744,14 @@ const orderStatuses: OrderStatus[] = [
  */
 const beforeDispatch: OrderStatus[] = ["pending", "processing"];
 
+/** Thrown inside the status transaction when another change got there first. */
+class StatusChanged extends Error {
+  constructor() {
+    super("order status changed since the page was rendered");
+    this.name = "StatusChanged";
+  }
+}
+
 export async function updateOrderStatus(formData: FormData): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
@@ -774,7 +783,17 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
 
   try {
     await prisma.$transaction(async (tx) => {
-      await tx.order.update({ where: { id: orderId }, data: { status } });
+      // The status was read before the transaction opened, and the moves
+      // below are worked out from it: two admins cancelling the same order
+      // together would both read `pending`, both release the copies, and the
+      // shelf would gain them twice. The write is conditional on the status
+      // still being what was read, so the second change finds nothing to
+      // update and is refused as a conflict instead of applied on top.
+      const changed = await tx.order.updateMany({
+        where: { id: orderId, status: order.status },
+        data: { status },
+      });
+      if (changed.count !== 1) throw new StatusChanged();
       await tx.orderEvent.create({ data: { orderId, status } });
 
       // The coupon's use goes the way of the sale: a cancelled order gives it
@@ -811,6 +830,7 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
       }
     });
   } catch (error) {
+    if (error instanceof StatusChanged) return fail("statusChanged");
     if (error instanceof ShortStock || isCheckViolation(error)) return fail("outOfStock");
     if (error instanceof CouponSpent) return fail("couponSpent");
     logActionError("updateOrderStatus", error, { orderId, status });
@@ -962,7 +982,13 @@ export async function saveCoupon(formData: FormData): Promise<ActionResult> {
   if (value <= 0) return fail("invalidValue");
   if (type === "percentage" && value > 100) return fail("invalidValue");
 
-  const expiresAt = text(formData, "expiresAt");
+  // "Expires on" a day means good until that day is over — in Baghdad,
+  // since that is where the day ends for the customer. It used to be parsed
+  // as UTC midnight, so a code dated the 30th stopped working at three in
+  // the morning of the 30th.
+  const expiresOn = text(formData, "expiresAt");
+  const expiresAt = expiresOn ? new Date(`${expiresOn}T23:59:59.999${STORE_UTC_OFFSET}`) : null;
+  if (expiresAt && Number.isNaN(expiresAt.getTime())) return fail("invalidDate");
   const usageLimit = optionalNumber(formData, "usageLimit");
 
   const data = {
@@ -971,7 +997,7 @@ export async function saveCoupon(formData: FormData): Promise<ActionResult> {
     value,
     minSubtotal: Math.max(number(formData, "minSubtotal"), 0),
     active: checkbox(formData, "active"),
-    expiresAt: expiresAt ? new Date(expiresAt) : null,
+    expiresAt,
     usageLimit: usageLimit && usageLimit > 0 ? Math.round(usageLimit) : null,
   };
 

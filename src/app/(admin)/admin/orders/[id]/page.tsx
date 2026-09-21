@@ -253,6 +253,7 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
               action={updateOrderStatus}
               successTitle={dictionary.common.toast.statusUpdated}
               fallbackError={dictionary.common.toast.actionFailed}
+              refreshOnErrors={["notFound", "statusChanged"]}
               errorMessages={{
                 forbidden: dictionary.common.actionErrors.forbidden,
                 notFound: dictionary.common.actionErrors.notFound,
@@ -261,6 +262,8 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
                 // coupon its use.
                 outOfStock: dictionary.common.outOfStock,
                 couponSpent: dictionary.common.actionErrors.couponSpent,
+                // Another admin moved it first; the page is redrawn to show where.
+                statusChanged: dictionary.common.actionErrors.statusChanged,
               }}
             >
               <input type="hidden" name="orderId" value={order.id} />

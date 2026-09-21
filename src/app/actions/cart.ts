@@ -7,6 +7,7 @@ import { fail, ok, text, type ActionResult } from "@/lib/action-result";
 import { getCurrentCustomer } from "@/lib/auth";
 import { COUPON_COOKIE, evaluateCoupon } from "@/lib/coupon";
 import { prisma } from "@/lib/prisma";
+import { isMissingRecord, isUniqueViolation } from "@/lib/prisma-errors";
 
 /** Signed-out readers are told to sign in rather than silently losing the item. */
 async function requireCustomerId(): Promise<string | null> {
@@ -56,6 +57,8 @@ export async function setCartQuantity(
   const customerId = await requireCustomerId();
   if (!customerId) return fail("unauthenticated");
 
+  // The column is an integer; whatever the stepper sent, the row gets one.
+  quantity = Math.trunc(quantity) || 0;
   if (quantity <= 0) return removeFromCart(bookId);
 
   const book = await prisma.book.findUnique({
@@ -64,10 +67,17 @@ export async function setCartQuantity(
   });
   if (!book) return fail("notFound");
 
-  await prisma.cartItem.update({
-    where: { customerId_bookId: { customerId, bookId } },
-    data: { quantity: Math.min(quantity, Math.max(book.stock, 1)) },
-  });
+  try {
+    await prisma.cartItem.update({
+      where: { customerId_bookId: { customerId, bookId } },
+      data: { quantity: Math.min(quantity, Math.max(book.stock, 1)) },
+    });
+  } catch (error) {
+    // The line went while the stepper was being pressed — removed in another
+    // tab, or archived by the panel. Nothing to set; the page redraws.
+    if (isMissingRecord(error)) return fail("notFound");
+    throw error;
+  }
 
   revalidatePath("/cart");
   return ok();
@@ -101,7 +111,13 @@ export async function toggleWishlist(bookId: string): Promise<ActionResult> {
     return ok("removed");
   }
 
-  await prisma.wishlistItem.create({ data: { customerId, bookId } });
+  try {
+    await prisma.wishlistItem.create({ data: { customerId, bookId } });
+  } catch (error) {
+    // Two clicks in flight at once both saw no row; the second finds the
+    // first's. The heart asked for "saved", and saved it is.
+    if (!isUniqueViolation(error)) throw error;
+  }
   revalidatePath("/account/wishlist");
   return ok("added");
 }
@@ -150,6 +166,7 @@ export async function setHandoutCartQuantity(
   const customerId = await requireCustomerId();
   if (!customerId) return fail("unauthenticated");
 
+  quantity = Math.trunc(quantity) || 0;
   if (quantity <= 0) return removeHandoutFromCart(handoutId);
 
   const handout = await prisma.handout.findUnique({
@@ -158,10 +175,15 @@ export async function setHandoutCartQuantity(
   });
   if (!handout) return fail("notFound");
 
-  await prisma.handoutCartItem.update({
-    where: { customerId_handoutId: { customerId, handoutId } },
-    data: { quantity: Math.min(quantity, Math.max(handout.stock, 1)) },
-  });
+  try {
+    await prisma.handoutCartItem.update({
+      where: { customerId_handoutId: { customerId, handoutId } },
+      data: { quantity: Math.min(quantity, Math.max(handout.stock, 1)) },
+    });
+  } catch (error) {
+    if (isMissingRecord(error)) return fail("notFound");
+    throw error;
+  }
 
   revalidatePath("/cart");
   return ok();
@@ -195,7 +217,11 @@ export async function toggleHandoutWishlist(handoutId: string): Promise<ActionRe
     return ok("removed");
   }
 
-  await prisma.handoutWishlistItem.create({ data: { customerId, handoutId } });
+  try {
+    await prisma.handoutWishlistItem.create({ data: { customerId, handoutId } });
+  } catch (error) {
+    if (!isUniqueViolation(error)) throw error;
+  }
   revalidatePath("/account/wishlist");
   return ok("added");
 }
