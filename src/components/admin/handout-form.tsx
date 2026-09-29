@@ -23,6 +23,7 @@ import type {
 import { ActionForm } from "@/components/ui/action-form";
 import { deleteHandout, saveHandout } from "@/app/actions/admin";
 import { indentFor } from "@/lib/category-tree";
+import { latestPublishedYear, storeYear } from "@/lib/constants";
 
 interface HandoutFormProps {
   locale: Locale;
@@ -69,6 +70,8 @@ export function HandoutForm({
         negativeStock: dictionary.common.actionErrors.negativeStock,
         negativePrice: dictionary.common.actionErrors.negativePrice,
         compareAtNotAbovePrice: dictionary.common.actionErrors.compareAtNotAbovePrice,
+        invalidPages: dictionary.common.actionErrors.invalidPages,
+        invalidYear: dictionary.common.actionErrors.invalidYear,
         saveFailed: dictionary.common.actionErrors.saveFailed,
         missingTitle: dictionary.common.actionErrors.missingTitle,
         missingRelation: dictionary.common.actionErrors.missingRelation,
@@ -198,8 +201,11 @@ export function HandoutForm({
                 name="publishedYear"
                 type="number"
                 dir="ltr"
+                min={1}
+                max={latestPublishedYear()}
                 data-numeric
-                defaultValue={handout?.publishedYear}
+                defaultValue={handout?.publishedYear ?? storeYear()}
+                required
               />
             </Field>
             <Field label={t.fields.pages} htmlFor="pages">
@@ -208,8 +214,10 @@ export function HandoutForm({
                 name="pages"
                 type="number"
                 dir="ltr"
+                min={1}
                 data-numeric
                 defaultValue={handout?.pages}
+                required
               />
             </Field>
           </div>

@@ -42,7 +42,7 @@ import {
   type HomeShelf,
   type ShelfKind,
 } from "@/lib/home-sections";
-import { STORE_UTC_OFFSET } from "@/lib/constants";
+import { latestPublishedYear, STORE_UTC_OFFSET, storeYear } from "@/lib/constants";
 import { isOwner } from "@/lib/owner";
 import { refreshBookRating } from "@/lib/book-rating";
 import { isWithin } from "@/lib/category-tree";
@@ -190,7 +190,7 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
     compareAtPrice: optionalNumber(formData, "compareAtPrice"),
     stock: number(formData, "stock"),
     pages: number(formData, "pages"),
-    publishedYear: number(formData, "publishedYear", new Date().getFullYear()),
+    publishedYear: number(formData, "publishedYear", storeYear()),
     tags: formData.getAll("tags").filter((tag): tag is string => typeof tag === "string") as BookTag[],
     authorId,
     categoryId,
@@ -207,6 +207,15 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
   // negative "discount". Left empty, there is no discount.
   if (data.compareAtPrice !== null && data.compareAtPrice <= data.price) {
     return fail("compareAtNotAbovePrice");
+  }
+  // Both are printed on the title's page. An empty page count used to save as
+  // 0 and a negative one as it was typed; a year had no bounds, so a slipped
+  // key made it 20255. Next year is allowed: a school year's handouts carry
+  // the year it ends in. The low bound is 1, not 1900 — classics keep the
+  // year they were written.
+  if (data.pages < 1) return fail("invalidPages");
+  if (data.publishedYear < 1 || data.publishedYear > latestPublishedYear()) {
+    return fail("invalidYear");
   }
 
   /*
@@ -359,7 +368,7 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
     compareAtPrice: optionalNumber(formData, "compareAtPrice"),
     stock: number(formData, "stock"),
     pages: number(formData, "pages"),
-    publishedYear: number(formData, "publishedYear", new Date().getFullYear()),
+    publishedYear: number(formData, "publishedYear", storeYear()),
     tags: formData.getAll("tags").filter((tag): tag is string => typeof tag === "string") as BookTag[],
     authorId,
     categoryId,
@@ -370,6 +379,10 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
   if (data.price < 0 || (data.compareAtPrice ?? 0) < 0) return fail("negativePrice");
   if (data.compareAtPrice !== null && data.compareAtPrice <= data.price) {
     return fail("compareAtNotAbovePrice");
+  }
+  if (data.pages < 1) return fail("invalidPages");
+  if (data.publishedYear < 1 || data.publishedYear > latestPublishedYear()) {
+    return fail("invalidYear");
   }
 
   // Upload first, write second, tidy up whichever one lost — as in `saveBook`.
