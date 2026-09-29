@@ -235,7 +235,11 @@ export function HandoutForm({
 
       <div className="space-y-4 lg:col-span-4">
         <Panel title={t.sections.media}>
-          <CoverField labels={t.upload} errors={dictionary.common.actionErrors}>
+          <CoverField
+            key={handout?.coverUrl ?? "no-cover"}
+            labels={t.upload}
+            errors={dictionary.common.actionErrors}
+          >
             <BookCover
               title={handout?.title[locale] ?? admin.handouts.title}
               author={handout?.author.name[locale] ?? admin.brand.name}

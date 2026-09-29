@@ -32,6 +32,12 @@ interface Chosen {
  * shrunk in the browser first — the form reads the input on submit, so the
  * smaller file is written back into it — and a file that still cannot be
  * used is refused here, with the same message the server would have sent.
+ *
+ * The forms key it on the row's cover URL. A saved cover changes that URL, so
+ * the field starts over empty: it used to keep the file and its "will be
+ * uploaded on save" line, and every later save of the form uploaded the same
+ * picture again. A failed save leaves the URL — and the chosen file — as they
+ * were, ready for another try.
  */
 export function CoverField({ labels, errors, children }: CoverFieldProps) {
   const [chosen, setChosen] = useState<Chosen | null>(null);

@@ -239,7 +239,11 @@ export function BookForm({
 
       <div className="space-y-4 lg:col-span-4">
         <Panel title={t.sections.media}>
-          <CoverField labels={t.upload} errors={dictionary.common.actionErrors}>
+          <CoverField
+            key={book?.coverUrl ?? "no-cover"}
+            labels={t.upload}
+            errors={dictionary.common.actionErrors}
+          >
             <BookCover
               title={book?.title[locale] ?? admin.books.title}
               author={book?.author.name[locale] ?? admin.brand.name}
