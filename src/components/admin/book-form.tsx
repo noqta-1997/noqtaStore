@@ -72,6 +72,7 @@ export function BookForm({
             duplicate: dictionary.common.actionErrors.duplicate,
             negativeStock: dictionary.common.actionErrors.negativeStock,
             negativePrice: dictionary.common.actionErrors.negativePrice,
+            compareAtNotAbovePrice: dictionary.common.actionErrors.compareAtNotAbovePrice,
             saveFailed: dictionary.common.actionErrors.saveFailed,
             missingTitle: dictionary.common.actionErrors.missingTitle,
             missingRelation: dictionary.common.actionErrors.missingRelation,

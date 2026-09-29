@@ -202,6 +202,12 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
   // reading as an unexpected failure.
   if (data.stock < 0) return fail("negativeStock");
   if (data.price < 0 || (data.compareAtPrice ?? 0) < 0) return fail("negativePrice");
+  // The struck-through price is what the book cost before the discount, so
+  // it has to be above the price: at or below it, the card showed a 0% or a
+  // negative "discount". Left empty, there is no discount.
+  if (data.compareAtPrice !== null && data.compareAtPrice <= data.price) {
+    return fail("compareAtNotAbovePrice");
+  }
 
   /*
    * The cover goes up before the row is written: a failed upload then leaves
@@ -362,6 +368,9 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
 
   if (data.stock < 0) return fail("negativeStock");
   if (data.price < 0 || (data.compareAtPrice ?? 0) < 0) return fail("negativePrice");
+  if (data.compareAtPrice !== null && data.compareAtPrice <= data.price) {
+    return fail("compareAtNotAbovePrice");
+  }
 
   // Upload first, write second, tidy up whichever one lost — as in `saveBook`.
   let coverUrl: string | undefined;
