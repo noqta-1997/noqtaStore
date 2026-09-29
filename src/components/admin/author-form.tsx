@@ -37,13 +37,14 @@ export function AuthorForm({ admin, dictionary, categories, author }: AuthorForm
       }
       fallbackError={dictionary.common.toast.actionFailed}
       resetOnSuccess={!isEdit}
+      refreshOnErrors={["notFound", "staleSubject"]}
           errorMessages={{
             forbidden: dictionary.common.actionErrors.forbidden,
             duplicate: dictionary.common.actionErrors.duplicate,
             saveFailed: dictionary.common.actionErrors.saveFailed,
             missingTitle: dictionary.common.actionErrors.missingTitle,
             notFound: dictionary.common.actionErrors.notFound,
-            missingRelation: dictionary.common.actionErrors.missingRelation,
+            staleSubject: dictionary.common.actionErrors.staleSubject,
           }}
     >
       {author ? <input type="hidden" name="authorId" value={author.id} /> : null}

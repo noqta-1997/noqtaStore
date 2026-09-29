@@ -621,6 +621,16 @@ function readBranchPlacement(formData: FormData) {
 }
 
 /**
+ * Whether a position fits its `Int` column as a whole number from 0 up. The
+ * field steps by one from 0 but had no top, so a slipped key past the
+ * column's range failed as an unexpected error; and a posted fraction or
+ * negative went in rounded or as it was.
+ */
+function sortOrderFits(sortOrder: number) {
+  return Number.isInteger(sortOrder) && sortOrder >= 0 && sortOrder <= INT_COLUMN_MAX;
+}
+
+/**
  * A nested branch's slug carries its parent's, so "العلمي" under two grades
  * does not collide, and so the address says where the branch sits.
  */
@@ -637,11 +647,13 @@ export async function saveCategory(formData: FormData): Promise<ActionResult> {
 
   const categoryId = text(formData, "categoryId");
   const { parentId, sortOrder } = readBranchPlacement(formData);
+  if (!sortOrderFits(sortOrder)) return fail("invalidNumber");
 
   /* The parent must exist, and a branch cannot hang under itself or under
-     anything below it — that would cut it out of the tree. */
+     anything below it — that would cut it out of the tree. A parent that is
+     gone was deleted while the form was open: the form draws its list again. */
   const parent = parentId ? await getCategoryById(parentId) : undefined;
-  if (parentId && !parent) return fail("missingRelation");
+  if (parentId && !parent) return fail("staleParent");
   if (categoryId && parent) {
     const self = await getCategoryById(categoryId);
     if (self && isWithin(self, parent.id)) return fail("invalidParent");
@@ -722,9 +734,10 @@ export async function saveHandoutCategory(formData: FormData): Promise<ActionRes
 
   const categoryId = text(formData, "categoryId");
   const { parentId, sortOrder } = readBranchPlacement(formData);
+  if (!sortOrderFits(sortOrder)) return fail("invalidNumber");
 
   const parent = parentId ? await getHandoutCategoryById(parentId) : undefined;
-  if (parentId && !parent) return fail("missingRelation");
+  if (parentId && !parent) return fail("staleParent");
   if (categoryId && parent) {
     const self = await getHandoutCategoryById(categoryId);
     if (self && isWithin(self, parent.id)) return fail("invalidParent");
@@ -794,7 +807,7 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
      offers branches that exist, so a stale id means the branch went while
      the form was open. */
   const subjectId = text(formData, "subjectId");
-  if (subjectId && !(await getCategoryById(subjectId))) return fail("missingRelation");
+  if (subjectId && !(await getCategoryById(subjectId))) return fail("staleSubject");
 
   /* The slug is not on the form: a create derives it from the name once,
      and an update leaves it as it is. */

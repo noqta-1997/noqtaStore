@@ -78,7 +78,7 @@ export function HandoutForm({
         stockChanged: dictionary.common.actionErrors.stockChanged,
         notFound: dictionary.common.actionErrors.notFound,
         saveFailed: dictionary.common.actionErrors.saveFailed,
-        missingTitle: dictionary.common.actionErrors.missingTitle,
+        missingTitle: dictionary.common.actionErrors.missingBookTitle,
         missingRelation: dictionary.common.actionErrors.missingRelation,
         invalidImage: dictionary.common.actionErrors.invalidImage,
         imageTooLarge: dictionary.common.actionErrors.imageTooLarge,

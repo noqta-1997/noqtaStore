@@ -51,14 +51,16 @@ export function CategoryForm({
       }
       fallbackError={dictionary.common.toast.actionFailed}
       resetOnSuccess={!isEdit}
+      refreshOnErrors={["notFound", "staleParent"]}
       errorMessages={{
         forbidden: dictionary.common.actionErrors.forbidden,
         duplicate: dictionary.common.actionErrors.duplicate,
         saveFailed: dictionary.common.actionErrors.saveFailed,
         missingTitle: dictionary.common.actionErrors.missingTitle,
         notFound: dictionary.common.actionErrors.notFound,
-        missingRelation: dictionary.common.actionErrors.missingRelation,
+        staleParent: dictionary.common.actionErrors.staleParent,
         invalidParent: dictionary.common.actionErrors.invalidParent,
+        invalidNumber: dictionary.common.actionErrors.invalidNumber,
       }}
     >
       {category ? <input type="hidden" name="categoryId" value={category.id} /> : null}
@@ -89,6 +91,7 @@ export function CategoryForm({
             type="number"
             inputMode="numeric"
             min={0}
+            max={2_147_483_647}
             step={1}
             defaultValue={category?.sortOrder ?? 0}
             data-numeric
