@@ -65,6 +65,7 @@ import {
 import { revalidateCatalogue, revalidateHandouts } from "@/lib/revalidate";
 import { CouponSpent, refundCouponUse, respendCoupon } from "@/lib/coupon";
 import { ShortStock, takeFromShelf } from "@/lib/shelf";
+import { slugify } from "@/lib/slug";
 import type {
   BookTag,
   ContactStatus,
@@ -80,15 +81,6 @@ async function requireManager() {
   return customer?.role === "admin" ? customer : null;
 }
 
-function slugify(value: string, fallback: string) {
-  const slug = value
-    .toLowerCase()
-    .replace(/[^a-z0-9ء-ي]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-
-  return slug || fallback;
-}
-
 /** `base`, or the first of `base-2`, `base-3`… that nothing holds yet. */
 function freeSlug(base: string, taken: Set<string>) {
   if (!taken.has(base)) return base;
@@ -98,15 +90,20 @@ function freeSlug(base: string, taken: Set<string>) {
 }
 
 /**
- * Creates a title under the first free slug of its base.
+ * Creates a row under the first free slug of its base.
  *
  * A title is not a name: «الرياضيات» is a book for every grade, and each
  * copy of it needs an address of its own. The base used to be written as it
  * was, so the second «الرياضيات» hit the slug's unique index and the panel
- * refused it as a duplicate. The slugs already under the base are read
- * first, so the usual case is a single insert; the index stays the judge,
- * and a slug another save claimed between the read and the insert only sends
- * the loop round again. Any other failure is the caller's to report.
+ * refused it as a duplicate. Named rows — teachers, presses, branches — go
+ * through here too: whether a name is taken is their name index's call, and
+ * two names that differ only in punctuation («أحمد علي (البصرة)», «أحمد علي
+ * - البصرة») must not be refused over the slug they happen to share.
+ *
+ * The slugs already under the base are read first, so the usual case is a
+ * single insert; the index stays the judge, and a slug another save claimed
+ * between the read and the insert only sends the loop round again. Any other
+ * failure — a name index included — is the caller's to report.
  */
 async function createUnderFreeSlug(
   base: string,
@@ -534,12 +531,13 @@ export async function saveCategory(formData: FormData): Promise<ActionResult> {
     if (categoryId) {
       await prisma.category.update({ where: { id: categoryId }, data });
     } else {
-      await prisma.category.create({
-        data: {
-          ...data,
-          slug: branchSlug(nameAr, parent?.slug ?? null, `category-${Date.now()}`),
-        },
-      });
+      await createUnderFreeSlug(
+        branchSlug(nameAr, parent?.slug ?? null, `category-${Date.now()}`),
+        "categories_slug_key",
+        (base) =>
+          prisma.category.findMany({ where: { slug: { startsWith: base } }, select: { slug: true } }),
+        (slug) => prisma.category.create({ data: { ...data, slug } }),
+      );
     }
   } catch (error) {
     if (isUniqueViolation(error)) return fail("duplicate");
@@ -608,12 +606,16 @@ export async function saveHandoutCategory(formData: FormData): Promise<ActionRes
     if (categoryId) {
       await prisma.handoutCategory.update({ where: { id: categoryId }, data });
     } else {
-      await prisma.handoutCategory.create({
-        data: {
-          ...data,
-          slug: branchSlug(nameAr, parent?.slug ?? null, `handout-category-${Date.now()}`),
-        },
-      });
+      await createUnderFreeSlug(
+        branchSlug(nameAr, parent?.slug ?? null, `handout-category-${Date.now()}`),
+        "handout_categories_slug_key",
+        (base) =>
+          prisma.handoutCategory.findMany({
+            where: { slug: { startsWith: base } },
+            select: { slug: true },
+          }),
+        (slug) => prisma.handoutCategory.create({ data: { ...data, slug } }),
+      );
     }
   } catch (error) {
     if (isUniqueViolation(error)) return fail("duplicate");
@@ -671,12 +673,13 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
     if (authorId) {
       await prisma.author.update({ where: { id: authorId }, data });
     } else {
-      await prisma.author.create({
-        data: {
-          ...data,
-          slug: slugify(nameAr, `author-${Date.now()}`),
-        },
-      });
+      await createUnderFreeSlug(
+        slugify(nameAr, `author-${Date.now()}`),
+        "authors_slug_key",
+        (base) =>
+          prisma.author.findMany({ where: { slug: { startsWith: base } }, select: { slug: true } }),
+        (slug) => prisma.author.create({ data: { ...data, slug } }),
+      );
     }
   } catch (error) {
     if (isUniqueViolation(error)) return fail("duplicate");
@@ -728,9 +731,13 @@ export async function savePublisher(formData: FormData): Promise<ActionResult> {
     if (publisherId) {
       await prisma.publisher.update({ where: { id: publisherId }, data });
     } else {
-      await prisma.publisher.create({
-        data: { ...data, slug: slugify(nameAr, `publisher-${Date.now()}`) },
-      });
+      await createUnderFreeSlug(
+        slugify(nameAr, `publisher-${Date.now()}`),
+        "publishers_slug_key",
+        (base) =>
+          prisma.publisher.findMany({ where: { slug: { startsWith: base } }, select: { slug: true } }),
+        (slug) => prisma.publisher.create({ data: { ...data, slug } }),
+      );
     }
   } catch (error) {
     if (isUniqueViolation(error)) return fail("duplicate");

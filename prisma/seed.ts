@@ -15,6 +15,7 @@ import { categories } from "../src/data/categories";
 import { handoutCategories } from "../src/data/handout-categories";
 import { handouts } from "../src/data/handouts";
 import { reviews } from "../src/data/reviews";
+import { slugify } from "../src/lib/slug";
 import { PrismaClient } from "../src/generated/prisma/client";
 import type { OrderStatus } from "../src/types";
 
@@ -120,11 +121,11 @@ async function seedCatalogue() {
    *
    * The English name used to be both the map key and the source of the slug,
    * which is how the seeded publishers ended up with Latin slugs. With English
-   * gone the Arabic name is the key, and the slug keeps Arabic letters — the
-   * same character class `slugify` in app/actions/admin.ts uses, so a
-   * publisher created by hand in the panel and one created here are shaped
-   * alike. Rows already in the database keep the Latin slugs they were seeded
-   * with; this only decides what a fresh seed produces.
+   * gone the Arabic name is the key, and the slug is made by the panel's own
+   * `slugify` (src/lib/slug.ts), so a publisher created by hand in the panel
+   * and one created here are shaped alike. Rows already in the database keep
+   * the Latin slugs they were seeded with; this only decides what a fresh
+   * seed produces.
    */
   const publisherNames = new Map<string, { ar: string }>();
   for (const book of books) publisherNames.set(book.publisher.ar, book.publisher);
@@ -133,11 +134,7 @@ async function seedCatalogue() {
   const publisherIds = new Map<string, string>();
   let fallback = 0;
   for (const [nameAr, name] of publisherNames) {
-    const slug =
-      nameAr
-        .toLowerCase()
-        .replace(/[^a-z0-9ء-ي]+/g, "-")
-        .replace(/^-+|-+$/g, "") || `publisher-${++fallback}`;
+    const slug = slugify(nameAr, "") || `publisher-${++fallback}`;
 
     const row = await prisma.publisher.create({
       data: { slug, nameAr: name.ar },
