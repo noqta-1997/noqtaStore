@@ -198,13 +198,18 @@ model Book {
   titleAr        String
   descriptionAr  String
   price          Int
+  /// The struck-through price before a discount. A CHECK (migration
+  /// 20260929120000_title_figure_checks) holds it above `price`, or null.
   compareAtPrice Int?
   /// Copies on the shelf. Never below zero: a CHECK constraint (migration
   /// 20260917080000_quantity_checks) refuses it, and checkout takes copies
   /// with `takeFromShelf`, whose WHERE clause is the check, so two orders
   /// for the last copy cannot both succeed.
   stock          Int       @default(0)
+  /// At least 1, by the same migration's CHECK.
   pages          Int
+  /// 1 or later, by the same migration's CHECK. The upper bound — next year —
+  /// moves with the clock, so the save actions hold it, not the table.
   publishedYear  Int
   languageAr     String    @default("العربية")
   coverUrl       String?
@@ -251,9 +256,11 @@ model Handout {
   titleAr        String
   descriptionAr  String
   price          Int
+  /// Same CHECK as Book.compareAtPrice.
   compareAtPrice Int?
   /// Same CHECK and the same `takeFromShelf` as Book.stock.
   stock          Int       @default(0)
+  /// Same CHECKs as Book.pages and Book.publishedYear.
   pages          Int
   publishedYear  Int
   languageAr     String    @default("العربية")

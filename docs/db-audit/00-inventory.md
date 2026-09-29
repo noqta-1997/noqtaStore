@@ -2,11 +2,11 @@
 
 > **الغرض:** لقطة وصفية لقاعدة بيانات Supabase الخاصة بالمشروع كما هي فعلياً في لحظة الالتقاط: المخططات، الجداول، عدد الأعمدة والصفوف، المجموعات المنطقية، والمفاتيح الأجنبية. هذا الملف **جرد فقط**: لا يحتوي تحليل أمان أو أداء ولا توصيات؛ تلك موضوع الملفات التالية في `docs/db-audit/`.
 >
-> **تاريخ الالتقاط:** 2026-09-18 07:17:44 UTC (18/09/2026, 10:17:44 بتوقيت بغداد)  
+> **تاريخ الالتقاط:** 2026-09-29 13:48:41 UTC (29/09/2026, 16:48:41 بتوقيت بغداد)  
 > **المشروع:** Supabase `aws-0-eu-central-1.pooler.supabase.com` — قاعدة `postgres`، الدور `postgres`، عبر مجمّع الجلسات (منفذ 5432، أي `DIRECT_URL` في `.env.local`)  
 > **الخادم:** PostgreSQL 17.6 on x86_64-pc-linux-gnu  
-> **حجم القاعدة الكلي:** 20 MB  
-> **حالة المستودع وقت الالتقاط:** الالتزام `63622bd` (في الشجرة 2 ملف غير ملتزم).  
+> **حجم القاعدة الكلي:** 21 MB  
+> **حالة المستودع وقت الالتقاط:** الالتزام `3084867` (في الشجرة 1 ملف غير ملتزم).  
 > **مولَّد بـ** `npm run db:inventory` (`scripts/db-audit-inventory.ts`) — أعد تشغيله لتحديث هذا الملف.
 
 ## كيف تقرأ هذا الملف
@@ -28,12 +28,12 @@
 | جداول التطبيق (`public`) | 23 (منها 22 جدول بيانات + `_prisma_migrations`) |
 | جداول منصّة Supabase (`auth` + `storage` + `realtime` + `vault`) | 39 |
 | مفاتيح أجنبية | 58 (`public` 29، `auth` 24، `storage` 5) |
-| قيود CHECK | 75 (`public` 23) |
+| قيود CHECK | 84 (`public` 29) |
 | جداول `public` مكشوفة عبر REST لدور `anon`/`authenticated` | 0 |
 | أنواع معدودة (enums) | 21 (`public` 9) |
 | إضافات (extensions) | 5 |
-| إجمالي الصفوف في كل الجداول | 891 |
-| إجمالي صفوف جداول التطبيق (`public` بدون سجل الترحيل) | 157 |
+| إجمالي الصفوف في كل الجداول | 401 |
+| إجمالي صفوف جداول التطبيق (`public` بدون سجل الترحيل) | 81 |
 
 لا فرق بين القاعدة والمستودع، ولا ترحيلات معلّقة.
 
@@ -61,28 +61,28 @@
 
 | # | الجدول | المجموعة | أعمدة | صفوف | تقدير | الحجم | ملاحظة |
 |--:|---|---|--:|--:|--:|--:|---|
-| 1 | `_prisma_migrations` | `MIGRATIONS` | 8 | 23 | 23 | 32 kB | سجل ترحيلات Prisma |
-| 2 | `addresses` | `CUSTOMERS` | 11 | 6 | 6 | 64 kB |  |
-| 3 | `authors` | `CATALOG` | 8 | 26 | 26 | 128 kB |  |
-| 4 | `books` | `CATALOG` | 19 | 25 | 25 | 184 kB |  |
+| 1 | `_prisma_migrations` | `MIGRATIONS` | 8 | 26 | 26 | 32 kB | سجل ترحيلات Prisma |
+| 2 | `addresses` | `CUSTOMERS` | 11 | 8 | 8 | 64 kB |  |
+| 3 | `authors` | `CATALOG` | 8 | 2 | 2 | 128 kB |  |
+| 4 | `books` | `CATALOG` | 20 | 0 | 0 | 184 kB |  |
 | 5 | `cart_items` | `CART_WISHLIST` | 4 | 0 | 0 | 2672 kB |  |
-| 6 | `categories` | `CATALOG` | 9 | 30 | 30 | 136 kB |  |
+| 6 | `categories` | `CATALOG` | 9 | 21 | 21 | 136 kB |  |
 | 7 | `contact_messages` | `MARKETING` | 7 | 0 | 0 | 64 kB |  |
-| 8 | `coupons` | `MARKETING` | 10 | 2 | 2 | 48 kB |  |
+| 8 | `coupons` | `MARKETING` | 10 | 2 | 2 | 80 kB |  |
 | 9 | `customers` | `CUSTOMERS` | 13 | 2 | 2 | 352 kB |  |
-| 10 | `handout_cart_items` | `CART_WISHLIST` | 4 | 0 | 0 | 40 kB |  |
-| 11 | `handout_categories` | `CATALOG` | 9 | 24 | 24 | 96 kB |  |
+| 10 | `handout_cart_items` | `CART_WISHLIST` | 4 | 0 | 0 | 48 kB |  |
+| 11 | `handout_categories` | `CATALOG` | 9 | 23 | 23 | 96 kB |  |
 | 12 | `handout_order_items` | `ORDERS` | 5 | 0 | 0 | 64 kB |  |
 | 13 | `handout_reviews` | `REVIEWS` | 9 | 0 | 0 | 72 kB |  |
 | 14 | `handout_wishlist_items` | `CART_WISHLIST` | 3 | 0 | 1 | 40 kB |  |
-| 15 | `handouts` | `CATALOG` | 19 | 3 | 3 | 112 kB |  |
+| 15 | `handouts` | `CATALOG` | 20 | 2 | 2 | 112 kB |  |
 | 16 | `newsletter_subscribers` | `MARKETING` | 3 | 0 | 0 | 32 kB |  |
-| 17 | `order_events` | `ORDERS` | 4 | 3 | 3 | 144 kB |  |
-| 18 | `order_items` | `ORDERS` | 5 | 5 | 5 | 136 kB |  |
-| 19 | `orders` | `ORDERS` | 19 | 1 | 1 | 112 kB |  |
-| 20 | `publishers` | `CATALOG` | 6 | 19 | 19 | 112 kB |  |
+| 17 | `order_events` | `ORDERS` | 4 | 0 | 0 | 144 kB |  |
+| 18 | `order_items` | `ORDERS` | 5 | 0 | 0 | 136 kB |  |
+| 19 | `orders` | `ORDERS` | 19 | 0 | 0 | 112 kB |  |
+| 20 | `publishers` | `CATALOG` | 6 | 2 | 2 | 112 kB |  |
 | 21 | `reviews` | `REVIEWS` | 9 | 0 | 0 | 4392 kB |  |
-| 22 | `store_settings` | `SETTINGS` | 3 | 11 | 11 | 64 kB |  |
+| 22 | `store_settings` | `SETTINGS` | 3 | 19 | 19 | 64 kB |  |
 | 23 | `wishlist_items` | `CART_WISHLIST` | 3 | 0 | 0 | 40 kB |  |
 
 RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لدور `anon` أو `authenticated` على أيّ منها: واجهة Supabase REST لا تصل إلى هذه الجداول (منذ الترحيل `20260918110000_lock_public_api`). كل جدول جديد يحتاج `ENABLE ROW LEVEL SECURITY` في ترحيله، وإلا سُمّي هنا.
@@ -98,7 +98,7 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 | 3 | `flow_state` | `AUTH_CORE` | 17 | 6 | 6 | 112 kB |  |
 | 4 | `identities` | `AUTH_CORE` | 9 | 2 | 2 | 80 kB |  |
 | 5 | `instances` | `AUTH_CORE` | 5 | 0 | 0 | 16 kB |  |
-| 6 | `mfa_amr_claims` | `AUTH_CORE` | 5 | 151 | 151 | 88 kB |  |
+| 6 | `mfa_amr_claims` | `AUTH_CORE` | 5 | 14 | 14 | 64 kB |  |
 | 7 | `mfa_challenges` | `AUTH_MFA` | 7 | 0 | 0 | 24 kB |  |
 | 8 | `mfa_factors` | `AUTH_MFA` | 13 | 0 | 0 | 56 kB |  |
 | 9 | `mfa_recovery_code_sets` | `AUTH_MFA` | 7 | 0 | 0 | 24 kB |  |
@@ -108,13 +108,13 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 | 13 | `oauth_clients` | `AUTH_OAUTH` | 13 | 0 | 0 | 24 kB |  |
 | 14 | `oauth_consents` | `AUTH_OAUTH` | 6 | 0 | 0 | 48 kB |  |
 | 15 | `one_time_tokens` | `AUTH_CORE` | 8 | 0 | 0 | 128 kB |  |
-| 16 | `refresh_tokens` | `AUTH_CORE` | 9 | 164 | 164 | 176 kB |  |
+| 16 | `refresh_tokens` | `AUTH_CORE` | 9 | 14 | 14 | 144 kB |  |
 | 17 | `saml_providers` | `AUTH_SSO` | 9 | 0 | 0 | 32 kB |  |
 | 18 | `saml_relay_states` | `AUTH_SSO` | 8 | 0 | 0 | 40 kB |  |
 | 19 | `schema_migrations` | `MIGRATIONS` | 1 | 82 | 82 | 24 kB |  |
 | 20 | `scim_tokens` | `AUTH_SSO` | 8 | 0 | 0 | 48 kB |  |
 | 21 | `scim_users` | `AUTH_SSO` | 10 | 0 | 0 | 88 kB |  |
-| 22 | `sessions` | `AUTH_CORE` | 15 | 151 | 151 | 128 kB |  |
+| 22 | `sessions` | `AUTH_CORE` | 15 | 14 | 14 | 112 kB |  |
 | 23 | `sso_domains` | `AUTH_SSO` | 5 | 0 | 0 | 32 kB |  |
 | 24 | `sso_providers` | `AUTH_SSO` | 5 | 0 | 0 | 32 kB |  |
 | 25 | `users` | `AUTH_CORE` | 35 | 2 | 2 | 256 kB |  |
@@ -123,15 +123,15 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 
 ### 3.3 `storage` — Supabase Storage (8)
 
-الحاويات الفعلية: `Books Covers` (عامة، النوع `STANDARD`، أُنشئت 2026-09-14، 1 ملف). أغلفة الكتب يرفعها `src/lib/cover-storage.ts` بمفتاح service-role.
+الحاويات الفعلية: `Books Covers` (عامة، النوع `STANDARD`، أُنشئت 2026-09-14، 3 ملف). أغلفة الكتب يرفعها `src/lib/cover-storage.ts` بمفتاح service-role.
 
 | # | الجدول | المجموعة | أعمدة | صفوف | تقدير | الحجم | ملاحظة |
 |--:|---|---|--:|--:|--:|--:|---|
-| 1 | `buckets` | `STORAGE` | 12 | 1 | 1 | 48 kB |  |
+| 1 | `buckets` | `STORAGE` | 14 | 1 | 1 | 48 kB |  |
 | 2 | `buckets_analytics` | `STORAGE` | 7 | 0 | 0 | 24 kB |  |
 | 3 | `buckets_vectors` | `STORAGE` | 4 | 0 | 0 | 16 kB |  |
-| 4 | `migrations` | `MIGRATIONS` | 4 | 68 | 68 | 40 kB |  |
-| 5 | `objects` | `STORAGE` | 15 | 1 | 1 | 144 kB |  |
+| 4 | `migrations` | `MIGRATIONS` | 4 | 73 | 73 | 72 kB |  |
+| 5 | `objects` | `STORAGE` | 15 | 3 | 3 | 168 kB |  |
 | 6 | `s3_multipart_uploads` | `STORAGE` | 10 | 0 | 0 | 24 kB |  |
 | 7 | `s3_multipart_uploads_parts` | `STORAGE` | 10 | 0 | 0 | 16 kB |  |
 | 8 | `vector_indexes` | `STORAGE` | 9 | 0 | 0 | 24 kB |  |
@@ -176,21 +176,21 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 
 | الرمز | الاسم | المخطط | الجداول | العدد | الصفوف |
 |---|---|---|---|--:|--:|
-| `CATALOG` | الكتالوج | `public` | `categories`، `handout_categories`، `publishers`، `authors`، `books`، `handouts` | 6 | 127 |
-| `CUSTOMERS` | العملاء والعناوين | `public` | `customers`، `addresses` | 2 | 8 |
-| `ORDERS` | الطلبات | `public` | `orders`، `order_items`، `handout_order_items`، `order_events` | 4 | 9 |
+| `CATALOG` | الكتالوج | `public` | `categories`، `handout_categories`، `publishers`، `authors`، `books`، `handouts` | 6 | 50 |
+| `CUSTOMERS` | العملاء والعناوين | `public` | `customers`، `addresses` | 2 | 10 |
+| `ORDERS` | الطلبات | `public` | `orders`، `order_items`، `handout_order_items`، `order_events` | 4 | 0 |
 | `REVIEWS` | المراجعات | `public` | `reviews`، `handout_reviews` | 2 | 0 |
 | `CART_WISHLIST` | السلة والمفضلة | `public` | `cart_items`، `handout_cart_items`، `wishlist_items`، `handout_wishlist_items` | 4 | 0 |
 | `MARKETING` | التسويق والتواصل | `public` | `coupons`، `newsletter_subscribers`، `contact_messages` | 3 | 2 |
-| `SETTINGS` | الإعدادات | `public` | `store_settings` | 1 | 11 |
-| `AUTH_CORE` | الهوية والجلسات | `auth` | `users`، `identities`، `sessions`، `refresh_tokens`، `mfa_amr_claims`، `one_time_tokens`، `flow_state`، `audit_log_entries`، `instances` | 9 | 476 |
+| `SETTINGS` | الإعدادات | `public` | `store_settings` | 1 | 19 |
+| `AUTH_CORE` | الهوية والجلسات | `auth` | `users`، `identities`، `sessions`، `refresh_tokens`، `mfa_amr_claims`، `one_time_tokens`، `flow_state`، `audit_log_entries`، `instances` | 9 | 52 |
 | `AUTH_MFA` | التحقق متعدد العوامل | `auth` | `mfa_factors`، `mfa_challenges`، `mfa_recovery_code_sets`، `mfa_recovery_codes`، `webauthn_challenges`، `webauthn_credentials` | 6 | 0 |
 | `AUTH_OAUTH` | خادم OAuth ومزوّدوه | `auth` | `oauth_clients`، `oauth_authorizations`، `oauth_consents`، `oauth_client_states`، `custom_oauth_providers` | 5 | 0 |
 | `AUTH_SSO` | SSO / SAML / SCIM | `auth` | `sso_providers`، `sso_domains`، `saml_providers`، `saml_relay_states`، `scim_tokens`، `scim_users` | 6 | 0 |
-| `STORAGE` | تخزين الملفات | `storage` | `buckets`، `buckets_analytics`، `buckets_vectors`، `objects`، `s3_multipart_uploads`، `s3_multipart_uploads_parts`، `vector_indexes` | 7 | 2 |
+| `STORAGE` | تخزين الملفات | `storage` | `buckets`، `buckets_analytics`، `buckets_vectors`، `objects`، `s3_multipart_uploads`، `s3_multipart_uploads_parts`، `vector_indexes` | 7 | 4 |
 | `REALTIME` | البث اللحظي | `realtime` | `messages`، `subscription` | 2 | 0 |
 | `VAULT` | الأسرار | `vault` | `secrets` | 1 | 0 |
-| `MIGRATIONS` | سجلات الترحيل | متعدد | `auth.schema_migrations`، `public._prisma_migrations`، `realtime.schema_migrations`، `storage.migrations` | 4 | 256 |
+| `MIGRATIONS` | سجلات الترحيل | متعدد | `auth.schema_migrations`، `public._prisma_migrations`، `realtime.schema_migrations`، `storage.migrations` | 4 | 264 |
 | `STATS_VIEWS` | views الإحصاء | `extensions` | `pg_stat_statements`، `pg_stat_statements_info` | 2 views | — |
 
 المجموع: 62 جدولاً = كل جداول القاعدة (62). `AUTH` وحدها اسم جامع للمجموعات الأربع `AUTH_*` (26 جدولاً)؛ و`APP` اسم جامع لمجموعات `public` السبع (22 جدولاً بدون سجل الترحيل).
@@ -216,7 +216,7 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 `coupons` (رمز، نوع `percentage|fixed`، قيمة، حد أدنى، حد استخدام)، `newsletter_subscribers` (البريد هو المفتاح الأساسي)، و`contact_messages` (صندوق وارد نموذج «اتصل بنا» بحالة `new|read`). لا مفاتيح أجنبية داخل هذه المجموعة ولا منها.
 
 #### `SETTINGS` — الإعدادات
-`store_settings` مخزن مفتاح/قيمة نصّي. المفاتيح الحالية (11): `home.authors`، `home.bestsellers`، `home.categories`، `home.features`، `home.hero`، `home.newArrivals`، `home.newsletter`، `home.promo`، `notifyOrders`، `notifyReviews`، `notifyStock` — 8 منها محتوى أقسام الصفحة الرئيسية (`home.*`، JSON مسلسل) و3 تفضيلات إشعارات الإدارة (`notify*`).
+`store_settings` مخزن مفتاح/قيمة نصّي. المفاتيح الحالية (19): `address`، `currency`، `email`، `home.authors`، `home.bestsellers`، `home.categories`، `home.features`، `home.features.shipping.description`، `home.hero`، `home.newArrivals`، `home.newsletter`، `home.promo`، `home.publishers`، `nameAr`، `notifyOrders`، `notifyReviews`، `notifyStock`، `phone`، `taglineAr` — 10 منها محتوى أقسام الصفحة الرئيسية (`home.*`، JSON مسلسل) و3 تفضيلات إشعارات الإدارة (`notify*`).
 
 #### `AUTH_CORE` — الهوية والجلسات (Supabase)
 `users` الحساب نفسه (35 عموداً، بينها البريد والهاتف وبياناتهما الوصفية)، `identities` ربط الحساب بمزوّد (الحالي: `google`)، `sessions` + `refresh_tokens` + `mfa_amr_claims` ثلاثية الجلسة، `one_time_tokens` رموز التأكيد/الاستعادة، `flow_state` حالة تدفّق PKCE، `audit_log_entries` سجل تدقيق Auth (فارغ)، `instances` بقايا تعدد المستأجرين. لا يوجد جدول سجلّات (logs) خاص بالتطبيق؛ الأقرب إلى ذلك `audit_log_entries` هنا و`order_events` في `ORDERS`.
@@ -231,13 +231,13 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 تسجيل الدخول المؤسسي. كلها فارغة.
 
 #### `STORAGE` — تخزين الملفات (Supabase)
-`buckets` + `objects` هما المستخدمان (حاوية `Books Covers`: 1 ملف). `buckets_analytics`/`buckets_vectors`/`vector_indexes` أنواع حاويات أحدث، و`s3_multipart_uploads(_parts)` لرفع S3 المجزّأ — كلها فارغة. FKs المخطط داخلية فقط؛ `objects.owner` لا يشير بـFK إلى `auth.users`.
+`buckets` + `objects` هما المستخدمان (حاوية `Books Covers`: 3 ملف). `buckets_analytics`/`buckets_vectors`/`vector_indexes` أنواع حاويات أحدث، و`s3_multipart_uploads(_parts)` لرفع S3 المجزّأ — كلها فارغة. FKs المخطط داخلية فقط؛ `objects.owner` لا يشير بـFK إلى `auth.users`.
 
 #### `REALTIME` / `VAULT` / `STATS_VIEWS`
 بنية Supabase الافتراضية، غير مستخدمة من التطبيق، وفارغة.
 
 #### `MIGRATIONS` — سجلات الترحيل
-أربعة دفاتر مستقلة: `public._prisma_migrations` (23 صفاً — يخصّ التطبيق، الملحق هـ)، و`auth.schema_migrations` (82)، `realtime.schema_migrations` (83)، `storage.migrations` (68) تخصّ خدمات Supabase.
+أربعة دفاتر مستقلة: `public._prisma_migrations` (26 صفاً — يخصّ التطبيق، الملحق هـ)، و`auth.schema_migrations` (82)، `realtime.schema_migrations` (83)، `storage.migrations` (73) تخصّ خدمات Supabase.
 
 ## 5. المفاتيح الأجنبية (كما هي في القاعدة الآن)
 
@@ -333,8 +333,8 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 
 | | المستودع (`prisma/migrations/`) | القاعدة (`public._prisma_migrations`) |
 |---|---|---|
-| عدد الترحيلات | 23 | 23 |
-| آخر ترحيل | `20260918110000_lock_public_api` | `20260918110000_lock_public_api` (اكتمل 2026-09-18 07:14:54 UTC) |
+| عدد الترحيلات | 26 | 26 |
+| آخر ترحيل | `20260929120000_title_figure_checks` | `20260929120000_title_figure_checks` (اكتمل 2026-09-29 13:47:45 UTC) |
 
 كل الترحيلات مطبَّقة والسجل يطابق المجلد.
 
@@ -351,7 +351,7 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 
 مأخوذ من `pg_attribute` وقت الالتقاط. 🔑 = مفتاح أساسي. `timestamp(3)` = بلا منطقة زمنية.
 
-### `_prisma_migrations` — 8 عموداً، 23 صف، مجموعة `MIGRATIONS`
+### `_prisma_migrations` — 8 عموداً، 26 صف، مجموعة `MIGRATIONS`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -364,7 +364,7 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 | 7 | `started_at` | `timestamp with time zone` | لا | `now()` |
 | 8 | `applied_steps_count` | `integer` | لا | `0` |
 
-### `addresses` — 11 عموداً، 6 صف، مجموعة `CUSTOMERS`
+### `addresses` — 11 عموداً، 8 صف، مجموعة `CUSTOMERS`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -380,7 +380,7 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 | 10 | `createdAt` | `timestamp(3)` | لا | `CURRENT_TIMESTAMP` |
 | 11 | `updatedAt` | `timestamp(3)` | لا |  |
 
-### `authors` — 8 عموداً، 26 صف، مجموعة `CATALOG`
+### `authors` — 8 عموداً، 2 صف، مجموعة `CATALOG`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -393,7 +393,7 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 | 11 | `updatedAt` | `timestamp(3)` | لا |  |
 | 13 | `subjectId` | `text` | نعم |  |
 
-### `books` — 19 عموداً، 25 صف، مجموعة `CATALOG`
+### `books` — 20 عموداً، 0 صف، مجموعة `CATALOG`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -416,6 +416,7 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 | 25 | `createdAt` | `timestamp(3)` | لا | `CURRENT_TIMESTAMP` |
 | 26 | `updatedAt` | `timestamp(3)` | لا |  |
 | 27 | `publisherId` | `text` | لا |  |
+| 28 | `archivedAt` | `timestamp(3)` | نعم |  |
 
 ### `cart_items` — 4 عموداً، 0 صف، مجموعة `CART_WISHLIST`
 
@@ -426,7 +427,7 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 | 3 | `quantity` | `integer` | لا | `1` |
 | 4 | `updatedAt` | `timestamp(3)` | لا |  |
 
-### `categories` — 9 عموداً، 30 صف، مجموعة `CATALOG`
+### `categories` — 9 عموداً، 21 صف، مجموعة `CATALOG`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -494,7 +495,7 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 | 3 | `quantity` | `integer` | لا | `1` |
 | 4 | `updatedAt` | `timestamp(3)` | لا |  |
 
-### `handout_categories` — 9 عموداً، 24 صف، مجموعة `CATALOG`
+### `handout_categories` — 9 عموداً، 23 صف، مجموعة `CATALOG`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -540,7 +541,7 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 | 2 | `handoutId` 🔑 | `text` | لا |  |
 | 3 | `createdAt` | `timestamp(3)` | لا | `CURRENT_TIMESTAMP` |
 
-### `handouts` — 19 عموداً، 3 صف، مجموعة `CATALOG`
+### `handouts` — 20 عموداً، 2 صف، مجموعة `CATALOG`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -563,6 +564,7 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 | 20 | `publisherId` | `text` | لا |  |
 | 21 | `createdAt` | `timestamp(3)` | لا | `CURRENT_TIMESTAMP` |
 | 22 | `updatedAt` | `timestamp(3)` | لا |  |
+| 23 | `archivedAt` | `timestamp(3)` | نعم |  |
 
 ### `newsletter_subscribers` — 3 عموداً، 0 صف، مجموعة `MARKETING`
 
@@ -572,7 +574,7 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 | 2 | `locale` | `text` | لا | `'ar'` |
 | 3 | `createdAt` | `timestamp(3)` | لا | `CURRENT_TIMESTAMP` |
 
-### `order_events` — 4 عموداً، 3 صف، مجموعة `ORDERS`
+### `order_events` — 4 عموداً، 0 صف، مجموعة `ORDERS`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -581,7 +583,7 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 | 3 | `status` | `"OrderStatus"` | لا |  |
 | 4 | `occurredAt` | `timestamp(3)` | لا | `CURRENT_TIMESTAMP` |
 
-### `order_items` — 5 عموداً، 5 صف، مجموعة `ORDERS`
+### `order_items` — 5 عموداً، 0 صف، مجموعة `ORDERS`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -591,7 +593,7 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 | 4 | `quantity` | `integer` | لا | `1` |
 | 5 | `unitPrice` | `integer` | لا |  |
 
-### `orders` — 19 عموداً، 1 صف، مجموعة `ORDERS`
+### `orders` — 19 عموداً، 0 صف، مجموعة `ORDERS`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -615,7 +617,7 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 | 18 | `updatedAt` | `timestamp(3)` | لا |  |
 | 19 | `couponCode` | `text` | نعم |  |
 
-### `publishers` — 6 عموداً، 19 صف، مجموعة `CATALOG`
+### `publishers` — 6 عموداً، 2 صف، مجموعة `CATALOG`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -640,7 +642,7 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 | 8 | `createdAt` | `timestamp(3)` | لا | `CURRENT_TIMESTAMP` |
 | 9 | `updatedAt` | `timestamp(3)` | لا |  |
 
-### `store_settings` — 3 عموداً، 11 صف، مجموعة `SETTINGS`
+### `store_settings` — 3 عموداً، 19 صف، مجموعة `SETTINGS`
 
 | # | العمود | النوع | null | الافتراضي |
 |--:|---|---|---|---|
@@ -686,14 +688,17 @@ RLS مفعّل على الجداول الـ23 كلها ولا صلاحية لد�
 | `store_settings` | `key` | طبيعي (`key`) |
 | `wishlist_items` | `customerId`، `bookId` | مركّب (جدول ربط) |
 
-### قيود CHECK (23)
+### قيود CHECK (29)
 
 Prisma لا يعبّر عن قيد CHECK في `schema.prisma`؛ هذه كُتبت يدوياً في ملفات الترحيل، والمصدر هنا هو `pg_constraint` لا المخطط.
 
 | الجدول | القيد | التعريف |
 |---|---|---|
+| `books` | `books_compareAtPrice_above_price_check` | `CHECK ((("compareAtPrice" IS NULL) OR ("compareAtPrice" > price)))` |
 | `books` | `books_compareAtPrice_check` | `CHECK ((("compareAtPrice" IS NULL) OR ("compareAtPrice" >= 0)))` |
+| `books` | `books_pages_check` | `CHECK ((pages >= 1))` |
 | `books` | `books_price_check` | `CHECK ((price >= 0))` |
+| `books` | `books_publishedYear_check` | `CHECK (("publishedYear" >= 1))` |
 | `books` | `books_rating_check` | `CHECK (((rating >= (0)::double precision) AND (rating <= (5)::double precision)))` |
 | `books` | `books_reviewsCount_check` | `CHECK (("reviewsCount" >= 0))` |
 | `books` | `books_stock_check` | `CHECK ((stock >= 0))` |
@@ -705,8 +710,11 @@ Prisma لا يعبّر عن قيد CHECK في `schema.prisma`؛ هذه كُتب�
 | `handout_order_items` | `handout_order_items_quantity_check` | `CHECK ((quantity > 0))` |
 | `handout_order_items` | `handout_order_items_unitPrice_check` | `CHECK (("unitPrice" >= 0))` |
 | `handout_reviews` | `handout_reviews_rating_check` | `CHECK (((rating >= 1) AND (rating <= 5)))` |
+| `handouts` | `handouts_compareAtPrice_above_price_check` | `CHECK ((("compareAtPrice" IS NULL) OR ("compareAtPrice" > price)))` |
 | `handouts` | `handouts_compareAtPrice_check` | `CHECK ((("compareAtPrice" IS NULL) OR ("compareAtPrice" >= 0)))` |
+| `handouts` | `handouts_pages_check` | `CHECK ((pages >= 1))` |
 | `handouts` | `handouts_price_check` | `CHECK ((price >= 0))` |
+| `handouts` | `handouts_publishedYear_check` | `CHECK (("publishedYear" >= 1))` |
 | `handouts` | `handouts_rating_check` | `CHECK (((rating >= (0)::double precision) AND (rating <= (5)::double precision)))` |
 | `handouts` | `handouts_reviewsCount_check` | `CHECK (("reviewsCount" >= 0))` |
 | `handouts` | `handouts_stock_check` | `CHECK ((stock >= 0))` |
@@ -716,7 +724,7 @@ Prisma لا يعبّر عن قيد CHECK في `schema.prisma`؛ هذه كُتب�
 | `orders` | `orders_total_check` | `CHECK ((total = ((subtotal + "shippingCost") - discount)))` |
 | `reviews` | `reviews_rating_check` | `CHECK (((rating >= 1) AND (rating <= 5)))` |
 
-خارج `public` توجد 52 قيود CHECK تخصّ خدمات Supabase (`auth` 47، `realtime` 2، `storage` 3)، غير مدرجة هنا.
+خارج `public` توجد 55 قيود CHECK تخصّ خدمات Supabase (`auth` 47، `realtime` 2، `storage` 6)، غير مدرجة هنا.
 
 ### الفهارس غير الأساسية (51)
 
@@ -849,6 +857,9 @@ Prisma لا يعبّر عن قيد CHECK في `schema.prisma`؛ هذه كُتب�
 | 21 | `20260917160000_normalized_name_keys` | 2026-09-17 20:40:09 | 1 | — |
 | 22 | `20260918090000_order_coupon_code` | 2026-09-17 21:45:33 | 1 | — |
 | 23 | `20260918110000_lock_public_api` | 2026-09-18 07:14:54 | 1 | — |
+| 24 | `20260919090000_book_archive` | 2026-09-18 22:00:03 | 1 | — |
+| 25 | `20260919100000_handout_archive` | 2026-09-18 22:17:08 | 1 | — |
+| 26 | `20260929120000_title_figure_checks` | 2026-09-29 13:47:45 | 1 | — |
 
 ## الملحق و — طريقة الالتقاط (لإعادة الجرد لاحقاً)
 
