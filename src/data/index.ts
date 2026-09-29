@@ -997,7 +997,15 @@ export async function getCustomer(): Promise<Customer> {
     where: { id: await currentCustomerId() },
     include: {
       addresses: { orderBy: { isDefault: "desc" } },
-      _count: { select: { orders: true, wishlist: true, handoutWishlist: true } },
+      /* What the wishlist page shows: an archived title's row is kept, for
+         the day it comes back, but is not on the page, so not in the count. */
+      _count: {
+        select: {
+          orders: true,
+          wishlist: { where: { book: onShelf } },
+          handoutWishlist: { where: { handout: handoutOnShelf } },
+        },
+      },
     },
   });
 

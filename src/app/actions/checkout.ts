@@ -165,11 +165,11 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
     });
 
     for (const item of lines) {
-      await takeFromShelf(tx, "book", item.bookId, item.quantity);
+      await takeFromShelf(tx, "book", item.bookId, item.quantity, { onSaleOnly: true });
     }
 
     for (const item of handoutLines) {
-      await takeFromShelf(tx, "handout", item.handoutId, item.quantity);
+      await takeFromShelf(tx, "handout", item.handoutId, item.quantity, { onSaleOnly: true });
     }
 
     await tx.cartItem.deleteMany({ where: { customerId: customer.id } });

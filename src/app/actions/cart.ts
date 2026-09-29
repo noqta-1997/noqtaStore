@@ -111,6 +111,9 @@ export async function toggleWishlist(bookId: string): Promise<ActionResult> {
     return ok("removed");
   }
 
+  // Only a title on sale is saved; a stale page may still offer an archived one.
+  if (!(await prisma.book.count({ where: { id: bookId, archivedAt: null } }))) return fail("notFound");
+
   try {
     await prisma.wishlistItem.create({ data: { customerId, bookId } });
   } catch (error) {
@@ -216,6 +219,8 @@ export async function toggleHandoutWishlist(handoutId: string): Promise<ActionRe
     revalidatePath("/account/wishlist");
     return ok("removed");
   }
+
+  if (!(await prisma.handout.count({ where: { id: handoutId, archivedAt: null } }))) return fail("notFound");
 
   try {
     await prisma.handoutWishlistItem.create({ data: { customerId, handoutId } });

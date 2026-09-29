@@ -20,6 +20,7 @@
     "inStock": "متوفر",
     "lowStock": "بقي القليل",
     "outOfStock": "نفدت الكمية",
+    "noLongerOnSale": "لم يعد متوفرًا في المتجر",
     "next": "التالي",
     "previous": "السابق",
     "skipToContent": "تخطَّ إلى المحتوى",

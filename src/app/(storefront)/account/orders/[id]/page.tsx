@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BookCover } from "@/components/book/book-cover";
+import { TitleLink } from "@/components/book/title-link";
 import { OrderSummary } from "@/components/commerce/order-summary";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Surface, surfaceTitleStyles } from "@/components/ui/surface";
@@ -171,12 +172,14 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
                   />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <Link
+                  <TitleLink
                     href={`/books/${item.book.slug}`}
+                    archived={item.book.archived}
+                    archivedNote={dictionary.common.noLongerOnSale}
                     className="block font-display text-base font-bold underline-offset-4 hover:underline"
                   >
                     {item.book.title[locale]}
-                  </Link>
+                  </TitleLink>
                   <span className="block text-label-md text-muted">
                     {dictionary.common.by} {item.book.author.name[locale]}
                   </span>
@@ -203,12 +206,14 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
                   />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <Link
+                  <TitleLink
                     href={`/handouts/${item.handout.slug}`}
+                    archived={item.handout.archived}
+                    archivedNote={dictionary.common.noLongerOnSale}
                     className="block font-display text-base font-bold underline-offset-4 hover:underline"
                   >
                     {item.handout.title[locale]}
-                  </Link>
+                  </TitleLink>
                   <span className="block text-label-md text-muted">
                     {dictionary.common.by} {item.handout.author.name[locale]}
                   </span>

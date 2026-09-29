@@ -161,6 +161,8 @@ export async function submitReview(formData: FormData): Promise<ActionResult> {
     return fail("invalidRating");
   }
   if (!bookId || !title || !body) return fail("missingReview");
+  // Reviews are left on a title's page, which an archived title no longer has.
+  if (!(await prisma.book.count({ where: { id: bookId, archivedAt: null } }))) return fail("notFound");
 
   const existing = await prisma.review.findUnique({
     where: { bookId_customerId: { bookId, customerId } },
@@ -226,6 +228,7 @@ export async function submitHandoutReview(formData: FormData): Promise<ActionRes
     return fail("invalidRating");
   }
   if (!handoutId || !title || !body) return fail("missingReview");
+  if (!(await prisma.handout.count({ where: { id: handoutId, archivedAt: null } }))) return fail("notFound");
 
   const existing = await prisma.handoutReview.findUnique({
     where: { handoutId_customerId: { handoutId, customerId } },

@@ -13,7 +13,6 @@ import { HomeSectionForm } from "@/components/admin/home-section-form";
 import { HomeShelfFields } from "@/components/admin/home-shelf-fields";
 import {
   getAuthorsByIds,
-  getBookById,
   getBooksByIds,
   getCategoriesByIds,
   getPublishersByIds,
@@ -103,8 +102,12 @@ export default async function HomeSectionPage({ params }: HomeSectionPageProps) 
 
   if (section === "hero") {
     const hero = readHeroContent(settings);
-    const [featured, showcase] = await Promise.all([
-      hero.featuredBookId ? getBookById(hero.featuredBookId) : undefined,
+    /* Both through the on-shelf read: an archived pick is off sale, the save
+       would refuse it, and the form used to show it anyway — so every save
+       of the hero, a link included, failed until the admin guessed which
+       title to remove. */
+    const [[featured], showcase] = await Promise.all([
+      getBooksByIds(hero.featuredBookId ? [hero.featuredBookId] : []),
       getBooksByIds(hero.showcaseIds),
     ]);
 

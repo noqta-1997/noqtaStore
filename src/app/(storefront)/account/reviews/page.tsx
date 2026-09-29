@@ -1,8 +1,8 @@
 import { MessageSquareQuote, Pencil } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { BookCover } from "@/components/book/book-cover";
+import { TitleLink } from "@/components/book/title-link";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { deleteOwnHandoutReview, deleteOwnReview } from "@/app/actions/account";
@@ -76,8 +76,9 @@ export default async function MyReviewsPage({
         {reviews.map((review) => (
           <li key={review.id} className="rounded-xl border border-line bg-card p-4 sm:p-5">
             <div className="flex gap-4">
-              <Link
+              <TitleLink
                 href={`/books/${review.book.slug}`}
+                archived={review.book.archived}
                 className="w-16 shrink-0 sm:w-20"
                 aria-label={review.book.title[locale]}
               >
@@ -89,18 +90,20 @@ export default async function MyReviewsPage({
                   sizes="5rem"
                   className="border border-line"
                 />
-              </Link>
+              </TitleLink>
 
               <div className="min-w-0 flex-1 space-y-2">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="min-w-0">
                     <span className="label-mono block text-muted">{t.onBook}</span>
-                    <Link
+                    <TitleLink
                       href={`/books/${review.book.slug}`}
+                      archived={review.book.archived}
+                      archivedNote={dictionary.common.noLongerOnSale}
                       className="block font-display text-base font-bold underline-offset-4 hover:underline"
                     >
                       {review.book.title[locale]}
-                    </Link>
+                    </TitleLink>
                   </div>
 
                   <span
@@ -156,8 +159,9 @@ export default async function MyReviewsPage({
         {handoutReviews.map((review) => (
           <li key={review.id} className="rounded-xl border border-line bg-card p-4 sm:p-5">
             <div className="flex gap-4">
-              <Link
+              <TitleLink
                 href={`/handouts/${review.handout.slug}`}
+                archived={review.handout.archived}
                 className="w-16 shrink-0 sm:w-20"
                 aria-label={review.handout.title[locale]}
               >
@@ -169,18 +173,20 @@ export default async function MyReviewsPage({
                   sizes="5rem"
                   className="border border-line"
                 />
-              </Link>
+              </TitleLink>
 
               <div className="min-w-0 flex-1 space-y-2">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="min-w-0">
                     <span className="label-mono block text-muted">{t.onHandout}</span>
-                    <Link
+                    <TitleLink
                       href={`/handouts/${review.handout.slug}`}
+                      archived={review.handout.archived}
+                      archivedNote={dictionary.common.noLongerOnSale}
                       className="block font-display text-base font-bold underline-offset-4 hover:underline"
                     >
                       {review.handout.title[locale]}
-                    </Link>
+                    </TitleLink>
                   </div>
 
                   <span

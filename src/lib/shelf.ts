@@ -23,14 +23,20 @@ export class ShortStock extends Error {
  * second order matches nothing and the count never crosses zero. The CHECK
  * constraint on `stock` (migration 20260917080000_quantity_checks) is the
  * backstop for any path that does not come through here.
+ *
+ * `onSaleOnly` is checkout's: a title archived between the cart and the
+ * click is as gone as one sold out, and the order rolls back the same way.
+ * The panel bringing a cancelled order back leaves it off — that order was
+ * placed while the title was on sale, and its copies are still on the shelf.
  */
 export async function takeFromShelf(
   tx: Prisma.TransactionClient,
   kind: "book" | "handout",
   id: string,
   quantity: number,
+  { onSaleOnly = false }: { onSaleOnly?: boolean } = {},
 ): Promise<void> {
-  const where = { id, stock: { gte: quantity } };
+  const where = { id, stock: { gte: quantity }, ...(onSaleOnly ? { archivedAt: null } : {}) };
   const data = { stock: { decrement: quantity } };
 
   const taken =
