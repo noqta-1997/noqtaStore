@@ -237,6 +237,7 @@ export function HandoutForm({
         <Panel title={t.sections.media}>
           <CoverField
             key={handout?.coverUrl ?? "no-cover"}
+            hasCover={Boolean(handout?.coverUrl)}
             labels={t.upload}
             errors={dictionary.common.actionErrors}
           >

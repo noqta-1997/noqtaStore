@@ -216,6 +216,10 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
   if (!cover.ok) return fail(cover.error);
 
   const bookId = text(formData, "bookId");
+  // "Remove the cover" counts only on an edit, and a newly chosen file wins
+  // over it. The row's column is cleared and, once the write holds, the file
+  // goes the way a replaced cover's does.
+  const dropCover = Boolean(bookId) && !cover.file && checkbox(formData, "removeCover");
 
   /*
    * What the form still edits.
@@ -285,7 +289,7 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
   const shelf = shelfWrite(data, optionalNumber(formData, "stockWas"));
   try {
     if (bookId) {
-      if (coverUrl) {
+      if (coverUrl || dropCover) {
         const current = await prisma.book.findUnique({
           where: { id: bookId },
           select: { coverUrl: true },
@@ -294,7 +298,7 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
       }
       await prisma.book.update({
         where: { id: bookId, ...shelf.guard },
-        data: { ...shelf.data, coverUrl },
+        data: { ...shelf.data, coverUrl: dropCover ? null : coverUrl },
       });
     } else {
       /*
@@ -415,6 +419,8 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
   if (!cover.ok) return fail(cover.error);
 
   const handoutId = text(formData, "handoutId");
+  // A cover removed on an edit, unless a new file came with it — as in `saveBook`.
+  const dropCover = Boolean(handoutId) && !cover.file && checkbox(formData, "removeCover");
 
   // The update payload: slug, ISBN, cover type and weight are absent for the
   // same reason they are in `saveBook` — an edit must not regenerate them.
@@ -460,7 +466,7 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
   const shelf = shelfWrite(data, optionalNumber(formData, "stockWas"));
   try {
     if (handoutId) {
-      if (coverUrl) {
+      if (coverUrl || dropCover) {
         const current = await prisma.handout.findUnique({
           where: { id: handoutId },
           select: { coverUrl: true },
@@ -469,7 +475,7 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
       }
       await prisma.handout.update({
         where: { id: handoutId, ...shelf.guard },
-        data: { ...shelf.data, coverUrl },
+        data: { ...shelf.data, coverUrl: dropCover ? null : coverUrl },
       });
     } else {
       // Suffixed when another handout carries the same title — as in `saveBook`.

@@ -241,6 +241,7 @@ export function BookForm({
         <Panel title={t.sections.media}>
           <CoverField
             key={book?.coverUrl ?? "no-cover"}
+            hasCover={Boolean(book?.coverUrl)}
             labels={t.upload}
             errors={dictionary.common.actionErrors}
           >

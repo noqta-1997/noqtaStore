@@ -4,6 +4,7 @@ import { ImagePlus } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import type { AdminDictionary, Dictionary } from "@/i18n/get-dictionary";
 import { COVER_EXTENSIONS, COVER_MIME_TYPES, MAX_COVER_BYTES } from "@/lib/cover-image";
 import { prepareCover } from "@/lib/cover-resize";
@@ -13,6 +14,8 @@ interface CoverFieldProps {
   errors: Pick<Dictionary["common"]["actionErrors"], "invalidImage" | "imageTooLarge">;
   /** The cover the row has now, or its typographic placeholder. */
   children: ReactNode;
+  /** The row has an uploaded cover, which the field then offers to remove. */
+  hasCover?: boolean;
 }
 
 interface Chosen {
@@ -38,11 +41,17 @@ interface Chosen {
  * uploaded on save" line, and every later save of the form uploaded the same
  * picture again. A failed save leaves the URL — and the chosen file — as they
  * were, ready for another try.
+ *
+ * A row with a cover gets a "remove" box beside it, posted as `removeCover`:
+ * without it a cover could be replaced but never taken off, so a wrong one
+ * stayed until another picture was found for it. Choosing a file hides the
+ * box — a new cover and a removal cannot both be meant.
  */
-export function CoverField({ labels, errors, children }: CoverFieldProps) {
+export function CoverField({ labels, errors, children, hasCover = false }: CoverFieldProps) {
   const [chosen, setChosen] = useState<Chosen | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [preparing, setPreparing] = useState(false);
+  const [removing, setRemoving] = useState(false);
   // Counts picks, so a slow resize cannot land after a newer pick.
   const pick = useRef(0);
 
@@ -64,6 +73,7 @@ export function CoverField({ labels, errors, children }: CoverFieldProps) {
     setPreparing(false);
     setChosen(null);
     setError(null);
+    setRemoving(false);
     if (!file) return;
 
     if (!(file.type in COVER_EXTENSIONS)) {
@@ -112,7 +122,11 @@ export function CoverField({ labels, errors, children }: CoverFieldProps) {
           .replace("{height}", String(chosen.resizedTo.height))
       : chosen
         ? labels.ready
-        : labels.placeholder;
+        : removing
+          ? labels.removing
+          : hasCover
+            ? labels.current
+            : labels.placeholder;
 
   return (
     <div className="space-y-3" aria-busy={preparing}>
@@ -122,7 +136,7 @@ export function CoverField({ labels, errors, children }: CoverFieldProps) {
             <Image src={chosen.url} alt="" fill sizes="8rem" className="object-cover" />
           </div>
         ) : (
-          children
+          <div className={removing ? "opacity-40" : undefined}>{children}</div>
         )}
       </div>
 
@@ -156,6 +170,17 @@ export function CoverField({ labels, errors, children }: CoverFieldProps) {
           {status}
         </p>
       )}
+
+      {hasCover && !chosen && !preparing ? (
+        <Checkbox
+          id="removeCover"
+          name="removeCover"
+          value="1"
+          checked={removing}
+          onChange={(event) => setRemoving(event.currentTarget.checked)}
+          label={labels.remove}
+        />
+      ) : null}
     </div>
   );
 }
