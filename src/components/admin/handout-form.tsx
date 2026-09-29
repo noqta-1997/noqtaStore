@@ -297,9 +297,6 @@ export function HandoutForm({
         <Button type="submit" size="lg">
           {isEdit ? admin.common.saveChanges : t.actions.publish}
         </Button>
-        <Button type="button" variant="secondary" size="lg">
-          {t.actions.saveDraft}
-        </Button>
         <Link
           href={cancelHref}
           className={buttonStyles({ variant: "subtle", size: "lg" })}
