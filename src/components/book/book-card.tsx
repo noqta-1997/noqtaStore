@@ -23,13 +23,16 @@ interface BookCardProps {
 }
 
 /**
- * The reference's shelf card: the jacket sits on its own tinted plate, and
- * everything below it is one column of running text — title and price on the
- * first line, author and the two controls on the last.
+ * The reference's profile card: the jacket fills a rounded frame, and a band
+ * in the anchor tokens — dark in both themes — rises from the bottom to carry
+ * the title, the author and category, a row of two figures and the actions.
  *
- * Nothing was removed to get there. The discount and tag badges, the
- * out-of-stock and low-stock notes, the wishlist heart and the cart button
- * are all still here; they are just placed the way the reference places them.
+ * The reference sets three figures across; at about 205px a card fits two,
+ * so the rating sits over "تقييم" and the price over its stock state, which
+ * is where the low-stock note went. The cart button is a pill that drops its
+ * label under `sm`, keeping it at zero size so it still names the button,
+ * and the wishlist heart sits beside it rather than appearing on hover.
+ * Placeholder jackets draw `compact`, without lettering under the title.
  */
 export function BookCard({
   book,
