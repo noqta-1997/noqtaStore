@@ -60,6 +60,7 @@ import {
   isMissingRecord,
   isUniqueViolation,
   logActionError,
+  violatedConstraint,
 } from "@/lib/prisma-errors";
 import { revalidateCatalogue, revalidateHandouts } from "@/lib/revalidate";
 import { CouponSpent, refundCouponUse, respendCoupon } from "@/lib/coupon";
@@ -86,6 +87,43 @@ function slugify(value: string, fallback: string) {
     .replace(/^-+|-+$/g, "");
 
   return slug || fallback;
+}
+
+/** `base`, or the first of `base-2`, `base-3`… that nothing holds yet. */
+function freeSlug(base: string, taken: Set<string>) {
+  if (!taken.has(base)) return base;
+  let suffix = 2;
+  while (taken.has(`${base}-${suffix}`)) suffix++;
+  return `${base}-${suffix}`;
+}
+
+/**
+ * Creates a title under the first free slug of its base.
+ *
+ * A title is not a name: «الرياضيات» is a book for every grade, and each
+ * copy of it needs an address of its own. The base used to be written as it
+ * was, so the second «الرياضيات» hit the slug's unique index and the panel
+ * refused it as a duplicate. The slugs already under the base are read
+ * first, so the usual case is a single insert; the index stays the judge,
+ * and a slug another save claimed between the read and the insert only sends
+ * the loop round again. Any other failure is the caller's to report.
+ */
+async function createUnderFreeSlug(
+  base: string,
+  slugIndex: string,
+  slugsUnder: (base: string) => Promise<{ slug: string }[]>,
+  create: (slug: string) => Promise<unknown>,
+) {
+  for (let attempt = 1; ; attempt++) {
+    const taken = new Set((await slugsUnder(base)).map((row) => row.slug));
+    try {
+      await create(freeSlug(base, taken));
+      return;
+    } catch (error) {
+      const lostRace = isUniqueViolation(error) && violatedConstraint(error) === slugIndex;
+      if (!lostRace || attempt === 3) throw error;
+    }
+  }
 }
 
 /**
@@ -196,24 +234,26 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
     } else {
       /*
        * A new row still needs its unique slug, derived once from the title
-       * here and never touched again.
+       * here and never touched again — suffixed when another book already
+       * carries the same title.
        */
-      await prisma.book.create({
-        data: {
-          ...data,
-          coverUrl,
-          slug: slugify(titleAr, `book-${Date.now()}`),
-        },
-      });
+      await createUnderFreeSlug(
+        slugify(titleAr, `book-${Date.now()}`),
+        "books_slug_key",
+        (base) =>
+          prisma.book.findMany({ where: { slug: { startsWith: base } }, select: { slug: true } }),
+        (slug) => prisma.book.create({ data: { ...data, coverUrl, slug } }),
+      );
     }
   } catch (error) {
     await discardCover(coverUrl);
     /*
-     * Only a unique-constraint violation is the admin's to fix — another
-     * book already slugs to this title. Anything else (a stale relation, a
-     * column the client and the database disagree on, the pooler dropping
-     * the connection) is a fault: say so plainly and keep the cause in the
-     * log instead of dressing it up as a duplicate.
+     * A title never collides any more, so a unique-constraint violation here
+     * is a slug lost to other saves three times running — rare enough to ask
+     * for a retry. Anything else (a stale relation, a column the client and
+     * the database disagree on, the pooler dropping the connection) is a
+     * fault: say so plainly and keep the cause in the log instead of
+     * dressing it up as a duplicate.
      */
     if (isUniqueViolation(error)) return fail("duplicate");
     logActionError("saveBook", error, { bookId: bookId || null });
@@ -349,17 +389,18 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
         data: { ...data, coverUrl },
       });
     } else {
-      await prisma.handout.create({
-        data: {
-          ...data,
-          coverUrl,
-          slug: slugify(titleAr, `handout-${Date.now()}`),
-        },
-      });
+      // Suffixed when another handout carries the same title — as in `saveBook`.
+      await createUnderFreeSlug(
+        slugify(titleAr, `handout-${Date.now()}`),
+        "handouts_slug_key",
+        (base) =>
+          prisma.handout.findMany({ where: { slug: { startsWith: base } }, select: { slug: true } }),
+        (slug) => prisma.handout.create({ data: { ...data, coverUrl, slug } }),
+      );
     }
   } catch (error) {
     await discardCover(coverUrl);
-    // A duplicate is the admin's to fix; anything else is logged — as in `saveBook`.
+    // Only a slug lost three times running reaches `duplicate`; anything else is logged — as in `saveBook`.
     if (isUniqueViolation(error)) return fail("duplicate");
     logActionError("saveHandout", error, { handoutId: handoutId || null });
     return fail("saveFailed");
