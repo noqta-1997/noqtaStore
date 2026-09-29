@@ -72,7 +72,8 @@
     "vsLastMonth": "مقارنة بالشهر الماضي",
     "today": "اليوم",
     "arabic": "بالعربية",
-    "english": "بالإنجليزية"
+    "english": "بالإنجليزية",
+    "archivedCount": "+{count} مؤرشف"
   },
   "dashboard": {
     "title": "لوحة المعلومات",
@@ -339,7 +340,8 @@
     "table": {
       "name": "التصنيف",
       "books": "عدد الكتب المدرسية",
-      "share": "حصة المبيعات"
+      "share": "حصة المبيعات",
+      "subjectOf": "مادة {count} مدرّس"
     },
     "form": {
       "title": "تصنيف جديد",

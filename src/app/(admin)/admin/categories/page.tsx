@@ -9,10 +9,16 @@ import { Panel } from "@/components/admin/panel";
 import { RowActions } from "@/components/admin/row-actions";
 import { deleteCategory } from "@/app/actions/admin";
 import { CategoryIcon } from "@/components/ui/category-icon";
-import { getCategories, getCategoryShares } from "@/data";
+import { HeldCount } from "@/components/admin/held-count";
+import {
+  getArchivedTitleCounts,
+  getCategories,
+  getCategoryShares,
+  getSubjectTeacherCounts,
+} from "@/data";
+import { subtreeOf } from "@/lib/category-tree";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
-import { formatNumber } from "@/lib/format";
 import { readParam, type SearchParamsRecord } from "@/lib/search-params";
 
 interface AdminCategoriesPageProps {
@@ -36,11 +42,13 @@ export default async function AdminCategoriesPage({
   const locale = defaultLocale;
   const parentId = readParam(await searchParams, "parent");
 
-  const [dictionary, admin, categories, shares] = await Promise.all([
+  const [dictionary, admin, categories, shares, archived, subjectOf] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
     getCategories(),
     getCategoryShares("all"),
+    getArchivedTitleCounts("categoryId"),
+    getSubjectTeacherCounts(),
   ]);
 
   const t = admin.categories;
@@ -86,7 +94,21 @@ export default async function AdminCategoriesPage({
                       </div>
                     </Td>
                     <Td data-numeric>
-                      {formatNumber(category.booksCount, locale)}
+                      <HeldCount
+                        count={category.booksCount}
+                        notes={[
+                          {
+                            // Rolled up like the figure above it.
+                            count: subtreeOf(category).reduce(
+                              (sum, node) => sum + (archived.books.get(node.id) ?? 0),
+                              0,
+                            ),
+                            label: admin.common.archivedCount,
+                          },
+                          { count: subjectOf.get(category.id) ?? 0, label: t.table.subjectOf },
+                        ]}
+                        locale={locale}
+                      />
                     </Td>
                     <Td>
                       <div className="flex items-center gap-2">
@@ -127,6 +149,9 @@ export default async function AdminCategoriesPage({
                           fallbackError={dictionary.common.toast.actionFailed}
                           errorMessages={{
                             inUse: dictionary.common.actionErrors.inUse,
+                            hasTitles: dictionary.common.actionErrors.hasTitles,
+                            hasArchivedTitles: dictionary.common.actionErrors.hasArchivedTitles,
+                            teacherSubject: dictionary.common.actionErrors.teacherSubject,
                             hasChildren: dictionary.common.actionErrors.hasChildren,
                             forbidden: dictionary.common.actionErrors.forbidden,
                             notFound: dictionary.common.actionErrors.notFound,

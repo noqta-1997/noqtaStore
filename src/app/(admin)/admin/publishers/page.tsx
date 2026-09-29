@@ -9,11 +9,11 @@ import { PublisherForm } from "@/components/admin/publisher-form";
 import { RowActions } from "@/components/admin/row-actions";
 import { TableToolbar } from "@/components/admin/table-toolbar";
 import { publisherTone } from "@/components/publisher/publisher-card";
-import { getPublishers } from "@/data";
+import { HeldCount } from "@/components/admin/held-count";
+import { getArchivedTitleCounts, getPublishers } from "@/data";
 import { arabicKey } from "@/lib/arabic";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
-import { formatNumber } from "@/lib/format";
 import { readParam, type SearchParamsRecord } from "@/lib/search-params";
 import { cn } from "@/lib/utils";
 
@@ -34,10 +34,11 @@ export default async function AdminPublishersPage({
 
   const term = readParam(await searchParams, "q");
 
-  const [dictionary, admin, allPublishers] = await Promise.all([
+  const [dictionary, admin, allPublishers, archived] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
     getPublishers(),
+    getArchivedTitleCounts("publisherId"),
   ]);
 
   // Spelling-blind, like the key that refuses a second «مكتبة» spelled «مكتبه».
@@ -96,10 +97,18 @@ export default async function AdminPublishersPage({
                     </div>
                   </Td>
                   <Td data-numeric>
-                    {formatNumber(publisher.booksCount, locale)}
+                    <HeldCount
+                      count={publisher.booksCount}
+                      notes={[{ count: archived.books.get(publisher.id) ?? 0, label: admin.common.archivedCount }]}
+                      locale={locale}
+                    />
                   </Td>
                   <Td data-numeric>
-                    {formatNumber(publisher.handoutsCount, locale)}
+                    <HeldCount
+                      count={publisher.handoutsCount}
+                      notes={[{ count: archived.handouts.get(publisher.id) ?? 0, label: admin.common.archivedCount }]}
+                      locale={locale}
+                    />
                   </Td>
                   <Td>
                     <RowActions

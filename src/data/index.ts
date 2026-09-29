@@ -472,6 +472,43 @@ export async function getAuthors(limit?: number): Promise<Author[]> {
   return (typeof limit === "number" ? ranked.slice(0, limit) : ranked).map(toAuthor);
 }
 
+/**
+ * Archived titles per teacher, press or branch, for the panel's tables. The
+ * counts above them are the shelf's, but an archived title still holds its
+ * relations, and a row reading 0 that refuses to be deleted has to show why.
+ */
+export async function getArchivedTitleCounts(
+  field: "authorId" | "publisherId" | "categoryId",
+): Promise<{ books: Map<string, number>; handouts: Map<string, number> }> {
+  const archived = { archivedAt: { not: null } };
+  const [books, handouts] = await Promise.all([
+    prisma.book.findMany({ where: archived, select: { [field]: true } }),
+    prisma.handout.findMany({ where: archived, select: { [field]: true } }),
+  ]);
+
+  const tally = (rows: Record<string, unknown>[]) => {
+    const counts = new Map<string, number>();
+    for (const row of rows) {
+      const id = row[field] as string;
+      counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+    return counts;
+  };
+
+  return { books: tally(books), handouts: tally(handouts) };
+}
+
+/** How many teachers take each branch as their subject — it holds the branch too. */
+export async function getSubjectTeacherCounts(): Promise<Map<string, number>> {
+  const rows = await prisma.author.groupBy({
+    by: ["subjectId"],
+    where: { subjectId: { not: null } },
+    _count: { _all: true },
+  });
+
+  return new Map(rows.map((row) => [row.subjectId!, row._count._all]));
+}
+
 /** Authors in the order their ids were given; a deleted one is skipped. */
 export async function getAuthorsByIds(ids: string[]): Promise<Author[]> {
   if (!ids.length) return [];

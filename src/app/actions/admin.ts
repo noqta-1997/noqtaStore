@@ -53,6 +53,7 @@ import {
   StorageNotConfiguredError,
 } from "@/lib/cover-storage";
 import { refreshHandoutRating } from "@/lib/handout-rating";
+import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   isCheckViolation,
@@ -151,6 +152,35 @@ async function attemptDelete<T>(
     if (isForeignKeyViolation(error)) return { ok: false, error: "inUse" };
     return { ok: false, error: "deleteFailed" };
   }
+}
+
+/**
+ * Why a teacher, press or branch cannot be deleted yet, or null when no
+ * title holds it. Every title holds its relations, archived ones included,
+ * but the panel's tables count only the titles on the shelf — so a row that
+ * read 0 was refused as merely "in use", with nothing to say what held it.
+ * An archived holder now says so, and where to find it.
+ */
+async function titlesHolding(where: {
+  books?: Prisma.BookWhereInput;
+  handouts?: Prisma.HandoutWhereInput;
+}): Promise<"hasTitles" | "hasArchivedTitles" | null> {
+  const count = (archived: boolean) =>
+    Promise.all([
+      where.books
+        ? prisma.book.count({ where: { ...where.books, archivedAt: archived ? { not: null } : null } })
+        : 0,
+      where.handouts
+        ? prisma.handout.count({
+            where: { ...where.handouts, archivedAt: archived ? { not: null } : null },
+          })
+        : 0,
+    ]).then(([books, handouts]) => books + handouts);
+
+  const [shelved, archived] = await Promise.all([count(false), count(true)]);
+  if (shelved > 0) return "hasTitles";
+  if (archived > 0) return "hasArchivedTitles";
+  return null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -664,13 +694,13 @@ export async function deleteCategory(categoryId: string): Promise<ActionResult> 
   const children = await prisma.category.count({ where: { parentId: categoryId } });
   if (children > 0) return fail("hasChildren");
 
-  const books = await prisma.book.count({ where: { categoryId } });
-  if (books > 0) return fail("inUse");
+  const held = await titlesHolding({ books: { categoryId } });
+  if (held) return fail(held);
 
   /* A teacher's subject is a branch too; the row would only lose it (the key
      is SET NULL), but silently is not how the panel drops a relation. */
   const teachers = await prisma.author.count({ where: { subjectId: categoryId } });
-  if (teachers > 0) return fail("inUse");
+  if (teachers > 0) return fail("teacherSubject");
 
   const deleted = await attemptDelete("deleteCategory", { categoryId }, () =>
     prisma.category.delete({ where: { id: categoryId } }),
@@ -741,8 +771,8 @@ export async function deleteHandoutCategory(categoryId: string): Promise<ActionR
   const children = await prisma.handoutCategory.count({ where: { parentId: categoryId } });
   if (children > 0) return fail("hasChildren");
 
-  const handouts = await prisma.handout.count({ where: { categoryId } });
-  if (handouts > 0) return fail("inUse");
+  const held = await titlesHolding({ handouts: { categoryId } });
+  if (held) return fail(held);
 
   const deleted = await attemptDelete("deleteHandoutCategory", { categoryId }, () =>
     prisma.handoutCategory.delete({ where: { id: categoryId } }),
@@ -809,10 +839,8 @@ export async function deleteAuthor(authorId: string): Promise<ActionResult> {
 
   /* A teacher is held by either catalogue: the handouts key is as RESTRICT
      as the books one, and a teacher with only handouts is the common case. */
-  const books = await prisma.book.count({ where: { authorId } });
-  if (books > 0) return fail("inUse");
-  const handouts = await prisma.handout.count({ where: { authorId } });
-  if (handouts > 0) return fail("inUse");
+  const held = await titlesHolding({ books: { authorId }, handouts: { authorId } });
+  if (held) return fail(held);
 
   const deleted = await attemptDelete("deleteAuthor", { authorId }, () =>
     prisma.author.delete({ where: { id: authorId } }),
@@ -870,10 +898,8 @@ export async function deletePublisher(publisherId: string): Promise<ActionResult
   if (!(await requireManager())) return fail("forbidden");
 
   /* Both catalogues hold a press — see `deleteAuthor`. */
-  const books = await prisma.book.count({ where: { publisherId } });
-  if (books > 0) return fail("inUse");
-  const handouts = await prisma.handout.count({ where: { publisherId } });
-  if (handouts > 0) return fail("inUse");
+  const held = await titlesHolding({ books: { publisherId }, handouts: { publisherId } });
+  if (held) return fail(held);
 
   const deleted = await attemptDelete("deletePublisher", { publisherId }, () =>
     prisma.publisher.delete({ where: { id: publisherId } }),

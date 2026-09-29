@@ -8,11 +8,11 @@ import { RowActions } from "@/components/admin/row-actions";
 import { deleteAuthor } from "@/app/actions/admin";
 import { TableToolbar } from "@/components/admin/table-toolbar";
 import { authorTone, getAuthorInitials } from "@/components/author/author-card";
-import { getAuthors, getCategories } from "@/data";
+import { HeldCount } from "@/components/admin/held-count";
+import { getArchivedTitleCounts, getAuthors, getCategories } from "@/data";
 import { arabicKey } from "@/lib/arabic";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
-import { formatNumber } from "@/lib/format";
 import { readParam, type SearchParamsRecord } from "@/lib/search-params";
 import { cn } from "@/lib/utils";
 
@@ -33,11 +33,12 @@ export default async function AdminAuthorsPage({
 
   const term = readParam(await searchParams, "q");
 
-  const [dictionary, admin, allAuthors, categories] = await Promise.all([
+  const [dictionary, admin, allAuthors, categories, archived] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
     getAuthors(),
     getCategories(),
+    getArchivedTitleCounts("authorId"),
   ]);
 
   // Spelling-blind, like the key that refuses a second «أحمد» spelled «احمد».
@@ -96,10 +97,18 @@ export default async function AdminAuthorsPage({
                     </div>
                   </Td>
                   <Td data-numeric>
-                    {formatNumber(author.booksCount, locale)}
+                    <HeldCount
+                      count={author.booksCount}
+                      notes={[{ count: archived.books.get(author.id) ?? 0, label: admin.common.archivedCount }]}
+                      locale={locale}
+                    />
                   </Td>
                   <Td data-numeric>
-                    {formatNumber(author.handoutsCount, locale)}
+                    <HeldCount
+                      count={author.handoutsCount}
+                      notes={[{ count: archived.handouts.get(author.id) ?? 0, label: admin.common.archivedCount }]}
+                      locale={locale}
+                    />
                   </Td>
                   <Td>
                     <RowActions
@@ -114,6 +123,8 @@ export default async function AdminAuthorsPage({
                       fallbackError={dictionary.common.toast.actionFailed}
                       errorMessages={{
                         inUse: dictionary.common.actionErrors.inUse,
+                        hasTitles: dictionary.common.actionErrors.hasTitles,
+                        hasArchivedTitles: dictionary.common.actionErrors.hasArchivedTitles,
                         forbidden: dictionary.common.actionErrors.forbidden,
                         notFound: dictionary.common.actionErrors.notFound,
                         deleteFailed: dictionary.common.actionErrors.deleteFailed,
