@@ -635,6 +635,10 @@ export async function saveCategory(formData: FormData): Promise<ActionResult> {
     }
   } catch (error) {
     if (isUniqueViolation(error)) return fail("duplicate");
+    /* A branch deleted while its edit page was open is a stale page, as it
+       is for a book: say so, and let the form draw the page again, rather
+       than logging it as a fault. */
+    if (isMissingRecord(error)) return fail("notFound");
     logActionError("saveCategory", error, { categoryId: categoryId || null });
     return fail("saveFailed");
   }
@@ -715,6 +719,7 @@ export async function saveHandoutCategory(formData: FormData): Promise<ActionRes
     }
   } catch (error) {
     if (isUniqueViolation(error)) return fail("duplicate");
+    if (isMissingRecord(error)) return fail("notFound");
     logActionError("saveHandoutCategory", error, { categoryId: categoryId || null });
     return fail("saveFailed");
   }
@@ -779,6 +784,8 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
     }
   } catch (error) {
     if (isUniqueViolation(error)) return fail("duplicate");
+    // Deleted while the edit page was open — as in `saveCategory`.
+    if (isMissingRecord(error)) return fail("notFound");
     logActionError("saveAuthor", error, { authorId: authorId || null });
     return fail("saveFailed");
   }
@@ -837,6 +844,8 @@ export async function savePublisher(formData: FormData): Promise<ActionResult> {
     }
   } catch (error) {
     if (isUniqueViolation(error)) return fail("duplicate");
+    // Deleted while the edit page was open — as in `saveCategory`.
+    if (isMissingRecord(error)) return fail("notFound");
     logActionError("savePublisher", error, { publisherId: publisherId || null });
     return fail("saveFailed");
   }

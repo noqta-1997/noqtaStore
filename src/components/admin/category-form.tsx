@@ -56,6 +56,7 @@ export function CategoryForm({
         duplicate: dictionary.common.actionErrors.duplicate,
         saveFailed: dictionary.common.actionErrors.saveFailed,
         missingTitle: dictionary.common.actionErrors.missingTitle,
+        notFound: dictionary.common.actionErrors.notFound,
         missingRelation: dictionary.common.actionErrors.missingRelation,
         invalidParent: dictionary.common.actionErrors.invalidParent,
       }}
