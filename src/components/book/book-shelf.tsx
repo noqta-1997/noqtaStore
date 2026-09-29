@@ -40,7 +40,7 @@ export function BookShelf({
   return (
     <section
       className={cn(
-        "py-14 lg:py-20",
+        "py-6 lg:py-8",
         band && "bg-surface-low",
         className,
       )}
