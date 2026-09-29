@@ -796,7 +796,10 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
     return fail("saveFailed");
   }
 
+  /* A handout's page names its teacher too, and is cached like a book's: a
+     rename used to reach it only when its five-minute window ran out. */
   revalidateCatalogue();
+  revalidateHandouts();
   revalidatePath("/admin/authors");
   return ok();
 }
@@ -856,7 +859,9 @@ export async function savePublisher(formData: FormData): Promise<ActionResult> {
     return fail("saveFailed");
   }
 
+  // The handouts' pages name their press as well — see `saveAuthor`.
   revalidateCatalogue();
+  revalidateHandouts();
   revalidatePath("/admin/publishers");
   return ok();
 }
