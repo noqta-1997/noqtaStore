@@ -22,6 +22,7 @@ interface AuthorFormProps {
  * One form for adding an author and for editing an existing one. The subject
  * is picked from the school-books category tree, indented the way the
  * category form's parent control is, so a branch added there is offered here.
+ * An add empties the form, which sits beside the list and is used again.
  */
 export function AuthorForm({ admin, dictionary, categories, author }: AuthorFormProps) {
   const t = admin.authors.form;
@@ -35,6 +36,7 @@ export function AuthorForm({ admin, dictionary, categories, author }: AuthorForm
         isEdit ? dictionary.common.toast.saved : dictionary.common.toast.itemAdded
       }
       fallbackError={dictionary.common.toast.actionFailed}
+      resetOnSuccess={!isEdit}
           errorMessages={{
             forbidden: dictionary.common.actionErrors.forbidden,
             duplicate: dictionary.common.actionErrors.duplicate,

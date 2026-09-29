@@ -25,7 +25,9 @@ interface CategoryFormProps {
  * One form for adding a category and for editing an existing one. Where the
  * branch sits is part of it: the parent it hangs under and its place among
  * its siblings. A branch being edited is left out of the parent list along
- * with everything under it — it cannot hang from its own descendants.
+ * with everything under it — it cannot hang from its own descendants. An add
+ * empties the form back to its parent, so a grade's branches go in one after
+ * another.
  */
 export function CategoryForm({
   admin,
@@ -48,6 +50,7 @@ export function CategoryForm({
         isEdit ? dictionary.common.toast.saved : dictionary.common.toast.itemAdded
       }
       fallbackError={dictionary.common.toast.actionFailed}
+      resetOnSuccess={!isEdit}
       errorMessages={{
         forbidden: dictionary.common.actionErrors.forbidden,
         duplicate: dictionary.common.actionErrors.duplicate,

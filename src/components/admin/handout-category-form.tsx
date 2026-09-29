@@ -26,7 +26,8 @@ interface HandoutCategoryFormProps {
  * category and for editing an existing one. Where the branch sits is part of
  * it: the parent it hangs under and its place among its siblings. A branch
  * being edited is left out of the parent list along with everything under
- * it — it cannot hang from its own descendants.
+ * it — it cannot hang from its own descendants. An add empties the form back
+ * to its parent, as `CategoryForm` does.
  */
 export function HandoutCategoryForm({
   admin,
@@ -49,6 +50,7 @@ export function HandoutCategoryForm({
         isEdit ? dictionary.common.toast.saved : dictionary.common.toast.itemAdded
       }
       fallbackError={dictionary.common.toast.actionFailed}
+      resetOnSuccess={!isEdit}
       errorMessages={{
         forbidden: dictionary.common.actionErrors.forbidden,
         duplicate: dictionary.common.actionErrors.duplicate,

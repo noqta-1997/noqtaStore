@@ -40,7 +40,11 @@ interface BookFormProps {
 
 const tagOptions: BookTag[] = ["bestseller", "new", "featured", "award"];
 
-/** One form serves both "add book" and "edit book". */
+/**
+ * One form serves both "add book" and "edit book". An added book ends on the
+ * list, where it heads the table; left on the filled form, the admin could not
+ * tell it had been saved, and a second press added it again.
+ */
 export function BookForm({
   locale,
   admin,
@@ -62,6 +66,7 @@ export function BookForm({
         isEdit ? dictionary.common.toast.saved : dictionary.common.toast.bookPublished
       }
       fallbackError={dictionary.common.toast.actionFailed}
+      redirectTo={isEdit ? undefined : cancelHref}
           errorMessages={{
             forbidden: dictionary.common.actionErrors.forbidden,
             duplicate: dictionary.common.actionErrors.duplicate,

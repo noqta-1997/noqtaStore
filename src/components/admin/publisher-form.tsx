@@ -14,7 +14,10 @@ interface PublisherFormProps {
   publisher?: Publisher;
 }
 
-/** One form for adding a publishing house and for editing an existing one. */
+/**
+ * One form for adding a publishing house and for editing an existing one. An
+ * add empties the form, which sits beside the list and is used again.
+ */
 export function PublisherForm({ admin, dictionary, publisher }: PublisherFormProps) {
   const t = admin.publishers.form;
   const isEdit = Boolean(publisher);
@@ -27,6 +30,7 @@ export function PublisherForm({ admin, dictionary, publisher }: PublisherFormPro
         isEdit ? dictionary.common.toast.saved : dictionary.common.toast.itemAdded
       }
       fallbackError={dictionary.common.toast.actionFailed}
+      resetOnSuccess={!isEdit}
       errorMessages={dictionary.common.actionErrors}
     >
       {publisher ? (

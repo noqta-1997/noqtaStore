@@ -40,7 +40,7 @@ interface HandoutFormProps {
 
 const tagOptions: BookTag[] = ["bestseller", "new", "featured", "award"];
 
-/** One form serves both "add handout" and "edit handout" — `BookForm` over the handouts table. */
+/** One form serves both "add handout" and "edit handout" — `BookForm` over the handouts table, ending on the list after an add as it does. */
 export function HandoutForm({
   locale,
   admin,
@@ -62,6 +62,7 @@ export function HandoutForm({
         isEdit ? dictionary.common.toast.saved : dictionary.common.toast.handoutPublished
       }
       fallbackError={dictionary.common.toast.actionFailed}
+      redirectTo={isEdit ? undefined : cancelHref}
       errorMessages={{
         forbidden: dictionary.common.actionErrors.forbidden,
         duplicate: dictionary.common.actionErrors.duplicate,
