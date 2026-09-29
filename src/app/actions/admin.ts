@@ -157,6 +157,29 @@ async function attemptDelete<T>(
 /* Books                                                               */
 /* ------------------------------------------------------------------ */
 
+/**
+ * How an edit writes a title's shelf count.
+ *
+ * The form posts the count it was drawn with (`stockWas`) beside the one in
+ * the field. The field used to be written back as it stood, so a copy sold
+ * while the page was open came back on the shelf the moment the admin fixed
+ * a typo in the description — a copy the shop did not have, which checkout
+ * would then sell. Now a field left alone is not written at all, and one the
+ * admin changed is written only over the count the page showed: if the shelf
+ * moved meanwhile the update matches nothing and the action says so, as
+ * `updateOrderStatus` does for a status. A post without `stockWas` writes
+ * the field as before.
+ */
+function shelfWrite<T extends { stock: number }>(data: T, stockWas: number | null) {
+  if (stockWas === null) return { guard: {}, data };
+  if (data.stock === stockWas) {
+    const untouched: Partial<T> = { ...data };
+    delete untouched.stock;
+    return { guard: {}, data: untouched };
+  }
+  return { guard: { stock: stockWas }, data };
+}
+
 /** The largest value an `Int` column (Postgres `integer`) holds. */
 const INT_COLUMN_MAX = 2_147_483_647;
 
@@ -259,6 +282,7 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
   }
 
   let replaced: string | null = null;
+  const shelf = shelfWrite(data, optionalNumber(formData, "stockWas"));
   try {
     if (bookId) {
       if (coverUrl) {
@@ -268,7 +292,10 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
         });
         replaced = current?.coverUrl ?? null;
       }
-      await prisma.book.update({ where: { id: bookId }, data: { ...data, coverUrl } });
+      await prisma.book.update({
+        where: { id: bookId, ...shelf.guard },
+        data: { ...shelf.data, coverUrl },
+      });
     } else {
       /*
        * A new row still needs its unique slug, derived once from the title
@@ -289,7 +316,8 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
      * A title never collides any more, so a unique-constraint violation here
      * is a slug lost to other saves three times running — rare enough to ask
      * for a retry. A broken foreign key is a teacher, branch or press deleted
-     * while the form was open, and a missing record the book itself: both
+     * while the form was open, and a missing record the book itself — or,
+     * when the edit changed the shelf, the shelf moving under it: all three
      * are a stale page, which the form draws again, not a fault. Anything
      * else (a column the client and the database disagree on, the pooler
      * dropping the connection) is: say so plainly and keep the cause in the
@@ -297,7 +325,10 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
      */
     if (isUniqueViolation(error)) return fail("duplicate");
     if (isForeignKeyViolation(error)) return fail("staleRelation");
-    if (isMissingRecord(error)) return fail("notFound");
+    if (isMissingRecord(error)) {
+      const stillThere = bookId && "stock" in shelf.guard && (await prisma.book.count({ where: { id: bookId } }));
+      return fail(stillThere ? "stockChanged" : "notFound");
+    }
     logActionError("saveBook", error, { bookId: bookId || null });
     return fail("saveFailed");
   }
@@ -425,6 +456,8 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
   }
 
   let replaced: string | null = null;
+  // The shelf is written only when the admin changed it, over the count the page showed — see `shelfWrite`.
+  const shelf = shelfWrite(data, optionalNumber(formData, "stockWas"));
   try {
     if (handoutId) {
       if (coverUrl) {
@@ -435,8 +468,8 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
         replaced = current?.coverUrl ?? null;
       }
       await prisma.handout.update({
-        where: { id: handoutId },
-        data: { ...data, coverUrl },
+        where: { id: handoutId, ...shelf.guard },
+        data: { ...shelf.data, coverUrl },
       });
     } else {
       // Suffixed when another handout carries the same title — as in `saveBook`.
@@ -455,7 +488,11 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
     // logged — as in `saveBook`.
     if (isUniqueViolation(error)) return fail("duplicate");
     if (isForeignKeyViolation(error)) return fail("staleRelation");
-    if (isMissingRecord(error)) return fail("notFound");
+    if (isMissingRecord(error)) {
+      const stillThere =
+        handoutId && "stock" in shelf.guard && (await prisma.handout.count({ where: { id: handoutId } }));
+      return fail(stillThere ? "stockChanged" : "notFound");
+    }
     logActionError("saveHandout", error, { handoutId: handoutId || null });
     return fail("saveFailed");
   }

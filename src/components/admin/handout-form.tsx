@@ -64,7 +64,7 @@ export function HandoutForm({
       }
       fallbackError={dictionary.common.toast.actionFailed}
       redirectTo={isEdit ? undefined : cancelHref}
-      refreshOnErrors={["notFound", "staleRelation"]}
+      refreshOnErrors={["notFound", "staleRelation", "stockChanged"]}
       errorMessages={{
         forbidden: dictionary.common.actionErrors.forbidden,
         duplicate: dictionary.common.actionErrors.duplicate,
@@ -75,6 +75,7 @@ export function HandoutForm({
         invalidYear: dictionary.common.actionErrors.invalidYear,
         invalidNumber: dictionary.common.actionErrors.invalidNumber,
         staleRelation: dictionary.common.actionErrors.staleRelation,
+        stockChanged: dictionary.common.actionErrors.stockChanged,
         notFound: dictionary.common.actionErrors.notFound,
         saveFailed: dictionary.common.actionErrors.saveFailed,
         missingTitle: dictionary.common.actionErrors.missingTitle,
@@ -86,6 +87,10 @@ export function HandoutForm({
       }}
     >
       {handout ? <input type="hidden" name="handoutId" value={handout.id} /> : null}
+      {/* The count the stock field was drawn with: the action writes the
+          field only if the admin changed it, and only over this number. The
+          stock field is keyed on it, so a redraw shows the shelf as it is now. */}
+      {handout ? <input type="hidden" name="stockWas" value={handout.stock} /> : null}
 
       <div className="space-y-4 lg:col-span-8">
         <Panel title={t.sections.basic}>
@@ -279,6 +284,7 @@ export function HandoutForm({
         <Panel title={t.sections.inventory}>
           <Field label={t.fields.stock} htmlFor="stock">
             <Input
+              key={handout?.stock}
               id="stock"
               name="stock"
               type="number"
