@@ -326,6 +326,7 @@ export function HandoutForm({
         {isEdit ? (
           <ConfirmDialog
             variant="button"
+            redirectTo={cancelHref}
             className="ms-auto"
             action={handout ? deleteHandout.bind(null, handout.id) : undefined}
             fallbackError={dictionary.common.toast.actionFailed}

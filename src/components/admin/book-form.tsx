@@ -330,6 +330,7 @@ export function BookForm({
         {isEdit ? (
           <ConfirmDialog
             variant="button"
+            redirectTo={cancelHref}
             className="ms-auto"
             action={book ? deleteBook.bind(null, book.id) : undefined}
             fallbackError={dictionary.common.toast.actionFailed}

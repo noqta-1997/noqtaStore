@@ -32,6 +32,12 @@ interface ConfirmDialogProps {
   itemName?: string;
   /** `icon` renders a square icon button, `button` a labelled danger button. */
   variant?: "icon" | "button";
+  /**
+   * Where to go once the action succeeds. For a dialog on the page of the
+   * row it removes: drawn again, that page has nothing left to show but its
+   * not-found shell.
+   */
+  redirectTo?: string;
   className?: string;
   children?: ReactNode;
 }
@@ -47,6 +53,7 @@ export function ConfirmDialog({
   fallbackError,
   itemName,
   variant = "icon",
+  redirectTo,
   className,
   children,
 }: ConfirmDialogProps) {
@@ -73,6 +80,7 @@ export function ConfirmDialog({
 
     if (result.ok) {
       toast({ title: labels.done, description: itemName, tone: "info" });
+      if (redirectTo) router.push(redirectTo);
       router.refresh();
       return;
     }
