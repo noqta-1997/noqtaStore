@@ -62,7 +62,11 @@ import {
   logActionError,
   violatedConstraint,
 } from "@/lib/prisma-errors";
-import { revalidateCatalogue, revalidateHandouts } from "@/lib/revalidate";
+import {
+  revalidateCatalogue,
+  revalidateCategoryMenu,
+  revalidateHandouts,
+} from "@/lib/revalidate";
 import { CouponSpent, refundCouponUse, respendCoupon } from "@/lib/coupon";
 import { ShortStock, takeFromShelf } from "@/lib/shelf";
 import { slugify } from "@/lib/slug";
@@ -545,7 +549,9 @@ export async function saveCategory(formData: FormData): Promise<ActionResult> {
     return fail("saveFailed");
   }
 
-  revalidateCatalogue();
+  /* Every storefront page, not only the catalogue's: the header's menus
+     hang this tree, and they are drawn on all of them. */
+  revalidateCategoryMenu();
   revalidatePath("/admin/categories");
   return ok();
 }
@@ -571,7 +577,7 @@ export async function deleteCategory(categoryId: string): Promise<ActionResult> 
   );
   if (!deleted.ok) return deleted;
 
-  revalidateCatalogue();
+  revalidateCategoryMenu();
   revalidatePath("/admin/categories");
   return ok();
 }
@@ -623,7 +629,7 @@ export async function saveHandoutCategory(formData: FormData): Promise<ActionRes
     return fail("saveFailed");
   }
 
-  revalidateHandouts();
+  revalidateCategoryMenu();
   revalidatePath("/admin/handout-categories");
   return ok();
 }
@@ -642,7 +648,7 @@ export async function deleteHandoutCategory(categoryId: string): Promise<ActionR
   );
   if (!deleted.ok) return deleted;
 
-  revalidateHandouts();
+  revalidateCategoryMenu();
   revalidatePath("/admin/handout-categories");
   return ok();
 }

@@ -38,6 +38,20 @@ export function revalidateCatalogue() {
 }
 
 /**
+ * The header hangs both category trees under its catalogue links, and the
+ * storefront layout that draws it is baked into every cached storefront page
+ * — the static ones too (`/about`, `/faq`, `/terms`…), which nothing else
+ * revalidates, so a branch added in the panel stayed out of their menus until
+ * the next deploy, and out of the other catalogue's pages for five minutes.
+ * A page's tags include one per layout above it, `/(storefront)/layout`
+ * among them, so this one call reaches every page under that layout and none
+ * outside it.
+ */
+export function revalidateCategoryMenu() {
+  revalidatePath("/(storefront)", "layout");
+}
+
+/**
  * The handout pages are cached the same way, and the category, author and
  * publisher pages carry a handouts section under their books — as does the
  * home page, where each featured press shelves its latest handouts.
