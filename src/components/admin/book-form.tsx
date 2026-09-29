@@ -243,7 +243,7 @@ export function BookForm({
                 type="number"
                 dir="ltr"
                 min={0}
-                step={500}
+                step={250}
                 data-numeric
                 defaultValue={book?.price}
                 required
@@ -260,7 +260,7 @@ export function BookForm({
                 type="number"
                 dir="ltr"
                 min={0}
-                step={500}
+                step={250}
                 data-numeric
                 defaultValue={book?.compareAtPrice}
               />

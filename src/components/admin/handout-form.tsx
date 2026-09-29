@@ -239,7 +239,7 @@ export function HandoutForm({
                 type="number"
                 dir="ltr"
                 min={0}
-                step={500}
+                step={250}
                 data-numeric
                 defaultValue={handout?.price}
                 required
@@ -256,7 +256,7 @@ export function HandoutForm({
                 type="number"
                 dir="ltr"
                 min={0}
-                step={500}
+                step={250}
                 data-numeric
                 defaultValue={handout?.compareAtPrice}
               />
