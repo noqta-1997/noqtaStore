@@ -157,6 +157,27 @@ async function attemptDelete<T>(
 /* Books                                                               */
 /* ------------------------------------------------------------------ */
 
+/** The largest value an `Int` column (Postgres `integer`) holds. */
+const INT_COLUMN_MAX = 2_147_483_647;
+
+/**
+ * Whether a title's figures are whole numbers its `Int` columns can hold.
+ * The inputs step by whole units, but nothing held a posted value to that: a
+ * price of 1000.5 or a stock of 2.5 was saved rounded, without a word, and a
+ * figure past the column's range failed as an unexpected error.
+ */
+function titleNumbersFit(data: {
+  price: number;
+  compareAtPrice: number | null;
+  stock: number;
+  pages: number;
+  publishedYear: number;
+}) {
+  return [data.price, data.compareAtPrice ?? 0, data.stock, data.pages, data.publishedYear].every(
+    (value) => Number.isInteger(value) && Math.abs(value) <= INT_COLUMN_MAX,
+  );
+}
+
 export async function saveBook(formData: FormData): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
@@ -197,6 +218,7 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
     publisherId,
   } as const;
 
+  if (!titleNumbersFit(data)) return fail("invalidNumber");
   // The database refuses a shelf below zero and a negative price (CHECKs on
   // `stock`, `price` and `compareAtPrice`); saying so here keeps that from
   // reading as an unexpected failure.
@@ -266,12 +288,16 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
     /*
      * A title never collides any more, so a unique-constraint violation here
      * is a slug lost to other saves three times running — rare enough to ask
-     * for a retry. Anything else (a stale relation, a column the client and
-     * the database disagree on, the pooler dropping the connection) is a
-     * fault: say so plainly and keep the cause in the log instead of
-     * dressing it up as a duplicate.
+     * for a retry. A broken foreign key is a teacher, branch or press deleted
+     * while the form was open, and a missing record the book itself: both
+     * are a stale page, which the form draws again, not a fault. Anything
+     * else (a column the client and the database disagree on, the pooler
+     * dropping the connection) is: say so plainly and keep the cause in the
+     * log instead of dressing it up as something the admin can fix.
      */
     if (isUniqueViolation(error)) return fail("duplicate");
+    if (isForeignKeyViolation(error)) return fail("staleRelation");
+    if (isMissingRecord(error)) return fail("notFound");
     logActionError("saveBook", error, { bookId: bookId || null });
     return fail("saveFailed");
   }
@@ -375,6 +401,7 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
     publisherId,
   } as const;
 
+  if (!titleNumbersFit(data)) return fail("invalidNumber");
   if (data.stock < 0) return fail("negativeStock");
   if (data.price < 0 || (data.compareAtPrice ?? 0) < 0) return fail("negativePrice");
   if (data.compareAtPrice !== null && data.compareAtPrice <= data.price) {
@@ -423,8 +450,12 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
     }
   } catch (error) {
     await discardCover(coverUrl);
-    // Only a slug lost three times running reaches `duplicate`; anything else is logged — as in `saveBook`.
+    // Only a slug lost three times running reaches `duplicate`, and a stale
+    // relation or row is the page's age, not a fault; anything else is
+    // logged — as in `saveBook`.
     if (isUniqueViolation(error)) return fail("duplicate");
+    if (isForeignKeyViolation(error)) return fail("staleRelation");
+    if (isMissingRecord(error)) return fail("notFound");
     logActionError("saveHandout", error, { handoutId: handoutId || null });
     return fail("saveFailed");
   }

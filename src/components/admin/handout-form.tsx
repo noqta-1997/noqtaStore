@@ -64,6 +64,7 @@ export function HandoutForm({
       }
       fallbackError={dictionary.common.toast.actionFailed}
       redirectTo={isEdit ? undefined : cancelHref}
+      refreshOnErrors={["notFound", "staleRelation"]}
       errorMessages={{
         forbidden: dictionary.common.actionErrors.forbidden,
         duplicate: dictionary.common.actionErrors.duplicate,
@@ -72,6 +73,9 @@ export function HandoutForm({
         compareAtNotAbovePrice: dictionary.common.actionErrors.compareAtNotAbovePrice,
         invalidPages: dictionary.common.actionErrors.invalidPages,
         invalidYear: dictionary.common.actionErrors.invalidYear,
+        invalidNumber: dictionary.common.actionErrors.invalidNumber,
+        staleRelation: dictionary.common.actionErrors.staleRelation,
+        notFound: dictionary.common.actionErrors.notFound,
         saveFailed: dictionary.common.actionErrors.saveFailed,
         missingTitle: dictionary.common.actionErrors.missingTitle,
         missingRelation: dictionary.common.actionErrors.missingRelation,
