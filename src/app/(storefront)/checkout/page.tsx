@@ -20,7 +20,7 @@ import { Select } from "@/components/ui/select";
 import { Stepper } from "@/components/ui/stepper";
 import { Surface, surfaceTitleStyles } from "@/components/ui/surface";
 import { Textarea } from "@/components/ui/textarea";
-import { getCart, getDefaultPaymentMethod, getHandoutCart, getShippingRules } from "@/data";
+import { getDefaultPaymentMethod, getHandoutCart, getShippingRules } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { requireCustomer } from "@/lib/auth";
@@ -91,15 +91,12 @@ export default async function CheckoutPage() {
     );
   }
 
-  const [lines, handoutLines, shippingRules, paymentDefault] = await Promise.all([
-    getCart(),
+  const [handoutLines, shippingRules, paymentDefault] = await Promise.all([
     getHandoutCart(),
     getShippingRules(),
     getDefaultPaymentMethod(),
   ]);
-  const subtotal =
-    lines.reduce((total, line) => total + line.lineTotal, 0) +
-    handoutLines.reduce((total, line) => total + line.lineTotal, 0);
+  const subtotal = handoutLines.reduce((total, line) => total + line.lineTotal, 0);
   const shipping =
     subtotal >= shippingRules.freeThreshold ? 0 : shippingRules.standardCost;
   const discount = (await getAppliedCoupon(subtotal))?.discount ?? 0;
@@ -107,7 +104,7 @@ export default async function CheckoutPage() {
   // Nothing to pay for: the form used to be drawn anyway, and submitting it
   // only produced an "empty cart" toast. The cart page's own empty state
   // says where to go instead.
-  if (!lines.length && !handoutLines.length) {
+  if (!handoutLines.length) {
     return (
       <>
         <section className="border-b border-line-divider bg-surface-low">
@@ -122,7 +119,7 @@ export default async function CheckoutPage() {
             title={dictionary.cart.empty.title}
             description={dictionary.cart.empty.description}
             actionLabel={dictionary.cart.empty.action}
-            actionHref="/books"
+            actionHref="/handouts"
           />
         </Container>
       </>
@@ -365,32 +362,6 @@ export default async function CheckoutPage() {
             >
               <p className="label-mono mb-3 text-muted">{t.itemsInOrder}</p>
               <ul className="space-y-3">
-                {lines.map((line) => (
-                  <li key={line.bookId} className="flex items-center gap-3">
-                    <span className="w-10 shrink-0">
-                      <BookCover
-                        title={line.book.title[locale]}
-                        author={line.book.author.name[locale]}
-                        seed={line.book.slug}
-                        src={line.book.coverUrl}
-                        sizes="2.5rem"
-                        className="border border-line"
-                        compact
-                      />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-label-md text-on-surface">
-                        {line.book.title[locale]}
-                      </span>
-                      <span className="block text-label-sm text-muted" data-numeric>
-                        × {line.quantity}
-                      </span>
-                    </span>
-                    <span className="shrink-0 text-label-md" data-numeric>
-                      {formatPrice(line.lineTotal, locale)}
-                    </span>
-                  </li>
-                ))}
                 {handoutLines.map((line) => (
                   <li key={line.handoutId} className="flex items-center gap-3">
                     <span className="w-10 shrink-0">

@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useSyncExternalStore } from "react";
 
 /**
- * Which books the reader has saved, shared by every heart on the page.
+ * Which handouts the reader has saved, shared by every heart on the page.
  *
  * The catalogue is statically rendered, so the server cannot bake this in
  * without making every page dynamic. One fetch per navigation, shared by all
@@ -57,14 +57,14 @@ async function load(path: string) {
   }
 }
 
-/** Applies a toggle locally so every heart for that book updates at once. */
-export function setWishlistSaved(bookId: string, next: boolean) {
+/** Applies a toggle locally so every heart for that handout updates at once. */
+export function setWishlistSaved(id: string, next: boolean) {
   const updated = new Set(saved ?? EMPTY);
 
   if (next) {
-    updated.add(bookId);
+    updated.add(id);
   } else {
-    updated.delete(bookId);
+    updated.delete(id);
   }
 
   saved = updated;

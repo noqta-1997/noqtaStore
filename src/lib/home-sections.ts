@@ -11,10 +11,6 @@ import type { Dictionary } from "@/i18n/get-dictionary";
 export const HOME_SECTIONS = [
   "hero",
   "features",
-  "bestsellers",
-  "categories",
-  "promo",
-  "newArrivals",
   "publishers",
   "authors",
   "newsletter",
@@ -76,12 +72,8 @@ export const HOME_TEXT_FIELDS = {
     "returns.title",
     "returns.description",
   ],
-  bestsellers: ["title", "subtitle"],
-  categories: ["title", "subtitle", "count"],
-  promo: ["eyebrow", "title", "description", "cta"],
-  newArrivals: ["title", "subtitle"],
-  publishers: ["handoutsTitle", "handoutsSubtitle", "booksTitle", "booksSubtitle"],
-  authors: ["title", "subtitle", "booksCount"],
+  publishers: ["handoutsTitle", "handoutsSubtitle"],
+  authors: ["title", "subtitle", "handoutsCount"],
   newsletter: ["title", "description", "placeholder", "cta", "note"],
 } as const satisfies Record<HomeSection, readonly string[]>;
 
@@ -153,7 +145,7 @@ export type HomeFeature = (typeof HOME_FEATURES)[number];
 /* ------------------------------------------------------------------ */
 
 /** What a shelf holds, which decides what its picker searches. */
-export type ShelfKind = "book" | "category" | "author" | "publisher";
+export type ShelfKind = "author" | "publisher";
 
 interface ShelfShape {
   kind: ShelfKind;
@@ -164,25 +156,19 @@ interface ShelfShape {
 }
 
 /**
- * The shelves the panel may fill by hand instead of by rule. Twenty titles
- * is four rows of the widest grid and twelve authors four rows of theirs;
- * the category tiles have always shown every category, so their rule has
- * no count until the panel gives it one. The publishers section counts
- * presses, not titles: each press it shows gets up to two shelves of its
- * own, so four of them is already most of a page.
+ * The shelves the panel may fill by hand instead of by rule. Twelve authors
+ * is four rows of their grid. The publishers section counts presses, not
+ * titles: each press it shows gets a shelf of its own, so four of them is
+ * already most of a page.
  */
 export const HOME_SHELVES = {
-  bestsellers: { kind: "book", limit: 10, max: 20 },
-  categories: { kind: "category", limit: null, max: 16 },
-  newArrivals: { kind: "book", limit: 5, max: 20 },
   publishers: { kind: "publisher", limit: 4, max: 12 },
   authors: { kind: "author", limit: 6, max: 12 },
 } as const satisfies Partial<Record<HomeSection, ShelfShape>>;
 
 /**
- * How many titles each of a publisher's shelves shows: one row of the
- * widest grid, the same as the new-arrivals shelf it is modelled on. The
- * "view all" link under the row is the way to the rest.
+ * How many titles each publisher's shelf shows: one row of the widest grid.
+ * The "view all" link under the row is the way to the rest.
  */
 export const PUBLISHER_SHELF_SIZE = 5;
 
@@ -262,38 +248,6 @@ export async function resolveShelf<T>(
 }
 
 /* ------------------------------------------------------------------ */
-/* Promo                                                               */
-/* ------------------------------------------------------------------ */
-
-/**
- * The banner's two values that are not copy: where its button goes, and the
- * figure ghosted behind it. The figure was "25%" in the component's markup,
- * separate from the headline that said the same — so a rewritten headline
- * would have kept the old number behind it.
- */
-export const PROMO_DEFAULTS = { href: "/offers", figure: "25%" } as const;
-
-/** The figure is set at 12–18rem; more characters than this run off the card. */
-export const PROMO_FIGURE_MAX = 6;
-
-export const PROMO_KEYS = {
-  href: "home.promo.href",
-  figure: "home.promo.figure",
-} as const;
-
-export interface PromoContent {
-  href: string;
-  figure: string;
-}
-
-export function readPromoContent(settings: Record<string, string>): PromoContent {
-  return {
-    href: settings[PROMO_KEYS.href] || PROMO_DEFAULTS.href,
-    figure: settings[PROMO_KEYS.figure] || PROMO_DEFAULTS.figure,
-  };
-}
-
-/* ------------------------------------------------------------------ */
 /* Hero                                                                */
 /* ------------------------------------------------------------------ */
 
@@ -308,12 +262,12 @@ export const HERO_SHOWCASE_SIZE = 12;
 
 /** Where the hero's two buttons go unless the panel says otherwise. */
 export const HERO_DEFAULT_LINKS = {
-  primaryHref: "/books",
-  secondaryHref: "/categories",
+  primaryHref: "/handouts",
+  secondaryHref: "/handouts/categories",
 } as const;
 
 export const HERO_KEYS = {
-  featuredBook: "home.hero.featuredBookId",
+  featuredHandout: "home.hero.featuredHandoutId",
   showcase: "home.hero.showcaseIds",
   primaryHref: "home.hero.primaryHref",
   secondaryHref: "home.hero.secondaryHref",
@@ -321,7 +275,7 @@ export const HERO_KEYS = {
 
 export interface HeroContent {
   /** The title the tagline pill links to; `null` leaves it to the catalogue. */
-  featuredBookId: string | null;
+  featuredHandoutId: string | null;
   /** Jackets for the showcase in the order they play; empty leaves it to the catalogue. */
   showcaseIds: string[];
   primaryHref: string;
@@ -330,7 +284,7 @@ export interface HeroContent {
 
 export function readHeroContent(settings: Record<string, string>): HeroContent {
   return {
-    featuredBookId: settings[HERO_KEYS.featuredBook] || null,
+    featuredHandoutId: settings[HERO_KEYS.featuredHandout] || null,
     showcaseIds: parseIdList(settings[HERO_KEYS.showcase]).slice(0, HERO_SHOWCASE_SIZE),
     primaryHref: settings[HERO_KEYS.primaryHref] || HERO_DEFAULT_LINKS.primaryHref,
     secondaryHref: settings[HERO_KEYS.secondaryHref] || HERO_DEFAULT_LINKS.secondaryHref,

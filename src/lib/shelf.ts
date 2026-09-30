@@ -5,11 +5,8 @@ import type { Prisma } from "@/generated/prisma/client";
  * it. The transaction rolls back with it; the caller reports `outOfStock`.
  */
 export class ShortStock extends Error {
-  constructor(
-    readonly kind: "book" | "handout",
-    readonly id: string,
-  ) {
-    super(`not enough copies of ${kind} ${id} on the shelf`);
+  constructor(readonly id: string) {
+    super(`not enough copies of handout ${id} on the shelf`);
     this.name = "ShortStock";
   }
 }
@@ -31,7 +28,6 @@ export class ShortStock extends Error {
  */
 export async function takeFromShelf(
   tx: Prisma.TransactionClient,
-  kind: "book" | "handout",
   id: string,
   quantity: number,
   { onSaleOnly = false }: { onSaleOnly?: boolean } = {},
@@ -39,10 +35,7 @@ export async function takeFromShelf(
   const where = { id, stock: { gte: quantity }, ...(onSaleOnly ? { archivedAt: null } : {}) };
   const data = { stock: { decrement: quantity } };
 
-  const taken =
-    kind === "book"
-      ? await tx.book.updateMany({ where, data })
-      : await tx.handout.updateMany({ where, data });
+  const taken = await tx.handout.updateMany({ where, data });
 
-  if (taken.count !== 1) throw new ShortStock(kind, id);
+  if (taken.count !== 1) throw new ShortStock(id);
 }

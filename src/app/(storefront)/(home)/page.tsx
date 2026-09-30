@@ -1,19 +1,14 @@
 
-import { BookShelf } from "@/components/book/book-shelf";
 import { AuthorsSpotlight } from "@/components/home/authors-spotlight";
-import { CategoryTiles } from "@/components/home/category-tiles";
 import { FeaturesStrip } from "@/components/home/features-strip";
 import { Hero } from "@/components/home/hero";
 import { Newsletter } from "@/components/home/newsletter";
-import { PromoBanner } from "@/components/home/promo-banner";
 import { PublisherShelves } from "@/components/home/publisher-shelves";
 import {
-  getHeroFeaturedBook,
+  getHeroFeaturedHandout,
   getHeroShowcase,
   getPublisherShelves,
   getShelfAuthors,
-  getShelfBooks,
-  getShelfCategories,
   getShelfPublishers,
   getStoreSettings,
 } from "@/data";
@@ -24,7 +19,6 @@ import {
   homeVisibility,
   PUBLISHER_SHELF_SIZE,
   readHeroContent,
-  readPromoContent,
   readShelfContent,
 } from "@/lib/home-sections";
 
@@ -41,24 +35,12 @@ export default async function HomePage() {
   const show = homeVisibility(settings);
   const hero = readHeroContent(settings);
 
-  const [
-    shipped,
-    categories,
-    featured,
-    showcase,
-    bestsellers,
-    newArrivals,
-    publisherShelves,
-    authors,
-  ] = await Promise.all([
+  const [shipped, featured, showcase, publisherShelves, authors] = await Promise.all([
     getDictionary(locale),
-    show.categories ? getShelfCategories(readShelfContent(settings, "categories")) : [],
     /* One title: the hero's tagline pill links to it. The jackets it
        scrolls are a separate list, not this tag. */
-    show.hero ? getHeroFeaturedBook(hero) : undefined,
+    show.hero ? getHeroFeaturedHandout(hero) : undefined,
     show.hero ? getHeroShowcase(hero) : [],
-    show.bestsellers ? getShelfBooks("bestsellers", readShelfContent(settings, "bestsellers")) : [],
-    show.newArrivals ? getShelfBooks("newArrivals", readShelfContent(settings, "newArrivals")) : [],
     /* Which presses first, then their titles: the second query needs the
        first's answer, so the pair is one step of the parallel fetch. */
     show.publishers
@@ -79,7 +61,7 @@ export default async function HomePage() {
         <Hero
           locale={locale}
           dictionary={dictionary}
-          featuredBook={featured}
+          featuredHandout={featured}
           showcase={showcase}
           primaryHref={hero.primaryHref}
           secondaryHref={hero.secondaryHref}
@@ -88,42 +70,6 @@ export default async function HomePage() {
 
       {show.features ? (
         <FeaturesStrip dictionary={dictionary.home.features} />
-      ) : null}
-
-      {show.bestsellers ? (
-        <BookShelf
-          title={dictionary.home.bestsellers.title}
-          subtitle={dictionary.home.bestsellers.subtitle}
-          books={bestsellers}
-          locale={locale}
-          dictionary={dictionary.common}
-          actionHref={`/books?sort=popular`}
-          priority
-        />
-      ) : null}
-
-      {show.categories ? (
-        <CategoryTiles
-          locale={locale}
-          dictionary={dictionary}
-          categories={categories}
-        />
-      ) : null}
-
-      {show.promo ? (
-        <PromoBanner dictionary={dictionary.home.promo} {...readPromoContent(settings)} />
-      ) : null}
-
-      {show.newArrivals ? (
-        <BookShelf
-          title={dictionary.home.newArrivals.title}
-          subtitle={dictionary.home.newArrivals.subtitle}
-          books={newArrivals}
-          locale={locale}
-          dictionary={dictionary.common}
-          actionHref={`/books?sort=newest`}
-          band
-        />
       ) : null}
 
       {show.publishers ? (

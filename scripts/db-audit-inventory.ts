@@ -40,11 +40,11 @@ const JSON_OUT = jsonFlag !== -1 ? process.argv[jsonFlag + 1] : undefined;
 // ---------------------------------------------------------------------------
 
 const APP_GROUPS: Record<string, { ar: string; tables: string[] }> = {
-  CATALOG: { ar: "الكتالوج", tables: ["categories", "handout_categories", "publishers", "authors", "books", "handouts"] },
+  CATALOG: { ar: "الكتالوج", tables: ["handout_categories", "publishers", "authors", "handouts"] },
   CUSTOMERS: { ar: "العملاء والعناوين", tables: ["customers", "addresses"] },
-  ORDERS: { ar: "الطلبات", tables: ["orders", "order_items", "handout_order_items", "order_events"] },
-  REVIEWS: { ar: "المراجعات", tables: ["reviews", "handout_reviews"] },
-  CART_WISHLIST: { ar: "السلة والمفضلة", tables: ["cart_items", "handout_cart_items", "wishlist_items", "handout_wishlist_items"] },
+  ORDERS: { ar: "الطلبات", tables: ["orders", "handout_order_items", "order_events"] },
+  REVIEWS: { ar: "المراجعات", tables: ["handout_reviews"] },
+  CART_WISHLIST: { ar: "السلة والمفضلة", tables: ["handout_cart_items", "handout_wishlist_items"] },
   MARKETING: { ar: "التسويق والتواصل", tables: ["coupons", "newsletter_subscribers", "contact_messages"] },
   SETTINGS: { ar: "الإعدادات", tables: ["store_settings"] },
 };
@@ -669,20 +669,20 @@ function render(inv: Capture, schema: PrismaSchema, folders: string[]): string {
   p(`### 4.2 وصف كل مجموعة`);
   p();
   p(`#### §CATALOG§ — الكتالوج`);
-  p(`كتالوجان متوازيان بشجرتي تصنيف مستقلتين: **الكتب المدرسية** (§categories§ ← §books§) و**الملازم** (§handout_categories§ ← §handouts§)، يتشاركان جدولي البحث §authors§ و§publishers§. الشجرتان ذاتيتا الإحالة (§parentId§ → نفس الجدول). §authors.subjectId§ يشير إلى §categories§ (مادة المدرّس). §books§ و§handouts§ نسختان متطابقتان بنية${extraColumns.some((c) => c.table === "books" || c.table === "handouts") ? "؛ انظر القسم 6 عن أعمدة زائدة فيهما" : ""}.`);
+  p(`كتالوج واحد: **الملازم** (§handout_categories§ ← §handouts§) مع جدولي البحث §authors§ و§publishers§. الشجرة ذاتية الإحالة (§parentId§ → نفس الجدول). حُذف كتالوج الكتب المدرسية (§books§ و§categories§ وجداول تجارته) بترحيل §20260930120000_drop_books§${extraColumns.some((c) => c.table === "handouts") ? "؛ انظر القسم 6 عن أعمدة زائدة في §handouts§" : ""}.`);
   p();
   p(`#### §CUSTOMERS§ — العملاء والعناوين`);
   const userIdType = inv.columns.find((c) => c.schema === "public" && c.table === "customers" && c.name === "userId")?.type ?? "?";
   p(`§customers§ هو الملف الشخصي داخل التطبيق (اسم، بريد، هاتف، دور §customer|admin§، حالة §active|blocked§، تفضيلات النشرة)؛ §customers.userId§ (§${userIdType}§) يحمل معرّف §auth.users§ — الربط الوحيد بين التطبيق و§AUTH_CORE§${customersFk ? `، بمفتاح أجنبي §${customersFk.name}§ (عند الحذف ${customersFk.on_delete})` : "، وهو بلا FK"}. حالياً ${inv.customers.total} عميل، منهم ${inv.customers.withUserId} مربوط بحساب §auth.users§ (§userId§ غير فارغ). §addresses§ دفتر عناوين متعدد لكل عميل، يُحذف معه (§CASCADE§).`);
   p();
   p(`#### §ORDERS§ — الطلبات`);
-  p(`§orders§ رأس الطلب مع لقطة عنوان الشحن ومبالغ بالدينار الصحيح (§subtotal/shippingCost/discount/total§) وطريقة الدفع (§cod|card|wallet§) كعمود، **لا جدول مدفوعات مستقل**. سطور الطلب في جدولين حسب نوع المنتج: §order_items§ (كتب) و§handout_order_items§ (ملازم)، وكلاهما يخزّن §unitPrice§ وقت الطلب. §order_events§ الخط الزمني لحالة الطلب. حذف الطلب يحذف سطوره وأحداثه؛ حذف العميل ممنوع ما دام له طلب (§RESTRICT§).`);
+  p(`§orders§ رأس الطلب مع لقطة عنوان الشحن ومبالغ بالدينار الصحيح (§subtotal/shippingCost/discount/total§) وطريقة الدفع (§cod|card|wallet§) كعمود، **لا جدول مدفوعات مستقل**. سطور الطلب في §handout_order_items§، وتخزّن §unitPrice§ وقت الطلب. §order_events§ الخط الزمني لحالة الطلب. حذف الطلب يحذف سطوره وأحداثه؛ حذف العميل ممنوع ما دام له طلب (§RESTRICT§).`);
   p();
   p(`#### §REVIEWS§ — المراجعات`);
-  p(`§reviews§ للكتب و§handout_reviews§ للملازم، بنية واحدة: تقييم + عنوان + نص + حالة اعتدال (§pending|published|rejected§)، وقيد فريد (منتج، عميل). §rating§ و§reviewsCount§ على المنتج قيمتان مشتقّتان (denormalised) يعيد التطبيق حسابهما.`);
+  p(`§handout_reviews§: تقييم + عنوان + نص + حالة اعتدال (§pending|published|rejected§)، وقيد فريد (ملزمة، عميل). §rating§ و§reviewsCount§ على المنتج قيمتان مشتقّتان (denormalised) يعيد التطبيق حسابهما.`);
   p();
   p(`#### §CART_WISHLIST§ — السلة والمفضلة`);
-  p(`أربعة جداول ربط بمفتاح مركّب (عميل، منتج): §cart_items§/§wishlist_items§ للكتب و§handout_cart_items§/§handout_wishlist_items§ للملازم. تُحذف مع العميل أو المنتج (§CASCADE§ من الجهتين).${empty("public", APP_GROUPS.CART_WISHLIST.tables) ? " كلها فارغة حالياً." : ""}`);
+  p(`جدولا ربط بمفتاح مركّب (عميل، ملزمة): §handout_cart_items§ و§handout_wishlist_items§. تُحذف مع العميل أو المنتج (§CASCADE§ من الجهتين).${empty("public", APP_GROUPS.CART_WISHLIST.tables) ? " كلها فارغة حالياً." : ""}`);
   p();
   p(`#### §MARKETING§ — التسويق والتواصل`);
   p(`§coupons§ (رمز، نوع §percentage|fixed§، قيمة، حد أدنى، حد استخدام)، §newsletter_subscribers§ (البريد هو المفتاح الأساسي)، و§contact_messages§ (صندوق وارد نموذج «اتصل بنا» بحالة §new|read§). لا مفاتيح أجنبية داخل هذه المجموعة ولا منها.`);
@@ -750,7 +750,7 @@ function render(inv: Capture, schema: PrismaSchema, folders: string[]): string {
   p(`| من | إلى | الحقيقة |`);
   p(`|---|---|---|`);
   if (!customersFk) p(`| §public.customers.userId§ (text، nullable، unique) | §auth.users.id§ (uuid) | الربط الوحيد بين التطبيق وAuth؛ نوعا العمودين مختلفان (نص مقابل uuid) |`);
-  p(`| §public.books.coverUrl§ / §public.handouts.coverUrl§ | §storage.objects§ | رابط URL عام نصّي، لا مرجع لصفّ الملف |`);
+  p(`| §public.handouts.coverUrl§ | §storage.objects§ | رابط URL عام نصّي، لا مرجع لصفّ الملف |`);
   p(`| §storage.objects.owner§ / §owner_id§ | §auth.users.id§ | تصميم Supabase القياسي بلا FK |`);
   p();
 

@@ -76,7 +76,7 @@ export default async function AdminLayout({
             />
 
             <Form
-              action="/admin/books"
+              action="/admin/handouts"
               className="hidden h-10 min-w-0 max-w-md flex-1 items-center rounded-full border border-line bg-card ps-4 sm:flex"
             >
               <Search aria-hidden className="size-4 shrink-0 text-muted" strokeWidth={1.75} />

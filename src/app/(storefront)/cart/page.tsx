@@ -2,7 +2,6 @@ import { ArrowRight, ShoppingCart, Truck } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { CartLineRow } from "@/components/commerce/cart-line-row";
 import { OrderSummary } from "@/components/commerce/order-summary";
 import { HandoutCartLineRow } from "@/components/handout/handout-cart-line-row";
 import { Button, buttonStyles } from "@/components/ui/button";
@@ -12,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { List } from "@/components/ui/list-row";
 import { PageHeader } from "@/components/ui/page-header";
 import { Surface } from "@/components/ui/surface";
-import { getCart, getHandoutCart, getShippingRules } from "@/data";
+import { getHandoutCart, getShippingRules } from "@/data";
 import { applyCoupon, clearCoupon } from "@/app/actions/cart";
 import { ActionForm } from "@/components/ui/action-form";
 import { getAppliedCoupon } from "@/lib/coupon";
@@ -34,22 +33,17 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function CartPage({ searchParams }: CartPageProps) {
   const locale = defaultLocale;
 
-  // The cart has two halves — books and handouts — shown as one list.
-  const [dictionary, allLines, allHandoutLines, shippingRules] = await Promise.all([
+  const [dictionary, allHandoutLines, shippingRules] = await Promise.all([
     getDictionary(locale),
-    getCart(),
     getHandoutCart(),
     getShippingRules(),
   ]);
   const previewEmpty = isEmptyPreview(await searchParams);
-  const lines = previewEmpty ? [] : allLines;
   const handoutLines = previewEmpty ? [] : allHandoutLines;
-  const hasLines = lines.length > 0 || handoutLines.length > 0;
+  const hasLines = handoutLines.length > 0;
 
   const t = dictionary.cart;
-  const subtotal =
-    lines.reduce((total, line) => total + line.lineTotal, 0) +
-    handoutLines.reduce((total, line) => total + line.lineTotal, 0);
+  const subtotal = handoutLines.reduce((total, line) => total + line.lineTotal, 0);
   const coupon = await getAppliedCoupon(subtotal);
   const discount = coupon?.discount ?? 0;
   const qualifiesForFreeShipping = subtotal >= shippingRules.freeThreshold;
@@ -59,9 +53,7 @@ export default async function CartPage({ searchParams }: CartPageProps) {
     100,
     Math.round((subtotal / shippingRules.freeThreshold) * 100),
   );
-  const itemsCount =
-    lines.reduce((total, line) => total + line.quantity, 0) +
-    handoutLines.reduce((total, line) => total + line.quantity, 0);
+  const itemsCount = handoutLines.reduce((total, line) => total + line.quantity, 0);
 
   return (
     <>
@@ -104,14 +96,6 @@ export default async function CartPage({ searchParams }: CartPageProps) {
               </Surface>
 
               <List>
-                {lines.map((line) => (
-                  <CartLineRow
-                    key={line.bookId}
-                    line={line}
-                    locale={locale}
-                    dictionary={dictionary.common}
-                  />
-                ))}
                 {handoutLines.map((line) => (
                   <HandoutCartLineRow
                     key={line.handoutId}
@@ -123,7 +107,7 @@ export default async function CartPage({ searchParams }: CartPageProps) {
               </List>
 
               <Link
-                href={`/books`}
+                href={`/handouts`}
                 className="inline-flex items-center gap-2 text-label-md text-on-surface underline-offset-4 hover:underline"
               >
                 <ArrowRight aria-hidden className="size-4 rotate-180 rtl:rotate-0" strokeWidth={1.75} />
@@ -211,7 +195,7 @@ export default async function CartPage({ searchParams }: CartPageProps) {
             title={t.empty.title}
             description={t.empty.description}
             actionLabel={t.empty.action}
-            actionHref={`/books`}
+            actionHref={`/handouts`}
           />
         )}
       </Container>

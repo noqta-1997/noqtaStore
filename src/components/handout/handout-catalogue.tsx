@@ -31,8 +31,9 @@ interface HandoutCatalogueProps {
 /**
  * Filters + toolbar + grid + pagination for the handouts listing.
  *
- * The filter panel, the sort control and the sheet are the book ones: they
- * carry nothing book-specific, and the same query string drives both tables.
+ * The filter panel, the sort control and the sheet keep the `Book*` names of
+ * the school-book catalogue they were written for; they carry nothing
+ * specific to it.
  */
 export function HandoutCatalogue({
   locale,

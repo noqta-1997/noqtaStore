@@ -7,15 +7,15 @@ import { Container } from "@/components/ui/container";
 import { localeDirection, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { cn } from "@/lib/utils";
-import type { BookWithRelations } from "@/types";
+import type { HandoutWithRelations } from "@/types";
 
 interface HeroProps {
   locale: Locale;
   dictionary: Dictionary;
   /** The one title the tagline pill links to; without one there is no pill. */
-  featuredBook?: BookWithRelations;
+  featuredHandout?: HandoutWithRelations;
   /** Jackets for the showcase, in the order they play. */
-  showcase: BookWithRelations[];
+  showcase: HandoutWithRelations[];
   primaryHref: string;
   secondaryHref: string;
 }
@@ -32,21 +32,21 @@ interface HeroProps {
 export function Hero({
   locale,
   dictionary,
-  featuredBook,
+  featuredHandout,
   showcase,
   primaryHref,
   secondaryHref,
 }: HeroProps) {
   const { hero } = dictionary.home;
 
-  const slides: HeroSlide[] = showcase.map((book) => ({
-    id: book.id,
-    slug: book.slug,
-    title: book.title[locale],
-    author: book.author.name[locale],
-    authorSlug: book.author.slug,
-    coverUrl: book.coverUrl,
-    description: book.description[locale],
+  const slides: HeroSlide[] = showcase.map((handout) => ({
+    id: handout.id,
+    slug: handout.slug,
+    title: handout.title[locale],
+    author: handout.author.name[locale],
+    authorSlug: handout.author.slug,
+    coverUrl: handout.coverUrl,
+    description: handout.description[locale],
   }));
 
   const copy = (
@@ -59,13 +59,13 @@ export function Hero({
       )}
     >
       {/*
-        The reference's "what's new" tagline, with the book of the week
+        The reference's "what's new" tagline, with the handout of the week
         standing in for the release note. A pill rather than a `Badge`
         because it is a link and 28px tall, not a 22px label.
       */}
-      {featuredBook ? (
+      {featuredHandout ? (
         <Link
-          href={`/books/${featuredBook.slug}`}
+          href={`/handouts/${featuredHandout.slug}`}
           className={
             "inline-flex h-7 max-w-full items-center gap-1.5 rounded-full border " +
             "border-line bg-card px-3 text-body-md text-on-surface elevation-sm " +
@@ -78,7 +78,7 @@ export function Hero({
           <span aria-hidden className="shrink-0 text-muted">
             ·
           </span>
-          <span className="truncate text-on-surface-variant">{featuredBook.title[locale]}</span>
+          <span className="truncate text-on-surface-variant">{featuredHandout.title[locale]}</span>
           <ArrowUpRight aria-hidden className="size-4 shrink-0 rtl:-scale-x-100" strokeWidth={1.75} />
         </Link>
       ) : null}

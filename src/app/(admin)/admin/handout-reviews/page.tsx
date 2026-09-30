@@ -40,7 +40,7 @@ const statusTones: Record<ReviewStatus, string> = {
   rejected: "border-line bg-error-container text-on-error-container",
 };
 
-/** The moderation queue for handout reviews — the book queue over the other table. */
+/** The moderation queue for handout reviews. */
 export default async function AdminHandoutReviewsPage({
   searchParams,
 }: AdminHandoutReviewsPageProps) {

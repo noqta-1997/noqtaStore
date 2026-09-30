@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-15T19:40:59.714Z",
+  "capturedAt": "2026-09-30T14:53:40.152Z",
   "project": "tablet-dark",
-  "pagesScanned": 21,
+  "pagesScanned": 15,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -11,24 +11,6 @@
       "theme": "dark",
       "project": "tablet-dark",
       "url": "/",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "catalogue",
-      "locale": "ar",
-      "theme": "dark",
-      "project": "tablet-dark",
-      "url": "/books",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "book-detail",
-      "locale": "ar",
-      "theme": "dark",
-      "project": "tablet-dark",
-      "url": "/books/al-amir-al-saghir",
       "violations": [],
       "total": 0
     },
@@ -47,33 +29,6 @@
       "theme": "dark",
       "project": "tablet-dark",
       "url": "/handouts/physics-sixth-scientific",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "categories",
-      "locale": "ar",
-      "theme": "dark",
-      "project": "tablet-dark",
-      "url": "/categories",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "category-detail",
-      "locale": "ar",
-      "theme": "dark",
-      "project": "tablet-dark",
-      "url": "/categories/literature",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "category-branch",
-      "locale": "ar",
-      "theme": "dark",
-      "project": "tablet-dark",
-      "url": "/categories/preparatory",
       "violations": [],
       "total": 0
     },
@@ -119,15 +74,6 @@
       "theme": "dark",
       "project": "tablet-dark",
       "url": "/publishers",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "offers",
-      "locale": "ar",
-      "theme": "dark",
-      "project": "tablet-dark",
-      "url": "/offers",
       "violations": [],
       "total": 0
     },
@@ -190,7 +136,7 @@
       "locale": "ar",
       "theme": "dark",
       "project": "tablet-dark",
-      "url": "/books/no-such-book",
+      "url": "/handouts/no-such-handout",
       "violations": [],
       "total": 0
     }

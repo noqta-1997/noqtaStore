@@ -32,31 +32,11 @@ export interface PageCase {
 
 export const PAGES: PageCase[] = [
   { id: "home", path: () => "/", ready: "main h1" },
-  { id: "catalogue", path: () => "/books", ready: "main" },
-  {
-    id: "book-detail",
-    path: () => "/books/al-amir-al-saghir",
-    ready: "main h1",
-  },
-  // The handouts catalogue mirrors the books one, read from its own table.
   { id: "handouts", path: () => "/handouts", ready: "main" },
   {
     id: "handout-detail",
     path: () => "/handouts/physics-sixth-scientific",
     ready: "main h1",
-  },
-  { id: "categories", path: () => "/categories", ready: "main" },
-  {
-    id: "category-detail",
-    path: () => "/categories/literature",
-    ready: "main",
-  },
-  // A stage of the school ladder: the strip of grades above an empty
-  // catalogue, and four levels of crumbs on the handouts' twin below.
-  {
-    id: "category-branch",
-    path: () => "/categories/preparatory",
-    ready: "main",
   },
   { id: "handout-categories", path: () => "/handouts/categories", ready: "main" },
   {
@@ -71,7 +51,6 @@ export const PAGES: PageCase[] = [
     ready: "main",
   },
   { id: "publishers", path: () => "/publishers", ready: "main" },
-  { id: "offers", path: () => "/offers", ready: "main" },
   { id: "search", path: () => "/search?q=1984", ready: "main" },
   { id: "cart", path: () => "/cart", ready: "main" },
   // Sign-in is a single Google button now; the page carries no form.
@@ -88,7 +67,7 @@ export const PAGES: PageCase[] = [
   // site chrome rather than the bare root shell.
   {
     id: "not-found",
-    path: () => "/books/no-such-book",
+    path: () => "/handouts/no-such-handout",
     ready: "main",
   },
 
@@ -106,7 +85,6 @@ export const PAGES: PageCase[] = [
     gated: true,
     volatile: true,
   },
-  { id: "admin-books", path: () => "/admin/books", gated: true },
   { id: "admin-handouts", path: () => "/admin/handouts", gated: true },
   { id: "checkout", path: () => "/checkout", gated: true, ready: "main" },
   {
@@ -145,12 +123,11 @@ export const PAGES: PageCase[] = [
   },
 
   // The admin half: the table page, the list-beside-a-form page, the long
-  // form, and the report. admin-books already covers the plain table.
+  // form, and the report. admin-handouts already covers the plain table.
   { id: "admin-orders", path: () => "/admin/orders", gated: true },
   { id: "admin-authors", path: () => "/admin/authors", gated: true },
   // The tree as a table, indented, beside the form with its parent control.
-  { id: "admin-categories", path: () => "/admin/categories", gated: true },
-  { id: "admin-book-new", path: () => "/admin/books/new", gated: true },
+  { id: "admin-handout-categories", path: () => "/admin/handout-categories", gated: true },
   { id: "admin-handout-new", path: () => "/admin/handouts/new", gated: true },
   { id: "admin-handout-reviews", path: () => "/admin/handout-reviews", gated: true },
   {

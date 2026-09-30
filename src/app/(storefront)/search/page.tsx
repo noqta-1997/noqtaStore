@@ -2,19 +2,11 @@ import { SearchX } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { BookCatalogue } from "@/components/book/book-catalogue";
 import { HandoutShelf } from "@/components/handout/handout-shelf";
 import { SearchBar } from "@/components/layout/search-bar";
 import { Container } from "@/components/ui/container";
 import { EmptyState } from "@/components/ui/empty-state";
-import {
-  getCategories,
-  getCategoryTree,
-  getPriceBounds,
-  getPublishers,
-  queryBooks,
-  queryHandouts,
-} from "@/data";
+import { getHandoutCategoryTree, queryHandouts } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { parseBookQuery, toBookQuery } from "@/lib/book-query";
@@ -38,24 +30,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const parsed = parseBookQuery(raw);
 
   /*
-   * The same term and filters run against both tables. The books get the
-   * catalogue with its pagination; the handouts get a shelf of the first ten
-   * and a link to their own listing, which takes the same query string.
+   * The term and filters give a shelf of the first ten handouts and a link to
+   * the listing, which takes the same query string and pages the rest.
    */
-  const [dictionary, categories, branches, publishers, bounds, result, handouts] = await Promise.all([
+  const [dictionary, tree, handouts] = await Promise.all([
     getDictionary(locale),
-    getCategories(),
-    getCategoryTree(5),
-    getPublishers(),
-    getPriceBounds(),
-    term ? queryBooks(toBookQuery(parsed)) : Promise.resolve(null),
+    getHandoutCategoryTree(),
     term
       ? queryHandouts(toBookQuery(parsed, { page: 1, perPage: 10 }))
       : Promise.resolve(null),
   ]);
 
   const t = dictionary.searchPage;
-  const booksTotal = result?.total ?? 0;
+  const branches = tree.slice(0, 5);
   const handoutsTotal = handouts?.total ?? 0;
   const handoutsHref = `/handouts${buildQueryString({ ...parsed.values, q: term })}`;
 
@@ -79,22 +66,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <p className="text-body-md text-on-surface-variant">
               {t.resultsFor}{" "}
               <span className="font-semibold text-on-surface">“{term}”</span>
-              {result ? (
+              {handouts ? (
                 <>
                   {" — "}
-                  {booksTotal || !handoutsTotal ? (
-                    <>
-                      <span data-numeric>{booksTotal}</span>{" "}
-                      {dictionary.books.resultsLabel}
-                    </>
-                  ) : null}
-                  {booksTotal && handoutsTotal ? " · " : null}
-                  {handoutsTotal ? (
-                    <>
-                      <span data-numeric>{handoutsTotal}</span>{" "}
-                      {t.handoutsCount}
-                    </>
-                  ) : null}
+                  <span data-numeric>{handoutsTotal}</span> {t.handoutsCount}
                 </>
               ) : null}
             </p>
@@ -115,19 +90,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         </Container>
       </section>
 
-      {result && booksTotal > 0 ? (
-        <BookCatalogue
-          locale={locale}
-          dictionary={dictionary}
-          categories={categories}
-          publishers={publishers}
-          bounds={bounds}
-          result={result}
-          values={{ ...parsed.values, q: term }}
-          basePath={`/search`}
-        />
-      ) : null}
-
       {handouts && handoutsTotal > 0 ? (
         <HandoutShelf
           title={t.handoutsTitle}
@@ -136,22 +98,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           locale={locale}
           dictionary={dictionary.common}
           actionHref={handoutsHref}
-          priority={!booksTotal}
-          /* Under the catalogue it sits on the band; alone it follows the
-             tinted header, so it stays on the page. */
-          band={booksTotal > 0}
-          className={booksTotal ? "border-t border-line-divider" : undefined}
+          priority
         />
       ) : null}
 
-      {!booksTotal && !handoutsTotal ? (
+      {!handoutsTotal ? (
         <Container className="py-10 lg:py-16">
           <EmptyState
             icon={SearchX}
             title={t.empty.title}
             description={t.empty.description}
             actionLabel={t.empty.action}
-            actionHref={`/books`}
+            actionHref={`/handouts`}
           />
         </Container>
       ) : null}

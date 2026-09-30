@@ -1,20 +1,11 @@
 import { config } from "dotenv";
 import { PrismaPg } from "@prisma/adapter-pg";
 
-import {
-  addresses,
-  cartLines,
-  customer,
-  customerReviews,
-  wishlistBookIds,
-} from "../src/data/account";
-import { adminOrders, adminReviews, customers, salesSeries } from "../src/data/admin";
+import { addresses, customer } from "../src/data/account";
+import { customers, salesSeries } from "../src/data/admin";
 import { authors } from "../src/data/authors";
-import { books } from "../src/data/books";
-import { categories } from "../src/data/categories";
 import { handoutCategories } from "../src/data/handout-categories";
 import { handouts } from "../src/data/handouts";
-import { reviews } from "../src/data/reviews";
 import { slugify } from "../src/lib/slug";
 import { PrismaClient } from "../src/generated/prisma/client";
 import type { OrderStatus } from "../src/types";
@@ -46,22 +37,16 @@ function pick<T>(items: T[]): T {
 async function clear() {
   // Children first: the schema cascades, but explicit order keeps the log clear.
   await prisma.orderEvent.deleteMany();
-  await prisma.orderItem.deleteMany();
   await prisma.handoutOrderItem.deleteMany();
   await prisma.handoutReview.deleteMany();
   await prisma.handoutWishlistItem.deleteMany();
   await prisma.handoutCartItem.deleteMany();
   await prisma.order.deleteMany();
-  await prisma.review.deleteMany();
-  await prisma.wishlistItem.deleteMany();
-  await prisma.cartItem.deleteMany();
   await prisma.address.deleteMany();
   await prisma.customer.deleteMany();
-  await prisma.book.deleteMany();
   await prisma.handout.deleteMany();
   await prisma.publisher.deleteMany();
   await prisma.author.deleteMany();
-  await prisma.category.deleteMany();
   await prisma.handoutCategory.deleteMany();
   await prisma.coupon.deleteMany();
 }
@@ -79,20 +64,8 @@ async function seedCoupons() {
 }
 
 async function seedCatalogue() {
-  /* Both trees list parents before children, and createMany keeps the order,
+  /* The tree lists parents before children, and createMany keeps the order,
      so the parent rows exist by the time the foreign key looks for them. */
-  await prisma.category.createMany({
-    data: categories.map((category) => ({
-      id: category.id,
-      slug: category.slug,
-      nameAr: category.name.ar,
-      descriptionAr: category.description.ar,
-      icon: category.icon,
-      parentId: category.parentId,
-      sortOrder: category.sortOrder,
-    })),
-  });
-
   await prisma.handoutCategory.createMany({
     data: handoutCategories.map((category) => ({
       id: category.id,
@@ -110,7 +83,6 @@ async function seedCatalogue() {
       id: author.id,
       slug: author.slug,
       nameAr: author.name.ar,
-      subjectId: author.subjectId ?? null,
       bioAr: author.bio.ar,
       avatarUrl: author.avatarUrl ?? null,
     })),
@@ -128,7 +100,6 @@ async function seedCatalogue() {
    * seed produces.
    */
   const publisherNames = new Map<string, { ar: string }>();
-  for (const book of books) publisherNames.set(book.publisher.ar, book.publisher);
   for (const handout of handouts) publisherNames.set(handout.publisher.ar, handout.publisher);
 
   const publisherIds = new Map<string, string>();
@@ -141,29 +112,6 @@ async function seedCatalogue() {
     });
     publisherIds.set(nameAr, row.id);
   }
-
-  await prisma.book.createMany({
-    data: books.map((book) => ({
-      id: book.id,
-      slug: book.slug,
-      titleAr: book.title.ar,
-      descriptionAr: book.description.ar,
-      price: book.price,
-      compareAtPrice: book.compareAtPrice ?? null,
-      stock: book.stock,
-      pages: book.pages,
-      publisherId: publisherIds.get(book.publisher.ar)!,
-      publishedYear: book.publishedYear,
-      languageAr: book.language.ar,
-      coverUrl: book.coverUrl ?? null,
-      tags: book.tags,
-      rating: book.rating,
-      reviewsCount: book.reviewsCount,
-      authorId: book.authorId,
-      categoryId: book.categoryId,
-      createdAt: new Date(book.createdAt),
-    })),
-  });
 
   await prisma.handout.createMany({
     data: handouts.map((handout) => ({
@@ -189,10 +137,9 @@ async function seedCatalogue() {
   });
 
   return {
-    categories: categories.length,
+    categories: handoutCategories.length,
     authors: authors.length,
     publishers: publisherIds.size,
-    books: books.length,
     handouts: handouts.length,
   };
 }
@@ -229,18 +176,6 @@ async function seedCustomers() {
     })),
   });
 
-  await prisma.wishlistItem.createMany({
-    data: wishlistBookIds.map((bookId) => ({ customerId: customer.id, bookId })),
-  });
-
-  await prisma.cartItem.createMany({
-    data: cartLines.map((line) => ({
-      customerId: customer.id,
-      bookId: line.bookId,
-      quantity: line.quantity,
-    })),
-  });
-
   return { customers: customers.length, addresses: addresses.length };
 }
 
@@ -250,7 +185,7 @@ interface OrderSeed {
   customerId: string;
   status: OrderStatus;
   createdAt: Date;
-  items: { bookId: string; quantity: number; unitPrice: number }[];
+  items: { handoutId: string; quantity: number; unitPrice: number }[];
   shippingCost: number;
   discount: number;
   paymentMethod: "cod" | "card" | "wallet";
@@ -284,7 +219,7 @@ async function insertOrder(seed: OrderSeed) {
       shippingCity: address.city.ar,
       shippingLine: address.line.ar,
       createdAt: seed.createdAt,
-      items: { create: seed.items },
+      handoutItems: { create: seed.items },
       timeline: {
         create:
           seed.status === "cancelled"
@@ -306,25 +241,8 @@ async function insertOrder(seed: OrderSeed) {
 }
 
 async function seedOrders() {
-  // 1. The twelve hand-written orders keep the reference numbers used across
-  //    the admin screens stable.
-  for (const order of adminOrders) {
-    await insertOrder({
-      id: order.id,
-      reference: order.reference,
-      customerId: order.customerId,
-      status: order.status,
-      createdAt: new Date(order.createdAt),
-      items: order.items,
-      shippingCost: order.shippingCost,
-      discount: order.discount,
-      paymentMethod: order.paymentMethod,
-      shippingMethod: order.shippingMethod,
-    });
-  }
-
-  // 2. Historical orders so the dashboard charts have twelve real months
-  //    to aggregate instead of a hard-coded series.
+  // Historical orders so the dashboard charts have twelve real months to
+  // aggregate instead of a hard-coded series.
   let counter = 0;
   for (const point of salesSeries) {
     const perMonth = Math.max(4, Math.round(point.orders / 12));
@@ -335,15 +253,15 @@ async function seedOrders() {
       const createdAt = new Date(`${point.month}-${String(day).padStart(2, "0")}T10:00:00Z`);
       const lineCount = 1 + Math.floor(random() * 3);
       const items = Array.from({ length: lineCount }, () => {
-        const book = pick(books);
+        const handout = pick(handouts);
         return {
-          bookId: book.id,
+          handoutId: handout.id,
           quantity: 1 + Math.floor(random() * 2),
-          unitPrice: book.price,
+          unitPrice: handout.price,
         };
       }).filter(
         (item, index_, all) =>
-          all.findIndex((other) => other.bookId === item.bookId) === index_,
+          all.findIndex((other) => other.handoutId === item.handoutId) === index_,
       );
 
       await insertOrder({
@@ -364,61 +282,6 @@ async function seedOrders() {
   return { orders: await prisma.order.count() };
 }
 
-async function seedReviews() {
-  const pool = [
-    ...reviews.map((review) => ({
-      bookId: review.bookId,
-      rating: review.rating,
-      title: review.title.ar,
-      body: review.body.ar,
-      createdAt: review.createdAt,
-      status: "published" as const,
-    })),
-    ...adminReviews.map((review) => ({
-      bookId: review.bookId,
-      rating: review.rating,
-      title: review.title.ar,
-      body: review.body.ar,
-      createdAt: review.createdAt,
-      status: review.status,
-    })),
-    ...customerReviews.map((review) => ({
-      bookId: review.bookId,
-      rating: review.rating,
-      title: review.title.ar,
-      body: review.body.ar,
-      createdAt: review.createdAt,
-      status: review.status,
-    })),
-  ];
-
-  // One review per (book, customer): walk the customer list until a free slot
-  // is found, otherwise drop the row rather than violate the constraint.
-  const taken = new Set<string>();
-  let created = 0;
-
-  for (const entry of pool) {
-    const owner = customers.find((c) => !taken.has(`${entry.bookId}:${c.id}`));
-    if (!owner) continue;
-
-    taken.add(`${entry.bookId}:${owner.id}`);
-    await prisma.review.create({
-      data: {
-        bookId: entry.bookId,
-        customerId: owner.id,
-        rating: entry.rating,
-        title: entry.title,
-        body: entry.body,
-        status: entry.status,
-        createdAt: new Date(entry.createdAt),
-      },
-    });
-    created += 1;
-  }
-
-  return { reviews: created };
-}
-
 async function main() {
   console.log("Clearing existing rows…");
   await clear();
@@ -431,9 +294,6 @@ async function main() {
 
   const orderCounts = await seedOrders();
   console.log("Orders:", orderCounts);
-
-  const reviewCounts = await seedReviews();
-  console.log("Reviews:", reviewCounts);
 
   const coupons = await seedCoupons();
   console.log("Coupons:", coupons);

@@ -134,9 +134,7 @@ export default async function AdminOrdersPage({
             </Thead>
             <Tbody>
               {result.items.map((order) => {
-                const itemsCount =
-                  order.items.reduce((total, item) => total + item.quantity, 0) +
-                  order.handoutItems.reduce((total, item) => total + item.quantity, 0);
+                const itemsCount = order.handoutItems.reduce((total, item) => total + item.quantity, 0);
 
                 return (
                   <Tr key={order.id}>

@@ -48,7 +48,7 @@ export default async function PublishersPage() {
                 <PublisherCard
                   publisher={publisher}
                   locale={locale}
-                  booksLabel={dictionary.home.authors.booksCount}
+                  countLabel={dictionary.home.authors.handoutsCount}
                 />
               </li>
             ))}

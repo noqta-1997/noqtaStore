@@ -2,8 +2,8 @@ import type { Prisma } from "@/generated/prisma/client";
 
 /**
  * Keeps the denormalised rating on Handout in step with its published
- * reviews — `refreshBookRating` over the handout tables. Called inside the
- * transaction that changed a review so the two never drift.
+ * reviews. Called inside the transaction that changed a review so the two
+ * never drift.
  */
 export async function refreshHandoutRating(
   tx: Prisma.TransactionClient,

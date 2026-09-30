@@ -120,7 +120,7 @@ function ensureBucket() {
  * Because a key never changes hands, the object can be cached for a year.
  */
 export async function storeCover(
-  folder: "books" | "handouts",
+  folder: "handouts",
   file: File,
 ): Promise<string> {
   await ensureBucket();

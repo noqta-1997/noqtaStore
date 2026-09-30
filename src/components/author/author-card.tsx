@@ -29,16 +29,17 @@ export function authorTone(slug: string) {
 interface AuthorCardProps {
   author: Author;
   locale: Locale;
-  booksLabel: string;
+  /** The word after the count: «ملزمة». */
+  countLabel: string;
   className?: string;
 }
 
 /**
  * The reference's author chip: a round portrait, the name, and a chevron —
- * laid out along the line rather than stacked. The country and the book count
- * are still here, on the second line, because they were here before.
+ * laid out along the line rather than stacked. The handout count is on the
+ * second line.
  */
-export function AuthorCard({ author, locale, booksLabel, className }: AuthorCardProps) {
+export function AuthorCard({ author, locale, countLabel, className }: AuthorCardProps) {
   return (
     <Link
       href={`/authors/${author.slug}`}
@@ -64,8 +65,8 @@ export function AuthorCard({ author, locale, booksLabel, className }: AuthorCard
           {author.name[locale]}
         </span>
         <span className="truncate text-label-md text-muted">
-          <span data-numeric>{formatNumber(author.booksCount, locale)}</span>{" "}
-          {booksLabel}
+          <span data-numeric>{formatNumber(author.handoutsCount, locale)}</span>{" "}
+          {countLabel}
         </span>
       </span>
 

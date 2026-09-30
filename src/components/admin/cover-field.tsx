@@ -10,7 +10,7 @@ import { COVER_EXTENSIONS, COVER_MIME_TYPES, MAX_COVER_BYTES } from "@/lib/cover
 import { prepareCover } from "@/lib/cover-resize";
 
 interface CoverFieldProps {
-  labels: AdminDictionary["bookForm"]["upload"];
+  labels: AdminDictionary["handoutForm"]["upload"];
   errors: Pick<Dictionary["common"]["actionErrors"], "invalidImage" | "imageTooLarge">;
   /** The cover the row has now, or its typographic placeholder. */
   children: ReactNode;
@@ -26,7 +26,7 @@ interface Chosen {
 }
 
 /**
- * The cover picker for the book and handout forms.
+ * The cover picker for the handout form.
  *
  * The file input is visually hidden behind the dashed label, so without this
  * island choosing a file changed nothing on screen and the upload looked

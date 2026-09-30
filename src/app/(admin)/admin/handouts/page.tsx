@@ -195,7 +195,6 @@ export default async function AdminHandoutsPage({
                     <Td>
                       <div className="flex items-center justify-end gap-1">
                       <ArchiveButton
-                        kind="handout"
                         id={handout.id}
                         archived={Boolean(handout.archived)}
                         labels={{

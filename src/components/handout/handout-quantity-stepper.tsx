@@ -22,9 +22,9 @@ interface HandoutQuantityStepperProps {
 const WRITE_DELAY = 500;
 
 /**
- * `QuantityStepper` in its writing mode, for a handout cart line. The book
- * stepper stays local when it has no `bookId`; the handout detail page uses
- * that local mode, so only the cart row needs this twin.
+ * The cart row's stepper: `QuantityStepper`'s control, writing each change to
+ * the handout's cart line. The detail page uses the local `QuantityStepper`,
+ * whose count only feeds the add-to-cart button.
  */
 export function HandoutQuantityStepper({
   defaultValue = 1,

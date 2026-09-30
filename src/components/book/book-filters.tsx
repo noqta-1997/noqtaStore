@@ -30,7 +30,7 @@ interface BookFiltersProps {
   resetHref: string;
   locale: Locale;
   dictionary: Dictionary;
-  /** Either tree in order; each branch is indented under its parent. */
+  /** The category tree in order; each branch is indented under its parent. */
   categories: CategoryOption[];
   publishers: Publisher[];
   values: BookFilterValues;
@@ -74,7 +74,7 @@ export function BookFilters({
   showCategory = true,
   className,
 }: BookFiltersProps) {
-  const t = dictionary.books;
+  const t = dictionary.handouts;
 
   return (
     <Form

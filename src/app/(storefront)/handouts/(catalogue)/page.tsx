@@ -21,7 +21,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HandoutsPage({ searchParams }: HandoutsPageProps) {
   const locale = defaultLocale;
 
-  // The handouts listing takes the same query string as the books listing.
   const parsed = parseBookQuery(await searchParams);
 
   const [dictionary, categories, publishers, bounds, result] = await Promise.all([

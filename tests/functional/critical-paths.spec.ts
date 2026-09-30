@@ -19,13 +19,12 @@ const isDesktop = (name: string) => name.startsWith("desktop");
 const isMobile = (name: string) => name.startsWith("mobile");
 
 test.describe("storefront renders real data", () => {
-  test("home lists books and categories", async ({ page }) => {
+  test("home lists handouts", async ({ page }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await settle(page, "main h1");
 
     await expect(page.locator("article")).not.toHaveCount(0);
-    await expect(page.locator('a[href^="/books/"]').first()).toBeVisible();
-    await expect(page.locator('a[href^="/categories/"]').first()).toBeVisible();
+    await expect(page.locator('main a[href^="/handouts/"]').first()).toBeVisible();
   });
 
   /*
@@ -58,8 +57,8 @@ test.describe("storefront renders real data", () => {
     await expect(hero.locator('[aria-roledescription="slide"]:not([inert])')).toHaveCount(1);
   });
 
-  test("book detail shows title, price and a cart control", async ({ page }) => {
-    await page.goto("/books/al-amir-al-saghir", { waitUntil: "domcontentloaded" });
+  test("handout detail shows title, price and a cart control", async ({ page }) => {
+    await page.goto("/handouts/physics-sixth-scientific", { waitUntil: "domcontentloaded" });
     await settle(page, "main h1");
 
     await expect(page.locator("main h1")).not.toBeEmpty();
@@ -75,7 +74,7 @@ test.describe("storefront renders real data", () => {
   });
 
   test("catalogue sort is URL-driven and survives a reload", async ({ page }) => {
-    await page.goto("/books?sort=newest", { waitUntil: "domcontentloaded" });
+    await page.goto("/handouts?sort=newest", { waitUntil: "domcontentloaded" });
     await settle(page, "main");
 
     const before = await page.locator("main").innerText();
@@ -128,7 +127,7 @@ test.describe("locale", () => {
    * nothing reintroduces a second language by accident.
    */
   test("the site offers no second language", async ({ page }) => {
-    await page.goto("/books", { waitUntil: "domcontentloaded" });
+    await page.goto("/handouts", { waitUntil: "domcontentloaded" });
     await settle(page, "main");
 
     await expect(page.getByRole("link", { name: "English" })).toHaveCount(0);

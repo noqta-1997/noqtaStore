@@ -3,8 +3,8 @@ import type { Handout, Localized } from "@/types";
 const ARABIC: Localized = { ar: "العربية" };
 
 /**
- * Seed input for the handouts table, shaped like `SeedBook`: the publisher is
- * a name here because the seed creates the publisher rows from the catalogue.
+ * Seed input for the handouts table: the publisher is a name here because the
+ * seed creates the publisher rows from the catalogue.
  */
 export type SeedHandout = Omit<Handout, "publisherId"> & { publisher: Localized };
 

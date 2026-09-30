@@ -8,7 +8,7 @@ import { TitleLink } from "@/components/book/title-link";
 import { OrderSummary } from "@/components/commerce/order-summary";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Surface, surfaceTitleStyles } from "@/components/ui/surface";
-import { getOrderById, getOrderHandoutItems, getOrderItems } from "@/data";
+import { getOrderById, getOrderHandoutItems } from "@/data";
 import { PrintButton } from "@/components/ui/print-button";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
@@ -41,9 +41,8 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
     notFound();
   }
 
-  const [dictionary, items, handoutItems] = await Promise.all([
+  const [dictionary, handoutItems] = await Promise.all([
     getDictionary(locale),
-    getOrderItems(order),
     getOrderHandoutItems(order),
   ]);
 
@@ -158,40 +157,6 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
         <Surface as="section" className="lg:col-span-7">
           <h3 className={surfaceTitleStyles()}>{t.itemsTitle}</h3>
           <ul className="divide-y divide-line-divider">
-            {items.map((item) => (
-              <li key={item.bookId} className="flex items-center gap-4 p-5">
-                <span className="w-14 shrink-0">
-                  <BookCover
-                    title={item.book.title[locale]}
-                    author={item.book.author.name[locale]}
-                    seed={item.book.slug}
-                    src={item.book.coverUrl}
-                    sizes="3.5rem"
-                    className="border border-line"
-                    compact
-                  />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <TitleLink
-                    href={`/books/${item.book.slug}`}
-                    archived={item.book.archived}
-                    archivedNote={dictionary.common.noLongerOnSale}
-                    className="block font-display text-base font-bold underline-offset-4 hover:underline"
-                  >
-                    {item.book.title[locale]}
-                  </TitleLink>
-                  <span className="block text-label-md text-muted">
-                    {dictionary.common.by} {item.book.author.name[locale]}
-                  </span>
-                  <span className="mt-1 block text-label-sm text-muted" data-numeric>
-                    {formatPrice(item.unitPrice, locale)} × {item.quantity}
-                  </span>
-                </span>
-                <span className="shrink-0 text-body-md font-semibold" data-numeric>
-                  {formatPrice(item.lineTotal, locale)}
-                </span>
-              </li>
-            ))}
             {handoutItems.map((item) => (
               <li key={item.handoutId} className="flex items-center gap-4 p-5">
                 <span className="w-14 shrink-0">

@@ -1,9 +1,9 @@
 import type { Locale } from "@/i18n/config";
-import type { CategoryNode, HandoutCategoryNode } from "@/types";
+import type { HandoutCategoryNode } from "@/types";
 
 /**
  * A branch as the header's menus and the phone drawer list it: a name, where
- * it leads, and what hangs under it. Built on the server from either tree so
+ * it leads, and what hangs under it. Built on the server from the tree so
  * the client islands carry plain data and know nothing about slugs.
  */
 export interface MenuBranch {
@@ -21,7 +21,7 @@ export interface MenuBranch {
  * panel of twelve top-level branches does not become twelve columns.
  */
 export interface CatalogueMenu {
-  /** The nav label, "الكتب المدرسية" or "الملازم". */
+  /** The nav label, "الملازم". */
   label: string;
   /** The catalogue's own listing, and the wording of the link to it. */
   href: string;
@@ -32,7 +32,7 @@ export interface CatalogueMenu {
   others: MenuBranch[];
 }
 
-type TreeNode = CategoryNode | HandoutCategoryNode;
+type TreeNode = HandoutCategoryNode;
 
 function toMenuBranch(node: TreeNode, locale: Locale, hrefFor: (slug: string) => string): MenuBranch {
   return {

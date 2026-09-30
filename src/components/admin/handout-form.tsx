@@ -41,7 +41,7 @@ interface HandoutFormProps {
 
 const tagOptions: BookTag[] = ["bestseller", "new", "featured", "award"];
 
-/** One form serves both "add handout" and "edit handout" — `BookForm` over the handouts table, ending on the list after an add as it does. */
+/** One form serves both "add handout" and "edit handout", ending on the list after an add. */
 export function HandoutForm({
   locale,
   admin,
@@ -78,7 +78,7 @@ export function HandoutForm({
         stockChanged: dictionary.common.actionErrors.stockChanged,
         notFound: dictionary.common.actionErrors.notFound,
         saveFailed: dictionary.common.actionErrors.saveFailed,
-        missingTitle: dictionary.common.actionErrors.missingBookTitle,
+        missingTitle: dictionary.common.actionErrors.missingHandoutTitle,
         missingRelation: dictionary.common.actionErrors.missingRelation,
         invalidImage: dictionary.common.actionErrors.invalidImage,
         imageTooLarge: dictionary.common.actionErrors.imageTooLarge,

@@ -1,5 +1,5 @@
 /**
- * The jackets drawn for books that have no cover image yet.
+ * The jackets drawn for handouts that have no cover image yet.
  *
  * Plain data with no imports, like the other two ramps, because these values
  * are read at render time and must not move.

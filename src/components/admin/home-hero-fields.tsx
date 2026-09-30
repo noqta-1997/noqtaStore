@@ -1,4 +1,4 @@
-import { searchHomeBooks } from "@/app/actions/admin";
+import { searchHomeHandouts } from "@/app/actions/admin";
 import { Panel } from "@/components/admin/panel";
 import { PickList, type PickListLabels } from "@/components/admin/pick-list";
 import { Field } from "@/components/ui/field";
@@ -22,8 +22,8 @@ interface HomeHeroFieldsProps {
 }
 
 /**
- * The opening section's fields: its copy on one side, the two book pickers
- * on the other.
+ * The opening section's fields: its copy on one side, the two handout
+ * pickers on the other.
  */
 export function HomeHeroFields({
   locale,
@@ -36,7 +36,7 @@ export function HomeHeroFields({
   const t = admin.settings.home;
   const h = t.hero;
 
-  const pickerLabels: PickListLabels = { ...t.picker, search: t.picker.searchBooks };
+  const pickerLabels: PickListLabels = { ...t.picker, search: t.picker.searchHandouts };
 
   return (
     <div className="grid gap-4 lg:grid-cols-12">
@@ -86,12 +86,12 @@ export function HomeHeroFields({
       </div>
 
       <div className="space-y-4 lg:col-span-5">
-        <Panel title={h.featuredBook} subtitle={h.featuredBookHint}>
+        <Panel title={h.featuredHandout} subtitle={h.featuredHandoutHint}>
           <PickList
-            name="featuredBookId"
+            name="featuredHandoutId"
             initial={featured ? [featured] : []}
             max={1}
-            search={searchHomeBooks}
+            search={searchHomeHandouts}
             locale={locale}
             labels={pickerLabels}
           />
@@ -102,7 +102,7 @@ export function HomeHeroFields({
             name="showcaseIds"
             initial={showcase}
             max={HERO_SHOWCASE_SIZE}
-            search={searchHomeBooks}
+            search={searchHomeHandouts}
             locale={locale}
             labels={pickerLabels}
           />

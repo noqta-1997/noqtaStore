@@ -23,8 +23,8 @@ interface HandoutWishlistButtonProps {
 }
 
 /**
- * `WishlistButton` for a handout. It reads the same store as the book hearts:
- * `/api/wishlist/ids` lists both kinds of saved id, and the ids never collide.
+ * The wishlist heart for a handout. Every heart on the page reads one store,
+ * filled from `/api/wishlist/ids`.
  */
 export function HandoutWishlistButton({
   handoutId,

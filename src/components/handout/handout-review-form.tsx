@@ -4,13 +4,25 @@ import { Star } from "lucide-react";
 import { useState } from "react";
 
 import { submitHandoutReview } from "@/app/actions/account";
-import type { ReviewFormLabels } from "@/components/book/review-form";
 import { ActionForm } from "@/components/ui/action-form";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+
+export interface ReviewFormLabels {
+  trigger: string;
+  formTitle: string;
+  ratingLabel: string;
+  titleLabel: string;
+  bodyLabel: string;
+  submit: string;
+  cancel: string;
+  pendingNote: string;
+  success: string;
+  fallbackError: string;
+}
 
 interface HandoutReviewFormProps {
   handoutId: string;
@@ -20,7 +32,7 @@ interface HandoutReviewFormProps {
 
 const stars = [1, 2, 3, 4, 5];
 
-/** `ReviewForm` posting to the handout review table. Collapsed until asked for. */
+/** Posts to the handout review table. Collapsed until asked for, so the review list stays the focus. */
 export function HandoutReviewForm({ handoutId, labels, errorMessages }: HandoutReviewFormProps) {
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(5);

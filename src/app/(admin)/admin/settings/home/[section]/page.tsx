@@ -8,13 +8,11 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { HomeFeaturesFields } from "@/components/admin/home-features-fields";
 import { HomeHeroFields } from "@/components/admin/home-hero-fields";
 import { HomeNewsletterFields } from "@/components/admin/home-newsletter-fields";
-import { HomePromoFields } from "@/components/admin/home-promo-fields";
 import { HomeSectionForm } from "@/components/admin/home-section-form";
 import { HomeShelfFields } from "@/components/admin/home-shelf-fields";
 import {
   getAuthorsByIds,
-  getBooksByIds,
-  getCategoriesByIds,
+  getHandoutsByIds,
   getPublishersByIds,
   getStoreSettings,
 } from "@/data";
@@ -32,11 +30,10 @@ import {
   isHomeSection,
   isHomeShelf,
   readHeroContent,
-  readPromoContent,
   readShelfContent,
   type ShelfKind,
 } from "@/lib/home-sections";
-import { authorPick, bookPick, categoryPick, publisherPick } from "@/lib/picks";
+import { authorPick, handoutPick, publisherPick } from "@/lib/picks";
 import type { PickOption } from "@/types";
 
 interface HomeSectionPageProps {
@@ -66,17 +63,13 @@ async function shelfPicks(
   texts: Dictionary["home"],
 ): Promise<PickOption[]> {
   switch (kind) {
-    case "book":
-      return (await getBooksByIds(ids)).map((book) => bookPick(book, locale));
-    case "category":
-      return (await getCategoriesByIds(ids)).map((category) => categoryPick(category, locale));
     case "author":
       return (await getAuthorsByIds(ids)).map((author) =>
-        authorPick(author, locale, texts.authors.booksCount),
+        authorPick(author, locale, texts.authors.handoutsCount),
       );
     case "publisher":
       return (await getPublishersByIds(ids)).map((publisher) =>
-        publisherPick(publisher, locale, texts.authors.booksCount),
+        publisherPick(publisher, locale, texts.authors.handoutsCount),
       );
   }
 }
@@ -107,8 +100,8 @@ export default async function HomeSectionPage({ params }: HomeSectionPageProps) 
        of the hero, a link included, failed until the admin guessed which
        title to remove. */
     const [[featured], showcase] = await Promise.all([
-      getBooksByIds(hero.featuredBookId ? [hero.featuredBookId] : []),
-      getBooksByIds(hero.showcaseIds),
+      getHandoutsByIds(hero.featuredHandoutId ? [hero.featuredHandoutId] : []),
+      getHandoutsByIds(hero.showcaseIds),
     ]);
 
     fields = (
@@ -117,8 +110,8 @@ export default async function HomeSectionPage({ params }: HomeSectionPageProps) 
         admin={admin}
         texts={texts.hero}
         content={hero}
-        featured={featured ? bookPick(featured, locale) : null}
-        showcase={showcase.map((book) => bookPick(book, locale))}
+        featured={featured ? handoutPick(featured, locale) : null}
+        showcase={showcase.map((handout) => handoutPick(handout, locale))}
       />
     );
   } else if (isHomeShelf(section)) {
@@ -140,10 +133,6 @@ export default async function HomeSectionPage({ params }: HomeSectionPageProps) 
         content={content}
         picks={picks}
       />
-    );
-  } else if (section === "promo") {
-    fields = (
-      <HomePromoFields admin={admin} texts={texts.promo} content={readPromoContent(settings)} />
     );
   } else if (section === "newsletter") {
     fields = <HomeNewsletterFields admin={admin} texts={texts.newsletter} />;

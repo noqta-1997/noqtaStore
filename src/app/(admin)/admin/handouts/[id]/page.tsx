@@ -62,7 +62,6 @@ export default async function AdminHandoutPage({ params }: AdminHandoutPageProps
         actions={
           <>
             <ArchiveButton
-              kind="handout"
               id={handout.id}
               archived={Boolean(handout.archived)}
               withText

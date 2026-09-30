@@ -23,7 +23,7 @@ interface HandoutCardProps {
 }
 
 /**
- * The shelf card for a handout — `BookCard` pointed at `/handouts`, with the
+ * The shelf card for a handout: the jacket, title and price, with the
  * wishlist heart and the cart button writing to the handout tables.
  */
 export function HandoutCard({

@@ -94,7 +94,7 @@ export default async function AdminHandoutCategoriesPage({
                         notes={[
                           {
                             count: subtreeOf(category).reduce(
-                              (sum, node) => sum + (archived.handouts.get(node.id) ?? 0),
+                              (sum, node) => sum + (archived.get(node.id) ?? 0),
                               0,
                             ),
                             label: admin.common.archivedCount,

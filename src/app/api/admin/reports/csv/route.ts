@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
 
-import {
-  getCategoryShares,
-  getHandoutCategoryShares,
-  getSalesSeries,
-  getTopBooks,
-  getTopHandouts,
-} from "@/data";
+import { getHandoutCategoryShares, getSalesSeries, getTopHandouts } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getCurrentCustomer } from "@/lib/auth";
 
@@ -32,11 +26,9 @@ export async function GET() {
 
   const locale = defaultLocale;
 
-  const [series, shares, handoutShares, top, topHandouts] = await Promise.all([
+  const [series, handoutShares, topHandouts] = await Promise.all([
     getSalesSeries(),
-    getCategoryShares(),
     getHandoutCategoryShares(),
-    getTopBooks(),
     getTopHandouts(),
   ]);
 
@@ -44,14 +36,8 @@ export async function GET() {
     ["month", "revenue_iqd", "orders"],
     ...series.map((point) => [point.month, point.revenue, point.orders]),
     [],
-    ["book", "copies_sold", "revenue_iqd"],
-    ...top.map((entry) => [entry.book.title[locale], entry.sold, entry.revenue]),
-    [],
     ["handout", "copies_sold", "revenue_iqd"],
     ...topHandouts.map((entry) => [entry.handout.title[locale], entry.sold, entry.revenue]),
-    [],
-    ["category", "share_percent"],
-    ...shares.map((entry) => [entry.category.name[locale], entry.share]),
     [],
     ["handout_category", "share_percent"],
     ...handoutShares.map((entry) => [entry.category.name[locale], entry.share]),

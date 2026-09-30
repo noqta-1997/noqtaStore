@@ -2,13 +2,10 @@
 
 import { useState } from "react";
 
-import { AddToCartButton } from "@/components/commerce/add-to-cart-button";
 import { HandoutAddToCartButton } from "@/components/handout/handout-add-to-cart-button";
 import { QuantityStepper } from "@/components/ui/quantity-stepper";
 
 interface PurchaseControlsProps {
-  /** Which cart table the button writes to. */
-  kind: "book" | "handout";
   id: string;
   /** Copies on the shelf; the stepper stops there. */
   stock: number;
@@ -37,7 +34,6 @@ interface PurchaseControlsProps {
  * siblings, so the row they sit in lays out as before.
  */
 export function PurchaseControls({
-  kind,
   id,
   stock,
   disabled,
@@ -70,11 +66,7 @@ export function PurchaseControls({
         }}
         onChange={setQuantity}
       />
-      {kind === "book" ? (
-        <AddToCartButton bookId={id} {...button} />
-      ) : (
-        <HandoutAddToCartButton handoutId={id} {...button} />
-      )}
+      <HandoutAddToCartButton handoutId={id} {...button} />
     </>
   );
 }

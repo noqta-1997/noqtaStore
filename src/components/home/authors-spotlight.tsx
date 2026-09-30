@@ -38,7 +38,7 @@ export function AuthorsSpotlight({
               <AuthorCard
                 author={author}
                 locale={locale}
-                booksLabel={section.booksCount}
+                countLabel={section.handoutsCount}
               />
             </li>
           ))}

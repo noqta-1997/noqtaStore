@@ -1,23 +1,17 @@
 import type {
   AddressModel as AddressRow,
   AuthorModel as AuthorRow,
-  BookModel as BookRow,
-  CategoryModel as CategoryRow,
   HandoutCategoryModel as HandoutCategoryRow,
   HandoutModel as HandoutRow,
   HandoutOrderItemModel as HandoutOrderItemRow,
   HandoutReviewModel as HandoutReviewRow,
   OrderEventModel as OrderEventRow,
-  OrderItemModel as OrderItemRow,
   OrderModel as OrderRow,
   PublisherModel as PublisherRow,
-  ReviewModel as ReviewRow,
 } from "@/generated/prisma/models";
 import type {
   Address,
   Author,
-  BookWithRelations,
-  Category,
   HandoutCategory,
   HandoutReview,
   HandoutReviewWithStatus,
@@ -25,8 +19,6 @@ import type {
   Localized,
   Order,
   Publisher,
-  Review,
-  ReviewWithStatus,
 } from "@/types";
 import { storeDateKey } from "@/lib/format";
 
@@ -42,29 +34,6 @@ import { storeDateKey } from "@/lib/format";
  */
 function mirror(value: string): Localized {
   return { ar: value };
-}
-
-export function toCategory(row: CategoryRow): Category & { booksCount: number } {
-  return {
-    id: row.id,
-    slug: row.slug,
-    name: { ar: row.nameAr },
-    description: { ar: row.descriptionAr },
-    icon: row.icon,
-    parentId: row.parentId,
-    sortOrder: row.sortOrder,
-    booksCount: 0,
-  };
-}
-
-/**
- * The count here is the row's own titles. The tree loader in data/index.ts
- * is what rolls the branches below into it.
- */
-export function toCategoryWithCount(
-  row: CategoryRow & { _count?: { books: number } },
-): Category {
-  return { ...toCategory(row), booksCount: row._count?.books ?? 0 };
 }
 
 export function toHandoutCategory(row: HandoutCategoryRow): HandoutCategory {
@@ -86,75 +55,31 @@ export function toHandoutCategoryWithCount(
   return { ...toHandoutCategory(row), handoutsCount: row._count?.handouts ?? 0 };
 }
 
-export function toAuthor(
-  row: AuthorRow & {
-    _count?: { books: number; handouts?: number };
-    subject?: CategoryRow | null;
-  },
-): Author {
+export function toAuthor(row: AuthorRow & { _count?: { handouts: number } }): Author {
   return {
     id: row.id,
     slug: row.slug,
     name: { ar: row.nameAr },
-    subjectId: row.subjectId ?? undefined,
-    subject: row.subject ? { ar: row.subject.nameAr } : undefined,
     bio: { ar: row.bioAr },
-    booksCount: row._count?.books ?? 0,
     handoutsCount: row._count?.handouts ?? 0,
     avatarUrl: row.avatarUrl ?? undefined,
   };
 }
 
-export function toPublisher(
-  row: PublisherRow & { _count?: { books: number; handouts?: number } },
-): Publisher {
+export function toPublisher(row: PublisherRow & { _count?: { handouts: number } }): Publisher {
   return {
     id: row.id,
     slug: row.slug,
     name: { ar: row.nameAr },
     description: { ar: row.descriptionAr },
-    booksCount: row._count?.books ?? 0,
     handoutsCount: row._count?.handouts ?? 0,
   };
 }
 
-export type BookRowWithRelations = BookRow & {
-  author: AuthorRow & { _count?: { books: number } };
-  category: CategoryRow & { _count?: { books: number } };
-  publisher: PublisherRow & { _count?: { books: number } };
-};
-
-export function toBook(row: BookRowWithRelations): BookWithRelations {
-  return {
-    id: row.id,
-    slug: row.slug,
-    title: { ar: row.titleAr },
-    authorId: row.authorId,
-    categoryId: row.categoryId,
-    price: row.price,
-    compareAtPrice: row.compareAtPrice ?? undefined,
-    rating: row.rating,
-    reviewsCount: row.reviewsCount,
-    stock: row.stock,
-    pages: row.pages,
-    publisherId: row.publisherId,
-    publishedYear: row.publishedYear,
-    language: { ar: row.languageAr },
-    description: { ar: row.descriptionAr },
-    tags: row.tags,
-    coverUrl: row.coverUrl ?? undefined,
-    archived: row.archivedAt !== null,
-    createdAt: storeDateKey(row.createdAt),
-    author: toAuthor(row.author),
-    category: toCategoryWithCount(row.category),
-    publisher: toPublisher(row.publisher),
-  };
-}
-
 export type HandoutRowWithRelations = HandoutRow & {
-  author: AuthorRow & { _count?: { books: number } };
+  author: AuthorRow & { _count?: { handouts: number } };
   category: HandoutCategoryRow & { _count?: { handouts: number } };
-  publisher: PublisherRow & { _count?: { books: number } };
+  publisher: PublisherRow & { _count?: { handouts: number } };
 };
 
 export function toHandout(row: HandoutRowWithRelations): HandoutWithRelations {
@@ -197,34 +122,6 @@ export function toAddress(row: AddressRow): Address {
   };
 }
 
-export function toReview(row: ReviewRow): Review {
-  return {
-    id: row.id,
-    bookId: row.bookId,
-    authorName: "",
-    rating: row.rating,
-    title: mirror(row.title),
-    body: mirror(row.body),
-    createdAt: storeDateKey(row.createdAt),
-  };
-}
-
-export function toReviewWithAuthor(
-  row: ReviewRow & { customer: { name: string } },
-): Review {
-  return { ...toReview(row), authorName: row.customer.name };
-}
-
-export function toReviewWithStatus(
-  row: ReviewRow & { customer: { name: string }; book: BookRow },
-): ReviewWithStatus {
-  return {
-    ...toReviewWithAuthor(row),
-    status: row.status,
-    bookTitle: { ar: row.book.titleAr },
-  };
-}
-
 export function toHandoutReview(row: HandoutReviewRow): HandoutReview {
   return {
     id: row.id,
@@ -254,7 +151,6 @@ export function toHandoutReviewWithStatus(
 }
 
 export type OrderRowWithRelations = OrderRow & {
-  items: OrderItemRow[];
   handoutItems: HandoutOrderItemRow[];
   timeline: OrderEventRow[];
 };
@@ -265,11 +161,6 @@ export function toOrder(row: OrderRowWithRelations): Order {
     reference: row.reference,
     createdAt: storeDateKey(row.createdAt),
     status: row.status,
-    items: row.items.map((item) => ({
-      bookId: item.bookId,
-      quantity: item.quantity,
-      unitPrice: item.unitPrice,
-    })),
     handoutItems: row.handoutItems.map((item) => ({
       handoutId: item.handoutId,
       quantity: item.quantity,

@@ -10,7 +10,6 @@ import {
   type ActionResult,
 } from "@/lib/action-result";
 import { makeDefaultAddress, saveAddressRow } from "@/lib/addresses";
-import { refreshBookRating } from "@/lib/book-rating";
 import { refreshHandoutRating } from "@/lib/handout-rating";
 import { getCurrentCustomer, getCustomerInGoodStanding } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -105,26 +104,6 @@ export async function setDefaultAddress(addressId: string): Promise<ActionResult
   return ok();
 }
 
-export async function deleteOwnReview(reviewId: string): Promise<ActionResult> {
-  const customerId = await requireCustomerId();
-  if (!customerId) return fail("unauthenticated");
-
-  const review = await prisma.review.findFirst({
-    where: { id: reviewId, customerId },
-    select: { bookId: true },
-  });
-
-  if (!review) return fail("notFound");
-
-  await prisma.$transaction(async (tx) => {
-    await tx.review.delete({ where: { id: reviewId } });
-    await refreshBookRating(tx, review.bookId);
-  });
-
-  revalidatePath("/account/reviews");
-  return ok();
-}
-
 /** Marketing opt-ins. An unchecked box posts nothing, which reads as false. */
 export async function savePreferences(formData: FormData): Promise<ActionResult> {
   const customerId = await requireCustomerId();
@@ -141,57 +120,6 @@ export async function savePreferences(formData: FormData): Promise<ActionResult>
   revalidatePath("/account");
   return ok();
 }
-
-/**
- * A reader's own review. It lands as `pending`: the admin moderation queue
- * decides whether it appears on the book page.
- */
-export async function submitReview(formData: FormData): Promise<ActionResult> {
-  // A blocked account keeps its lists and its history, but is not heard.
-  const standing = await getCustomerInGoodStanding();
-  if (!standing.ok) return fail(standing.error);
-  const customerId = standing.customer.id;
-
-  const bookId = text(formData, "bookId");
-  const rating = Number(text(formData, "rating"));
-  const title = text(formData, "title");
-  const body = text(formData, "body");
-
-  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-    return fail("invalidRating");
-  }
-  if (!bookId || !title || !body) return fail("missingReview");
-  // Reviews are left on a title's page, which an archived title no longer has.
-  if (!(await prisma.book.count({ where: { id: bookId, archivedAt: null } }))) return fail("notFound");
-
-  const existing = await prisma.review.findUnique({
-    where: { bookId_customerId: { bookId, customerId } },
-  });
-  if (existing) return fail("alreadyReviewed");
-
-  try {
-    await prisma.review.create({
-      data: { bookId, customerId, rating, title, body },
-    });
-  } catch (error) {
-    // The form posted twice before the first answer came back: the row the
-    // check above did not see is this reader's own, written a moment ago.
-    if (isUniqueViolation(error)) return fail("alreadyReviewed");
-    // A book id that is not in the catalogue — the page was stale, or the
-    // hidden field was edited.
-    if (isForeignKeyViolation(error)) return fail("notFound");
-    logActionError("submitReview", error, { bookId });
-    return fail("saveFailed");
-  }
-
-  revalidatePath("/account/reviews");
-  revalidatePath("/admin/reviews");
-  return ok();
-}
-
-/* ------------------------------------------------------------------ */
-/* Handout reviews — the two review writes over the handout table      */
-/* ------------------------------------------------------------------ */
 
 export async function deleteOwnHandoutReview(reviewId: string): Promise<ActionResult> {
   const customerId = await requireCustomerId();
@@ -213,8 +141,12 @@ export async function deleteOwnHandoutReview(reviewId: string): Promise<ActionRe
   return ok();
 }
 
-/** A reader's own handout review; `pending` until the moderation queue decides. */
+/**
+ * A reader's own review. It lands as `pending`: the admin moderation queue
+ * decides whether it appears on the handout page.
+ */
 export async function submitHandoutReview(formData: FormData): Promise<ActionResult> {
+  // A blocked account keeps its lists and its history, but is not heard.
   const standing = await getCustomerInGoodStanding();
   if (!standing.ok) return fail(standing.error);
   const customerId = standing.customer.id;
@@ -228,6 +160,7 @@ export async function submitHandoutReview(formData: FormData): Promise<ActionRes
     return fail("invalidRating");
   }
   if (!handoutId || !title || !body) return fail("missingReview");
+  // Reviews are left on a title's page, which an archived title no longer has.
   if (!(await prisma.handout.count({ where: { id: handoutId, archivedAt: null } }))) return fail("notFound");
 
   const existing = await prisma.handoutReview.findUnique({
@@ -240,7 +173,11 @@ export async function submitHandoutReview(formData: FormData): Promise<ActionRes
       data: { handoutId, customerId, rating, title, body },
     });
   } catch (error) {
+    // The form posted twice before the first answer came back: the row the
+    // check above did not see is this reader's own, written a moment ago.
     if (isUniqueViolation(error)) return fail("alreadyReviewed");
+    // A handout id that is not in the catalogue — the page was stale, or the
+    // hidden field was edited.
     if (isForeignKeyViolation(error)) return fail("notFound");
     logActionError("submitHandoutReview", error, { handoutId });
     return fail("saveFailed");

@@ -9,7 +9,7 @@ import { deleteAuthor } from "@/app/actions/admin";
 import { TableToolbar } from "@/components/admin/table-toolbar";
 import { authorTone, getAuthorInitials } from "@/components/author/author-card";
 import { HeldCount } from "@/components/admin/held-count";
-import { getArchivedTitleCounts, getAuthors, getCategories } from "@/data";
+import { getArchivedTitleCounts, getAuthors } from "@/data";
 import { arabicKey } from "@/lib/arabic";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
@@ -33,11 +33,10 @@ export default async function AdminAuthorsPage({
 
   const term = readParam(await searchParams, "q");
 
-  const [dictionary, admin, allAuthors, categories, archived] = await Promise.all([
+  const [dictionary, admin, allAuthors, archived] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
     getAuthors(),
-    getCategories(),
     getArchivedTitleCounts("authorId"),
   ]);
 
@@ -67,7 +66,6 @@ export default async function AdminAuthorsPage({
             <Thead>
               <Tr>
                 <Th>{t.table.author}</Th>
-                <Th>{t.table.books}</Th>
                 <Th>{t.table.handouts}</Th>
                 <Th className="text-end">{admin.common.actions}</Th>
               </Tr>
@@ -98,15 +96,8 @@ export default async function AdminAuthorsPage({
                   </Td>
                   <Td data-numeric>
                     <HeldCount
-                      count={author.booksCount}
-                      notes={[{ count: archived.books.get(author.id) ?? 0, label: admin.common.archivedCount }]}
-                      locale={locale}
-                    />
-                  </Td>
-                  <Td data-numeric>
-                    <HeldCount
                       count={author.handoutsCount}
-                      notes={[{ count: archived.handouts.get(author.id) ?? 0, label: admin.common.archivedCount }]}
+                      notes={[{ count: archived.get(author.id) ?? 0, label: admin.common.archivedCount }]}
                       locale={locale}
                     />
                   </Td>
@@ -153,7 +144,7 @@ export default async function AdminAuthorsPage({
         </div>
 
         <Panel title={t.form.title} className="min-w-0 lg:col-span-4">
-          <AuthorForm admin={admin} dictionary={dictionary} categories={categories} />
+          <AuthorForm admin={admin} dictionary={dictionary} />
         </Panel>
       </div>
     </>

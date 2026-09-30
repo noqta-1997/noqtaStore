@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: HandoutPageProps): Promise<Me
   };
 }
 
-/** The book detail page over a handout, control for control. */
+/** A handout's page: the jacket, the buy box, the tabs and the related shelf. */
 export default async function HandoutPage({ params }: HandoutPageProps) {
   const slug = readSlug((await params).slug);
   const locale = defaultLocale;
@@ -178,7 +178,6 @@ export default async function HandoutPage({ params }: HandoutPageProps) {
               {/* One number for both: what the stepper shows is what the
                   button adds. */}
               <PurchaseControls
-                kind="handout"
                 id={handout.id}
                 stock={handout.stock}
                 disabled={isSoldOut}

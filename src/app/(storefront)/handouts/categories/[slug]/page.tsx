@@ -47,9 +47,9 @@ export async function generateMetadata({
 }
 
 /**
- * One branch of the handouts' tree at any depth — the books' branch page over
- * the other table: crumbs down from the top, the branches below as chips, and
- * a catalogue of everything filed here or anywhere under here.
+ * One branch of the handouts' tree at any depth: crumbs down from the top,
+ * the branches below as chips, and a catalogue of everything filed here or
+ * anywhere under here.
  */
 export default async function HandoutCategoryPage({
   params,

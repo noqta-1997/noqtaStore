@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-15T19:43:49.886Z",
+  "capturedAt": "2026-09-30T14:55:45.306Z",
   "project": "desktop-light",
-  "pagesScanned": 18,
+  "pagesScanned": 16,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -29,15 +29,6 @@
       "theme": "light",
       "project": "desktop-light",
       "url": "/admin",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "admin-books",
-      "locale": "ar",
-      "theme": "light",
-      "project": "desktop-light",
-      "url": "/admin/books",
       "violations": [],
       "total": 0
     },
@@ -123,20 +114,11 @@
       "total": 0
     },
     {
-      "page": "admin-categories",
+      "page": "admin-handout-categories",
       "locale": "ar",
       "theme": "light",
       "project": "desktop-light",
-      "url": "/admin/categories",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "admin-book-new",
-      "locale": "ar",
-      "theme": "light",
-      "project": "desktop-light",
-      "url": "/admin/books/new",
+      "url": "/admin/handout-categories",
       "violations": [],
       "total": 0
     },

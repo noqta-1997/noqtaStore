@@ -4,13 +4,12 @@ import { Archive, ArchiveRestore } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { setBookArchived, setHandoutArchived } from "@/app/actions/admin";
+import { setHandoutArchived } from "@/app/actions/admin";
 import { runAction } from "@/lib/action-result";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 
 interface ArchiveButtonProps {
-  kind: "book" | "handout";
   id: string;
   archived: boolean;
   labels: {
@@ -26,11 +25,8 @@ interface ArchiveButtonProps {
   className?: string;
 }
 
-const setArchived = { book: setBookArchived, handout: setHandoutArchived };
-
 /** Takes a title off sale or puts it back; the alternative to deleting an ordered one. */
 export function ArchiveButton({
-  kind,
   id,
   archived,
   labels,
@@ -47,7 +43,7 @@ export function ArchiveButton({
 
   const onClick = async () => {
     setPending(true);
-    const result = await runAction(setArchived[kind](id, !archived));
+    const result = await runAction(setHandoutArchived(id, !archived));
     setPending(false);
 
     if (!result.ok) {

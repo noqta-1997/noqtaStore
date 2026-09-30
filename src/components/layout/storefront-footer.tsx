@@ -29,10 +29,9 @@ export function StorefrontFooter({
     {
       title: footer.shop.title,
       links: [
-        { label: footer.shop.newArrivals, href: `/books?sort=newest` },
-        { label: footer.shop.bestsellers, href: `/books?sort=popular` },
-        { label: footer.shop.offers, href: `/offers` },
-        { label: footer.shop.categories, href: `/categories` },
+        { label: footer.shop.newArrivals, href: `/handouts?sort=newest` },
+        { label: footer.shop.bestsellers, href: `/handouts?sort=popular` },
+        { label: footer.shop.categories, href: `/handouts/categories` },
       ],
     },
     {

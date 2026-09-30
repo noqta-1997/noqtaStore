@@ -12,11 +12,9 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import {
   getAdminOrders,
   getAdminStats,
-  getCategoryShares,
   getHandoutCategoryShares,
-  getLowStockBooks,
+  getLowStockHandouts,
   getSalesSeries,
-  getTopBooks,
   getTopHandouts,
 } from "@/data";
 import { defaultLocale } from "@/i18n/config";
@@ -39,27 +37,14 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AdminDashboardPage() {
   const locale = defaultLocale;
 
-  const [
-    dictionary,
-    admin,
-    stats,
-    series,
-    top,
-    topHandouts,
-    shares,
-    handoutShares,
-    lowStock,
-    recent,
-  ] = await Promise.all([
+  const [dictionary, admin, stats, series, top, shares, lowStock, recent] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
     getAdminStats(),
     getSalesSeries(),
-    getTopBooks(),
     getTopHandouts(),
-    getCategoryShares(),
     getHandoutCategoryShares(),
-    getLowStockBooks(5),
+    getLowStockHandouts(5),
     getAdminOrders({ perPage: 5 }),
   ]);
 
@@ -86,9 +71,9 @@ export default async function AdminDashboardPage() {
     },
     {
       icon: BookOpen,
-      label: t.stats.books,
-      value: formatNumber(stats.books.value, locale),
-      change: stats.books.change,
+      label: t.stats.titles,
+      value: formatNumber(stats.titles.value, locale),
+      change: stats.titles.change,
     },
   ];
 
@@ -137,20 +122,6 @@ export default async function AdminDashboardPage() {
               value: share.share,
             }))}
           />
-
-          {/* The handouts file under their own tree, so their share is its own list. */}
-          {handoutShares.some((share) => share.share > 0) ? (
-            <section className="mt-5 space-y-3 border-t border-line-divider pt-4">
-              <h3 className="label-mono text-muted">{t.categoryShare.handouts}</h3>
-              <ShareBars
-                caption={t.categoryShare.handouts}
-                data={handoutShares.map((share) => ({
-                  label: share.category.name[locale],
-                  value: share.share,
-                }))}
-              />
-            </section>
-          ) : null}
         </Panel>
       </div>
 
@@ -208,13 +179,13 @@ export default async function AdminDashboardPage() {
         </Panel>
 
         <Panel
-          title={t.topBooks.title}
-          subtitle={t.topBooks.subtitle}
+          title={t.topSellers.title}
+          subtitle={t.topSellers.subtitle}
           className="min-w-0 lg:col-span-5"
         >
           <ol className="space-y-4">
             {top.map((entry, index) => (
-              <li key={entry.bookId} className="flex items-center gap-3">
+              <li key={entry.handoutId} className="flex items-center gap-3">
                 <span
                   className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-label-md font-semibold text-primary"
                   data-numeric
@@ -223,10 +194,10 @@ export default async function AdminDashboardPage() {
                 </span>
                 <span className="w-9 shrink-0">
                   <BookCover
-                    title={entry.book.title[locale]}
-                    author={entry.book.author.name[locale]}
-                    seed={entry.book.slug}
-                    src={entry.book.coverUrl}
+                    title={entry.handout.title[locale]}
+                    author={entry.handout.author.name[locale]}
+                    seed={entry.handout.slug}
+                    src={entry.handout.coverUrl}
                     sizes="2.25rem"
                     className="rounded-md elevation-sm"
                     compact
@@ -234,13 +205,13 @@ export default async function AdminDashboardPage() {
                 </span>
                 <span className="min-w-0 flex-1">
                   <Link
-                    href={`/admin/books/${entry.bookId}`}
+                    href={`/admin/handouts/${entry.handoutId}`}
                     className="block truncate text-sm font-semibold text-on-surface underline-offset-4 hover:underline"
                   >
-                    {entry.book.title[locale]}
+                    {entry.handout.title[locale]}
                   </Link>
                   <span className="block text-label-md text-muted" data-numeric>
-                    {formatNumber(entry.sold, locale)} {t.topBooks.sold}
+                    {formatNumber(entry.sold, locale)} {t.topSellers.sold}
                   </span>
                 </span>
                 <span className="shrink-0 text-label-md text-on-surface" data-numeric>
@@ -249,50 +220,6 @@ export default async function AdminDashboardPage() {
               </li>
             ))}
           </ol>
-
-          {/* The handout half of the ranking, under its own heading. */}
-          {topHandouts.length ? (
-            <section className="mt-5 space-y-4 border-t border-line-divider pt-4">
-              <h3 className="label-mono text-muted">{t.topBooks.handouts}</h3>
-              <ol className="space-y-4">
-                {topHandouts.map((entry, index) => (
-                  <li key={entry.handoutId} className="flex items-center gap-3">
-                    <span
-                      className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-label-md font-semibold text-primary"
-                      data-numeric
-                    >
-                      {index + 1}
-                    </span>
-                    <span className="w-9 shrink-0">
-                      <BookCover
-                        title={entry.handout.title[locale]}
-                        author={entry.handout.author.name[locale]}
-                        seed={entry.handout.slug}
-                        src={entry.handout.coverUrl}
-                        sizes="2.25rem"
-                        className="rounded-md elevation-sm"
-                        compact
-                      />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <Link
-                        href={`/admin/handouts/${entry.handoutId}`}
-                        className="block truncate text-sm font-semibold text-on-surface underline-offset-4 hover:underline"
-                      >
-                        {entry.handout.title[locale]}
-                      </Link>
-                      <span className="block text-label-md text-muted" data-numeric>
-                        {formatNumber(entry.sold, locale)} {t.topBooks.sold}
-                      </span>
-                    </span>
-                    <span className="shrink-0 text-label-md text-on-surface" data-numeric>
-                      {formatCompactPrice(entry.revenue, locale)}
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            </section>
-          ) : null}
         </Panel>
       </div>
 
@@ -300,33 +227,33 @@ export default async function AdminDashboardPage() {
         <Table minWidth="34rem" className="border-0">
           <Thead>
             <Tr>
-              <Th>{admin.books.table.book}</Th>
-              <Th>{admin.books.table.category}</Th>
-              <Th>{admin.books.table.price}</Th>
+              <Th>{admin.handouts.table.handout}</Th>
+              <Th>{admin.handouts.table.category}</Th>
+              <Th>{admin.handouts.table.price}</Th>
               <Th>{t.lowStock.remaining}</Th>
             </Tr>
           </Thead>
           <Tbody>
-            {lowStock.map((book) => (
-              <Tr key={book.id}>
+            {lowStock.map((handout) => (
+              <Tr key={handout.id}>
                 <Td>
                   <Link
-                    href={`/admin/books/${book.id}`}
+                    href={`/admin/handouts/${handout.id}`}
                     className="font-semibold underline-offset-4 hover:underline"
                   >
-                    {book.title[locale]}
+                    {handout.title[locale]}
                   </Link>
                 </Td>
-                <Td className="text-on-surface-variant">{book.category.name[locale]}</Td>
+                <Td className="text-on-surface-variant">{handout.category.name[locale]}</Td>
                 <Td data-numeric>
-                  {formatPrice(book.price, locale)}
+                  {formatPrice(handout.price, locale)}
                 </Td>
                 <Td>
                   <span
                     className="inline-flex rounded-full bg-error-container px-2.5 py-0.5 text-label-md font-semibold text-on-error-container"
                     data-numeric
                   >
-                    {formatNumber(book.stock, locale)}
+                    {formatNumber(handout.stock, locale)}
                   </span>
                 </Td>
               </Tr>

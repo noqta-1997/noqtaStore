@@ -1,0 +1,1114 @@
+{
+  "exportedAt": "2026-09-30T13:29:13.484Z",
+  "head": "63f7efc",
+  "tables": {
+    "books": [],
+    "order_items": [],
+    "reviews": [],
+    "cart_items": [],
+    "wishlist_items": [],
+    "categories": [
+      {
+        "id": "c-primary",
+        "slug": "primary",
+        "nameAr": "المرحلة الابتدائية",
+        "descriptionAr": "الصفوف من الأول إلى السادس الابتدائي",
+        "icon": "Backpack",
+        "createdAt": "2026-09-15T03:16:16.728Z",
+        "updatedAt": "2026-09-15T03:16:16.728Z",
+        "parentId": null,
+        "sortOrder": 1
+      },
+      {
+        "id": "c-primary-1",
+        "slug": "primary-1",
+        "nameAr": "الأول الابتدائي",
+        "descriptionAr": "الكتب المدرسية للصف الأول الابتدائي",
+        "icon": "Backpack",
+        "createdAt": "2026-09-15T03:16:16.983Z",
+        "updatedAt": "2026-09-15T03:16:16.983Z",
+        "parentId": "c-primary",
+        "sortOrder": 1
+      },
+      {
+        "id": "c-primary-2",
+        "slug": "primary-2",
+        "nameAr": "الثاني الابتدائي",
+        "descriptionAr": "الكتب المدرسية للصف الثاني الابتدائي",
+        "icon": "Backpack",
+        "createdAt": "2026-09-15T03:16:17.239Z",
+        "updatedAt": "2026-09-15T03:16:17.239Z",
+        "parentId": "c-primary",
+        "sortOrder": 2
+      },
+      {
+        "id": "c-primary-3",
+        "slug": "primary-3",
+        "nameAr": "الثالث الابتدائي",
+        "descriptionAr": "الكتب المدرسية للصف الثالث الابتدائي",
+        "icon": "Backpack",
+        "createdAt": "2026-09-15T03:16:17.492Z",
+        "updatedAt": "2026-09-15T03:16:17.492Z",
+        "parentId": "c-primary",
+        "sortOrder": 3
+      },
+      {
+        "id": "c-primary-4",
+        "slug": "primary-4",
+        "nameAr": "الرابع الابتدائي",
+        "descriptionAr": "الكتب المدرسية للصف الرابع الابتدائي",
+        "icon": "Backpack",
+        "createdAt": "2026-09-15T03:16:18.031Z",
+        "updatedAt": "2026-09-15T03:16:18.031Z",
+        "parentId": "c-primary",
+        "sortOrder": 4
+      },
+      {
+        "id": "c-primary-5",
+        "slug": "primary-5",
+        "nameAr": "الخامس الابتدائي",
+        "descriptionAr": "الكتب المدرسية للصف الخامس الابتدائي",
+        "icon": "Backpack",
+        "createdAt": "2026-09-15T03:16:18.284Z",
+        "updatedAt": "2026-09-15T03:16:18.284Z",
+        "parentId": "c-primary",
+        "sortOrder": 5
+      },
+      {
+        "id": "c-primary-6",
+        "slug": "primary-6",
+        "nameAr": "السادس الابتدائي",
+        "descriptionAr": "الكتب المدرسية للصف السادس الابتدائي",
+        "icon": "Backpack",
+        "createdAt": "2026-09-15T03:16:18.535Z",
+        "updatedAt": "2026-09-15T03:16:18.535Z",
+        "parentId": "c-primary",
+        "sortOrder": 6
+      },
+      {
+        "id": "c-intermediate",
+        "slug": "intermediate",
+        "nameAr": "المرحلة المتوسطة",
+        "descriptionAr": "الصفوف من الأول إلى الثالث المتوسط",
+        "icon": "School",
+        "createdAt": "2026-09-15T03:16:18.787Z",
+        "updatedAt": "2026-09-15T03:16:18.787Z",
+        "parentId": null,
+        "sortOrder": 2
+      },
+      {
+        "id": "c-intermediate-1",
+        "slug": "intermediate-1",
+        "nameAr": "الأول المتوسط",
+        "descriptionAr": "الكتب المدرسية للصف الأول المتوسط",
+        "icon": "School",
+        "createdAt": "2026-09-15T03:16:19.038Z",
+        "updatedAt": "2026-09-15T03:16:19.038Z",
+        "parentId": "c-intermediate",
+        "sortOrder": 1
+      },
+      {
+        "id": "c-intermediate-2",
+        "slug": "intermediate-2",
+        "nameAr": "الثاني المتوسط",
+        "descriptionAr": "الكتب المدرسية للصف الثاني المتوسط",
+        "icon": "School",
+        "createdAt": "2026-09-15T03:16:19.296Z",
+        "updatedAt": "2026-09-15T03:16:19.296Z",
+        "parentId": "c-intermediate",
+        "sortOrder": 2
+      },
+      {
+        "id": "c-intermediate-3",
+        "slug": "intermediate-3",
+        "nameAr": "الثالث المتوسط",
+        "descriptionAr": "الكتب المدرسية للصف الثالث المتوسط",
+        "icon": "School",
+        "createdAt": "2026-09-15T03:16:19.547Z",
+        "updatedAt": "2026-09-15T03:16:19.547Z",
+        "parentId": "c-intermediate",
+        "sortOrder": 3
+      },
+      {
+        "id": "c-preparatory",
+        "slug": "preparatory",
+        "nameAr": "المرحلة الإعدادية",
+        "descriptionAr": "الصفوف الرابع والخامس والسادس الإعدادي بفرعيهما العلمي والأدبي",
+        "icon": "GraduationCap",
+        "createdAt": "2026-09-15T03:16:19.795Z",
+        "updatedAt": "2026-09-15T03:16:19.795Z",
+        "parentId": null,
+        "sortOrder": 3
+      },
+      {
+        "id": "c-preparatory-4",
+        "slug": "preparatory-4",
+        "nameAr": "الرابع الإعدادي",
+        "descriptionAr": "الكتب المدرسية للصف الرابع الإعدادي",
+        "icon": "GraduationCap",
+        "createdAt": "2026-09-15T03:16:20.046Z",
+        "updatedAt": "2026-09-15T03:16:20.046Z",
+        "parentId": "c-preparatory",
+        "sortOrder": 1
+      },
+      {
+        "id": "c-preparatory-4-scientific",
+        "slug": "preparatory-4-scientific",
+        "nameAr": "العلمي",
+        "descriptionAr": "الكتب المدرسية للفرع العلمي من الصف الرابع الإعدادي",
+        "icon": "FlaskConical",
+        "createdAt": "2026-09-15T03:16:20.304Z",
+        "updatedAt": "2026-09-15T03:16:20.304Z",
+        "parentId": "c-preparatory-4",
+        "sortOrder": 1
+      },
+      {
+        "id": "c-preparatory-4-literary",
+        "slug": "preparatory-4-literary",
+        "nameAr": "الأدبي",
+        "descriptionAr": "الكتب المدرسية للفرع الأدبي من الصف الرابع الإعدادي",
+        "icon": "Feather",
+        "createdAt": "2026-09-15T03:16:20.551Z",
+        "updatedAt": "2026-09-15T03:16:20.551Z",
+        "parentId": "c-preparatory-4",
+        "sortOrder": 2
+      },
+      {
+        "id": "c-preparatory-5",
+        "slug": "preparatory-5",
+        "nameAr": "الخامس الإعدادي",
+        "descriptionAr": "الكتب المدرسية للصف الخامس الإعدادي",
+        "icon": "GraduationCap",
+        "createdAt": "2026-09-15T03:16:20.803Z",
+        "updatedAt": "2026-09-15T03:16:20.803Z",
+        "parentId": "c-preparatory",
+        "sortOrder": 2
+      },
+      {
+        "id": "c-preparatory-5-scientific",
+        "slug": "preparatory-5-scientific",
+        "nameAr": "العلمي",
+        "descriptionAr": "الكتب المدرسية للفرع العلمي من الصف الخامس الإعدادي",
+        "icon": "FlaskConical",
+        "createdAt": "2026-09-15T03:16:21.058Z",
+        "updatedAt": "2026-09-15T03:16:21.058Z",
+        "parentId": "c-preparatory-5",
+        "sortOrder": 1
+      },
+      {
+        "id": "c-preparatory-5-literary",
+        "slug": "preparatory-5-literary",
+        "nameAr": "الأدبي",
+        "descriptionAr": "الكتب المدرسية للفرع الأدبي من الصف الخامس الإعدادي",
+        "icon": "Feather",
+        "createdAt": "2026-09-15T03:16:21.306Z",
+        "updatedAt": "2026-09-15T03:16:21.306Z",
+        "parentId": "c-preparatory-5",
+        "sortOrder": 2
+      },
+      {
+        "id": "c-preparatory-6",
+        "slug": "preparatory-6",
+        "nameAr": "السادس الإعدادي",
+        "descriptionAr": "الكتب المدرسية للصف السادس الإعدادي",
+        "icon": "GraduationCap",
+        "createdAt": "2026-09-15T03:16:21.559Z",
+        "updatedAt": "2026-09-15T03:16:21.559Z",
+        "parentId": "c-preparatory",
+        "sortOrder": 3
+      },
+      {
+        "id": "c-preparatory-6-scientific",
+        "slug": "preparatory-6-scientific",
+        "nameAr": "العلمي",
+        "descriptionAr": "الكتب المدرسية للفرع العلمي من الصف السادس الإعدادي",
+        "icon": "FlaskConical",
+        "createdAt": "2026-09-15T03:16:21.806Z",
+        "updatedAt": "2026-09-15T03:16:21.806Z",
+        "parentId": "c-preparatory-6",
+        "sortOrder": 1
+      },
+      {
+        "id": "c-preparatory-6-literary",
+        "slug": "preparatory-6-literary",
+        "nameAr": "الأدبي",
+        "descriptionAr": "الكتب المدرسية للفرع الأدبي من الصف السادس الإعدادي",
+        "icon": "Feather",
+        "createdAt": "2026-09-15T03:16:22.059Z",
+        "updatedAt": "2026-09-15T03:16:22.059Z",
+        "parentId": "c-preparatory-6",
+        "sortOrder": 2
+      }
+    ],
+    "authors": [
+      {
+        "id": "cmudv9lqk000304k16n8inu9p",
+        "slug": "مجيد-حميد",
+        "nameAr": "مجيد حميد",
+        "bioAr": "",
+        "avatarUrl": null,
+        "createdAt": "2026-09-23T05:54:16.652Z",
+        "updatedAt": "2026-09-23T05:54:16.652Z",
+        "subjectId": null
+      },
+      {
+        "id": "cmudv49x9000004jsjzz4i4ra",
+        "slug": "خالد-جمعة",
+        "nameAr": "خالد جمعة",
+        "bioAr": "",
+        "avatarUrl": null,
+        "createdAt": "2026-09-23T05:50:08.062Z",
+        "updatedAt": "2026-09-29T11:29:28.440Z",
+        "subjectId": null
+      }
+    ],
+    "store_settings": [
+      {
+        "key": "nameAr",
+        "value": "نُقطة",
+        "updatedAt": "2026-09-19T07:07:45.517Z"
+      },
+      {
+        "key": "taglineAr",
+        "value": "مكتبة الكترونية متخصصة ببيع الملازم المدرسية",
+        "updatedAt": "2026-09-19T07:07:45.618Z"
+      },
+      {
+        "key": "email",
+        "value": "hello@noqta.iq",
+        "updatedAt": "2026-09-19T07:07:45.712Z"
+      },
+      {
+        "key": "phone",
+        "value": "+964 770 000 0000",
+        "updatedAt": "2026-09-19T07:07:45.807Z"
+      },
+      {
+        "key": "address",
+        "value": "بغداد — العراق",
+        "updatedAt": "2026-09-19T07:07:45.901Z"
+      },
+      {
+        "key": "currency",
+        "value": "IQD",
+        "updatedAt": "2026-09-19T07:07:45.995Z"
+      },
+      {
+        "key": "home.newsletter",
+        "value": "false",
+        "updatedAt": "2026-09-19T07:33:39.665Z"
+      },
+      {
+        "key": "notifyOrders",
+        "value": "true",
+        "updatedAt": "2026-09-01T11:27:43.039Z"
+      },
+      {
+        "key": "notifyReviews",
+        "value": "true",
+        "updatedAt": "2026-09-01T11:27:43.120Z"
+      },
+      {
+        "key": "notifyStock",
+        "value": "true",
+        "updatedAt": "2026-09-01T11:27:43.199Z"
+      },
+      {
+        "key": "home.authors",
+        "value": "false",
+        "updatedAt": "2026-09-19T07:33:54.963Z"
+      },
+      {
+        "key": "home.newArrivals",
+        "value": "false",
+        "updatedAt": "2026-09-19T07:34:12.334Z"
+      },
+      {
+        "key": "home.promo",
+        "value": "false",
+        "updatedAt": "2026-09-19T07:34:46.717Z"
+      },
+      {
+        "key": "home.bestsellers",
+        "value": "false",
+        "updatedAt": "2026-09-19T07:35:12.080Z"
+      },
+      {
+        "key": "home.features.shipping.description",
+        "value": "خلال 24 او 48 ساعة",
+        "updatedAt": "2026-09-19T07:37:54.100Z"
+      },
+      {
+        "key": "home.features",
+        "value": "false",
+        "updatedAt": "2026-09-23T05:46:53.172Z"
+      },
+      {
+        "key": "home.categories",
+        "value": "false",
+        "updatedAt": "2026-09-23T05:47:05.549Z"
+      },
+      {
+        "key": "home.hero",
+        "value": "true",
+        "updatedAt": "2026-09-18T13:55:05.626Z"
+      },
+      {
+        "key": "home.publishers",
+        "value": "true",
+        "updatedAt": "2026-09-18T13:55:48.855Z"
+      }
+    ]
+  },
+  "ddl": {
+    "books": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "slug",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "titleAr",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "descriptionAr",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "price",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "compareAtPrice",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "stock",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "NO",
+          "column_default": "0"
+        },
+        {
+          "column_name": "pages",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "publishedYear",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "languageAr",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": "'العربية'::text"
+        },
+        {
+          "column_name": "coverUrl",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "tags",
+          "data_type": "ARRAY",
+          "udt_name": "_BookTag",
+          "is_nullable": "YES",
+          "column_default": "ARRAY[]::\"BookTag\"[]"
+        },
+        {
+          "column_name": "rating",
+          "data_type": "double precision",
+          "udt_name": "float8",
+          "is_nullable": "NO",
+          "column_default": "0"
+        },
+        {
+          "column_name": "reviewsCount",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "NO",
+          "column_default": "0"
+        },
+        {
+          "column_name": "authorId",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "categoryId",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "createdAt",
+          "data_type": "timestamp without time zone",
+          "udt_name": "timestamp",
+          "is_nullable": "NO",
+          "column_default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "column_name": "updatedAt",
+          "data_type": "timestamp without time zone",
+          "udt_name": "timestamp",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "publisherId",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "archivedAt",
+          "data_type": "timestamp without time zone",
+          "udt_name": "timestamp",
+          "is_nullable": "YES",
+          "column_default": null
+        }
+      ],
+      "constraints": [
+        {
+          "conname": "books_authorId_fkey",
+          "def": "FOREIGN KEY (\"authorId\") REFERENCES authors(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+        },
+        {
+          "conname": "books_categoryId_fkey",
+          "def": "FOREIGN KEY (\"categoryId\") REFERENCES categories(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+        },
+        {
+          "conname": "books_compareAtPrice_above_price_check",
+          "def": "CHECK (((\"compareAtPrice\" IS NULL) OR (\"compareAtPrice\" > price)))"
+        },
+        {
+          "conname": "books_compareAtPrice_check",
+          "def": "CHECK (((\"compareAtPrice\" IS NULL) OR (\"compareAtPrice\" >= 0)))"
+        },
+        {
+          "conname": "books_pages_check",
+          "def": "CHECK ((pages >= 1))"
+        },
+        {
+          "conname": "books_pkey",
+          "def": "PRIMARY KEY (id)"
+        },
+        {
+          "conname": "books_price_check",
+          "def": "CHECK ((price >= 0))"
+        },
+        {
+          "conname": "books_publishedYear_check",
+          "def": "CHECK ((\"publishedYear\" >= 1))"
+        },
+        {
+          "conname": "books_publisherId_fkey",
+          "def": "FOREIGN KEY (\"publisherId\") REFERENCES publishers(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+        },
+        {
+          "conname": "books_rating_check",
+          "def": "CHECK (((rating >= (0)::double precision) AND (rating <= (5)::double precision)))"
+        },
+        {
+          "conname": "books_reviewsCount_check",
+          "def": "CHECK ((\"reviewsCount\" >= 0))"
+        },
+        {
+          "conname": "books_stock_check",
+          "def": "CHECK ((stock >= 0))"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "books_pkey",
+          "indexdef": "CREATE UNIQUE INDEX books_pkey ON public.books USING btree (id)"
+        },
+        {
+          "indexname": "books_slug_key",
+          "indexdef": "CREATE UNIQUE INDEX books_slug_key ON public.books USING btree (slug)"
+        },
+        {
+          "indexname": "books_categoryId_idx",
+          "indexdef": "CREATE INDEX \"books_categoryId_idx\" ON public.books USING btree (\"categoryId\")"
+        },
+        {
+          "indexname": "books_authorId_idx",
+          "indexdef": "CREATE INDEX \"books_authorId_idx\" ON public.books USING btree (\"authorId\")"
+        },
+        {
+          "indexname": "books_createdAt_idx",
+          "indexdef": "CREATE INDEX \"books_createdAt_idx\" ON public.books USING btree (\"createdAt\")"
+        },
+        {
+          "indexname": "books_publisherId_idx",
+          "indexdef": "CREATE INDEX \"books_publisherId_idx\" ON public.books USING btree (\"publisherId\")"
+        }
+      ]
+    },
+    "order_items": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "orderId",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "bookId",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "quantity",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "NO",
+          "column_default": "1"
+        },
+        {
+          "column_name": "unitPrice",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "NO",
+          "column_default": null
+        }
+      ],
+      "constraints": [
+        {
+          "conname": "order_items_bookId_fkey",
+          "def": "FOREIGN KEY (\"bookId\") REFERENCES books(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+        },
+        {
+          "conname": "order_items_orderId_fkey",
+          "def": "FOREIGN KEY (\"orderId\") REFERENCES orders(id) ON UPDATE CASCADE ON DELETE CASCADE"
+        },
+        {
+          "conname": "order_items_pkey",
+          "def": "PRIMARY KEY (id)"
+        },
+        {
+          "conname": "order_items_quantity_check",
+          "def": "CHECK ((quantity > 0))"
+        },
+        {
+          "conname": "order_items_unitPrice_check",
+          "def": "CHECK ((\"unitPrice\" >= 0))"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "order_items_pkey",
+          "indexdef": "CREATE UNIQUE INDEX order_items_pkey ON public.order_items USING btree (id)"
+        },
+        {
+          "indexname": "order_items_orderId_idx",
+          "indexdef": "CREATE INDEX \"order_items_orderId_idx\" ON public.order_items USING btree (\"orderId\")"
+        },
+        {
+          "indexname": "order_items_bookId_idx",
+          "indexdef": "CREATE INDEX \"order_items_bookId_idx\" ON public.order_items USING btree (\"bookId\")"
+        }
+      ]
+    },
+    "reviews": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "bookId",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "customerId",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "rating",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "title",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "body",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "status",
+          "data_type": "USER-DEFINED",
+          "udt_name": "ReviewStatus",
+          "is_nullable": "NO",
+          "column_default": "'pending'::\"ReviewStatus\""
+        },
+        {
+          "column_name": "createdAt",
+          "data_type": "timestamp without time zone",
+          "udt_name": "timestamp",
+          "is_nullable": "NO",
+          "column_default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "column_name": "updatedAt",
+          "data_type": "timestamp without time zone",
+          "udt_name": "timestamp",
+          "is_nullable": "NO",
+          "column_default": null
+        }
+      ],
+      "constraints": [
+        {
+          "conname": "reviews_bookId_fkey",
+          "def": "FOREIGN KEY (\"bookId\") REFERENCES books(id) ON UPDATE CASCADE ON DELETE CASCADE"
+        },
+        {
+          "conname": "reviews_customerId_fkey",
+          "def": "FOREIGN KEY (\"customerId\") REFERENCES customers(id) ON UPDATE CASCADE ON DELETE CASCADE"
+        },
+        {
+          "conname": "reviews_pkey",
+          "def": "PRIMARY KEY (id)"
+        },
+        {
+          "conname": "reviews_rating_check",
+          "def": "CHECK (((rating >= 1) AND (rating <= 5)))"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "reviews_pkey",
+          "indexdef": "CREATE UNIQUE INDEX reviews_pkey ON public.reviews USING btree (id)"
+        },
+        {
+          "indexname": "reviews_status_idx",
+          "indexdef": "CREATE INDEX reviews_status_idx ON public.reviews USING btree (status)"
+        },
+        {
+          "indexname": "reviews_bookId_customerId_key",
+          "indexdef": "CREATE UNIQUE INDEX \"reviews_bookId_customerId_key\" ON public.reviews USING btree (\"bookId\", \"customerId\")"
+        },
+        {
+          "indexname": "reviews_customerId_idx",
+          "indexdef": "CREATE INDEX \"reviews_customerId_idx\" ON public.reviews USING btree (\"customerId\")"
+        }
+      ]
+    },
+    "cart_items": {
+      "columns": [
+        {
+          "column_name": "customerId",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "bookId",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "quantity",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "NO",
+          "column_default": "1"
+        },
+        {
+          "column_name": "updatedAt",
+          "data_type": "timestamp without time zone",
+          "udt_name": "timestamp",
+          "is_nullable": "NO",
+          "column_default": null
+        }
+      ],
+      "constraints": [
+        {
+          "conname": "cart_items_bookId_fkey",
+          "def": "FOREIGN KEY (\"bookId\") REFERENCES books(id) ON UPDATE CASCADE ON DELETE CASCADE"
+        },
+        {
+          "conname": "cart_items_customerId_fkey",
+          "def": "FOREIGN KEY (\"customerId\") REFERENCES customers(id) ON UPDATE CASCADE ON DELETE CASCADE"
+        },
+        {
+          "conname": "cart_items_pkey",
+          "def": "PRIMARY KEY (\"customerId\", \"bookId\")"
+        },
+        {
+          "conname": "cart_items_quantity_check",
+          "def": "CHECK ((quantity > 0))"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "cart_items_pkey",
+          "indexdef": "CREATE UNIQUE INDEX cart_items_pkey ON public.cart_items USING btree (\"customerId\", \"bookId\")"
+        },
+        {
+          "indexname": "cart_items_bookId_idx",
+          "indexdef": "CREATE INDEX \"cart_items_bookId_idx\" ON public.cart_items USING btree (\"bookId\")"
+        }
+      ]
+    },
+    "wishlist_items": {
+      "columns": [
+        {
+          "column_name": "customerId",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "bookId",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "createdAt",
+          "data_type": "timestamp without time zone",
+          "udt_name": "timestamp",
+          "is_nullable": "NO",
+          "column_default": "CURRENT_TIMESTAMP"
+        }
+      ],
+      "constraints": [
+        {
+          "conname": "wishlist_items_bookId_fkey",
+          "def": "FOREIGN KEY (\"bookId\") REFERENCES books(id) ON UPDATE CASCADE ON DELETE CASCADE"
+        },
+        {
+          "conname": "wishlist_items_customerId_fkey",
+          "def": "FOREIGN KEY (\"customerId\") REFERENCES customers(id) ON UPDATE CASCADE ON DELETE CASCADE"
+        },
+        {
+          "conname": "wishlist_items_pkey",
+          "def": "PRIMARY KEY (\"customerId\", \"bookId\")"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "wishlist_items_pkey",
+          "indexdef": "CREATE UNIQUE INDEX wishlist_items_pkey ON public.wishlist_items USING btree (\"customerId\", \"bookId\")"
+        },
+        {
+          "indexname": "wishlist_items_bookId_idx",
+          "indexdef": "CREATE INDEX \"wishlist_items_bookId_idx\" ON public.wishlist_items USING btree (\"bookId\")"
+        }
+      ]
+    },
+    "categories": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "slug",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "nameAr",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "descriptionAr",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "icon",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "createdAt",
+          "data_type": "timestamp without time zone",
+          "udt_name": "timestamp",
+          "is_nullable": "NO",
+          "column_default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "column_name": "updatedAt",
+          "data_type": "timestamp without time zone",
+          "udt_name": "timestamp",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "parentId",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "sortOrder",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "NO",
+          "column_default": "0"
+        }
+      ],
+      "constraints": [
+        {
+          "conname": "categories_parentId_fkey",
+          "def": "FOREIGN KEY (\"parentId\") REFERENCES categories(id) ON UPDATE CASCADE"
+        },
+        {
+          "conname": "categories_pkey",
+          "def": "PRIMARY KEY (id)"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "categories_pkey",
+          "indexdef": "CREATE UNIQUE INDEX categories_pkey ON public.categories USING btree (id)"
+        },
+        {
+          "indexname": "categories_slug_key",
+          "indexdef": "CREATE UNIQUE INDEX categories_slug_key ON public.categories USING btree (slug)"
+        },
+        {
+          "indexname": "categories_parentId_idx",
+          "indexdef": "CREATE INDEX \"categories_parentId_idx\" ON public.categories USING btree (\"parentId\")"
+        },
+        {
+          "indexname": "categories_parentId_nameAr_key",
+          "indexdef": "CREATE UNIQUE INDEX \"categories_parentId_nameAr_key\" ON public.categories USING btree (\"parentId\", \"nameAr\") NULLS NOT DISTINCT"
+        },
+        {
+          "indexname": "categories_parentId_nameAr_normalized_key",
+          "indexdef": "CREATE UNIQUE INDEX \"categories_parentId_nameAr_normalized_key\" ON public.categories USING btree (\"parentId\", arabic_key(\"nameAr\")) NULLS NOT DISTINCT"
+        }
+      ]
+    },
+    "authors": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "slug",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "nameAr",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "bioAr",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "avatarUrl",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "createdAt",
+          "data_type": "timestamp without time zone",
+          "udt_name": "timestamp",
+          "is_nullable": "NO",
+          "column_default": "CURRENT_TIMESTAMP"
+        },
+        {
+          "column_name": "updatedAt",
+          "data_type": "timestamp without time zone",
+          "udt_name": "timestamp",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "subjectId",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        }
+      ],
+      "constraints": [
+        {
+          "conname": "authors_pkey",
+          "def": "PRIMARY KEY (id)"
+        },
+        {
+          "conname": "authors_subjectId_fkey",
+          "def": "FOREIGN KEY (\"subjectId\") REFERENCES categories(id) ON UPDATE CASCADE ON DELETE SET NULL"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "authors_pkey",
+          "indexdef": "CREATE UNIQUE INDEX authors_pkey ON public.authors USING btree (id)"
+        },
+        {
+          "indexname": "authors_slug_key",
+          "indexdef": "CREATE UNIQUE INDEX authors_slug_key ON public.authors USING btree (slug)"
+        },
+        {
+          "indexname": "authors_subjectId_idx",
+          "indexdef": "CREATE INDEX \"authors_subjectId_idx\" ON public.authors USING btree (\"subjectId\")"
+        },
+        {
+          "indexname": "authors_nameAr_key",
+          "indexdef": "CREATE UNIQUE INDEX \"authors_nameAr_key\" ON public.authors USING btree (\"nameAr\")"
+        },
+        {
+          "indexname": "authors_nameAr_normalized_key",
+          "indexdef": "CREATE UNIQUE INDEX \"authors_nameAr_normalized_key\" ON public.authors USING btree (arabic_key(\"nameAr\"))"
+        }
+      ]
+    },
+    "store_settings": {
+      "columns": [
+        {
+          "column_name": "key",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "value",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "updatedAt",
+          "data_type": "timestamp without time zone",
+          "udt_name": "timestamp",
+          "is_nullable": "NO",
+          "column_default": null
+        }
+      ],
+      "constraints": [
+        {
+          "conname": "store_settings_pkey",
+          "def": "PRIMARY KEY (key)"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "store_settings_pkey",
+          "indexdef": "CREATE UNIQUE INDEX store_settings_pkey ON public.store_settings USING btree (key)"
+        }
+      ]
+    }
+  },
+  "storage": [
+    {
+      "name": "handouts/3c9e765e-2586-4653-acf3-69d0473de51e.jpg",
+      "bucket": "Books Covers"
+    },
+    {
+      "name": "books/.emptyFolderPlaceholder",
+      "bucket": "Books Covers"
+    },
+    {
+      "name": "handouts/f8dd6b61-a630-4bd5-b72c-2860bd0e90ae.jpg",
+      "bucket": "Books Covers"
+    }
+  ]
+}

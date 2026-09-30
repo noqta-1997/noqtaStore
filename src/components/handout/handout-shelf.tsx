@@ -14,14 +14,14 @@ interface HandoutShelfProps {
   dictionary: Dictionary["common"];
   actionHref?: string;
   priority?: boolean;
-  /** Sets the shelf on the tinted band, the way `BookShelf` does. */
+  /** Sets the shelf on the tinted band, so a run of shelves alternates. */
   band?: boolean;
   /** Tailwind grid-cols classes, forwarded to the grid. */
   columns?: string;
   className?: string;
 }
 
-/** A titled row of handout cards — `BookShelf` for the other catalogue. */
+/** A titled row of handout cards, with a "view all" link under it. */
 export function HandoutShelf({
   title,
   subtitle,

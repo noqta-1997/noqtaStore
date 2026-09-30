@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-09-15T19:39:04.159Z",
+  "capturedAt": "2026-09-30T14:52:19.455Z",
   "project": "tablet-light",
-  "pagesScanned": 21,
+  "pagesScanned": 15,
   "totalViolationNodes": 0,
   "byRule": {},
   "detail": [
@@ -11,24 +11,6 @@
       "theme": "light",
       "project": "tablet-light",
       "url": "/",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "catalogue",
-      "locale": "ar",
-      "theme": "light",
-      "project": "tablet-light",
-      "url": "/books",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "book-detail",
-      "locale": "ar",
-      "theme": "light",
-      "project": "tablet-light",
-      "url": "/books/al-amir-al-saghir",
       "violations": [],
       "total": 0
     },
@@ -47,33 +29,6 @@
       "theme": "light",
       "project": "tablet-light",
       "url": "/handouts/physics-sixth-scientific",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "categories",
-      "locale": "ar",
-      "theme": "light",
-      "project": "tablet-light",
-      "url": "/categories",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "category-detail",
-      "locale": "ar",
-      "theme": "light",
-      "project": "tablet-light",
-      "url": "/categories/literature",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "category-branch",
-      "locale": "ar",
-      "theme": "light",
-      "project": "tablet-light",
-      "url": "/categories/preparatory",
       "violations": [],
       "total": 0
     },
@@ -119,15 +74,6 @@
       "theme": "light",
       "project": "tablet-light",
       "url": "/publishers",
-      "violations": [],
-      "total": 0
-    },
-    {
-      "page": "offers",
-      "locale": "ar",
-      "theme": "light",
-      "project": "tablet-light",
-      "url": "/offers",
       "violations": [],
       "total": 0
     },
@@ -190,7 +136,7 @@
       "locale": "ar",
       "theme": "light",
       "project": "tablet-light",
-      "url": "/books/no-such-book",
+      "url": "/handouts/no-such-handout",
       "violations": [],
       "total": 0
     }

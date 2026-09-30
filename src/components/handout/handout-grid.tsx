@@ -14,7 +14,7 @@ interface HandoutGridProps {
   className?: string;
 }
 
-/** The handouts grid — same spacing and breakpoints as the book grid. */
+/** The handouts grid: the cards at the catalogue's spacing and breakpoints. */
 export function HandoutGrid({
   handouts,
   locale,

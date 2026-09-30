@@ -248,7 +248,7 @@ export function HeroShowcase({ slides, dir, labels, children }: HeroShowcaseProp
                 className="flex min-w-0 shrink-0 grow-0 basis-full items-center justify-center"
               >
                 <Link
-                  href={`/books/${slide.slug}`}
+                  href={`/handouts/${slide.slug}`}
                   aria-label={slide.title}
                   className="block w-52 rounded-lg sm:w-60 lg:w-72"
                 >
@@ -356,7 +356,7 @@ export function HeroShowcase({ slides, dir, labels, children }: HeroShowcaseProp
                 <div className="min-w-0">
                   <p className="text-body-md">
                     <Link
-                      href={`/books/${slide.slug}`}
+                      href={`/handouts/${slide.slug}`}
                       className="font-semibold text-on-surface transition-colors duration-100 ease-fluent hover:text-primary"
                     >
                       {slide.title}

@@ -2,9 +2,7 @@
 
 import {
   BarChart3,
-  BookOpen,
   Building2,
-  FolderTree,
   FolderKanban,
   LayoutDashboard,
   Mail,
@@ -13,7 +11,6 @@ import {
   Package,
   PenLine,
   Settings,
-  Star,
   TicketPercent,
   Users,
   type LucideIcon,
@@ -29,15 +26,12 @@ export interface AdminNavLabels {
   sectionSales: string;
   sectionSystem: string;
   dashboard: string;
-  books: string;
   handouts: string;
-  categories: string;
   handoutCategories: string;
   authors: string;
   publishers: string;
   orders: string;
   customers: string;
-  reviews: string;
   handoutReviews: string;
   messages: string;
   coupons: string;
@@ -73,9 +67,7 @@ export function AdminNav({ labels, iconsOnly = false, onNavigate }: AdminNavProp
     {
       title: labels.sectionCatalogue,
       items: [
-        { href: `${base}/books`, label: labels.books, icon: BookOpen },
         { href: `${base}/handouts`, label: labels.handouts, icon: NotebookText },
-        { href: `${base}/categories`, label: labels.categories, icon: FolderTree },
         { href: `${base}/handout-categories`, label: labels.handoutCategories, icon: FolderKanban },
         { href: `${base}/authors`, label: labels.authors, icon: PenLine },
         { href: `${base}/publishers`, label: labels.publishers, icon: Building2 },
@@ -86,7 +78,6 @@ export function AdminNav({ labels, iconsOnly = false, onNavigate }: AdminNavProp
       items: [
         { href: `${base}/orders`, label: labels.orders, icon: Package },
         { href: `${base}/customers`, label: labels.customers, icon: Users },
-        { href: `${base}/reviews`, label: labels.reviews, icon: Star },
         { href: `${base}/handout-reviews`, label: labels.handoutReviews, icon: NotebookPen },
         { href: `${base}/messages`, label: labels.messages, icon: Mail },
         { href: `${base}/coupons`, label: labels.coupons, icon: TicketPercent },

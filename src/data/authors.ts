@@ -8,7 +8,6 @@ export const authors: Author[] = [
     bio: {
       ar: "روائي مصري وأول عربي يفوز بجائزة نوبل في الأدب عام 1988.",
     },
-    booksCount: 34,
     handoutsCount: 0,
   },
   {
@@ -18,7 +17,6 @@ export const authors: Author[] = [
     bio: {
       ar: "روائي سوداني لُقّب بعبقري الرواية العربية.",
     },
-    booksCount: 7,
     handoutsCount: 0,
   },
   {
@@ -28,7 +26,6 @@ export const authors: Author[] = [
     bio: {
       ar: "روائي وقاص وصحفي فلسطيني من أبرز أصوات أدب المقاومة.",
     },
-    booksCount: 12,
     handoutsCount: 0,
   },
   {
@@ -38,7 +35,6 @@ export const authors: Author[] = [
     bio: {
       ar: "روائية وأكاديمية وناقدة مصرية صاحبة ثلاثية غرناطة.",
     },
-    booksCount: 11,
     handoutsCount: 0,
   },
   {
@@ -48,7 +44,6 @@ export const authors: Author[] = [
     bio: {
       ar: "روائي عربي صاحب خماسية مدن الملح.",
     },
-    booksCount: 15,
     handoutsCount: 0,
   },
   {
@@ -58,7 +53,6 @@ export const authors: Author[] = [
     bio: {
       ar: "روائية جزائرية من أكثر الكاتبات العربيات قراءةً.",
     },
-    booksCount: 9,
     handoutsCount: 0,
   },
   {
@@ -68,7 +62,6 @@ export const authors: Author[] = [
     bio: {
       ar: "روائي وشاعر عراقي، فاز بالجائزة العالمية للرواية العربية 2014.",
     },
-    booksCount: 6,
     handoutsCount: 0,
   },
   {
@@ -78,7 +71,6 @@ export const authors: Author[] = [
     bio: {
       ar: "روائي كويتي، فاز بالجائزة العالمية للرواية العربية 2013.",
     },
-    booksCount: 5,
     handoutsCount: 0,
   },
   {
@@ -88,7 +80,6 @@ export const authors: Author[] = [
     bio: {
       ar: "روائي وباحث مصري متخصص في التراث والمخطوطات.",
     },
-    booksCount: 18,
     handoutsCount: 0,
   },
   {
@@ -98,7 +89,6 @@ export const authors: Author[] = [
     bio: {
       ar: "روائي كولومبي وأحد أعلام الواقعية السحرية، نوبل 1982.",
     },
-    booksCount: 22,
     handoutsCount: 0,
   },
   {
@@ -108,7 +98,6 @@ export const authors: Author[] = [
     bio: {
       ar: "روائي وصحفي بريطاني اشتهر برواياته السياسية.",
     },
-    booksCount: 14,
     handoutsCount: 0,
   },
   {
@@ -118,7 +107,6 @@ export const authors: Author[] = [
     bio: {
       ar: "روائي برازيلي تُرجمت أعماله إلى أكثر من ثمانين لغة.",
     },
-    booksCount: 19,
     handoutsCount: 0,
   },
   {
@@ -128,7 +116,6 @@ export const authors: Author[] = [
     bio: {
       ar: "كاتب مغربي عُرف بسيرته الذاتية الجريئة.",
     },
-    booksCount: 8,
     handoutsCount: 0,
   },
   {
@@ -138,7 +125,6 @@ export const authors: Author[] = [
     bio: {
       ar: "كاتب وطيّار فرنسي، صاحب الأمير الصغير.",
     },
-    booksCount: 6,
     handoutsCount: 0,
   },
   {
@@ -148,7 +134,6 @@ export const authors: Author[] = [
     bio: {
       ar: "عالم فيزياء نظرية اشتهر بتبسيط علوم الكون.",
     },
-    booksCount: 10,
     handoutsCount: 0,
   },
   {
@@ -158,7 +143,6 @@ export const authors: Author[] = [
     bio: {
       ar: "روائي مصري صاحب عمارة يعقوبيان.",
     },
-    booksCount: 9,
     handoutsCount: 0,
   },
   {
@@ -168,7 +152,6 @@ export const authors: Author[] = [
     bio: {
       ar: "روائي وسيناريست مصري، من أبرز كتّاب التشويق العربي.",
     },
-    booksCount: 7,
     handoutsCount: 0,
   },
   {
@@ -178,7 +161,6 @@ export const authors: Author[] = [
     bio: {
       ar: "شاعر وكاتب فلسطيني صاحب رأيت رام الله.",
     },
-    booksCount: 13,
     handoutsCount: 0,
   },
   {
@@ -188,7 +170,6 @@ export const authors: Author[] = [
     bio: {
       ar: "روائية سعودية، فازت بالجائزة العالمية للرواية العربية 2011.",
     },
-    booksCount: 10,
     handoutsCount: 0,
   },
   {
@@ -198,7 +179,6 @@ export const authors: Author[] = [
     bio: {
       ar: "شاعر فلسطيني يُعد من أهم شعراء العربية المعاصرين.",
     },
-    booksCount: 30,
     handoutsCount: 0,
   },
   {
@@ -208,7 +188,6 @@ export const authors: Author[] = [
     bio: {
       ar: "مؤرخ وعالم اجتماع، مؤسس علم العمران البشري.",
     },
-    booksCount: 5,
     handoutsCount: 0,
   },
   {
@@ -218,7 +197,6 @@ export const authors: Author[] = [
     bio: {
       ar: "مؤرخ وفيلسوف أمريكي صاحب قصة الحضارة.",
     },
-    booksCount: 12,
     handoutsCount: 0,
   },
   {
@@ -228,7 +206,6 @@ export const authors: Author[] = [
     bio: {
       ar: "كاتب أمريكي متخصص في القيادة وفعالية الأفراد.",
     },
-    booksCount: 8,
     handoutsCount: 0,
   },
   {
@@ -238,7 +215,6 @@ export const authors: Author[] = [
     bio: {
       ar: "عالم فلك أمريكي اشتهر بتبسيط العلوم للجمهور.",
     },
-    booksCount: 11,
     handoutsCount: 0,
   },
   {
@@ -248,7 +224,6 @@ export const authors: Author[] = [
     bio: {
       ar: "أديب ومترجم، نقل كليلة ودمنة إلى العربية.",
     },
-    booksCount: 4,
     handoutsCount: 0,
   },
 ];

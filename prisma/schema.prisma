@@ -1,7 +1,7 @@
 // Noqta Store — database schema, modelled from src/types/index.ts.
 //
 // Conventions
-// - Editorial content (books, categories, authors) carries one column per
+// - Editorial content (handouts, categories, authors) carries one column per
 //   locale: the store ships exactly two, so a column pair beats a join.
 // - Customer-written content (addresses, reviews) is a single column — a
 //   reader types one string, not a translation pair.
@@ -81,46 +81,8 @@ enum ContactStatus {
 // Catalogue
 // ------------------------------------------------------------------
 
-/// The school-book catalogue's tree: stages hold grades, grades may hold
-/// branches, and any of them may grow another level. A row with no parent
-/// is a top-level branch.
-model Category {
-  id            String   @id @default(cuid())
-  slug          String   @unique
-  nameAr        String
-  descriptionAr String
-  /// Lucide icon name; the UI layer owns the mapping.
-  icon          String
-  /// The branch this one hangs under; null for a top-level branch.
-  parentId      String?
-  /// Position among siblings — the grades read in school order, not by size.
-  sortOrder     Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: NoAction)
-  children Category[] @relation("CategoryTree")
-
-  books Book[]
-
-  /// Teachers whose subject this branch is.
-  authors Author[] @relation("AuthorSubject")
-
-  /// A name is unique among siblings: «العلمي» hangs under every preparatory
-  /// grade, but never twice under the same one. The migration declares the
-  /// index NULLS NOT DISTINCT so two top-level branches cannot share a name
-  /// either — Postgres would otherwise treat each null parent as distinct.
-  /// A second, spelling-blind key (migration 20260917160000_normalized_name_keys,
-  /// which Prisma cannot declare) compares `arabic_key(nameAr)` instead, so
-  /// «العلمى» is not a new sibling of «العلمي».
-  @@unique([parentId, nameAr])
-  @@index([parentId])
-  @@map("categories")
-}
-
-/// The handouts' own tree, shaped exactly like Category and kept in its own
-/// table: the two catalogues are filed apart, so a branch added to one does
-/// not appear in the other.
+/// The handouts' tree: stages hold grades, grades may hold branches, and any
+/// of them may grow another level. A row with no parent is a top-level branch.
 model HandoutCategory {
   id            String   @id @default(cuid())
   slug          String   @unique
@@ -140,8 +102,13 @@ model HandoutCategory {
 
   handouts Handout[]
 
-  /// Same rule as Category, same NULLS NOT DISTINCT and the same
-  /// spelling-blind key in the migrations.
+  /// A name is unique among siblings: «العلمي» hangs under every preparatory
+  /// grade, but never twice under the same one. The migration declares the
+  /// index NULLS NOT DISTINCT so two top-level branches cannot share a name
+  /// either — Postgres would otherwise treat each null parent as distinct.
+  /// A second, spelling-blind key (migration 20260917160000_normalized_name_keys,
+  /// which Prisma cannot declare) compares `arabic_key(nameAr)` instead, so
+  /// «العلمى» is not a new sibling of «العلمي».
   @@unique([parentId, nameAr])
   @@index([parentId])
   @@map("handout_categories")
@@ -161,8 +128,6 @@ model Publisher {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  books Book[]
-
   handouts Handout[]
 
   @@map("publishers")
@@ -175,24 +140,20 @@ model Author {
   /// included. Two teachers who really share a name are told apart by a
   /// suffix in the panel, not by a second row.
   nameAr    String   @unique
-  /// The category the teacher's subject is filed under; null when none is on record.
-  subjectId String?
   bioAr     String
   avatarUrl String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  subject Category? @relation("AuthorSubject", fields: [subjectId], references: [id], onDelete: SetNull)
-
-  books Book[]
-
   handouts Handout[]
 
-  @@index([subjectId])
   @@map("authors")
 }
 
-model Book {
+/// Lecture-note booklets (ملازم) — the store's catalogue. The table was a copy
+/// of a school-book table dropped in migration 20260930120000_drop_books,
+/// which is why the tag enum is still called BookTag.
+model Handout {
   id             String    @id @default(cuid())
   slug           String    @unique
   titleAr        String
@@ -219,59 +180,11 @@ model Book {
   rating       Float @default(0)
   reviewsCount Int   @default(0)
 
-  /// Set when the panel takes the title off sale without deleting it. A book
-  /// that has been ordered cannot be deleted — its order lines hold it — so
-  /// archiving is how it leaves the shop: every storefront read filters on
-  /// `archivedAt: null`, while order history and the panel still see it.
-  archivedAt DateTime?
-
-  authorId    String
-  categoryId  String
-  publisherId String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  author        Author         @relation(fields: [authorId], references: [id])
-  category      Category       @relation(fields: [categoryId], references: [id])
-  publisher     Publisher      @relation(fields: [publisherId], references: [id])
-  reviews       Review[]
-  orderItems    OrderItem[]
-  wishlistItems WishlistItem[]
-  cartItems     CartItem[]
-
-  @@index([categoryId])
-  @@index([authorId])
-  @@index([publisherId])
-  @@index([createdAt])
-  @@map("books")
-}
-
-/// Lecture-note booklets (ملازم). A carbon copy of Book kept in its own
-/// table on purpose: the two catalogues are managed and browsed apart, and
-/// share only the author and publisher lookups — each files under its own
-/// category tree.
-model Handout {
-  id             String    @id @default(cuid())
-  slug           String    @unique
-  titleAr        String
-  descriptionAr  String
-  price          Int
-  /// Same CHECK as Book.compareAtPrice.
-  compareAtPrice Int?
-  /// Same CHECK and the same `takeFromShelf` as Book.stock.
-  stock          Int       @default(0)
-  /// Same CHECKs as Book.pages and Book.publishedYear.
-  pages          Int
-  publishedYear  Int
-  languageAr     String    @default("العربية")
-  coverUrl       String?
-  tags           BookTag[] @default([])
-
-  /// Denormalised for the listing pages; recomputed when reviews change.
-  rating       Float @default(0)
-  reviewsCount Int   @default(0)
-
-  /// Same as Book.archivedAt: off sale without being deleted.
+  /// Set when the panel takes the title off sale without deleting it. A
+  /// handout that has been ordered cannot be deleted — its order lines hold
+  /// it — so archiving is how it leaves the shop: every storefront read
+  /// filters on `archivedAt: null`, while order history and the panel still
+  /// see it.
   archivedAt DateTime?
 
   authorId    String
@@ -327,9 +240,6 @@ model Customer {
 
   addresses Address[]
   orders    Order[]
-  reviews   Review[]
-  wishlist  WishlistItem[]
-  cart      CartItem[]
 
   handoutReviews  HandoutReview[]
   handoutWishlist HandoutWishlistItem[]
@@ -400,7 +310,6 @@ model Order {
   updatedAt DateTime @updatedAt
 
   customer Customer     @relation(fields: [customerId], references: [id])
-  items    OrderItem[]
   timeline OrderEvent[]
 
   handoutItems HandoutOrderItem[]
@@ -409,22 +318,6 @@ model Order {
   @@index([status])
   @@index([createdAt])
   @@map("orders")
-}
-
-model OrderItem {
-  id        String @id @default(cuid())
-  orderId   String
-  bookId    String
-  quantity  Int    @default(1)
-  /// Price at the moment of ordering, not the current catalogue price.
-  unitPrice Int
-
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  book  Book  @relation(fields: [bookId], references: [id])
-
-  @@index([orderId])
-  @@index([bookId])
-  @@map("order_items")
 }
 
 model OrderEvent {
@@ -439,8 +332,7 @@ model OrderEvent {
   @@map("order_events")
 }
 
-/// An order line for a handout. Orders hold both kinds of line side by side;
-/// the two tables are kept apart because the two catalogues are.
+/// An order line: one handout, how many, and the price it was sold at.
 model HandoutOrderItem {
   id        String @id @default(cuid())
   orderId   String
@@ -461,62 +353,6 @@ model HandoutOrderItem {
 // Reviews, wishlist and cart
 // ------------------------------------------------------------------
 
-model Review {
-  id         String       @id @default(cuid())
-  bookId     String
-  customerId String
-  rating     Int
-  title      String
-  body       String
-  status     ReviewStatus @default(pending)
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-
-  book     Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-
-  /// One review per book per reader.
-  @@unique([bookId, customerId])
-  /// The unique index above leads with bookId, so it serves a book page but
-  /// not "my reviews", nor the cascade when a customer row goes.
-  @@index([customerId])
-  @@index([status])
-  @@map("reviews")
-}
-
-model WishlistItem {
-  customerId String
-  bookId     String
-  createdAt  DateTime @default(now())
-
-  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  book     Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
-
-  @@id([customerId, bookId])
-  /// The key leads with customerId; deleting a book has to find its rows by bookId.
-  @@index([bookId])
-  @@map("wishlist_items")
-}
-
-model CartItem {
-  customerId String
-  bookId     String
-  quantity   Int      @default(1)
-  updatedAt  DateTime @updatedAt
-
-  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  book     Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
-
-  @@id([customerId, bookId])
-  /// Same as WishlistItem: the cascade from a deleted book looks up bookId.
-  @@index([bookId])
-  @@map("cart_items")
-}
-
-// ------------------------------------------------------------------
-// The same three, for handouts
-// ------------------------------------------------------------------
-
 model HandoutReview {
   id         String       @id @default(cuid())
   handoutId  String
@@ -533,7 +369,8 @@ model HandoutReview {
 
   /// One review per handout per reader.
   @@unique([handoutId, customerId])
-  /// Same as Review: the unique index does not serve a lookup by customer.
+  /// The unique index above leads with handoutId, so it serves a handout page
+  /// but not "my reviews", nor the cascade when a customer row goes.
   @@index([customerId])
   @@index([status])
   @@map("handout_reviews")
@@ -548,7 +385,7 @@ model HandoutWishlistItem {
   handout  Handout  @relation(fields: [handoutId], references: [id], onDelete: Cascade)
 
   @@id([customerId, handoutId])
-  /// Same as WishlistItem, for the handout's cascade.
+  /// The key leads with customerId; deleting a handout has to find its rows by handoutId.
   @@index([handoutId])
   @@map("handout_wishlist_items")
 }
@@ -563,7 +400,7 @@ model HandoutCartItem {
   handout  Handout  @relation(fields: [handoutId], references: [id], onDelete: Cascade)
 
   @@id([customerId, handoutId])
-  /// Same as CartItem, for the handout's cascade.
+  /// Same as HandoutWishlistItem: the cascade from a deleted handout looks up handoutId.
   @@index([handoutId])
   @@map("handout_cart_items")
 }

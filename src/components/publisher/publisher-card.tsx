@@ -20,14 +20,15 @@ export function publisherTone(slug: string) {
 interface PublisherCardProps {
   publisher: Publisher;
   locale: Locale;
-  booksLabel: string;
+  /** The word after the count: «ملزمة». */
+  countLabel: string;
   className?: string;
 }
 
 export function PublisherCard({
   publisher,
   locale,
-  booksLabel,
+  countLabel,
   className,
 }: PublisherCardProps) {
   return (
@@ -54,7 +55,7 @@ export function PublisherCard({
       </span>
 
       <span className="mt-auto pt-2 text-label-md text-muted" data-numeric>
-        {formatNumber(publisher.booksCount, locale)} {booksLabel}
+        {formatNumber(publisher.handoutsCount, locale)} {countLabel}
       </span>
     </Link>
   );

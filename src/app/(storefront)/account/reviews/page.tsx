@@ -5,10 +5,10 @@ import { BookCover } from "@/components/book/book-cover";
 import { TitleLink } from "@/components/book/title-link";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { deleteOwnHandoutReview, deleteOwnReview } from "@/app/actions/account";
+import { deleteOwnHandoutReview } from "@/app/actions/account";
 import { IconButton } from "@/components/ui/icon-button";
 import { Rating } from "@/components/ui/rating";
-import { getCustomerHandoutReviews, getCustomerReviews } from "@/data";
+import { getCustomerHandoutReviews } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { formatDate, formatNumber } from "@/lib/format";
@@ -37,25 +37,23 @@ export default async function MyReviewsPage({
 }: MyReviewsPageProps) {
   const locale = defaultLocale;
 
-  const [dictionary, allReviews, allHandoutReviews] = await Promise.all([
+  const [dictionary, allHandoutReviews] = await Promise.all([
     getDictionary(locale),
-    getCustomerReviews(),
     getCustomerHandoutReviews(),
   ]);
   const previewEmpty = isEmptyPreview(await searchParams);
-  const reviews = previewEmpty ? [] : allReviews;
   const handoutReviews = previewEmpty ? [] : allHandoutReviews;
 
   const t = dictionary.account.reviews;
 
-  if (!reviews.length && !handoutReviews.length) {
+  if (!handoutReviews.length) {
     return (
       <EmptyState
         icon={MessageSquareQuote}
         title={t.empty.title}
         description={t.empty.description}
         actionLabel={t.empty.action}
-        actionHref={`/books`}
+        actionHref={`/handouts`}
       />
     );
   }
@@ -65,97 +63,12 @@ export default async function MyReviewsPage({
       <header className="space-y-1">
         <h2 className="text-headline-md">{t.title}</h2>
         <p className="text-body-md text-muted">
-          <span data-numeric>
-            {formatNumber(reviews.length + handoutReviews.length, locale)}
-          </span>{" "}
+          <span data-numeric>{formatNumber(handoutReviews.length, locale)}</span>{" "}
           {t.itemsCount} — {t.subtitle}
         </p>
       </header>
 
       <ul className="space-y-4">
-        {reviews.map((review) => (
-          <li key={review.id} className="rounded-xl border border-line bg-card p-4 sm:p-5">
-            <div className="flex gap-4">
-              <TitleLink
-                href={`/books/${review.book.slug}`}
-                archived={review.book.archived}
-                className="w-16 shrink-0 sm:w-20"
-                aria-label={review.book.title[locale]}
-              >
-                <BookCover
-                  title={review.book.title[locale]}
-                  author={review.book.author.name[locale]}
-                  seed={review.book.slug}
-                  src={review.book.coverUrl}
-                  sizes="5rem"
-                  className="border border-line"
-                />
-              </TitleLink>
-
-              <div className="min-w-0 flex-1 space-y-2">
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <span className="label-mono block text-muted">{t.onBook}</span>
-                    <TitleLink
-                      href={`/books/${review.book.slug}`}
-                      archived={review.book.archived}
-                      archivedNote={dictionary.common.noLongerOnSale}
-                      className="block font-display text-base font-bold underline-offset-4 hover:underline"
-                    >
-                      {review.book.title[locale]}
-                    </TitleLink>
-                  </div>
-
-                  <span
-                    className={cn(
-                      "label-mono inline-flex border px-2 py-1",
-                      statusTones[review.status],
-                    )}
-                  >
-                    {t.statuses[review.status]}
-                  </span>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-3">
-                  <Rating value={review.rating} locale={locale} />
-                  <span className="text-label-sm text-muted" data-numeric>
-                    {formatDate(review.createdAt, locale)}
-                  </span>
-                </div>
-
-                <div>
-                  <p className="font-display text-base font-bold text-on-surface">
-                    {review.title[locale]}
-                  </p>
-                  <p className="text-body-md leading-relaxed text-on-surface-variant">
-                    {review.body[locale]}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-1 border-t border-line-divider pt-3">
-                  <IconButton variant="subtle" label={dictionary.common.edit}>
-                    <Pencil aria-hidden className="size-4" strokeWidth={1.75} />
-                  </IconButton>
-                  <ConfirmDialog
-                    action={deleteOwnReview.bind(null, review.id)}
-                    fallbackError={dictionary.common.toast.actionFailed}
-                    itemName={review.book.title[locale]}
-                    labels={{
-                      title: dictionary.common.confirm.deleteTitle,
-                      description: dictionary.common.confirm.deleteDescription,
-                      confirm: dictionary.common.confirm.confirm,
-                      cancel: dictionary.common.confirm.cancel,
-                      done: dictionary.common.toast.deleted,
-                      trigger: dictionary.common.remove,
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          </li>
-        ))}
-
-        {/* The reader's handout reviews, in the same card, after the books. */}
         {handoutReviews.map((review) => (
           <li key={review.id} className="rounded-xl border border-line bg-card p-4 sm:p-5">
             <div className="flex gap-4">

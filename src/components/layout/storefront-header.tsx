@@ -14,7 +14,7 @@ import type { Dictionary } from "@/i18n/get-dictionary";
 import { buildCatalogueMenu } from "@/lib/category-menu";
 import { getMainNav } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
-import type { CategoryNode, HandoutCategoryNode } from "@/types";
+import type { HandoutCategoryNode } from "@/types";
 
 const iconLinkStyles =
   "relative inline-flex size-10 items-center justify-center rounded-md text-on-surface " +
@@ -27,9 +27,7 @@ const navLinkStyles =
 interface StorefrontHeaderProps {
   locale: Locale;
   dictionary: Dictionary;
-  /** The top-level branches of the books' tree, each with what hangs under it. */
-  categories: CategoryNode[];
-  /** The same for the handouts' own tree. */
+  /** The top-level branches of the handouts' tree, each with what hangs under it. */
   handoutCategories: HandoutCategoryNode[];
   /** Overrides the shipped copy when the settings screen has been filled in. */
   brand: { name: string; tagline: string };
@@ -53,26 +51,18 @@ interface StorefrontHeaderProps {
  * wordmark, the one element whose length the settings screen leaves free,
  * and `Logo` keeps it out of the row wherever the links are on it.
  *
- * The two catalogue items carry their category trees: on a desktop each is a
- * menu that cascades through the stages and grades, and in the phone drawer
- * the trees are listed after the main links. Both are built here, once, as
- * plain data.
+ * The catalogue item carries its category tree: on a desktop it is a menu
+ * that cascades through the stages and grades, and in the phone drawer the
+ * tree is listed after the main links. It is built here, once, as plain data.
  */
 export function StorefrontHeader({
   locale,
   dictionary,
-  categories,
   handoutCategories,
   brand,
 }: StorefrontHeaderProps) {
   const navItems = getMainNav(dictionary.nav);
   const menus = {
-    books: buildCatalogueMenu(categories, locale, (slug) => `/categories/${slug}`, {
-      label: dictionary.nav.books,
-      href: "/books",
-      allLabel: dictionary.books.title,
-      othersLabel: dictionary.nav.otherBranches,
-    }),
     handouts: buildCatalogueMenu(
       handoutCategories,
       locale,
@@ -91,10 +81,7 @@ export function StorefrontHeader({
       <Container className="flex h-18 items-center gap-3 lg:gap-2">
         <MobileNav
           items={navItems}
-          trees={[
-            { title: dictionary.nav.bookTree, menu: menus.books },
-            { title: dictionary.nav.handoutTree, menu: menus.handouts },
-          ]}
+          trees={[{ title: dictionary.nav.handoutTree, menu: menus.handouts }]}
           loginHref={`/login`}
           accountHref={`/account`}
           adminHref={`/admin`}

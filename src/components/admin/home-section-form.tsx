@@ -39,8 +39,7 @@ export function HomeSectionForm({
         forbidden: dictionary.common.actionErrors.forbidden,
         unknownSection: dictionary.common.actionErrors.unknownSection,
         invalidLink: dictionary.common.actionErrors.invalidLink,
-        unknownBook: dictionary.common.actionErrors.unknownBook,
-        unknownCategory: dictionary.common.actionErrors.unknownCategory,
+        unknownHandout: dictionary.common.actionErrors.unknownHandout,
         unknownAuthor: dictionary.common.actionErrors.unknownAuthor,
       }}
     >

@@ -67,7 +67,6 @@ export default async function AdminPublishersPage({
             <Thead>
               <Tr>
                 <Th>{t.table.name}</Th>
-                <Th>{t.table.books}</Th>
                 <Th>{t.table.handouts}</Th>
                 <Th className="text-end">{admin.common.actions}</Th>
               </Tr>
@@ -98,15 +97,8 @@ export default async function AdminPublishersPage({
                   </Td>
                   <Td data-numeric>
                     <HeldCount
-                      count={publisher.booksCount}
-                      notes={[{ count: archived.books.get(publisher.id) ?? 0, label: admin.common.archivedCount }]}
-                      locale={locale}
-                    />
-                  </Td>
-                  <Td data-numeric>
-                    <HeldCount
                       count={publisher.handoutsCount}
-                      notes={[{ count: archived.handouts.get(publisher.id) ?? 0, label: admin.common.archivedCount }]}
+                      notes={[{ count: archived.get(publisher.id) ?? 0, label: admin.common.archivedCount }]}
                       locale={locale}
                     />
                   </Td>

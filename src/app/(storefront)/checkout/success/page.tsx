@@ -106,7 +106,7 @@ export default async function OrderSuccessPage({
               {t.trackOrder}
             </Link>
             <Link
-              href={`/books`}
+              href={`/handouts`}
               className={buttonStyles({ variant: "secondary", size: "lg" })}
             >
               {t.continueShopping}

@@ -40,7 +40,7 @@ export default async function AuthorsPage() {
               <AuthorCard
                 author={author}
                 locale={locale}
-                booksLabel={dictionary.home.authors.booksCount}
+                countLabel={dictionary.home.authors.handoutsCount}
               />
             </li>
           ))}

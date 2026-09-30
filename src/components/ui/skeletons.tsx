@@ -130,9 +130,9 @@ export function AdminSkeleton() {
 
 /**
  * A detail page: the crumb band, the jacket on its plate beside the title
- * block and the buy box. The catalogue skeleton used to cover `books/[slug]`
- * too (its `loading.tsx` sat one level up, before the catalogue moved into
- * its own route group), so a single title loaded behind a grid of eight
+ * block and the buy box. The catalogue skeleton used to cover the detail
+ * page too (its `loading.tsx` sat one level up, before the catalogue moved
+ * into its own route group), so a single title loaded behind a grid of eight
  * cards — the wrong shape, briefly, on every jacket a reader opened.
  */
 export function DetailSkeleton() {

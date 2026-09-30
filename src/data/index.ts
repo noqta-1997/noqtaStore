@@ -3,19 +3,15 @@ import { cache } from "react";
 import {
   toAddress,
   toAuthor,
-  toBook,
-  toCategoryWithCount,
   toHandout,
   toHandoutCategoryWithCount,
   toHandoutReviewWithAuthor,
   toHandoutReviewWithStatus,
   toOrder,
   toPublisher,
-  toReviewWithAuthor,
-  toReviewWithStatus,
 } from "@/data/mappers";
 import type { Prisma } from "@/generated/prisma/client";
-import { arabicKey, escapeLike } from "@/lib/arabic";
+import { escapeLike } from "@/lib/arabic";
 import { getCurrentCustomer } from "@/lib/auth";
 import {
   homeVisibility,
@@ -42,11 +38,7 @@ import type {
   ContactStatus,
   Coupon,
   NewsletterSubscriber,
-  BookWithRelations,
-  CartLineWithBook,
   CartLineWithHandout,
-  Category,
-  CategoryNode,
   CategoryShare,
   Customer,
   CustomerStatus,
@@ -60,9 +52,7 @@ import type {
   OrderStatus,
   PickOption,
   Publisher,
-  Review,
   ReviewStatus,
-  ReviewWithStatus,
 } from "@/types";
 
 /**
@@ -76,7 +66,6 @@ import type {
 export const FREE_SHIPPING_THRESHOLD = 50000;
 export const STANDARD_SHIPPING_COST = 5000;
 export const EXPRESS_SHIPPING_COST = 10000;
-export const BOOKS_PER_PAGE = 12;
 export const HANDOUTS_PER_PAGE = 12;
 export const LOW_STOCK_THRESHOLD = 12;
 
@@ -103,17 +92,12 @@ async function optionalCustomerId(): Promise<string | null> {
   return (await getCurrentCustomer())?.id ?? null;
 }
 
-const bookInclude = { author: true, category: true, publisher: true } as const;
-
 /**
- * The storefront's view of the books table: every title the panel has not
+ * The storefront's view of the handouts table: every title the panel has not
  * archived. Each read a customer can reach filters on it, counts included;
  * the panel's own table, order history and the sales reports do not, since
  * an archived title is still one the shop has sold.
  */
-const onShelf = { archivedAt: null } satisfies Prisma.BookWhereInput;
-
-/** The handouts' `onShelf`: what the panel has not archived. */
 const handoutOnShelf = { archivedAt: null } satisfies Prisma.HandoutWhereInput;
 
 export type SortKey =
@@ -137,59 +121,6 @@ export interface BookQuery {
   sort?: SortKey;
   page?: number;
   perPage?: number;
-}
-
-export interface BookQueryResult {
-  items: BookWithRelations[];
-  total: number;
-  page: number;
-  pageCount: number;
-}
-
-/*
- * Every key breaks ties on `createdAt`, as the handouts map does. The books
- * had no ties in their seed data once; with no reviews in the live table every
- * title sorts equal on the default key, and Postgres returns equal rows in
- * whatever order the plan touched them — the category filter changing from a
- * join to an id list was enough to reshuffle a page.
- */
-const orderByForSort: Record<SortKey, Prisma.BookOrderByWithRelationInput[]> = {
-  relevance: [{ reviewsCount: "desc" }, { createdAt: "desc" }],
-  popular: [{ reviewsCount: "desc" }, { createdAt: "desc" }],
-  newest: [{ createdAt: "desc" }],
-  priceAsc: [{ price: "asc" }, { createdAt: "desc" }],
-  priceDesc: [{ price: "desc" }, { createdAt: "desc" }],
-  rating: [{ rating: "desc" }, { createdAt: "desc" }],
-};
-
-/**
- * The ids of the books a search term matches.
- *
- * Prisma's `contains` compares letters, and Arabic spells one word several
- * ways: a reader who types «احمد» found nothing by «أحمد». The comparison is
- * made in SQL over `arabic_key()`, the same spelling-blind form the unique
- * keys use (migration 20260917160000_normalized_name_keys), on the title and
- * on the teacher, press and branch names — the term folded the same way.
- * The English columns were dropped with the English site, so a Latin-script
- * title no longer matches on the title itself; the slug clause is what still
- * answers those queries: the seeded slugs are Latin, so "1984" finds the
- * book. The ids then go into an ordinary `where`, which is what keeps the
- * filters, the count and the pagination as they were.
- */
-async function searchBookIds(term: string): Promise<string[]> {
-  const pattern = `%${escapeLike(term)}%`;
-  const rows = await prisma.$queryRaw<{ id: string }[]>`
-    SELECT b.id
-    FROM books b
-    JOIN authors a ON a.id = b."authorId"
-    JOIN publishers p ON p.id = b."publisherId"
-    JOIN categories c ON c.id = b."categoryId"
-    WHERE arabic_key(b."titleAr") LIKE arabic_key(${pattern}) ESCAPE '\\'
-       OR lower(b.slug) LIKE lower(${pattern}) ESCAPE '\\'
-       OR arabic_key(a."nameAr") LIKE arabic_key(${pattern}) ESCAPE '\\'
-       OR arabic_key(p."nameAr") LIKE arabic_key(${pattern}) ESCAPE '\\'
-       OR arabic_key(c."nameAr") LIKE arabic_key(${pattern}) ESCAPE '\\'`;
-  return rows.map((row) => row.id);
 }
 
 /**
@@ -219,175 +150,16 @@ async function idsMatchingArabic(
   return rows.map((row) => row.id);
 }
 
-async function bookWhere(query: BookQuery): Promise<Prisma.BookWhereInput> {
-  const where: Prisma.BookWhereInput = { ...onShelf };
-
-  if (query.q?.trim()) {
-    where.id = { in: await searchBookIds(query.q.trim()) };
-  }
-
-  /* A branch answers for everything under it: the primary stage lists the
-     books of all six grades, a grade those of both its branches. */
-  if (query.category) where.categoryId = { in: await categorySubtreeIds(query.category) };
-  if (query.author) where.author = { slug: query.author };
-  if (query.publisher) where.publisher = { slug: query.publisher };
-  if (query.inStock) where.stock = { gt: 0 };
-  if (query.onSale) where.compareAtPrice = { not: null };
-  if (typeof query.rating === "number") where.rating = { gte: query.rating };
-
-  if (typeof query.minPrice === "number" || typeof query.maxPrice === "number") {
-    where.price = {
-      ...(typeof query.minPrice === "number" ? { gte: query.minPrice } : {}),
-      ...(typeof query.maxPrice === "number" ? { lte: query.maxPrice } : {}),
-    };
-  }
-
-  return where;
-}
-
-/** The single entry point behind listing, category, search and offers pages. */
-export async function queryBooks(query: BookQuery = {}): Promise<BookQueryResult> {
-  const perPage = query.perPage ?? BOOKS_PER_PAGE;
-  const where = await bookWhere(query);
-
-  const total = await prisma.book.count({ where });
-  const pageCount = Math.max(1, Math.ceil(total / perPage));
-  const page = Math.min(Math.max(query.page ?? 1, 1), pageCount);
-
-  const rows = await prisma.book.findMany({
-    where,
-    include: bookInclude,
-    orderBy: orderByForSort[query.sort ?? "relevance"],
-    skip: (page - 1) * perPage,
-    take: perPage,
-  });
-
-  return { items: rows.map(toBook), total, page, pageCount };
-}
-
-export async function getPriceBounds() {
-  const result = await prisma.book.aggregate({
-    where: onShelf,
-    _min: { price: true },
-    _max: { price: true },
-  });
-
-  return { min: result._min.price ?? 0, max: result._max.price ?? 0 };
-}
-
 /* ------------------------------------------------------------------ */
 /* Catalogue                                                           */
 /* ------------------------------------------------------------------ */
 
 /*
  * The category tree is a few dozen rows that every page asks something of —
- * the filter, the crumbs, the tiles — so a request loads it once and answers
+ * the filter, the crumbs, the menus — so a request loads it once and answers
  * the rest from memory. Siblings come back in the order the panel gave them,
  * oldest first among equals; a branch's count is rolled up from below.
  */
-const loadCategoryTree = cache(async (): Promise<CategoryNode[]> => {
-  const rows = await prisma.category.findMany({
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    include: { _count: { select: { books: { where: onShelf } } } },
-  });
-
-  return rollUp(buildTree(rows.map(toCategoryWithCount)), "booksCount");
-});
-
-const loadCategoryIndex = cache(async () => {
-  const nodes = flattenTree(await loadCategoryTree());
-  return {
-    nodes,
-    byId: new Map(nodes.map((node) => [node.id, node])),
-    bySlug: new Map(nodes.map((node) => [node.slug, node])),
-  };
-});
-
-/** The top-level branches, each carrying what hangs under it. */
-export async function getCategoryTree(limit?: number): Promise<CategoryNode[]> {
-  const roots = await loadCategoryTree();
-  return typeof limit === "number" ? roots.slice(0, limit) : roots;
-}
-
-/** Every branch, parents before children, siblings in order. */
-export async function getCategories(): Promise<CategoryNode[]> {
-  return (await loadCategoryIndex()).nodes;
-}
-
-/** Categories in the order their ids were given; a deleted one is skipped. */
-export async function getCategoriesByIds(ids: string[]): Promise<CategoryNode[]> {
-  if (!ids.length) return [];
-
-  const { byId } = await loadCategoryIndex();
-  return ids.flatMap((id) => {
-    const category = byId.get(id);
-    return category ? [category] : [];
-  });
-}
-
-/** The category tiles: the panel's picks, or the top-level branches in order. */
-export async function getShelfCategories(content: ShelfContent): Promise<CategoryNode[]> {
-  return resolveShelf(content, getCategoriesByIds, getCategoryTree);
-}
-
-/** The branches above a category, top-level first — its breadcrumb trail. */
-export async function getCategoryAncestors(category: Category): Promise<CategoryNode[]> {
-  const { byId } = await loadCategoryIndex();
-  const node = byId.get(category.id);
-  return node ? ancestorsOf(node, byId) : [];
-}
-
-/** The ids of a branch and every branch under it; empty for an unknown slug. */
-async function categorySubtreeIds(slug: string): Promise<string[]> {
-  const node = (await loadCategoryIndex()).bySlug.get(slug);
-  return node ? subtreeOf(node).map((entry) => entry.id) : [];
-}
-
-/**
- * What the panel's category picker searches through: by name, in tree order,
- * with the tile's icon in place of a jacket and the branch's place in the
- * tree in place of its blurb.
- */
-export async function searchCategoryPicks(
-  term: string,
-  exclude: string[] = [],
-  limit = 8,
-): Promise<PickOption[]> {
-  const { nodes, byId } = await loadCategoryIndex();
-  const needle = arabicKey(term);
-  const excluded = new Set(exclude);
-
-  return nodes
-    .filter((node) => !excluded.has(node.id))
-    .filter((node) => !needle || arabicKey(node.name.ar).includes(needle))
-    .slice(0, limit)
-    .map((node) => ({
-      id: node.id,
-      label: node.name.ar,
-      sublabel:
-        ancestorsOf(node, byId)
-          .map((entry) => entry.name.ar)
-          .join(" › ") || node.description.ar,
-      seed: node.slug,
-      picture: { kind: "icon", name: node.icon },
-    }));
-}
-
-export async function getCategoryBySlug(slug: string): Promise<CategoryNode | undefined> {
-  return (await loadCategoryIndex()).bySlug.get(slug);
-}
-
-export async function getCategoryById(id: string): Promise<CategoryNode | undefined> {
-  return (await loadCategoryIndex()).byId.get(id);
-}
-
-export async function getCategoryIds() {
-  const rows = await prisma.category.findMany({ select: { id: true } });
-  return rows.map((row) => row.id);
-}
-
-/* The handouts' tree: the same shape over its own table, kept apart on purpose. */
-
 const loadHandoutCategoryTree = cache(async (): Promise<HandoutCategoryNode[]> => {
   const rows = await prisma.handoutCategory.findMany({
     orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
@@ -442,27 +214,19 @@ export async function getHandoutCategoryById(
   return (await loadHandoutCategoryIndex()).byId.get(id);
 }
 
-/** Both counts, and the branch the teacher's subject points at. */
+/** What the teacher has on the shelf. */
 const authorInclude = {
-  _count: { select: { books: { where: onShelf }, handouts: { where: handoutOnShelf } } },
-  subject: true,
+  _count: { select: { handouts: { where: handoutOnShelf } } },
 } as const;
 
 type AuthorRowWithCounts = Prisma.AuthorGetPayload<{ include: typeof authorInclude }>;
 
 /**
- * Most in the catalogue first — school books and handouts counted together,
- * books breaking a tie — then by name, so equals keep one order between
+ * Most handouts first, then by name, so equals keep one order between
  * renders: Postgres hands ties back in whatever order the plan produced.
- * Ranked in memory, as the presses are: the database cannot order by the
- * sum of two relation counts, and the table is a few dozen rows.
  */
 function byTitlesWritten(a: AuthorRowWithCounts, b: AuthorRowWithCounts): number {
-  return (
-    b._count.books + b._count.handouts - (a._count.books + a._count.handouts) ||
-    b._count.books - a._count.books ||
-    a.nameAr.localeCompare(b.nameAr, "ar")
-  );
+  return b._count.handouts - a._count.handouts || a.nameAr.localeCompare(b.nameAr, "ar");
 }
 
 export async function getAuthors(limit?: number): Promise<Author[]> {
@@ -473,40 +237,24 @@ export async function getAuthors(limit?: number): Promise<Author[]> {
 }
 
 /**
- * Archived titles per teacher, press or branch, for the panel's tables. The
+ * Archived handouts per teacher, press or branch, for the panel's tables. The
  * counts above them are the shelf's, but an archived title still holds its
  * relations, and a row reading 0 that refuses to be deleted has to show why.
  */
 export async function getArchivedTitleCounts(
   field: "authorId" | "publisherId" | "categoryId",
-): Promise<{ books: Map<string, number>; handouts: Map<string, number> }> {
-  const archived = { archivedAt: { not: null } };
-  const [books, handouts] = await Promise.all([
-    prisma.book.findMany({ where: archived, select: { [field]: true } }),
-    prisma.handout.findMany({ where: archived, select: { [field]: true } }),
-  ]);
-
-  const tally = (rows: Record<string, unknown>[]) => {
-    const counts = new Map<string, number>();
-    for (const row of rows) {
-      const id = row[field] as string;
-      counts.set(id, (counts.get(id) ?? 0) + 1);
-    }
-    return counts;
-  };
-
-  return { books: tally(books), handouts: tally(handouts) };
-}
-
-/** How many teachers take each branch as their subject — it holds the branch too. */
-export async function getSubjectTeacherCounts(): Promise<Map<string, number>> {
-  const rows = await prisma.author.groupBy({
-    by: ["subjectId"],
-    where: { subjectId: { not: null } },
-    _count: { _all: true },
+): Promise<Map<string, number>> {
+  const rows: Record<string, unknown>[] = await prisma.handout.findMany({
+    where: { archivedAt: { not: null } },
+    select: { [field]: true },
   });
 
-  return new Map(rows.map((row) => [row.subjectId!, row._count._all]));
+  const counts = new Map<string, number>();
+  for (const row of rows) {
+    const id = row[field] as string;
+    counts.set(id, (counts.get(id) ?? 0) + 1);
+  }
+  return counts;
 }
 
 /** Authors in the order their ids were given; a deleted one is skipped. */
@@ -525,18 +273,18 @@ export async function getAuthorsByIds(ids: string[]): Promise<Author[]> {
   });
 }
 
-/** The spotlight: the panel's picks, or the authors with the most books. */
+/** The spotlight: the panel's picks, or the authors with the most handouts. */
 export async function getShelfAuthors(content: ShelfContent): Promise<Author[]> {
   return resolveShelf(content, getAuthorsByIds, getAuthors);
 }
 
 /**
- * What the panel's author picker searches through: by name, most books
+ * What the panel's author picker searches through: by name, most handouts
  * first, each with the card's second line — the count — under the name.
  */
 export async function searchAuthorPicks(
   term: string,
-  booksLabel: string,
+  handoutsLabel: string,
   exclude: string[] = [],
   limit = 8,
 ): Promise<PickOption[]> {
@@ -547,15 +295,15 @@ export async function searchAuthorPicks(
         ...(term.trim() ? { in: await idsMatchingArabic("authors", term.trim()) } : {}),
       },
     },
-    include: { _count: { select: { books: { where: onShelf } } } },
-    orderBy: [{ books: { _count: "desc" } }, { nameAr: "asc" }],
+    include: { _count: { select: { handouts: { where: handoutOnShelf } } } },
+    orderBy: [{ handouts: { _count: "desc" } }, { nameAr: "asc" }],
     take: limit,
   });
 
   return rows.map((row) => ({
     id: row.id,
     label: row.nameAr,
-    sublabel: `${row._count.books} ${booksLabel}`,
+    sublabel: `${row._count.handouts} ${handoutsLabel}`,
     seed: row.slug,
     picture: { kind: "portrait" },
   }));
@@ -584,228 +332,16 @@ export async function getAuthorIds() {
   return rows.map((row) => row.id);
 }
 
-export async function getBooks(limit?: number): Promise<BookWithRelations[]> {
-  const rows = await prisma.book.findMany({
-    where: onShelf,
-    include: bookInclude,
-    orderBy: { createdAt: "desc" },
-    ...(typeof limit === "number" ? { take: limit } : {}),
-  });
-
-  return rows.map(toBook);
-}
-
-export async function getBooksByTag(
-  tag: BookTag,
-  limit?: number,
-): Promise<BookWithRelations[]> {
-  const rows = await prisma.book.findMany({
-    where: { ...onShelf, tags: { has: tag } },
-    include: bookInclude,
-    orderBy: { reviewsCount: "desc" },
-    ...(typeof limit === "number" ? { take: limit } : {}),
-  });
-
-  return rows.map(toBook);
-}
-
-export async function getNewArrivals(limit = 8): Promise<BookWithRelations[]> {
-  const rows = await prisma.book.findMany({
-    where: onShelf,
-    include: bookInclude,
-    orderBy: { createdAt: "desc" },
-    take: limit,
-  });
-
-  return rows.map(toBook);
-}
-
-export async function getBestsellers(limit = 10): Promise<BookWithRelations[]> {
-  const rows = await prisma.book.findMany({
-    where: { ...onShelf, tags: { has: "bestseller" } },
-    include: bookInclude,
-    orderBy: { reviewsCount: "desc" },
-    take: limit,
-  });
-
-  return rows.map(toBook);
-}
-
-/**
- * The jackets the home hero slides past. Real artwork leads — a cover that
- * someone took the trouble to upload is what a showcase is for — and the
- * typographic placeholders fill in behind it, the most-reviewed titles first
- * in both halves.
- */
-export async function getShowcaseBooks(limit = 12): Promise<BookWithRelations[]> {
-  const rows = await prisma.book.findMany({
-    where: onShelf,
-    include: bookInclude,
-    orderBy: [{ coverUrl: { sort: "desc", nulls: "last" } }, { reviewsCount: "desc" }],
-    take: limit,
-  });
-
-  return rows.map(toBook);
-}
-
-/**
- * The title the hero's tagline pill links to: the panel's pick while it is
- * still in the catalogue, otherwise the most-reviewed title tagged featured.
- */
-export async function getHeroFeaturedBook(
-  content: HeroContent,
-): Promise<BookWithRelations | undefined> {
-  if (content.featuredBookId) {
-    const picked = await getBookById(content.featuredBookId);
-    if (picked && !picked.archived) return picked;
-  }
-
-  const [tagged] = await getBooksByTag("featured", 1);
-  return tagged;
-}
-
-/**
- * The hero's jackets: the panel's picks, in its order, while any of them are
- * still in the catalogue; otherwise the showcase ranking.
- */
-export async function getHeroShowcase(content: HeroContent): Promise<BookWithRelations[]> {
-  if (content.showcaseIds.length) {
-    const picked = await getBooksByIds(content.showcaseIds);
-    if (picked.length) return picked;
-  }
-
-  return getShowcaseBooks();
-}
-
-/** Each book shelf's own rule, given how many titles to show. */
-const bookShelfRules = {
-  bestsellers: getBestsellers,
-  newArrivals: getNewArrivals,
-} satisfies Record<string, (limit?: number) => Promise<BookWithRelations[]>>;
-
-export type BookShelf = keyof typeof bookShelfRules;
-
-/** A book shelf's titles: the panel's picks, or the shelf's rule cut to its count. */
-export async function getShelfBooks(
-  shelf: BookShelf,
-  content: ShelfContent,
-): Promise<BookWithRelations[]> {
-  return resolveShelf(content, getBooksByIds, bookShelfRules[shelf]);
-}
-
-export async function getDiscountedBooks(limit?: number): Promise<BookWithRelations[]> {
-  const rows = await prisma.book.findMany({
-    where: { ...onShelf, compareAtPrice: { not: null } },
-    include: bookInclude,
-    orderBy: { createdAt: "desc" },
-    ...(typeof limit === "number" ? { take: limit } : {}),
-  });
-
-  return rows.map(toBook);
-}
-
-/**
- * The by-slug reads are memoised per request: a detail page asks three times
- * — the segment layout that decides 404, `generateMetadata`, and the page —
- * and one row is enough for all of them.
- */
-export const getBookBySlug = cache(
-  async (slug: string): Promise<BookWithRelations | undefined> => {
-    const row = await prisma.book.findUnique({ where: { slug, ...onShelf }, include: bookInclude });
-    return row ? toBook(row) : undefined;
-  },
-);
-
-export async function getBookById(id: string): Promise<BookWithRelations | undefined> {
-  const row = await prisma.book.findUnique({ where: { id }, include: bookInclude });
-  return row ? toBook(row) : undefined;
-}
-
-/**
- * Books in the order their ids were given — the order the panel picked them
- * in. An id whose book has since been deleted is skipped rather than left
- * as a hole, so a hand-picked shelf shortens instead of breaking.
- */
-export async function getBooksByIds(ids: string[]): Promise<BookWithRelations[]> {
-  if (!ids.length) return [];
-
-  const rows = await prisma.book.findMany({
-    where: { ...onShelf, id: { in: ids } },
-    include: bookInclude,
-  });
-  const byId = new Map(rows.map((row) => [row.id, toBook(row)]));
-
-  return ids.flatMap((id) => {
-    const book = byId.get(id);
-    return book ? [book] : [];
-  });
-}
-
-/**
- * What the panel's book pickers search through. The same clauses as the
- * catalogue search, ranked the way the hero showcase is — real artwork
- * first — so that with nothing typed the list opens on the jackets most
- * worth showing.
- */
-export async function searchBookPicks(
-  term: string,
-  exclude: string[] = [],
-  limit = 8,
-): Promise<PickOption[]> {
-  const rows = await prisma.book.findMany({
-    where: { AND: [await bookWhere({ q: term }), { id: { notIn: exclude } }] },
-    include: { author: true },
-    orderBy: [{ coverUrl: { sort: "desc", nulls: "last" } }, { reviewsCount: "desc" }],
-    take: limit,
-  });
-
-  return rows.map((row) => ({
-    id: row.id,
-    label: row.titleAr,
-    sublabel: row.author.nameAr,
-    seed: row.slug,
-    picture: { kind: "jacket", src: row.coverUrl ?? undefined },
-  }));
-}
-
-export async function getBookSlugs(): Promise<string[]> {
-  const rows = await prisma.book.findMany({ where: onShelf, select: { slug: true } });
-  return rows.map((row) => row.slug);
-}
-
-export async function getBookIds(): Promise<string[]> {
-  const rows = await prisma.book.findMany({ select: { id: true } });
-  return rows.map((row) => row.id);
-}
-
-export async function getRelatedBooks(
-  book: BookWithRelations,
-  limit = 5,
-): Promise<BookWithRelations[]> {
-  const rows = await prisma.book.findMany({
-    where: { ...onShelf, categoryId: book.categoryId, id: { not: book.id } },
-    include: bookInclude,
-    orderBy: { reviewsCount: "desc" },
-    take: limit,
-  });
-
-  return rows.map(toBook);
-}
-
 /* ------------------------------------------------------------------ */
 /* Handouts                                                            */
 /* ------------------------------------------------------------------ */
 
-/*
- * The lecture-note catalogue (ملازم) is the book catalogue over again: the same
- * columns, the same filters, the same sort keys, read from its own table. It
- * is copied rather than parameterised on purpose — the two are meant to be
- * managed apart, and a shared query would be the first thing to couple them.
- */
-
 const handoutInclude = { author: true, category: true, publisher: true } as const;
 
-/** Same filter set as the books listing; the two forms are interchangeable. */
+/**
+ * The listing's filters. `BookQuery` keeps the name of the school-book
+ * catalogue it was written for; the handouts are what it filters now.
+ */
 export type HandoutQuery = BookQuery;
 
 export interface HandoutQueryResult {
@@ -819,7 +355,7 @@ export interface HandoutQueryResult {
  * Every key breaks ties on `createdAt`. Three seeded handouts with no reviews
  * yet all sort equal on the default key, and Postgres returns equal rows in
  * whatever order it last touched them — the listing reshuffled after a review
- * was published and withdrawn. The book map has no such tie in its seed data.
+ * was published and withdrawn.
  */
 const handoutOrderByForSort: Record<SortKey, Prisma.HandoutOrderByWithRelationInput[]> = {
   relevance: [{ reviewsCount: "desc" }, { createdAt: "desc" }],
@@ -830,7 +366,17 @@ const handoutOrderByForSort: Record<SortKey, Prisma.HandoutOrderByWithRelationIn
   rating: [{ rating: "desc" }, { createdAt: "desc" }],
 };
 
-/** The handouts' `searchBookIds`, over their own tree. */
+/**
+ * The ids of the handouts a search term matches.
+ *
+ * Prisma's `contains` compares letters, and Arabic spells one word several
+ * ways: a reader who types «احمد» found nothing by «أحمد». The comparison is
+ * made in SQL over `arabic_key()`, the same spelling-blind form the unique
+ * keys use (migration 20260917160000_normalized_name_keys), on the title and
+ * on the teacher, press and branch names — the term folded the same way. The
+ * slug clause answers a Latin-script query. The ids then go into an ordinary
+ * `where`, which is what keeps the filters, the count and the pagination.
+ */
 async function searchHandoutIds(term: string): Promise<string[]> {
   const pattern = `%${escapeLike(term)}%`;
   const rows = await prisma.$queryRaw<{ id: string }[]>`
@@ -854,8 +400,8 @@ async function handoutWhere(query: HandoutQuery): Promise<Prisma.HandoutWhereInp
     where.id = { in: await searchHandoutIds(query.q.trim()) };
   }
 
-  /* The slug is looked up in the handouts' own tree; a branch answers for
-     everything under it, as in the books' catalogue. */
+  /* A branch answers for everything under it: the primary stage lists the
+     handouts of all six grades, a grade those of both its branches. */
   if (query.category) {
     where.categoryId = { in: await handoutCategorySubtreeIds(query.category) };
   }
@@ -875,7 +421,7 @@ async function handoutWhere(query: HandoutQuery): Promise<Prisma.HandoutWhereInp
   return where;
 }
 
-/** The single entry point behind the handouts listing. */
+/** The single entry point behind the listing, category and search pages. */
 export async function queryHandouts(query: HandoutQuery = {}): Promise<HandoutQueryResult> {
   const perPage = query.perPage ?? HANDOUTS_PER_PAGE;
   const where = await handoutWhere(query);
@@ -905,6 +451,11 @@ export async function getHandoutPriceBounds() {
   return { min: result._min.price ?? 0, max: result._max.price ?? 0 };
 }
 
+/**
+ * The by-slug read is memoised per request: a detail page asks three times
+ * — the segment layout that decides 404, `generateMetadata`, and the page —
+ * and one row is enough for all of them.
+ */
 export const getHandoutBySlug = cache(
   async (slug: string): Promise<HandoutWithRelations | undefined> => {
     const row = await prisma.handout.findUnique({
@@ -918,6 +469,116 @@ export const getHandoutBySlug = cache(
 export async function getHandoutById(id: string): Promise<HandoutWithRelations | undefined> {
   const row = await prisma.handout.findUnique({ where: { id }, include: handoutInclude });
   return row ? toHandout(row) : undefined;
+}
+
+/**
+ * Handouts in the order their ids were given — the order the panel picked
+ * them in. An id whose handout has since gone is skipped rather than left as
+ * a hole, so a hand-picked list shortens instead of breaking.
+ */
+export async function getHandoutsByIds(ids: string[]): Promise<HandoutWithRelations[]> {
+  if (!ids.length) return [];
+
+  const rows = await prisma.handout.findMany({
+    where: { ...handoutOnShelf, id: { in: ids } },
+    include: handoutInclude,
+  });
+  const byId = new Map(rows.map((row) => [row.id, toHandout(row)]));
+
+  return ids.flatMap((id) => {
+    const handout = byId.get(id);
+    return handout ? [handout] : [];
+  });
+}
+
+export async function getHandoutsByTag(
+  tag: BookTag,
+  limit?: number,
+): Promise<HandoutWithRelations[]> {
+  const rows = await prisma.handout.findMany({
+    where: { ...handoutOnShelf, tags: { has: tag } },
+    include: handoutInclude,
+    orderBy: handoutOrderByForSort.popular,
+    ...(typeof limit === "number" ? { take: limit } : {}),
+  });
+
+  return rows.map(toHandout);
+}
+
+/**
+ * The jackets the home hero slides past. Real artwork leads — a cover that
+ * someone took the trouble to upload is what a showcase is for — and the
+ * typographic placeholders fill in behind it, the most-reviewed titles first
+ * in both halves.
+ */
+export async function getShowcaseHandouts(limit = 12): Promise<HandoutWithRelations[]> {
+  const rows = await prisma.handout.findMany({
+    where: handoutOnShelf,
+    include: handoutInclude,
+    orderBy: [
+      { coverUrl: { sort: "desc", nulls: "last" } },
+      { reviewsCount: "desc" },
+      { createdAt: "desc" },
+    ],
+    take: limit,
+  });
+
+  return rows.map(toHandout);
+}
+
+/**
+ * The title the hero's tagline pill links to: the panel's pick while it is
+ * still in the catalogue, otherwise the most-reviewed handout tagged featured.
+ */
+export async function getHeroFeaturedHandout(
+  content: HeroContent,
+): Promise<HandoutWithRelations | undefined> {
+  if (content.featuredHandoutId) {
+    const picked = await getHandoutById(content.featuredHandoutId);
+    if (picked && !picked.archived) return picked;
+  }
+
+  const [tagged] = await getHandoutsByTag("featured", 1);
+  return tagged;
+}
+
+/**
+ * The hero's jackets: the panel's picks, in its order, while any of them are
+ * still in the catalogue; otherwise the showcase ranking.
+ */
+export async function getHeroShowcase(content: HeroContent): Promise<HandoutWithRelations[]> {
+  if (content.showcaseIds.length) {
+    const picked = await getHandoutsByIds(content.showcaseIds);
+    if (picked.length) return picked;
+  }
+
+  return getShowcaseHandouts();
+}
+
+/**
+ * What the panel's hero pickers search through. The same clauses as the
+ * catalogue search, ranked the way the showcase is — real artwork first — so
+ * that with nothing typed the list opens on the jackets most worth showing.
+ */
+export async function searchHandoutPicks(
+  term: string,
+  exclude: string[] = [],
+  limit = 8,
+): Promise<PickOption[]> {
+  const rows = await prisma.handout.findMany({
+    where: { AND: [await handoutWhere({ q: term }), { id: { notIn: exclude } }] },
+    include: { author: true },
+    orderBy: [{ coverUrl: { sort: "desc", nulls: "last" } }, { reviewsCount: "desc" }],
+    take: limit,
+  });
+
+  return rows.map((row) => ({
+    id: row.id,
+    label: row.titleAr,
+    sublabel: row.author.nameAr,
+    seed: row.slug,
+    picture: { kind: "jacket", src: row.coverUrl ?? undefined },
+  }));
 }
 
 export async function getHandoutSlugs(): Promise<string[]> {
@@ -940,9 +601,8 @@ export async function getRelatedHandouts(
 }
 
 /*
- * The author and publisher pages list their handouts whole, under the
- * paginated books: an author's handouts are a handful, and a second page
- * control for them would fight the one the books already have.
+ * The author and publisher pages list their handouts whole, without pages:
+ * a teacher's or a press's handouts are a handful.
  */
 export async function getHandoutsByAuthor(
   authorSlug: string,
@@ -978,16 +638,6 @@ export async function getReviewsByHandout(handoutId: string): Promise<HandoutRev
   return rows.map(toHandoutReviewWithAuthor);
 }
 
-export async function getReviewsByBook(bookId: string): Promise<Review[]> {
-  const rows = await prisma.review.findMany({
-    where: { bookId, status: "published" },
-    include: { customer: { select: { name: true } } },
-    orderBy: { createdAt: "desc" },
-  });
-
-  return rows.map(toReviewWithAuthor);
-}
-
 /* ------------------------------------------------------------------ */
 /* Account — the signed-in reader                                      */
 /* ------------------------------------------------------------------ */
@@ -1002,19 +652,16 @@ export async function getCustomer(): Promise<Customer> {
       _count: {
         select: {
           orders: true,
-          wishlist: { where: { book: onShelf } },
           handoutWishlist: { where: { handout: handoutOnShelf } },
         },
       },
     },
   });
 
-  // Copies bought, over both tables — a handout is a copy too.
-  const sold = { order: { customerId: row.id, status: { not: "cancelled" as const } } };
-  const [bought, handoutsBought] = await Promise.all([
-    prisma.orderItem.aggregate({ _sum: { quantity: true }, where: sold }),
-    prisma.handoutOrderItem.aggregate({ _sum: { quantity: true }, where: sold }),
-  ]);
+  const bought = await prisma.handoutOrderItem.aggregate({
+    _sum: { quantity: true },
+    where: { order: { customerId: row.id, status: { not: "cancelled" } } },
+  });
 
   return {
     id: row.id,
@@ -1031,33 +678,12 @@ export async function getCustomer(): Promise<Customer> {
     addresses: row.addresses.map(toAddress),
     stats: {
       orders: row._count.orders,
-      wishlist: row._count.wishlist + row._count.handoutWishlist,
-      copiesBought: (bought._sum.quantity ?? 0) + (handoutsBought._sum.quantity ?? 0),
+      wishlist: row._count.handoutWishlist,
+      copiesBought: bought._sum.quantity ?? 0,
     },
   };
 }
 
-export async function getCart(): Promise<CartLineWithBook[]> {
-  const customerId = await optionalCustomerId();
-  if (!customerId) return [];
-
-  const rows = await prisma.cartItem.findMany({
-    where: { customerId, book: onShelf },
-    include: { book: { include: bookInclude } },
-  });
-
-  return rows.map((row) => {
-    const book = toBook(row.book);
-    return {
-      bookId: row.bookId,
-      quantity: row.quantity,
-      book,
-      lineTotal: book.price * row.quantity,
-    };
-  });
-}
-
-/** The handout half of the cart; the cart page lists both halves together. */
 export async function getHandoutCart(): Promise<CartLineWithHandout[]> {
   const customerId = await optionalCustomerId();
   if (!customerId) return [];
@@ -1083,42 +709,25 @@ export async function getCartCount(): Promise<number> {
   const customerId = await optionalCustomerId();
   if (!customerId) return 0;
 
-  const [books, handouts] = await Promise.all([
-    prisma.cartItem.aggregate({ _sum: { quantity: true }, where: { customerId } }),
-    prisma.handoutCartItem.aggregate({ _sum: { quantity: true }, where: { customerId } }),
-  ]);
+  const cart = await prisma.handoutCartItem.aggregate({
+    _sum: { quantity: true },
+    where: { customerId },
+  });
 
-  return (books._sum.quantity ?? 0) + (handouts._sum.quantity ?? 0);
+  return cart._sum.quantity ?? 0;
 }
 
-/**
- * The saved ids, for the hearts the catalogue renders statically. Books and
- * handouts are listed together: their ids never collide, so every heart on a
- * page reads one set.
- */
+/** The saved ids, for the hearts the catalogue renders statically. */
 export async function getWishlistIds(): Promise<string[]> {
   const customerId = await optionalCustomerId();
   if (!customerId) return [];
 
-  const [books, handouts] = await Promise.all([
-    prisma.wishlistItem.findMany({ where: { customerId }, select: { bookId: true } }),
-    prisma.handoutWishlistItem.findMany({ where: { customerId }, select: { handoutId: true } }),
-  ]);
-
-  return [...books.map((row) => row.bookId), ...handouts.map((row) => row.handoutId)];
-}
-
-export async function getWishlist(): Promise<BookWithRelations[]> {
-  const customerId = await optionalCustomerId();
-  if (!customerId) return [];
-
-  const rows = await prisma.wishlistItem.findMany({
-    where: { customerId, book: onShelf },
-    include: { book: { include: bookInclude } },
-    orderBy: { createdAt: "desc" },
+  const rows = await prisma.handoutWishlistItem.findMany({
+    where: { customerId },
+    select: { handoutId: true },
   });
 
-  return rows.map((row) => toBook(row.book));
+  return rows.map((row) => row.handoutId);
 }
 
 export async function getHandoutWishlist(): Promise<HandoutWithRelations[]> {
@@ -1137,7 +746,7 @@ export async function getHandoutWishlist(): Promise<HandoutWithRelations[]> {
 export async function getOrders(): Promise<Order[]> {
   const rows = await prisma.order.findMany({
     where: { customerId: await currentCustomerId() },
-    include: { items: true, handoutItems: true, timeline: true },
+    include: { handoutItems: true, timeline: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -1151,29 +760,13 @@ export async function getOrderById(id: string): Promise<Order | undefined> {
       customerId: await currentCustomerId(),
       OR: [{ id }, { reference: id }],
     },
-    include: { items: true, handoutItems: true, timeline: true },
+    include: { handoutItems: true, timeline: true },
   });
 
   return row ? toOrder(row) : undefined;
 }
 
-/** Order lines joined with their books for detail and summary views. */
-export async function getOrderItems(order: Order) {
-  const rows = await prisma.orderItem.findMany({
-    where: { orderId: order.id },
-    include: { book: { include: bookInclude } },
-  });
-
-  return rows.map((row) => ({
-    bookId: row.bookId,
-    quantity: row.quantity,
-    unitPrice: row.unitPrice,
-    book: toBook(row.book),
-    lineTotal: row.unitPrice * row.quantity,
-  }));
-}
-
-/** The handout lines of an order, joined the same way. */
+/** The lines of an order joined with their handouts, for detail and summary views. */
 export async function getOrderHandoutItems(order: Order) {
   const rows = await prisma.handoutOrderItem.findMany({
     where: { orderId: order.id },
@@ -1186,23 +779,6 @@ export async function getOrderHandoutItems(order: Order) {
     unitPrice: row.unitPrice,
     handout: toHandout(row.handout),
     lineTotal: row.unitPrice * row.quantity,
-  }));
-}
-
-/** The signed-in reader's own reviews, joined with their books. */
-export async function getCustomerReviews() {
-  const rows = await prisma.review.findMany({
-    where: { customerId: await currentCustomerId() },
-    include: {
-      customer: { select: { name: true } },
-      book: { include: bookInclude },
-    },
-    orderBy: { createdAt: "desc" },
-  });
-
-  return rows.map((row) => ({
-    ...toReviewWithStatus(row),
-    book: toBook(row.book),
   }));
 }
 
@@ -1268,19 +844,6 @@ function adminOrderBy<T>(
   return key && Object.hasOwn(map, key) ? map[key] : fallback;
 }
 
-const bookAdminSort: Record<string, Prisma.BookOrderByWithRelationInput> = {
-  "title-asc": { titleAr: "asc" },
-  "title-desc": { titleAr: "desc" },
-  "price-asc": { price: "asc" },
-  "price-desc": { price: "desc" },
-  "stock-asc": { stock: "asc" },
-  "stock-desc": { stock: "desc" },
-  "rating-asc": { rating: "asc" },
-  "rating-desc": { rating: "desc" },
-  "created-asc": { createdAt: "asc" },
-  "created-desc": { createdAt: "desc" },
-};
-
 const handoutAdminSort: Record<string, Prisma.HandoutOrderByWithRelationInput> = {
   "title-asc": { titleAr: "asc" },
   "title-desc": { titleAr: "desc" },
@@ -1308,13 +871,6 @@ const customerAdminSort: Record<string, Prisma.CustomerOrderByWithRelationInput>
   "name-desc": { name: "desc" },
   "created-asc": { createdAt: "asc" },
   "created-desc": { createdAt: "desc" },
-};
-
-const reviewAdminSort: Record<string, Prisma.ReviewOrderByWithRelationInput> = {
-  "created-asc": { createdAt: "asc" },
-  "created-desc": { createdAt: "desc" },
-  "rating-asc": { rating: "asc" },
-  "rating-desc": { rating: "desc" },
 };
 
 const handoutReviewAdminSort: Record<string, Prisma.HandoutReviewOrderByWithRelationInput> = {
@@ -1371,45 +927,6 @@ export async function getSalesSeries() {
 }
 
 /** Order lines of non-cancelled orders — the basis of every sales report. */
-async function soldItems() {
-  return prisma.orderItem.findMany({
-    where: { order: { status: { not: "cancelled" } } },
-    select: {
-      quantity: true,
-      unitPrice: true,
-      bookId: true,
-      book: { select: { categoryId: true } },
-    },
-  });
-}
-
-export async function getTopBooks() {
-  const rows = await soldItems();
-  const totals = new Map<string, { sold: number; revenue: number }>();
-
-  for (const row of rows) {
-    const entry = totals.get(row.bookId) ?? { sold: 0, revenue: 0 };
-    entry.sold += row.quantity;
-    entry.revenue += row.quantity * row.unitPrice;
-    totals.set(row.bookId, entry);
-  }
-
-  const top = [...totals.entries()].sort((a, b) => b[1].sold - a[1].sold).slice(0, 5);
-
-  const books = await prisma.book.findMany({
-    where: { id: { in: top.map(([bookId]) => bookId) } },
-    include: bookInclude,
-  });
-
-  return top.flatMap(([bookId, value]) => {
-    const book = books.find((entry) => entry.id === bookId);
-    return book
-      ? [{ bookId, sold: value.sold, revenue: value.revenue, book: toBook(book) }]
-      : [];
-  });
-}
-
-/** Handout lines of non-cancelled orders — the handout half of the sales. */
 async function soldHandoutItems() {
   return prisma.handoutOrderItem.findMany({
     where: { order: { status: { not: "cancelled" } } },
@@ -1422,11 +939,7 @@ async function soldHandoutItems() {
   });
 }
 
-/**
- * `getTopBooks` over the handout lines. The dashboard, the reports page and
- * the CSV export read it beside the book list rather than merged into it: a
- * handout that outsells a book is still listed under its own heading.
- */
+/** The five best sellers, for the dashboard, the reports page and the CSV export. */
 export async function getTopHandouts() {
   const rows = await soldHandoutItems();
   const totals = new Map<string, { sold: number; revenue: number }>();
@@ -1472,39 +985,8 @@ export async function getHandoutSales(handoutId: string) {
 /**
  * Sales by branch. Each branch's share includes the branches under it, so a
  * stage answers for its grades. "top" is the dashboard's view — the top-level
- * branches, largest first; "all" is every branch in tree order, for the
- * categories table. Books only: the handouts file under their own tree.
+ * branches, largest first; "all" is every branch in tree order.
  */
-export async function getCategoryShares(
-  scope: "top" | "all" = "top",
-): Promise<Array<CategoryShare & { category: CategoryNode }>> {
-  const [rows, roots] = await Promise.all([soldItems(), loadCategoryTree()]);
-
-  const own = new Map<string, number>();
-  let grandTotal = 0;
-
-  for (const row of rows) {
-    const value = row.quantity * row.unitPrice;
-    own.set(row.book.categoryId, (own.get(row.book.categoryId) ?? 0) + value);
-    grandTotal += value;
-  }
-
-  const shareOf = (node: CategoryNode): number => {
-    const value = subtreeOf(node).reduce((sum, entry) => sum + (own.get(entry.id) ?? 0), 0);
-    return grandTotal ? Math.round((value / grandTotal) * 100) : 0;
-  };
-
-  const nodes = scope === "top" ? roots : flattenTree(roots);
-  const shares = nodes.map((category) => ({
-    categoryId: category.id,
-    share: shareOf(category),
-    category,
-  }));
-
-  return scope === "top" ? shares.sort((a, b) => b.share - a.share) : shares;
-}
-
-/** `getCategoryShares` over the handouts and their own tree. */
 export async function getHandoutCategoryShares(
   scope: "top" | "all" = "top",
 ): Promise<Array<CategoryShare & { category: HandoutCategoryNode }>> {
@@ -1541,7 +1023,7 @@ export async function getAdminStats() {
     Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1),
   );
 
-  const [thisMonth, lastMonth, customersCount, booksCount, customersBefore] =
+  const [thisMonth, lastMonth, customersCount, titlesCount, customersBefore] =
     await Promise.all([
       prisma.order.aggregate({
         _sum: { total: true },
@@ -1557,7 +1039,7 @@ export async function getAdminStats() {
         },
       }),
       prisma.customer.count(),
-      prisma.book.count({ where: onShelf }),
+      prisma.handout.count({ where: handoutOnShelf }),
       prisma.customer.count({ where: { createdAt: { lt: monthStart } } }),
     ]);
 
@@ -1577,19 +1059,19 @@ export async function getAdminStats() {
       value: customersCount,
       change: change(customersCount, customersBefore),
     },
-    books: { value: booksCount, change: 0 },
+    titles: { value: titlesCount, change: 0 },
   };
 }
 
-export async function getLowStockBooks(limit = 5): Promise<BookWithRelations[]> {
-  const rows = await prisma.book.findMany({
-    where: onShelf,
-    include: bookInclude,
+export async function getLowStockHandouts(limit = 5): Promise<HandoutWithRelations[]> {
+  const rows = await prisma.handout.findMany({
+    where: handoutOnShelf,
+    include: handoutInclude,
     orderBy: { stock: "asc" },
     take: limit,
   });
 
-  return rows.map(toBook);
+  return rows.map(toHandout);
 }
 
 function toCustomerSummary(
@@ -1661,7 +1143,7 @@ export async function getAdminOrders(query: AdminListQuery = {}) {
 
   const rows = await prisma.order.findMany({
     where,
-    include: { items: true, handoutItems: true, timeline: true, customer: true },
+    include: { handoutItems: true, timeline: true, customer: true },
     orderBy: adminOrderBy(orderAdminSort, query.sort, { createdAt: "desc" }),
     skip,
     take: perPage,
@@ -1687,7 +1169,7 @@ export async function getAdminOrders(query: AdminListQuery = {}) {
 export async function getAdminOrderById(id: string) {
   const row = await prisma.order.findUnique({
     where: { id },
-    include: { items: true, handoutItems: true, timeline: true, customer: true },
+    include: { handoutItems: true, timeline: true, customer: true },
   });
 
   if (!row) return undefined;
@@ -1789,7 +1271,7 @@ export async function getCustomerCounts() {
 export async function getOrdersByCustomer(customerId: string) {
   const rows = await prisma.order.findMany({
     where: { customerId },
-    include: { items: true, handoutItems: true, timeline: true },
+    include: { handoutItems: true, timeline: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -1798,48 +1280,7 @@ export async function getOrdersByCustomer(customerId: string) {
 
 const reviewStatuses: ReviewStatus[] = ["pending", "published", "rejected"];
 
-export async function getAdminReviews(query: AdminListQuery = {}) {
-  const where: Prisma.ReviewWhereInput = {};
-
-  if (query.status && reviewStatuses.includes(query.status as ReviewStatus)) {
-    where.status = query.status as ReviewStatus;
-  }
-  if (query.q?.trim()) {
-    const term = query.q.trim();
-    where.OR = [
-      { customerId: { in: await idsMatchingArabic("customers", term) } },
-      { bookId: { in: await searchBookIds(term) } },
-    ];
-  }
-
-  const total = await prisma.review.count({ where });
-  const { perPage, pageCount, page, skip } = paginationOf(total, query);
-
-  const rows = await prisma.review.findMany({
-    where,
-    include: { customer: { select: { name: true } }, book: true },
-    orderBy: adminOrderBy(reviewAdminSort, query.sort, { createdAt: "desc" }),
-    skip,
-    take: perPage,
-  });
-
-  const items: ReviewWithStatus[] = rows.map(toReviewWithStatus);
-  return { items, total, page, pageCount };
-}
-
-export async function getReviewCounts() {
-  const grouped = await prisma.review.groupBy({ by: ["status"], _count: { _all: true } });
-  const byStatus = new Map(grouped.map((row) => [row.status, row._count._all]));
-
-  return {
-    all: grouped.reduce((total, row) => total + row._count._all, 0),
-    pending: byStatus.get("pending") ?? 0,
-    published: byStatus.get("published") ?? 0,
-    rejected: byStatus.get("rejected") ?? 0,
-  };
-}
-
-/** The handout moderation queue — `getAdminReviews` over the other table. */
+/** The review moderation queue. */
 export async function getAdminHandoutReviews(query: AdminListQuery = {}) {
   const where: Prisma.HandoutReviewWhereInput = {};
 
@@ -1884,45 +1325,8 @@ export async function getHandoutReviewCounts() {
   };
 }
 
-/** The book table's tabs: stock levels of what is on sale, then the archive. */
+/** The handout table's tabs: stock levels of what is on sale, then the archive. */
 export type StockFilter = "all" | "inStock" | "low" | "out" | "archived";
-
-/** Catalogue listing for the admin table — searchable and stock-aware. */
-export async function getAdminBooks(
-  query: AdminListQuery & { stock?: StockFilter } = {},
-) {
-  const where: Prisma.BookWhereInput = await bookWhere({ q: query.q });
-
-  if (query.stock === "archived") where.archivedAt = { not: null };
-  else if (query.stock === "inStock") where.stock = { gt: LOW_STOCK_THRESHOLD };
-  else if (query.stock === "low") where.stock = { gt: 0, lte: LOW_STOCK_THRESHOLD };
-  else if (query.stock === "out") where.stock = 0;
-
-  const total = await prisma.book.count({ where });
-  const { perPage, pageCount, page, skip } = paginationOf(total, query);
-
-  const rows = await prisma.book.findMany({
-    where,
-    include: bookInclude,
-    orderBy: adminOrderBy(bookAdminSort, query.sort, { createdAt: "desc" }),
-    skip,
-    take: perPage,
-  });
-
-  return { items: rows.map(toBook), total, page, pageCount };
-}
-
-export async function getStockCounts() {
-  const [all, inStock, low, out, archived] = await Promise.all([
-    prisma.book.count({ where: onShelf }),
-    prisma.book.count({ where: { ...onShelf, stock: { gt: LOW_STOCK_THRESHOLD } } }),
-    prisma.book.count({ where: { ...onShelf, stock: { gt: 0, lte: LOW_STOCK_THRESHOLD } } }),
-    prisma.book.count({ where: { ...onShelf, stock: 0 } }),
-    prisma.book.count({ where: { archivedAt: { not: null } } }),
-  ]);
-
-  return { all, inStock, low, out, archived };
-}
 
 /** Handout listing for the admin table — searchable and stock-aware. */
 export async function getAdminHandouts(
@@ -1965,15 +1369,15 @@ export async function getHandoutStockCounts() {
 /* Publishers                                                          */
 /* ------------------------------------------------------------------ */
 
-/** Both counts: the panel's table shows them side by side. */
+/** What the press has on the shelf. */
 const publisherInclude = {
-  _count: { select: { books: { where: onShelf }, handouts: { where: handoutOnShelf } } },
+  _count: { select: { handouts: { where: handoutOnShelf } } },
 } as const;
 
 export async function getPublishers(): Promise<Publisher[]> {
   const rows = await prisma.publisher.findMany({
     include: publisherInclude,
-    orderBy: [{ books: { _count: "desc" } }, { nameAr: "asc" }],
+    orderBy: [{ handouts: { _count: "desc" } }, { nameAr: "asc" }],
   });
 
   return rows.map(toPublisher);
@@ -1997,25 +1401,13 @@ export async function getPublisherById(id: string): Promise<Publisher | null> {
   return row ? toPublisher(row) : null;
 }
 
-export async function getBooksByPublisher(
-  publisherId: string,
-): Promise<BookWithRelations[]> {
-  const rows = await prisma.book.findMany({
-    where: { ...onShelf, publisherId },
-    include: bookInclude,
-    orderBy: { createdAt: "desc" },
-  });
-
-  return rows.map(toBook);
-}
-
-/** Publishers in the order their ids were given — the panel's order, like `getBooksByIds`. */
+/** Publishers in the order their ids were given — the panel's order, like `getHandoutsByIds`. */
 export async function getPublishersByIds(ids: string[]): Promise<Publisher[]> {
   if (!ids.length) return [];
 
   const rows = await prisma.publisher.findMany({
     where: { id: { in: ids } },
-    include: { _count: { select: { books: { where: onShelf } } } },
+    include: publisherInclude,
   });
   const byId = new Map(rows.map((row) => [row.id, toPublisher(row)]));
 
@@ -2026,33 +1418,22 @@ export async function getPublishersByIds(ids: string[]): Promise<Publisher[]> {
 }
 
 type PublisherRowWithCounts = Prisma.PublisherGetPayload<{
-  include: { _count: { select: { books: true; handouts: true } } };
+  include: typeof publisherInclude;
 }>;
 
 /**
- * Most in the catalogue first — school books and handouts counted together,
- * handouts breaking a tie since the presses are what the home section is
- * for — then by name, so equals keep one order between renders. Ranked in
- * memory rather than in the query: the table is a few dozen rows at most,
- * and the database cannot order by the sum of two relation counts.
+ * Most handouts first, then by name, so equals keep one order between
+ * renders: Postgres hands ties back in whatever order the plan produced.
  */
 function byCatalogueSize(a: PublisherRowWithCounts, b: PublisherRowWithCounts): number {
-  return (
-    b._count.books + b._count.handouts - (a._count.books + a._count.handouts) ||
-    b._count.handouts - a._count.handouts ||
-    a.nameAr.localeCompare(b.nameAr, "ar")
-  );
+  return b._count.handouts - a._count.handouts || a.nameAr.localeCompare(b.nameAr, "ar");
 }
 
 /** The publishers with the most titles, leaving out any with nothing to shelve. */
 export async function getFeaturedPublishers(limit?: number): Promise<Publisher[]> {
-  const rows = await prisma.publisher.findMany({
-    include: { _count: { select: { books: { where: onShelf }, handouts: { where: handoutOnShelf } } } },
-  });
+  const rows = await prisma.publisher.findMany({ include: publisherInclude });
 
-  const ranked = rows
-    .filter((row) => row._count.books + row._count.handouts > 0)
-    .sort(byCatalogueSize);
+  const ranked = rows.filter((row) => row._count.handouts > 0).sort(byCatalogueSize);
 
   return (typeof limit === "number" ? ranked.slice(0, limit) : ranked).map(toPublisher);
 }
@@ -2062,18 +1443,17 @@ export async function getShelfPublishers(content: ShelfContent): Promise<Publish
   return resolveShelf(content, getPublishersByIds, getFeaturedPublishers);
 }
 
-/** One publisher's two shelves on the home page; either may be empty. */
+/** One publisher's shelf on the home page; it may be empty. */
 export interface PublisherShelf {
   publisher: Publisher;
   handouts: HandoutWithRelations[];
-  books: BookWithRelations[];
 }
 
 /**
- * Each publisher's latest handouts and school books, up to `size` of each,
- * in the order the publishers were given. Fetched from the publisher side
- * so that one query serves every shelf, however many presses the panel
- * shows; the nested rows carry the same relations the catalogue's do.
+ * Each publisher's latest handouts, up to `size`, in the order the
+ * publishers were given. Fetched from the publisher side so that one query
+ * serves every shelf, however many presses the panel shows; the nested rows
+ * carry the same relations the catalogue's do.
  */
 export async function getPublisherShelves(
   publishers: Publisher[],
@@ -2090,7 +1470,6 @@ export async function getPublisherShelves(
         orderBy: { createdAt: "desc" },
         take: size,
       },
-      books: { where: onShelf, include: bookInclude, orderBy: { createdAt: "desc" }, take: size },
     },
   });
   const byId = new Map(rows.map((row) => [row.id, row]));
@@ -2098,7 +1477,7 @@ export async function getPublisherShelves(
   return publishers.flatMap((publisher) => {
     const row = byId.get(publisher.id);
     return row
-      ? [{ publisher, handouts: row.handouts.map(toHandout), books: row.books.map(toBook) }]
+      ? [{ publisher, handouts: row.handouts.map(toHandout) }]
       : [];
   });
 }
@@ -2106,12 +1485,11 @@ export async function getPublisherShelves(
 /**
  * What the publisher picker searches through, ranked the way the section's
  * own rule is, so that with nothing typed the list opens on the presses the
- * rule would show. The second line counts both kinds of title, which is what
- * the manager is choosing between.
+ * rule would show, each with its handout count under the name.
  */
 export async function searchPublisherPicks(
   term: string,
-  labels: { books: string; handouts: string },
+  handoutsLabel: string,
   exclude: string[] = [],
   limit = 8,
 ): Promise<PickOption[]> {
@@ -2122,7 +1500,7 @@ export async function searchPublisherPicks(
         ...(term.trim() ? { in: await idsMatchingArabic("publishers", term.trim()) } : {}),
       },
     },
-    include: { _count: { select: { books: { where: onShelf }, handouts: { where: handoutOnShelf } } } },
+    include: publisherInclude,
   });
 
   return rows
@@ -2131,10 +1509,7 @@ export async function searchPublisherPicks(
     .map((row) => ({
       id: row.id,
       label: row.nameAr,
-      sublabel: [
-        `${row._count.books} ${labels.books}`,
-        `${row._count.handouts} ${labels.handouts}`,
-      ].join(" · "),
+      sublabel: `${row._count.handouts} ${handoutsLabel}`,
       seed: row.slug,
       picture: { kind: "mark" },
     }));
@@ -2359,32 +1734,12 @@ export async function getAdminNotifications(): Promise<{
   const settings = await getStoreSettings();
   const wants = (key: string) => settings[key] !== "false";
 
-  const [
-    orders,
-    reviews,
-    handoutReviews,
-    books,
-    orderTotal,
-    reviewTotal,
-    handoutReviewTotal,
-    stockTotal,
-  ] =
+  const [orders, handoutReviews, handouts, orderTotal, handoutReviewTotal, stockTotal] =
     await Promise.all([
       wants("notifyOrders")
         ? prisma.order.findMany({
             where: { status: "pending" },
             include: { customer: { select: { name: true } } },
-            orderBy: { createdAt: "desc" },
-            take: NOTIFICATIONS_PER_KIND,
-          })
-        : [],
-      wants("notifyReviews")
-        ? prisma.review.findMany({
-            where: { status: "pending" },
-            include: {
-              customer: { select: { name: true } },
-              book: { select: { titleAr: true } },
-            },
             orderBy: { createdAt: "desc" },
             take: NOTIFICATIONS_PER_KIND,
           })
@@ -2401,8 +1756,8 @@ export async function getAdminNotifications(): Promise<{
           })
         : [],
       wants("notifyStock")
-        ? prisma.book.findMany({
-            where: { ...onShelf, stock: { lte: LOW_STOCK_THRESHOLD } },
+        ? prisma.handout.findMany({
+            where: { ...handoutOnShelf, stock: { lte: LOW_STOCK_THRESHOLD } },
             orderBy: { stock: "asc" },
             take: NOTIFICATIONS_PER_KIND,
           })
@@ -2411,13 +1766,10 @@ export async function getAdminNotifications(): Promise<{
         ? prisma.order.count({ where: { status: "pending" } })
         : 0,
       wants("notifyReviews")
-        ? prisma.review.count({ where: { status: "pending" } })
-        : 0,
-      wants("notifyReviews")
         ? prisma.handoutReview.count({ where: { status: "pending" } })
         : 0,
       wants("notifyStock")
-        ? prisma.book.count({ where: { ...onShelf, stock: { lte: LOW_STOCK_THRESHOLD } } })
+        ? prisma.handout.count({ where: { ...handoutOnShelf, stock: { lte: LOW_STOCK_THRESHOLD } } })
         : 0,
     ]);
 
@@ -2430,14 +1782,6 @@ export async function getAdminNotifications(): Promise<{
       href: `/admin/orders/${order.id}`,
       at: order.createdAt.toISOString(),
     })),
-    ...reviews.map((review) => ({
-      id: `review-${review.id}`,
-      kind: "review" as const,
-      label: review.book.titleAr,
-      detail: review.customer.name,
-      href: `/admin/reviews?status=pending`,
-      at: review.createdAt.toISOString(),
-    })),
     ...handoutReviews.map((review) => ({
       id: `handout-review-${review.id}`,
       kind: "review" as const,
@@ -2446,18 +1790,18 @@ export async function getAdminNotifications(): Promise<{
       href: `/admin/handout-reviews?status=pending`,
       at: review.createdAt.toISOString(),
     })),
-    ...books.map((book) => ({
-      id: `stock-${book.id}`,
+    ...handouts.map((handout) => ({
+      id: `stock-${handout.id}`,
       kind: "stock" as const,
-      label: book.titleAr,
-      detail: String(book.stock),
-      href: `/admin/books/${book.id}`,
-      at: book.updatedAt.toISOString(),
+      label: handout.titleAr,
+      detail: String(handout.stock),
+      href: `/admin/handouts/${handout.id}`,
+      at: handout.updatedAt.toISOString(),
     })),
   ].sort((a, b) => b.at.localeCompare(a.at));
 
   return {
     items,
-    total: orderTotal + reviewTotal + handoutReviewTotal + stockTotal,
+    total: orderTotal + handoutReviewTotal + stockTotal,
   };
 }

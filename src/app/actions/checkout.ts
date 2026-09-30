@@ -17,7 +17,7 @@ import { COUPON_COOKIE, CouponSpent, evaluateCoupon, spendCoupon } from "@/lib/c
 import { withOrderReference } from "@/lib/order-reference";
 import { prisma } from "@/lib/prisma";
 import { isCheckViolation } from "@/lib/prisma-errors";
-import { revalidateCatalogue, revalidateHandouts } from "@/lib/revalidate";
+import { revalidateHandouts } from "@/lib/revalidate";
 import { ShortStock, takeFromShelf } from "@/lib/shelf";
 import { getShippingRules, type ShippingRules } from "@/data";
 
@@ -48,25 +48,16 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
   if (!standing.ok) return fail(standing.error);
   const { customer } = standing;
 
-  // Both halves of the cart go into one order.
-  const [lines, handoutLines] = await Promise.all([
-    prisma.cartItem.findMany({
-      where: { customerId: customer.id },
-      include: { book: { select: { id: true, price: true, stock: true } } },
-    }),
-    prisma.handoutCartItem.findMany({
-      where: { customerId: customer.id },
-      include: { handout: { select: { id: true, price: true, stock: true } } },
-    }),
-  ]);
+  const handoutLines = await prisma.handoutCartItem.findMany({
+    where: { customerId: customer.id },
+    include: { handout: { select: { id: true, price: true, stock: true } } },
+  });
 
-  if (!lines.length && !handoutLines.length) return fail("emptyCart");
+  if (!handoutLines.length) return fail("emptyCart");
 
   // A quick answer before the address is even read; the check that holds is
   // `takeFromShelf` inside the transaction, which cannot be raced.
-  const shortage =
-    lines.find((line) => line.book.stock < line.quantity) ??
-    handoutLines.find((line) => line.handout.stock < line.quantity);
+  const shortage = handoutLines.find((line) => line.handout.stock < line.quantity);
   if (shortage) return fail("outOfStock");
 
   const rules = await getShippingRules();
@@ -92,12 +83,10 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
   }
 
   // Prices come from the catalogue, never from the browser.
-  const subtotal =
-    lines.reduce((total, item) => total + item.book.price * item.quantity, 0) +
-    handoutLines.reduce(
-      (total, item) => total + item.handout.price * item.quantity,
-      0,
-    );
+  const subtotal = handoutLines.reduce(
+    (total, item) => total + item.handout.price * item.quantity,
+    0,
+  );
   const shippingCost = shippingCostFor(shippingMethod, subtotal, rules);
 
   // The order has one phone column. The optional second number the form asks
@@ -146,13 +135,6 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
         shippingCity: city,
         shippingLine: line,
         notes: notes || null,
-        items: {
-          create: lines.map((item) => ({
-            bookId: item.bookId,
-            quantity: item.quantity,
-            unitPrice: item.book.price,
-          })),
-        },
         handoutItems: {
           create: handoutLines.map((item) => ({
             handoutId: item.handoutId,
@@ -164,15 +146,10 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
       },
     });
 
-    for (const item of lines) {
-      await takeFromShelf(tx, "book", item.bookId, item.quantity, { onSaleOnly: true });
-    }
-
     for (const item of handoutLines) {
-      await takeFromShelf(tx, "handout", item.handoutId, item.quantity, { onSaleOnly: true });
+      await takeFromShelf(tx, item.handoutId, item.quantity, { onSaleOnly: true });
     }
 
-    await tx.cartItem.deleteMany({ where: { customerId: customer.id } });
     await tx.handoutCartItem.deleteMany({ where: { customerId: customer.id } });
 
     if (applied?.ok) {
@@ -225,8 +202,7 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
   revalidatePath("/account/orders");
   revalidatePath("/admin/orders");
   revalidatePath("/admin");
-  if (lines.length) revalidateCatalogue();
-  if (handoutLines.length) revalidateHandouts();
+  revalidateHandouts();
 
   return ok(order.reference);
 }

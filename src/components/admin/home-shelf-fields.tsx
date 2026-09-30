@@ -1,9 +1,4 @@
-import {
-  searchHomeAuthors,
-  searchHomeBooks,
-  searchHomeCategories,
-  searchHomePublishers,
-} from "@/app/actions/admin";
+import { searchHomeAuthors, searchHomePublishers } from "@/app/actions/admin";
 import { Panel } from "@/components/admin/panel";
 import { PickList, type PickListLabels } from "@/components/admin/pick-list";
 import { ShelfModeFields } from "@/components/admin/shelf-mode-fields";
@@ -33,8 +28,6 @@ interface HomeShelfFieldsProps {
 
 /** What each kind of shelf searches through. */
 const searchByKind: Record<ShelfKind, (term: string, exclude: string[]) => Promise<PickOption[]>> = {
-  book: searchHomeBooks,
-  category: searchHomeCategories,
   author: searchHomeAuthors,
   publisher: searchHomePublishers,
 };
@@ -55,7 +48,7 @@ export function HomeShelfFields({
 }: HomeShelfFieldsProps) {
   const t = admin.settings.home;
   const s = t.shelf;
-  const { kind, limit: fallback, max } = HOME_SHELVES[shelf];
+  const { kind, max } = HOME_SHELVES[shelf];
   const k = s.kinds[kind];
 
   const pickerLabels: PickListLabels = { ...t.picker, search: k.search };
@@ -91,7 +84,7 @@ export function HomeShelfFields({
             <Field
               label={k.limit}
               htmlFor="limit"
-              hint={fallback === null ? `${range} — ${s.limitAll}` : range}
+              hint={range}
               className="sm:max-w-xs"
             >
               <Input

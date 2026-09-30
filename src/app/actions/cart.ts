@@ -15,120 +15,6 @@ async function requireCustomerId(): Promise<string | null> {
   return customer?.id ?? null;
 }
 
-export async function addToCart(
-  bookId: string,
-  quantity = 1,
-): Promise<ActionResult> {
-  const customerId = await requireCustomerId();
-  if (!customerId) return fail("unauthenticated");
-
-  // A cart line holds at least one copy (CHECK on `quantity`); whatever the
-  // caller sent, the request means "add".
-  quantity = Math.max(1, Math.trunc(quantity) || 1);
-
-  const book = await prisma.book.findUnique({
-    where: { id: bookId, archivedAt: null },
-    select: { stock: true },
-  });
-
-  if (!book) return fail("notFound");
-  if (book.stock <= 0) return fail("outOfStock");
-
-  const existing = await prisma.cartItem.findUnique({
-    where: { customerId_bookId: { customerId, bookId } },
-  });
-
-  const next = Math.min((existing?.quantity ?? 0) + quantity, book.stock);
-
-  await prisma.cartItem.upsert({
-    where: { customerId_bookId: { customerId, bookId } },
-    create: { customerId, bookId, quantity: Math.min(quantity, book.stock) },
-    update: { quantity: next },
-  });
-
-  revalidatePath("/cart");
-  return ok();
-}
-
-export async function setCartQuantity(
-  bookId: string,
-  quantity: number,
-): Promise<ActionResult> {
-  const customerId = await requireCustomerId();
-  if (!customerId) return fail("unauthenticated");
-
-  // The column is an integer; whatever the stepper sent, the row gets one.
-  quantity = Math.trunc(quantity) || 0;
-  if (quantity <= 0) return removeFromCart(bookId);
-
-  const book = await prisma.book.findUnique({
-    where: { id: bookId },
-    select: { stock: true },
-  });
-  if (!book) return fail("notFound");
-
-  try {
-    await prisma.cartItem.update({
-      where: { customerId_bookId: { customerId, bookId } },
-      data: { quantity: Math.min(quantity, Math.max(book.stock, 1)) },
-    });
-  } catch (error) {
-    // The line went while the stepper was being pressed — removed in another
-    // tab, or archived by the panel. Nothing to set; the page redraws.
-    if (isMissingRecord(error)) return fail("notFound");
-    throw error;
-  }
-
-  revalidatePath("/cart");
-  return ok();
-}
-
-export async function removeFromCart(bookId: string): Promise<ActionResult> {
-  const customerId = await requireCustomerId();
-  if (!customerId) return fail("unauthenticated");
-
-  await prisma.cartItem
-    .delete({ where: { customerId_bookId: { customerId, bookId } } })
-    .catch(() => null);
-
-  revalidatePath("/cart");
-  return ok();
-}
-
-export async function toggleWishlist(bookId: string): Promise<ActionResult> {
-  const customerId = await requireCustomerId();
-  if (!customerId) return fail("unauthenticated");
-
-  const existing = await prisma.wishlistItem.findUnique({
-    where: { customerId_bookId: { customerId, bookId } },
-  });
-
-  if (existing) {
-    await prisma.wishlistItem.delete({
-      where: { customerId_bookId: { customerId, bookId } },
-    });
-    revalidatePath("/account/wishlist");
-    return ok("removed");
-  }
-
-  // Only a title on sale is saved; a stale page may still offer an archived one.
-  if (!(await prisma.book.count({ where: { id: bookId, archivedAt: null } }))) return fail("notFound");
-
-  try {
-    await prisma.wishlistItem.create({ data: { customerId, bookId } });
-  } catch (error) {
-    // Two clicks in flight at once both saw no row; the second finds the
-    // first's. The heart asked for "saved", and saved it is.
-    if (!isUniqueViolation(error)) throw error;
-  }
-  revalidatePath("/account/wishlist");
-  return ok("added");
-}
-
-/* ------------------------------------------------------------------ */
-/* Handouts — the same four writes over the handout tables             */
-/* ------------------------------------------------------------------ */
-
 export async function addHandoutToCart(
   handoutId: string,
   quantity = 1,
@@ -136,6 +22,8 @@ export async function addHandoutToCart(
   const customerId = await requireCustomerId();
   if (!customerId) return fail("unauthenticated");
 
+  // A cart line holds at least one copy (CHECK on `quantity`); whatever the
+  // caller sent, the request means "add".
   quantity = Math.max(1, Math.trunc(quantity) || 1);
 
   const handout = await prisma.handout.findUnique({
@@ -169,6 +57,7 @@ export async function setHandoutCartQuantity(
   const customerId = await requireCustomerId();
   if (!customerId) return fail("unauthenticated");
 
+  // The column is an integer; whatever the stepper sent, the row gets one.
   quantity = Math.trunc(quantity) || 0;
   if (quantity <= 0) return removeHandoutFromCart(handoutId);
 
@@ -184,6 +73,8 @@ export async function setHandoutCartQuantity(
       data: { quantity: Math.min(quantity, Math.max(handout.stock, 1)) },
     });
   } catch (error) {
+    // The line went while the stepper was being pressed — removed in another
+    // tab, or archived by the panel. Nothing to set; the page redraws.
     if (isMissingRecord(error)) return fail("notFound");
     throw error;
   }
@@ -220,63 +111,52 @@ export async function toggleHandoutWishlist(handoutId: string): Promise<ActionRe
     return ok("removed");
   }
 
+  // Only a title on sale is saved; a stale page may still offer an archived one.
   if (!(await prisma.handout.count({ where: { id: handoutId, archivedAt: null } }))) return fail("notFound");
 
   try {
     await prisma.handoutWishlistItem.create({ data: { customerId, handoutId } });
   } catch (error) {
+    // Two clicks in flight at once both saw no row; the second finds the
+    // first's. The heart asked for "saved", and saved it is.
     if (!isUniqueViolation(error)) throw error;
   }
   revalidatePath("/account/wishlist");
   return ok("added");
 }
 
-/** Moves every saved book and handout into the cart, respecting stock. */
+/** Moves every saved handout into the cart, respecting stock. */
 export async function addWishlistToCart(): Promise<ActionResult> {
   const customerId = await requireCustomerId();
   if (!customerId) return fail("unauthenticated");
 
-  const [saved, savedHandouts] = await Promise.all([
-    prisma.wishlistItem.findMany({
-      where: { customerId },
-      include: { book: { select: { id: true, stock: true, archivedAt: true } } },
-    }),
-    prisma.handoutWishlistItem.findMany({
-      where: { customerId },
-      include: { handout: { select: { id: true, stock: true, archivedAt: true } } },
-    }),
-  ]);
+  const savedHandouts = await prisma.handoutWishlistItem.findMany({
+    where: { customerId },
+    include: { handout: { select: { id: true, stock: true, archivedAt: true } } },
+  });
 
   // An archived title is off sale even while it waits in a wishlist.
-  const available = saved.filter((item) => item.book.stock > 0 && !item.book.archivedAt);
   const availableHandouts = savedHandouts.filter(
     (item) => item.handout.stock > 0 && !item.handout.archivedAt,
   );
 
-  await prisma.$transaction([
-    ...available.map((item) =>
-      prisma.cartItem.upsert({
-        where: { customerId_bookId: { customerId, bookId: item.bookId } },
-        create: { customerId, bookId: item.bookId, quantity: 1 },
-        update: {},
-      }),
-    ),
-    ...availableHandouts.map((item) =>
+  await prisma.$transaction(
+    availableHandouts.map((item) =>
       prisma.handoutCartItem.upsert({
         where: { customerId_handoutId: { customerId, handoutId: item.handoutId } },
         create: { customerId, handoutId: item.handoutId, quantity: 1 },
         update: {},
       }),
     ),
-  ]);
+  );
 
   revalidatePath("/cart");
-  return ok(String(available.length + availableHandouts.length));
+  return ok(String(availableHandouts.length));
 }
 
 /**
- * Puts a past order back in the cart. Books that have since sold out or been
- * withdrawn are skipped rather than blocking the rest — the message reports
+ * Puts a past order back in the cart. Handouts that have since sold out or
+ * been withdrawn are skipped rather than blocking the rest — the message reports
  * how many lines made it.
  */
 export async function reorder(orderId: string): Promise<ActionResult> {
@@ -286,7 +166,6 @@ export async function reorder(orderId: string): Promise<ActionResult> {
   const order = await prisma.order.findFirst({
     where: { id: orderId, customerId },
     include: {
-      items: { include: { book: { select: { id: true, stock: true, archivedAt: true } } } },
       handoutItems: {
         include: { handout: { select: { id: true, stock: true, archivedAt: true } } },
       },
@@ -296,25 +175,13 @@ export async function reorder(orderId: string): Promise<ActionResult> {
   if (!order) return fail("notFound");
 
   // Archived titles count as withdrawn: skipped like a sold-out one.
-  const available = order.items.filter((item) => item.book.stock > 0 && !item.book.archivedAt);
   const availableHandouts = order.handoutItems.filter(
     (item) => item.handout.stock > 0 && !item.handout.archivedAt,
   );
-  if (!available.length && !availableHandouts.length) return fail("outOfStock");
+  if (!availableHandouts.length) return fail("outOfStock");
 
-  await prisma.$transaction([
-    ...available.map((item) =>
-      prisma.cartItem.upsert({
-        where: { customerId_bookId: { customerId, bookId: item.bookId } },
-        create: {
-          customerId,
-          bookId: item.bookId,
-          quantity: Math.min(item.quantity, item.book.stock),
-        },
-        update: { quantity: Math.min(item.quantity, item.book.stock) },
-      }),
-    ),
-    ...availableHandouts.map((item) =>
+  await prisma.$transaction(
+    availableHandouts.map((item) =>
       prisma.handoutCartItem.upsert({
         where: { customerId_handoutId: { customerId, handoutId: item.handoutId } },
         create: {
@@ -325,10 +192,10 @@ export async function reorder(orderId: string): Promise<ActionResult> {
         update: { quantity: Math.min(item.quantity, item.handout.stock) },
       }),
     ),
-  ]);
+  );
 
   revalidatePath("/cart");
-  return ok(String(available.length + availableHandouts.length));
+  return ok(String(availableHandouts.length));
 }
 
 /* ------------------------------------------------------------------ */
@@ -337,21 +204,12 @@ export async function reorder(orderId: string): Promise<ActionResult> {
 
 /** The subtotal a code is judged against comes from the cart, not the form. */
 async function cartSubtotal(customerId: string): Promise<number> {
-  const [lines, handoutLines] = await Promise.all([
-    prisma.cartItem.findMany({
-      where: { customerId },
-      include: { book: { select: { price: true } } },
-    }),
-    prisma.handoutCartItem.findMany({
-      where: { customerId },
-      include: { handout: { select: { price: true } } },
-    }),
-  ]);
+  const lines = await prisma.handoutCartItem.findMany({
+    where: { customerId },
+    include: { handout: { select: { price: true } } },
+  });
 
-  return (
-    lines.reduce((total, line) => total + line.book.price * line.quantity, 0) +
-    handoutLines.reduce((total, line) => total + line.handout.price * line.quantity, 0)
-  );
+  return lines.reduce((total, line) => total + line.handout.price * line.quantity, 0);
 }
 
 export async function applyCoupon(formData: FormData): Promise<ActionResult> {

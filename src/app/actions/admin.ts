@@ -3,11 +3,9 @@
 import { revalidatePath } from "next/cache";
 
 import {
-  getCategoryById,
   getHandoutCategoryById,
   searchAuthorPicks,
-  searchBookPicks,
-  searchCategoryPicks,
+  searchHandoutPicks,
   searchPublisherPicks,
 } from "@/data";
 import { defaultLocale } from "@/i18n/config";
@@ -35,16 +33,12 @@ import {
   isHomeSection,
   isHomeShelf,
   isSafeHref,
-  PROMO_DEFAULTS,
-  PROMO_FIGURE_MAX,
-  PROMO_KEYS,
   shelfKeys,
   type HomeShelf,
   type ShelfKind,
 } from "@/lib/home-sections";
 import { latestPublishedYear, STORE_UTC_OFFSET, storeYear } from "@/lib/constants";
 import { isOwner } from "@/lib/owner";
-import { refreshBookRating } from "@/lib/book-rating";
 import { isWithin } from "@/lib/category-tree";
 import {
   discardCover,
@@ -63,11 +57,7 @@ import {
   logActionError,
   violatedConstraint,
 } from "@/lib/prisma-errors";
-import {
-  revalidateCatalogue,
-  revalidateCategoryMenu,
-  revalidateHandouts,
-} from "@/lib/revalidate";
+import { revalidateCategoryMenu, revalidateHandouts } from "@/lib/revalidate";
 import { CouponSpent, refundCouponUse, respendCoupon } from "@/lib/coupon";
 import { ShortStock, takeFromShelf } from "@/lib/shelf";
 import { slugify } from "@/lib/slug";
@@ -97,7 +87,7 @@ function freeSlug(base: string, taken: Set<string>) {
 /**
  * Creates a row under the first free slug of its base.
  *
- * A title is not a name: «الرياضيات» is a book for every grade, and each
+ * A title is not a name: «الرياضيات» is a handout for every grade, and each
  * copy of it needs an address of its own. The base used to be written as it
  * was, so the second «الرياضيات» hit the slug's unique index and the panel
  * refused it as a duplicate. Named rows — teachers, presses, branches — go
@@ -161,21 +151,11 @@ async function attemptDelete<T>(
  * read 0 was refused as merely "in use", with nothing to say what held it.
  * An archived holder now says so, and where to find it.
  */
-async function titlesHolding(where: {
-  books?: Prisma.BookWhereInput;
-  handouts?: Prisma.HandoutWhereInput;
-}): Promise<"hasTitles" | "hasArchivedTitles" | null> {
+async function titlesHolding(
+  where: Prisma.HandoutWhereInput,
+): Promise<"hasTitles" | "hasArchivedTitles" | null> {
   const count = (archived: boolean) =>
-    Promise.all([
-      where.books
-        ? prisma.book.count({ where: { ...where.books, archivedAt: archived ? { not: null } : null } })
-        : 0,
-      where.handouts
-        ? prisma.handout.count({
-            where: { ...where.handouts, archivedAt: archived ? { not: null } : null },
-          })
-        : 0,
-    ]).then(([books, handouts]) => books + handouts);
+    prisma.handout.count({ where: { ...where, archivedAt: archived ? { not: null } : null } });
 
   const [shelved, archived] = await Promise.all([count(false), count(true)]);
   if (shelved > 0) return "hasTitles";
@@ -184,7 +164,7 @@ async function titlesHolding(where: {
 }
 
 /* ------------------------------------------------------------------ */
-/* Books                                                               */
+/* Handouts                                                            */
 /* ------------------------------------------------------------------ */
 
 /**
@@ -231,7 +211,7 @@ function titleNumbersFit(data: {
   );
 }
 
-export async function saveBook(formData: FormData): Promise<ActionResult> {
+export async function saveHandout(formData: FormData): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
   const titleAr = text(formData, "titleAr");
@@ -245,11 +225,11 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
   const cover = readCoverImage(formData);
   if (!cover.ok) return fail(cover.error);
 
-  const bookId = text(formData, "bookId");
+  const handoutId = text(formData, "handoutId");
   // "Remove the cover" counts only on an edit, and a newly chosen file wins
   // over it. The row's column is cleared and, once the write holds, the file
   // goes the way a replaced cover's does.
-  const dropCover = Boolean(bookId) && !cover.file && checkbox(formData, "removeCover");
+  const dropCover = Boolean(handoutId) && !cover.file && checkbox(formData, "removeCover");
 
   /*
    * What the form still edits.
@@ -259,7 +239,7 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
    * update payload: writing a fallback into it would mean every edit silently
    * replaced the real ISBN with a `TEMP-` string, reset a hardcover to
    * paperback, zeroed the weight, and — worst — regenerated the slug from the
-   * title, changing the book's public URL out from under any link to it.
+   * title, changing the handout's public URL out from under any link to it.
    */
   const data = {
     titleAr,
@@ -281,7 +261,7 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
   // reading as an unexpected failure.
   if (data.stock < 0) return fail("negativeStock");
   if (data.price < 0 || (data.compareAtPrice ?? 0) < 0) return fail("negativePrice");
-  // The struck-through price is what the book cost before the discount, so
+  // The struck-through price is what the handout cost before the discount, so
   // it has to be above the price: at or below it, the card showed a 0% or a
   // negative "discount". Left empty, there is no discount.
   if (data.compareAtPrice !== null && data.compareAtPrice <= data.price) {
@@ -290,8 +270,7 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
   // Both are printed on the title's page. An empty page count used to save as
   // 0 and a negative one as it was typed; a year had no bounds, so a slipped
   // key made it 20255. Next year is allowed: a school year's handouts carry
-  // the year it ends in. The low bound is 1, not 1900 — classics keep the
-  // year they were written.
+  // the year it ends in.
   if (data.pages < 1) return fail("invalidPages");
   if (data.publishedYear < 1 || data.publishedYear > latestPublishedYear()) {
     return fail("invalidYear");
@@ -306,186 +285,10 @@ export async function saveBook(formData: FormData): Promise<ActionResult> {
   let coverUrl: string | undefined;
   if (cover.file) {
     try {
-      coverUrl = await storeCover("books", cover.file);
-    } catch (error) {
-      logActionError("saveBook (cover)", error, { bookId: bookId || null });
-      // A server without the key is told so; anything else may pass on a retry.
-      if (error instanceof StorageNotConfiguredError) return fail("storageNotConfigured");
-      return fail("uploadFailed");
-    }
-  }
-
-  let replaced: string | null = null;
-  const shelf = shelfWrite(data, optionalNumber(formData, "stockWas"));
-  try {
-    if (bookId) {
-      if (coverUrl || dropCover) {
-        const current = await prisma.book.findUnique({
-          where: { id: bookId },
-          select: { coverUrl: true },
-        });
-        replaced = current?.coverUrl ?? null;
-      }
-      await prisma.book.update({
-        where: { id: bookId, ...shelf.guard },
-        data: { ...shelf.data, coverUrl: dropCover ? null : coverUrl },
-      });
-    } else {
-      /*
-       * A new row still needs its unique slug, derived once from the title
-       * here and never touched again — suffixed when another book already
-       * carries the same title.
-       */
-      await createUnderFreeSlug(
-        slugify(titleAr, `book-${Date.now()}`),
-        "books_slug_key",
-        (base) =>
-          prisma.book.findMany({ where: { slug: { startsWith: base } }, select: { slug: true } }),
-        (slug) => prisma.book.create({ data: { ...data, coverUrl, slug } }),
-      );
-    }
-  } catch (error) {
-    await discardCover(coverUrl);
-    /*
-     * A title never collides any more, so a unique-constraint violation here
-     * is a slug lost to other saves three times running — rare enough to ask
-     * for a retry. A broken foreign key is a teacher, branch or press deleted
-     * while the form was open, and a missing record the book itself — or,
-     * when the edit changed the shelf, the shelf moving under it: all three
-     * are a stale page, which the form draws again, not a fault. Anything
-     * else (a column the client and the database disagree on, the pooler
-     * dropping the connection) is: say so plainly and keep the cause in the
-     * log instead of dressing it up as something the admin can fix.
-     */
-    if (isUniqueViolation(error)) return fail("duplicate");
-    if (isForeignKeyViolation(error)) return fail("staleRelation");
-    if (isMissingRecord(error)) {
-      const stillThere = bookId && "stock" in shelf.guard && (await prisma.book.count({ where: { id: bookId } }));
-      return fail(stillThere ? "stockChanged" : "notFound");
-    }
-    logActionError("saveBook", error, { bookId: bookId || null });
-    return fail("saveFailed");
-  }
-
-  // Nothing refers to the cover this one replaced any more.
-  await discardCover(replaced);
-
-  revalidateCatalogue();
-  revalidatePath("/admin/books");
-  return ok();
-}
-
-export async function deleteBook(bookId: string): Promise<ActionResult> {
-  if (!(await requireManager())) return fail("forbidden");
-
-  // An ordered book stays for the order's sake; archiving is how it leaves.
-  const ordered = await prisma.orderItem.count({ where: { bookId } });
-  if (ordered > 0) return fail("archiveInstead");
-
-  const deleted = await attemptDelete("deleteBook", { bookId }, () =>
-    prisma.book.delete({ where: { id: bookId }, select: { coverUrl: true } }),
-  );
-  if (!deleted.ok) return deleted;
-  await discardCover(deleted.row.coverUrl);
-
-  revalidateCatalogue();
-  revalidatePath("/admin/books");
-  return ok();
-}
-
-/**
- * Takes a book off sale, or puts it back, without deleting it.
- *
- * The row stays — orders, reviews and the sales reports keep pointing at it —
- * and the storefront stops reading it (`onShelf` in `src/data`). Copies in
- * customers' carts go with the archiving, in the same transaction: the cart
- * page would hide the line anyway, and a line nobody can see must not reach
- * checkout. Wishlists are only hidden, so restoring brings them back.
- */
-export async function setBookArchived(
-  bookId: string,
-  archived: boolean,
-): Promise<ActionResult> {
-  if (!(await requireManager())) return fail("forbidden");
-
-  try {
-    await prisma.$transaction([
-      prisma.book.update({
-        where: { id: bookId },
-        data: { archivedAt: archived ? new Date() : null },
-      }),
-      ...(archived ? [prisma.cartItem.deleteMany({ where: { bookId } })] : []),
-    ]);
-  } catch (error) {
-    if (isMissingRecord(error)) return fail("notFound");
-    logActionError("setBookArchived", error, { bookId, archived: String(archived) });
-    return fail("saveFailed");
-  }
-
-  revalidateCatalogue();
-  revalidatePath("/cart");
-  revalidatePath("/admin/books");
-  revalidatePath(`/admin/books/${bookId}`);
-  return ok();
-}
-
-/* ------------------------------------------------------------------ */
-/* Handouts                                                            */
-/* ------------------------------------------------------------------ */
-
-/** `saveBook` over the handouts table — the form and its fields are the same. */
-export async function saveHandout(formData: FormData): Promise<ActionResult> {
-  if (!(await requireManager())) return fail("forbidden");
-
-  const titleAr = text(formData, "titleAr");
-  if (!titleAr) return fail("missingTitle");
-
-  const authorId = text(formData, "authorId");
-  const categoryId = text(formData, "categoryId");
-  const publisherId = text(formData, "publisherId");
-  if (!authorId || !categoryId || !publisherId) return fail("missingRelation");
-
-  const cover = readCoverImage(formData);
-  if (!cover.ok) return fail(cover.error);
-
-  const handoutId = text(formData, "handoutId");
-  // A cover removed on an edit, unless a new file came with it — as in `saveBook`.
-  const dropCover = Boolean(handoutId) && !cover.file && checkbox(formData, "removeCover");
-
-  // The update payload: slug, ISBN, cover type and weight are absent for the
-  // same reason they are in `saveBook` — an edit must not regenerate them.
-  const data = {
-    titleAr,
-    descriptionAr: text(formData, "descriptionAr"),
-    price: number(formData, "price"),
-    compareAtPrice: optionalNumber(formData, "compareAtPrice"),
-    stock: number(formData, "stock"),
-    pages: number(formData, "pages"),
-    publishedYear: number(formData, "publishedYear", storeYear()),
-    tags: formData.getAll("tags").filter((tag): tag is string => typeof tag === "string") as BookTag[],
-    authorId,
-    categoryId,
-    publisherId,
-  } as const;
-
-  if (!titleNumbersFit(data)) return fail("invalidNumber");
-  if (data.stock < 0) return fail("negativeStock");
-  if (data.price < 0 || (data.compareAtPrice ?? 0) < 0) return fail("negativePrice");
-  if (data.compareAtPrice !== null && data.compareAtPrice <= data.price) {
-    return fail("compareAtNotAbovePrice");
-  }
-  if (data.pages < 1) return fail("invalidPages");
-  if (data.publishedYear < 1 || data.publishedYear > latestPublishedYear()) {
-    return fail("invalidYear");
-  }
-
-  // Upload first, write second, tidy up whichever one lost — as in `saveBook`.
-  let coverUrl: string | undefined;
-  if (cover.file) {
-    try {
       coverUrl = await storeCover("handouts", cover.file);
     } catch (error) {
       logActionError("saveHandout (cover)", error, { handoutId: handoutId || null });
+      // A server without the key is told so; anything else may pass on a retry.
       if (error instanceof StorageNotConfiguredError) return fail("storageNotConfigured");
       return fail("uploadFailed");
     }
@@ -508,7 +311,11 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
         data: { ...shelf.data, coverUrl: dropCover ? null : coverUrl },
       });
     } else {
-      // Suffixed when another handout carries the same title — as in `saveBook`.
+      /*
+       * A new row still needs its unique slug, derived once from the title
+       * here and never touched again — suffixed when another handout already
+       * carries the same title.
+       */
       await createUnderFreeSlug(
         slugify(titleAr, `handout-${Date.now()}`),
         "handouts_slug_key",
@@ -519,9 +326,17 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
     }
   } catch (error) {
     await discardCover(coverUrl);
-    // Only a slug lost three times running reaches `duplicate`, and a stale
-    // relation or row is the page's age, not a fault; anything else is
-    // logged — as in `saveBook`.
+    /*
+     * A title never collides any more, so a unique-constraint violation here
+     * is a slug lost to other saves three times running — rare enough to ask
+     * for a retry. A broken foreign key is a teacher, branch or press deleted
+     * while the form was open, and a missing record the handout itself — or,
+     * when the edit changed the shelf, the shelf moving under it: all three
+     * are a stale page, which the form draws again, not a fault. Anything
+     * else (a column the client and the database disagree on, the pooler
+     * dropping the connection) is: say so plainly and keep the cause in the
+     * log instead of dressing it up as something the admin can fix.
+     */
     if (isUniqueViolation(error)) return fail("duplicate");
     if (isForeignKeyViolation(error)) return fail("staleRelation");
     if (isMissingRecord(error)) {
@@ -533,6 +348,7 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
     return fail("saveFailed");
   }
 
+  // Nothing refers to the cover this one replaced any more.
   await discardCover(replaced);
 
   revalidateHandouts();
@@ -542,7 +358,7 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
 export async function deleteHandout(handoutId: string): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
-  // As with books: an ordered handout stays, and archiving is how it leaves.
+  // An ordered handout stays for the order's sake; archiving is how it leaves.
   const ordered = await prisma.handoutOrderItem.count({ where: { handoutId } });
   if (ordered > 0) return fail("archiveInstead");
 
@@ -556,7 +372,15 @@ export async function deleteHandout(handoutId: string): Promise<ActionResult> {
   return ok();
 }
 
-/** `setBookArchived` over the handouts table and its cart. */
+/**
+ * Takes a handout off sale, or puts it back, without deleting it.
+ *
+ * The row stays — orders, reviews and the sales reports keep pointing at it —
+ * and the storefront stops reading it (`handoutOnShelf` in `src/data`). Copies
+ * in customers' carts go with the archiving, in the same transaction: the cart
+ * page would hide the line anyway, and a line nobody can see must not reach
+ * checkout. Wishlists are only hidden, so restoring brings them back.
+ */
 export async function setHandoutArchived(
   handoutId: string,
   archived: boolean,
@@ -639,7 +463,7 @@ function branchSlug(nameAr: string, parentSlug: string | null, fallback: string)
   return parentSlug ? `${parentSlug}-${own}` : own;
 }
 
-export async function saveCategory(formData: FormData): Promise<ActionResult> {
+export async function saveHandoutCategory(formData: FormData): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
   const nameAr = name(formData, "nameAr");
@@ -652,90 +476,6 @@ export async function saveCategory(formData: FormData): Promise<ActionResult> {
   /* The parent must exist, and a branch cannot hang under itself or under
      anything below it — that would cut it out of the tree. A parent that is
      gone was deleted while the form was open: the form draws its list again. */
-  const parent = parentId ? await getCategoryById(parentId) : undefined;
-  if (parentId && !parent) return fail("staleParent");
-  if (categoryId && parent) {
-    const self = await getCategoryById(categoryId);
-    if (self && isWithin(self, parent.id)) return fail("invalidParent");
-  }
-
-  /* The slug left the form; see the note in `saveBook` for why it is absent
-     from the update payload rather than defaulted into it. */
-  const data = {
-    nameAr,
-    descriptionAr: text(formData, "descriptionAr"),
-    icon: text(formData, "icon") || "BookOpen",
-    parentId,
-    sortOrder,
-  };
-
-  try {
-    if (categoryId) {
-      await prisma.category.update({ where: { id: categoryId }, data });
-    } else {
-      await createUnderFreeSlug(
-        branchSlug(nameAr, parent?.slug ?? null, `category-${Date.now()}`),
-        "categories_slug_key",
-        (base) =>
-          prisma.category.findMany({ where: { slug: { startsWith: base } }, select: { slug: true } }),
-        (slug) => prisma.category.create({ data: { ...data, slug } }),
-      );
-    }
-  } catch (error) {
-    if (isUniqueViolation(error)) return fail("duplicate");
-    /* A branch deleted while its edit page was open is a stale page, as it
-       is for a book: say so, and let the form draw the page again, rather
-       than logging it as a fault. */
-    if (isMissingRecord(error)) return fail("notFound");
-    logActionError("saveCategory", error, { categoryId: categoryId || null });
-    return fail("saveFailed");
-  }
-
-  /* Every storefront page, not only the catalogue's: the header's menus
-     hang this tree, and they are drawn on all of them. */
-  revalidateCategoryMenu();
-  revalidatePath("/admin/categories");
-  return ok();
-}
-
-export async function deleteCategory(categoryId: string): Promise<ActionResult> {
-  if (!(await requireManager())) return fail("forbidden");
-
-  /* The branches below go first, then their titles; a branch is never
-     deleted out from under either. */
-  const children = await prisma.category.count({ where: { parentId: categoryId } });
-  if (children > 0) return fail("hasChildren");
-
-  const held = await titlesHolding({ books: { categoryId } });
-  if (held) return fail(held);
-
-  /* A teacher's subject is a branch too; the row would only lose it (the key
-     is SET NULL), but silently is not how the panel drops a relation. */
-  const teachers = await prisma.author.count({ where: { subjectId: categoryId } });
-  if (teachers > 0) return fail("teacherSubject");
-
-  const deleted = await attemptDelete("deleteCategory", { categoryId }, () =>
-    prisma.category.delete({ where: { id: categoryId } }),
-  );
-  if (!deleted.ok) return deleted;
-
-  revalidateCategoryMenu();
-  revalidatePath("/admin/categories");
-  return ok();
-}
-
-/* The handouts' tree: `saveCategory` and `deleteCategory` over its own table. */
-
-export async function saveHandoutCategory(formData: FormData): Promise<ActionResult> {
-  if (!(await requireManager())) return fail("forbidden");
-
-  const nameAr = name(formData, "nameAr");
-  if (!nameAr) return fail("missingTitle");
-
-  const categoryId = text(formData, "categoryId");
-  const { parentId, sortOrder } = readBranchPlacement(formData);
-  if (!sortOrderFits(sortOrder)) return fail("invalidNumber");
-
   const parent = parentId ? await getHandoutCategoryById(parentId) : undefined;
   if (parentId && !parent) return fail("staleParent");
   if (categoryId && parent) {
@@ -743,6 +483,8 @@ export async function saveHandoutCategory(formData: FormData): Promise<ActionRes
     if (self && isWithin(self, parent.id)) return fail("invalidParent");
   }
 
+  /* The slug left the form; see the note in `saveHandout` for why it is
+     absent from the update payload rather than defaulted into it. */
   const data = {
     nameAr,
     descriptionAr: text(formData, "descriptionAr"),
@@ -768,11 +510,16 @@ export async function saveHandoutCategory(formData: FormData): Promise<ActionRes
     }
   } catch (error) {
     if (isUniqueViolation(error)) return fail("duplicate");
+    /* A branch deleted while its edit page was open is a stale page, as it
+       is for a handout: say so, and let the form draw the page again, rather
+       than logging it as a fault. */
     if (isMissingRecord(error)) return fail("notFound");
     logActionError("saveHandoutCategory", error, { categoryId: categoryId || null });
     return fail("saveFailed");
   }
 
+  /* Every storefront page, not only the catalogue's: the header's menu
+     hangs this tree, and it is drawn on all of them. */
   revalidateCategoryMenu();
   revalidatePath("/admin/handout-categories");
   return ok();
@@ -781,10 +528,12 @@ export async function saveHandoutCategory(formData: FormData): Promise<ActionRes
 export async function deleteHandoutCategory(categoryId: string): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
+  /* The branches below go first, then their titles; a branch is never
+     deleted out from under either. */
   const children = await prisma.handoutCategory.count({ where: { parentId: categoryId } });
   if (children > 0) return fail("hasChildren");
 
-  const held = await titlesHolding({ handouts: { categoryId } });
+  const held = await titlesHolding({ categoryId });
   if (held) return fail(held);
 
   const deleted = await attemptDelete("deleteHandoutCategory", { categoryId }, () =>
@@ -803,17 +552,10 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
   const nameAr = name(formData, "nameAr");
   if (!nameAr) return fail("missingTitle");
 
-  /* The subject is a branch of the category tree, or nothing. The form only
-     offers branches that exist, so a stale id means the branch went while
-     the form was open. */
-  const subjectId = text(formData, "subjectId");
-  if (subjectId && !(await getCategoryById(subjectId))) return fail("staleSubject");
-
   /* The slug is not on the form: a create derives it from the name once,
      and an update leaves it as it is. */
   const data = {
     nameAr,
-    subjectId: subjectId || null,
     bioAr: text(formData, "bioAr"),
   };
 
@@ -833,15 +575,14 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
     }
   } catch (error) {
     if (isUniqueViolation(error)) return fail("duplicate");
-    // Deleted while the edit page was open — as in `saveCategory`.
+    // Deleted while the edit page was open — as in `saveHandoutCategory`.
     if (isMissingRecord(error)) return fail("notFound");
     logActionError("saveAuthor", error, { authorId: authorId || null });
     return fail("saveFailed");
   }
 
-  /* A handout's page names its teacher too, and is cached like a book's: a
-     rename used to reach it only when its five-minute window ran out. */
-  revalidateCatalogue();
+  /* A handout's page names its teacher, and is cached: without this a rename
+     reached it only when its five-minute window ran out. */
   revalidateHandouts();
   revalidatePath("/admin/authors");
   return ok();
@@ -850,9 +591,7 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
 export async function deleteAuthor(authorId: string): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
-  /* A teacher is held by either catalogue: the handouts key is as RESTRICT
-     as the books one, and a teacher with only handouts is the common case. */
-  const held = await titlesHolding({ books: { authorId }, handouts: { authorId } });
+  const held = await titlesHolding({ authorId });
   if (held) return fail(held);
 
   const deleted = await attemptDelete("deleteAuthor", { authorId }, () =>
@@ -860,7 +599,7 @@ export async function deleteAuthor(authorId: string): Promise<ActionResult> {
   );
   if (!deleted.ok) return deleted;
 
-  revalidateCatalogue();
+  revalidateHandouts();
   revalidatePath("/admin/authors");
   return ok();
 }
@@ -894,14 +633,13 @@ export async function savePublisher(formData: FormData): Promise<ActionResult> {
     }
   } catch (error) {
     if (isUniqueViolation(error)) return fail("duplicate");
-    // Deleted while the edit page was open — as in `saveCategory`.
+    // Deleted while the edit page was open — as in `saveHandoutCategory`.
     if (isMissingRecord(error)) return fail("notFound");
     logActionError("savePublisher", error, { publisherId: publisherId || null });
     return fail("saveFailed");
   }
 
   // The handouts' pages name their press as well — see `saveAuthor`.
-  revalidateCatalogue();
   revalidateHandouts();
   revalidatePath("/admin/publishers");
   return ok();
@@ -910,8 +648,7 @@ export async function savePublisher(formData: FormData): Promise<ActionResult> {
 export async function deletePublisher(publisherId: string): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
-  /* Both catalogues hold a press — see `deleteAuthor`. */
-  const held = await titlesHolding({ books: { publisherId }, handouts: { publisherId } });
+  const held = await titlesHolding({ publisherId });
   if (held) return fail(held);
 
   const deleted = await attemptDelete("deletePublisher", { publisherId }, () =>
@@ -919,7 +656,7 @@ export async function deletePublisher(publisherId: string): Promise<ActionResult
   );
   if (!deleted.ok) return deleted;
 
-  revalidateCatalogue();
+  revalidateHandouts();
   revalidatePath("/admin/publishers");
   return ok();
 }
@@ -941,8 +678,8 @@ const orderStatuses: OrderStatus[] = [
  *
  * `placeOrder` decrements stock at checkout, so an order that falls through
  * before dispatch has to put the copies back or the count drifts down every
- * time a delivery is called off. Once an order ships the books have physically
- * left, so cancelling it afterwards records the outcome without inventing
+ * time a delivery is called off. Once an order ships the handouts have
+ * physically left, so cancelling it afterwards records the outcome without inventing
  * stock — goods actually coming back are a new arrival, not an undo of a sale.
  */
 const beforeDispatch: OrderStatus[] = ["pending", "processing"];
@@ -968,7 +705,6 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
     select: {
       status: true,
       couponCode: true,
-      items: { select: { bookId: true, quantity: true } },
       handoutItems: { select: { handoutId: true, quantity: true } },
     },
   });
@@ -1010,20 +746,9 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
 
       if (!stockMoves) return;
 
-      for (const item of order.items) {
-        if (reclaiming) {
-          await takeFromShelf(tx, "book", item.bookId, item.quantity);
-        } else {
-          await tx.book.update({
-            where: { id: item.bookId },
-            data: { stock: { increment: item.quantity } },
-          });
-        }
-      }
-
       for (const item of order.handoutItems) {
         if (reclaiming) {
-          await takeFromShelf(tx, "handout", item.handoutId, item.quantity);
+          await takeFromShelf(tx, item.handoutId, item.quantity);
         } else {
           await tx.handout.update({
             where: { id: item.handoutId },
@@ -1040,10 +765,7 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
     return fail("saveFailed");
   }
 
-  if (stockMoves) {
-    revalidateCatalogue();
-    revalidateHandouts();
-  }
+  if (stockMoves) revalidateHandouts();
   revalidatePath("/admin/orders");
   revalidatePath("/account/orders");
   return ok();
@@ -1053,12 +775,12 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
  * Removes an order and everything hanging off it.
  *
  * Cancelling is the tool for an order that fell through; this is for a record
- * that should not exist at all. `OrderItem` and `OrderEvent` cascade with the
- * row, and copies from an order that never shipped go back on the shelf under
+ * that should not exist at all. `HandoutOrderItem` and `OrderEvent` cascade
+ * with the row, and copies from an order that never shipped go back on the shelf under
  * the same rule `updateOrderStatus` follows.
  *
- * A delivered order is refused outright: money changed hands and the books
- * left the shop, so the row is the only remaining evidence of the sale and the
+ * A delivered order is refused outright: money changed hands and the
+ * handouts left the shop, so the row is the only remaining evidence of the sale and the
  * reports are built from it. The table hides the control on those rows, but
  * the check lives here because that is the half a caller cannot skip.
  */
@@ -1070,7 +792,6 @@ export async function deleteOrder(orderId: string): Promise<ActionResult> {
     select: {
       status: true,
       couponCode: true,
-      items: { select: { bookId: true, quantity: true } },
       handoutItems: { select: { handoutId: true, quantity: true } },
     },
   });
@@ -1093,14 +814,6 @@ export async function deleteOrder(orderId: string): Promise<ActionResult> {
           ]
         : []),
       ...(releasing
-        ? order.items.map((item) =>
-            prisma.book.update({
-              where: { id: item.bookId },
-              data: { stock: { increment: item.quantity } },
-            }),
-          )
-        : []),
-      ...(releasing
         ? order.handoutItems.map((item) =>
             prisma.handout.update({
               where: { id: item.handoutId },
@@ -1112,34 +825,9 @@ export async function deleteOrder(orderId: string): Promise<ActionResult> {
   );
   if (!deleted.ok) return deleted;
 
-  if (releasing) {
-    revalidateCatalogue();
-    revalidateHandouts();
-  }
+  if (releasing) revalidateHandouts();
   revalidatePath("/admin/orders");
   revalidatePath("/account/orders");
-  return ok();
-}
-
-export async function setReviewStatus(
-  reviewId: string,
-  status: ReviewStatus,
-): Promise<ActionResult> {
-  if (!(await requireManager())) return fail("forbidden");
-
-  const review = await prisma.review.findUnique({
-    where: { id: reviewId },
-    select: { bookId: true },
-  });
-  if (!review) return fail("notFound");
-
-  await prisma.$transaction(async (tx) => {
-    await tx.review.update({ where: { id: reviewId }, data: { status } });
-    await refreshBookRating(tx, review.bookId);
-  });
-
-  revalidatePath("/admin/reviews");
-  revalidateCatalogue();
   return ok();
 }
 
@@ -1417,7 +1105,7 @@ export async function setHomeSectionVisibility(
  * field left empty, or set back to the dictionary's own wording, deletes
  * its row rather than storing a copy of the default: the table then holds
  * only what the panel actually changed, and a string nobody rewrote follows
- * the dictionary if the dictionary is edited later. The picked books are
+ * the dictionary if the dictionary is edited later. The picked handouts are
  * checked against the catalogue before anything is written, so the page
  * never stores an id it cannot draw.
  */
@@ -1446,10 +1134,6 @@ export async function saveHomeSection(formData: FormData): Promise<ActionResult>
     const shelf = await readShelfForm(formData, section);
     if (!shelf.ok) return shelf;
     rows.push(...shelf.rows);
-  } else if (section === "promo") {
-    const promo = readPromoForm(formData);
-    if (!promo.ok) return promo;
-    rows.push(...promo.rows);
   }
 
   await prisma.$transaction(
@@ -1484,15 +1168,15 @@ async function readHeroForm(formData: FormData): Promise<SectionRows> {
     return { ok: false, error: "invalidLink" };
   }
 
-  const featuredBookId = text(formData, "featuredBookId");
+  const featuredHandoutId = text(formData, "featuredHandoutId");
   // Repeated hidden inputs, in the order the picker shows them.
   const showcaseIds = [...new Set(idList(formData, "showcaseIds"))].slice(0, HERO_SHOWCASE_SIZE);
 
-  const wanted = [...new Set([featuredBookId, ...showcaseIds].filter(Boolean))];
+  const wanted = [...new Set([featuredHandoutId, ...showcaseIds].filter(Boolean))];
   if (wanted.length) {
     // An archived title is off sale; the hero cannot show it either.
-    const found = await prisma.book.count({ where: { id: { in: wanted }, archivedAt: null } });
-    if (found !== wanted.length) return { ok: false, error: "unknownBook" };
+    const found = await prisma.handout.count({ where: { id: { in: wanted }, archivedAt: null } });
+    if (found !== wanted.length) return { ok: false, error: "unknownHandout" };
   }
 
   const link = (value: string, fallback: string) =>
@@ -1501,7 +1185,7 @@ async function readHeroForm(formData: FormData): Promise<SectionRows> {
   return {
     ok: true,
     rows: [
-      { key: HERO_KEYS.featuredBook, value: featuredBookId || null },
+      { key: HERO_KEYS.featuredHandout, value: featuredHandoutId || null },
       { key: HERO_KEYS.showcase, value: showcaseIds.length ? JSON.stringify(showcaseIds) : null },
       { key: HERO_KEYS.primaryHref, value: link(primaryHref, HERO_DEFAULT_LINKS.primaryHref) },
       { key: HERO_KEYS.secondaryHref, value: link(secondaryHref, HERO_DEFAULT_LINKS.secondaryHref) },
@@ -1509,35 +1193,14 @@ async function readHeroForm(formData: FormData): Promise<SectionRows> {
   };
 }
 
-/** The banner's link and ghosted figure, validated. */
-function readPromoForm(formData: FormData): SectionRows {
-  const href = text(formData, "href");
-  if (href && !isSafeHref(href)) return { ok: false, error: "invalidLink" };
-
-  // Bounded in the browser; cut, not refused, for a post that skipped it.
-  const figure = text(formData, "figure").slice(0, PROMO_FIGURE_MAX);
-
-  return {
-    ok: true,
-    rows: [
-      { key: PROMO_KEYS.href, value: href && href !== PROMO_DEFAULTS.href ? href : null },
-      { key: PROMO_KEYS.figure, value: figure && figure !== PROMO_DEFAULTS.figure ? figure : null },
-    ],
-  };
-}
-
 /** How many of the ids name a row of the shelf's kind. */
 const countByKind: Record<ShelfKind, (ids: string[]) => Promise<number>> = {
-  book: (ids) => prisma.book.count({ where: { id: { in: ids }, archivedAt: null } }),
-  category: (ids) => prisma.category.count({ where: { id: { in: ids } } }),
   author: (ids) => prisma.author.count({ where: { id: { in: ids } } }),
   publisher: (ids) => prisma.publisher.count({ where: { id: { in: ids } } }),
 };
 
 /** The error each kind reports when a pick has been deleted since the page loaded. */
 const missingByKind: Record<ShelfKind, string> = {
-  book: "unknownBook",
-  category: "unknownCategory",
   author: "unknownAuthor",
   publisher: "unknownPublisher",
 };
@@ -1585,29 +1248,18 @@ function idList(formData: FormData, name: string): string[] {
 }
 
 /**
- * What the book pickers on the home page forms search through. Reachable
- * only by the manager: the catalogue is public, but this shape and ranking
- * exist for the panel and there is no reason to serve them to anyone else.
+ * What the hero's handout pickers search through. Reachable only by the
+ * manager: the catalogue is public, but this shape and ranking exist for the
+ * panel and there is no reason to serve them to anyone else.
  */
-export async function searchHomeBooks(
+export async function searchHomeHandouts(
   term: string,
   exclude: string[],
 ): Promise<PickOption[]> {
   if (!(await requireManager())) return [];
 
   const [safeTerm, safeExclude] = pickerArguments(term, exclude);
-  return searchBookPicks(safeTerm, safeExclude);
-}
-
-/** The category picker's counterpart, for the category tiles. */
-export async function searchHomeCategories(
-  term: string,
-  exclude: string[],
-): Promise<PickOption[]> {
-  if (!(await requireManager())) return [];
-
-  const [safeTerm, safeExclude] = pickerArguments(term, exclude);
-  return searchCategoryPicks(safeTerm, safeExclude);
+  return searchHandoutPicks(safeTerm, safeExclude);
 }
 
 /** The author picker's counterpart, for the spotlight. */
@@ -1619,7 +1271,7 @@ export async function searchHomeAuthors(
 
   const [safeTerm, safeExclude] = pickerArguments(term, exclude);
   const { home } = await getDictionary(defaultLocale);
-  return searchAuthorPicks(safeTerm, home.authors.booksCount, safeExclude);
+  return searchAuthorPicks(safeTerm, home.authors.handoutsCount, safeExclude);
 }
 
 /** The publisher picker's counterpart, for the presses' shelves. */
@@ -1630,12 +1282,8 @@ export async function searchHomePublishers(
   if (!(await requireManager())) return [];
 
   const [safeTerm, safeExclude] = pickerArguments(term, exclude);
-  const { home, searchPage } = await getDictionary(defaultLocale);
-  return searchPublisherPicks(
-    safeTerm,
-    { books: home.authors.booksCount, handouts: searchPage.handoutsCount },
-    safeExclude,
-  );
+  const { searchPage } = await getDictionary(defaultLocale);
+  return searchPublisherPicks(safeTerm, searchPage.handoutsCount, safeExclude);
 }
 
 /** Picker arguments arrive as JSON from the browser, so their shape is checked, not assumed. */
