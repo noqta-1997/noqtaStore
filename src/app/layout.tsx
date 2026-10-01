@@ -4,6 +4,7 @@ import { Suspense, type ReactNode } from "react";
 
 import { FluentShell } from "@/components/fluent/fluent-shell";
 import { NavigationProgress } from "@/components/layout/navigation-progress";
+import { SplashScreen } from "@/components/layout/splash-screen";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
 import { ToastProvider } from "@/components/ui/toast";
 import { getStoreIdentity } from "@/data";
@@ -104,6 +105,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             {children}
           </ToastProvider>
         </FluentShell>
+        <SplashScreen />
       </body>
     </html>
   );
