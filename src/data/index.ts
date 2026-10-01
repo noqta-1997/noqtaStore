@@ -777,6 +777,9 @@ export async function getOrderHandoutItems(order: Order) {
     handoutId: row.handoutId,
     quantity: row.quantity,
     unitPrice: row.unitPrice,
+    // As they read when the order was placed, not as the handout reads now.
+    title: { ar: row.titleAr },
+    authorName: { ar: row.authorNameAr },
     handout: toHandout(row.handout),
     lineTotal: row.unitPrice * row.quantity,
   }));

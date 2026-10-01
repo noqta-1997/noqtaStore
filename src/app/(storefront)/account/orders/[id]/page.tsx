@@ -161,8 +161,8 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
               <li key={item.handoutId} className="flex items-center gap-4 p-5">
                 <span className="w-14 shrink-0">
                   <BookCover
-                    title={item.handout.title[locale]}
-                    author={item.handout.author.name[locale]}
+                    title={item.title[locale]}
+                    author={item.authorName[locale]}
                     seed={item.handout.slug}
                     src={item.handout.coverUrl}
                     sizes="3.5rem"
@@ -177,10 +177,10 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
                     archivedNote={dictionary.common.noLongerOnSale}
                     className="block font-display text-base font-bold underline-offset-4 hover:underline"
                   >
-                    {item.handout.title[locale]}
+                    {item.title[locale]}
                   </TitleLink>
                   <span className="block text-label-md text-muted">
-                    {dictionary.common.by} {item.handout.author.name[locale]}
+                    {dictionary.common.by} {item.authorName[locale]}
                   </span>
                   <span className="mt-1 block text-label-sm text-muted" data-numeric>
                     {formatPrice(item.unitPrice, locale)} × {item.quantity}

@@ -340,6 +340,10 @@ model HandoutOrderItem {
   quantity  Int    @default(1)
   /// Price at the moment of ordering, not the current catalogue price.
   unitPrice Int
+  /// The title and teacher as they read when the order was placed, so
+  /// editing the handout later does not rewrite the order's history.
+  titleAr      String
+  authorNameAr String
 
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   handout Handout @relation(fields: [handoutId], references: [id])

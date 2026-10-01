@@ -50,7 +50,17 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
 
   const handoutLines = await prisma.handoutCartItem.findMany({
     where: { customerId: customer.id },
-    include: { handout: { select: { id: true, price: true, stock: true } } },
+    include: {
+      handout: {
+        select: {
+          id: true,
+          price: true,
+          stock: true,
+          titleAr: true,
+          author: { select: { nameAr: true } },
+        },
+      },
+    },
   });
 
   if (!handoutLines.length) return fail("emptyCart");
@@ -140,6 +150,8 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
             handoutId: item.handoutId,
             quantity: item.quantity,
             unitPrice: item.handout.price,
+            titleAr: item.handout.titleAr,
+            authorNameAr: item.handout.author.nameAr,
           })),
         },
         timeline: { create: [{ status: "pending" }] },

@@ -122,8 +122,8 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
                       <div className="flex items-center gap-3">
                         <span className="w-9 shrink-0">
                           <BookCover
-                            title={item.handout.title[locale]}
-                            author={item.handout.author.name[locale]}
+                            title={item.title[locale]}
+                            author={item.authorName[locale]}
                             seed={item.handout.slug}
                             src={item.handout.coverUrl}
                             sizes="2.25rem"
@@ -136,10 +136,10 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
                             href={`/admin/handouts/${item.handoutId}`}
                             className="block max-w-56 truncate font-semibold underline-offset-4 hover:underline"
                           >
-                            {item.handout.title[locale]}
+                            {item.title[locale]}
                           </Link>
                           <span className="block text-label-md text-muted">
-                            {item.handout.author.name[locale]}
+                            {item.authorName[locale]}
                           </span>
                         </span>
                       </div>

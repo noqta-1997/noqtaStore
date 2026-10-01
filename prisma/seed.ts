@@ -185,7 +185,13 @@ interface OrderSeed {
   customerId: string;
   status: OrderStatus;
   createdAt: Date;
-  items: { handoutId: string; quantity: number; unitPrice: number }[];
+  items: {
+    handoutId: string;
+    quantity: number;
+    unitPrice: number;
+    titleAr: string;
+    authorNameAr: string;
+  }[];
   shippingCost: number;
   discount: number;
   paymentMethod: "cod" | "card" | "wallet";
@@ -258,6 +264,8 @@ async function seedOrders() {
           handoutId: handout.id,
           quantity: 1 + Math.floor(random() * 2),
           unitPrice: handout.price,
+          titleAr: handout.title.ar,
+          authorNameAr: authors.find((author) => author.id === handout.authorId)!.name.ar,
         };
       }).filter(
         (item, index_, all) =>
