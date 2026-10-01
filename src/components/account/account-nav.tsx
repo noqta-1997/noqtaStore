@@ -4,6 +4,7 @@ import { Heart, LogOut, MapPin, Package, Star, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { useSignOut } from "@/components/layout/sign-out-overlay";
 import { cn } from "@/lib/utils";
 
 interface AccountNavProps {
@@ -19,6 +20,7 @@ interface AccountNavProps {
 
 export function AccountNav({ labels }: AccountNavProps) {
   const pathname = usePathname();
+  const { signOut, overlay } = useSignOut("/");
   const base = `/account`;
 
   const items = [
@@ -62,15 +64,17 @@ export function AccountNav({ labels }: AccountNavProps) {
         })}
 
         <li className="flex-1 lg:flex-none">
-          <Link
-            href={`/login`}
-            className="flex items-center gap-2.5 whitespace-nowrap rounded-md px-3 py-2 text-body-md text-error transition-colors duration-100 ease-fluent hover:bg-error-container"
+          <button
+            type="button"
+            onClick={signOut}
+            className="flex w-full items-center gap-2.5 whitespace-nowrap rounded-md px-3 py-2 text-body-md text-error transition-colors duration-100 ease-fluent hover:bg-error-container"
           >
             <LogOut aria-hidden className="size-4 shrink-0 rtl:rotate-180" strokeWidth={1.75} />
             {labels.logout}
-          </Link>
+          </button>
         </li>
       </ul>
+      {overlay}
     </nav>
   );
 }
