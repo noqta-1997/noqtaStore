@@ -19,10 +19,10 @@ import {
   UserRound,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { MenuLink } from "@/components/layout/menu-link";
+import { useSignOut } from "@/components/layout/sign-out-overlay";
 import { buttonStyles } from "@/components/ui/button";
 import { isOwner } from "@/lib/owner";
 import { cn } from "@/lib/utils";
@@ -49,7 +49,7 @@ interface AccountMenuProps {
  * once Supabase resolves who is signed in.
  */
 export function AccountMenu({ labels }: AccountMenuProps) {
-  const router = useRouter();
+  const { signOut, overlay } = useSignOut("/");
   const [displayName, setDisplayName] = useState<string | null>(null);
   /*
    * The header reads the session in the browser so the storefront can stay
@@ -99,6 +99,7 @@ export function AccountMenu({ labels }: AccountMenuProps) {
   if (!displayName) {
     return (
       <>
+        {overlay}
         <Link
           href={`/login`}
           className={buttonStyles({
@@ -131,13 +132,6 @@ export function AccountMenu({ labels }: AccountMenuProps) {
     { href: `/account/addresses`, label: labels.addresses, icon: MapPin },
   ];
 
-  const signOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.replace("/");
-    router.refresh();
-  };
-
   return (
     /*
      * Fluent's Menu. The hand-rolled dropdown had `role="menu"` but none of the
@@ -145,86 +139,89 @@ export function AccountMenu({ labels }: AccountMenuProps) {
      * focus return to the trigger, and its outside-click and Escape handling
      * were written by hand. All of that now comes from the component.
      */
-    <Menu positioning="below-end">
-      <MenuTrigger disableButtonEnhancement>
-        <button
-          type="button"
-          /*
-           * The name and the chevron are hidden below `xl`, which leaves the
-           * avatar — and the avatar is aria-hidden, so the button had no
-           * accessible name at all on a phone. It went unseen because the
-           * public pages are scanned signed out, where this branch does not
-           * render.
-           */
-          aria-label={labels.account}
-          className={cn(
-            "flex items-center gap-2 rounded-md border border-transparent px-2 py-1",
-            "transition-colors duration-100 ease-fluent hover:bg-state-hover",
-          )}
-        >
-          <span
-            aria-hidden
-            className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary-container text-label-md font-semibold text-on-primary-container"
+    <>
+      {overlay}
+      <Menu positioning="below-end">
+        <MenuTrigger disableButtonEnhancement>
+          <button
+            type="button"
+            /*
+             * The name and the chevron are hidden below `xl`, which leaves the
+             * avatar — and the avatar is aria-hidden, so the button had no
+             * accessible name at all on a phone. It went unseen because the
+             * public pages are scanned signed out, where this branch does not
+             * render.
+             */
+            aria-label={labels.account}
+            className={cn(
+              "flex items-center gap-2 rounded-md border border-transparent px-2 py-1",
+              "transition-colors duration-100 ease-fluent hover:bg-state-hover",
+            )}
           >
-            {displayName.slice(0, 1)}
-          </span>
-          <span className="hidden max-w-28 truncate text-body-md text-on-surface xl:inline">
-            {displayName}
-          </span>
-          <ChevronDown
-            aria-hidden
-            className="hidden size-4 text-muted xl:block"
-            strokeWidth={1.75}
-          />
-        </button>
-      </MenuTrigger>
-
-      <MenuPopover>
-        <div className="px-3 py-2">
-          <p className="label-mono text-muted">{labels.signedInAs}</p>
-          <p className="truncate text-body-md font-semibold text-on-surface">
-            {displayName}
-          </p>
-        </div>
-        <MenuDivider />
-
-        <MenuList>
-          {isOwner(email) ? (
-            <>
-              <MenuLink
-                icon={
-                  <LayoutDashboard aria-hidden className="size-4" strokeWidth={1.75} />
-                }
-                href={`/admin`}
-              >
-                {labels.adminPanel}
-              </MenuLink>
-              <MenuDivider />
-            </>
-          ) : null}
-
-          {items.map((item) => (
-            <MenuLink
-              key={item.href}
-              icon={<item.icon aria-hidden className="size-4" strokeWidth={1.75} />}
-              href={item.href}
+            <span
+              aria-hidden
+              className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary-container text-label-md font-semibold text-on-primary-container"
             >
-              {item.label}
-            </MenuLink>
-          ))}
+              {displayName.slice(0, 1)}
+            </span>
+            <span className="hidden max-w-28 truncate text-body-md text-on-surface xl:inline">
+              {displayName}
+            </span>
+            <ChevronDown
+              aria-hidden
+              className="hidden size-4 text-muted xl:block"
+              strokeWidth={1.75}
+            />
+          </button>
+        </MenuTrigger>
 
+        <MenuPopover>
+          <div className="px-3 py-2">
+            <p className="label-mono text-muted">{labels.signedInAs}</p>
+            <p className="truncate text-body-md font-semibold text-on-surface">
+              {displayName}
+            </p>
+          </div>
           <MenuDivider />
 
-          <MenuItem
-            icon={
-              <LogOut aria-hidden className="size-4 rtl:rotate-180" strokeWidth={1.75} />
-            }
-            onClick={signOut}
-          >
-            {labels.logout}
-          </MenuItem>
-        </MenuList>
-      </MenuPopover>
-    </Menu>
+          <MenuList>
+            {isOwner(email) ? (
+              <>
+                <MenuLink
+                  icon={
+                    <LayoutDashboard aria-hidden className="size-4" strokeWidth={1.75} />
+                  }
+                  href={`/admin`}
+                >
+                  {labels.adminPanel}
+                </MenuLink>
+                <MenuDivider />
+              </>
+            ) : null}
+
+            {items.map((item) => (
+              <MenuLink
+                key={item.href}
+                icon={<item.icon aria-hidden className="size-4" strokeWidth={1.75} />}
+                href={item.href}
+              >
+                {item.label}
+              </MenuLink>
+            ))}
+
+            <MenuDivider />
+
+            <MenuItem
+              icon={
+                <LogOut aria-hidden className="size-4 rtl:rotate-180" strokeWidth={1.75} />
+              }
+              onClick={signOut}
+            >
+              {labels.logout}
+            </MenuItem>
+          </MenuList>
+        </MenuPopover>
+      </Menu>
+    </>
   );
 }

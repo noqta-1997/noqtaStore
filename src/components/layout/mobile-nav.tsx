@@ -2,9 +2,9 @@
 
 import { ChevronDown, LayoutDashboard, LogOut, Menu } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { useSignOut } from "@/components/layout/sign-out-overlay";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { createClient } from "@/utils/supabase/client";
 import { buttonStyles } from "@/components/ui/button";
@@ -116,7 +116,7 @@ export function MobileNav({
   const [isSignedIn, setIsSignedIn] = useState(false);
   /* Display only — the server decides who may actually open the panel. */
   const [email, setEmail] = useState<string | null>(null);
-  const router = useRouter();
+  const { signOut, overlay } = useSignOut("/", () => setIsOpen(false));
 
   useEffect(() => {
     const supabase = createClient();
@@ -220,12 +220,7 @@ export function MobileNav({
               </Link>
               <button
                 type="button"
-                onClick={async () => {
-                  await createClient().auth.signOut();
-                  setIsOpen(false);
-                  router.replace("/");
-                  router.refresh();
-                }}
+                onClick={signOut}
                 className="flex w-full items-center justify-center gap-2 rounded-md border border-line px-4 py-2 text-body-md font-semibold text-error transition-colors duration-100 ease-fluent hover:bg-error-container"
               >
                 <LogOut aria-hidden className="size-4 rtl:rotate-180" strokeWidth={1.75} />
@@ -243,6 +238,7 @@ export function MobileNav({
           )}
         </div>
       </Drawer>
+      {overlay}
     </>
   );
 }

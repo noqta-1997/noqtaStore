@@ -1,10 +1,8 @@
 "use client";
 
 import { LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
-import { createClient } from "@/utils/supabase/client";
+import { useSignOut } from "@/components/layout/sign-out-overlay";
 
 interface AdminSignOutProps {
   label: string;
@@ -12,26 +10,21 @@ interface AdminSignOutProps {
 
 /** The panel needs its own way out; the storefront menu is a page away. */
 export function AdminSignOut({ label }: AdminSignOutProps) {
-  const router = useRouter();
-  const [pending, setPending] = useState(false);
-
-  const onClick = async () => {
-    setPending(true);
-    await createClient().auth.signOut();
-    router.replace(`/login`);
-    router.refresh();
-  };
+  const { signOut, signingOut, overlay } = useSignOut(`/login`);
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={pending}
-      aria-label={label}
-      title={label}
-      className="inline-flex size-9 items-center justify-center rounded-md text-on-surface transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-primary disabled:opacity-60"
-    >
-      <LogOut aria-hidden className="size-4.5 rtl:-scale-x-100" strokeWidth={1.75} />
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={signOut}
+        disabled={signingOut}
+        aria-label={label}
+        title={label}
+        className="inline-flex size-9 items-center justify-center rounded-md text-on-surface transition-colors duration-100 ease-fluent hover:bg-state-hover hover:text-primary disabled:opacity-60"
+      >
+        <LogOut aria-hidden className="size-4.5 rtl:-scale-x-100" strokeWidth={1.75} />
+      </button>
+      {overlay}
+    </>
   );
 }
