@@ -1081,6 +1081,7 @@ export async function saveSettings(formData: FormData): Promise<ActionResult> {
   if (section === "shipping") {
     revalidatePath("/cart");
     revalidatePath("/checkout");
+    revalidatePath("/shipping");
   }
 
   if (section === "payments") {

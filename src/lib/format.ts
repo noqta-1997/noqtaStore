@@ -24,6 +24,23 @@ export function formatPrice(value: number, locale: Locale): string {
   return `${formatNumber(value, locale)} ${currencySuffix[locale]}`;
 }
 
+/**
+ * The settings screen stores the delivery time as typed ("1 - 2", "3"). It
+ * is printed as a range with an en dash, and Arabic counts 3–10 with a
+ * plural noun and everything else with a singular one.
+ */
+export function formatDeliveryTime(
+  raw: string,
+  units: { workingDay: string; workingDays: string },
+): string {
+  const numbers = raw.match(/\d+/g);
+  if (!numbers) return `${raw} ${units.workingDays}`;
+
+  const upper = Number(numbers[numbers.length - 1]);
+  const unit = upper >= 3 && upper <= 10 ? units.workingDays : units.workingDay;
+  return `${numbers.join("–")} ${unit}`;
+}
+
 export function formatDiscount(
   price: number,
   compareAtPrice: number,
