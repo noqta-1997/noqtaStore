@@ -27,14 +27,10 @@ const paymentMethods = ["cod", "card", "wallet"] as const;
 type ShippingMethod = (typeof shippingMethods)[number];
 type PaymentMethod = (typeof paymentMethods)[number];
 
-function shippingCostFor(
-  method: ShippingMethod,
-  subtotal: number,
-  rules: ShippingRules,
-) {
+function shippingCostFor(method: ShippingMethod, rules: ShippingRules) {
   if (method === "pickup") return 0;
   if (method === "express") return rules.expressCost;
-  return subtotal >= rules.freeThreshold ? 0 : rules.standardCost;
+  return rules.standardCost;
 }
 
 /**
@@ -97,7 +93,7 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
     (total, item) => total + item.handout.price * item.quantity,
     0,
   );
-  const shippingCost = shippingCostFor(shippingMethod, subtotal, rules);
+  const shippingCost = shippingCostFor(shippingMethod, rules);
 
   // The order has one phone column. The optional second number the form asks
   // for used to be read by nothing and vanished on submit; it goes into the

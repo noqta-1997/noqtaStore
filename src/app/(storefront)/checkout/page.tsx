@@ -97,8 +97,7 @@ export default async function CheckoutPage() {
     getDefaultPaymentMethod(),
   ]);
   const subtotal = handoutLines.reduce((total, line) => total + line.lineTotal, 0);
-  const shipping =
-    subtotal >= shippingRules.freeThreshold ? 0 : shippingRules.standardCost;
+  const shipping = shippingRules.standardCost;
   const discount = (await getAppliedCoupon(subtotal))?.discount ?? 0;
 
   // Nothing to pay for: the form used to be drawn anyway, and submitting it

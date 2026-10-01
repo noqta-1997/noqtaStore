@@ -243,17 +243,6 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                 defaultValue={shippingRules.expressCost}
               />
             </Field>
-            <Field label={t.shipping.freeThreshold} htmlFor="freeThreshold">
-              <Input
-                id="freeThreshold"
-                name="freeThreshold"
-                type="number"
-                dir="ltr"
-                step={1000}
-                data-numeric
-                defaultValue={shippingRules.freeThreshold}
-              />
-            </Field>
             <Field label={t.shipping.estimatedDays} htmlFor="estimatedDays">
               <Input
                 id="estimatedDays"

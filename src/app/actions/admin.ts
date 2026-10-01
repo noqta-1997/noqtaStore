@@ -1035,7 +1035,7 @@ const settingSections = {
     flags: [],
   },
   shipping: {
-    fields: ["standardCost", "expressCost", "freeThreshold", "estimatedDays"],
+    fields: ["standardCost", "expressCost", "estimatedDays"],
     flags: ["enablePickup"],
   },
   payments: { fields: ["paymentDefault"], flags: [] },

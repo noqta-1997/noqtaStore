@@ -333,8 +333,8 @@ export function PublisherGridSkeleton({ count = 10 }: { count?: number }) {
 }
 
 /**
- * The basket: the free-shipping meter over the lines on the wide side, the
- * summary on the narrow one. Drawn as though it holds something — a reader
+ * The basket: the lines on the wide side, the summary on the narrow one.
+ * Drawn as though it holds something — a reader
  * who opens an empty basket gets one short swap instead of a page that
  * fills and then empties.
  */
@@ -346,14 +346,6 @@ export function CartSkeleton({ rows = 2 }: { rows?: number }) {
       <Container className="py-8 lg:py-12">
         <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
           <div className="min-w-0 space-y-4 lg:col-span-8">
-            <div className="flex items-center gap-3 rounded-xl border border-line bg-surface-low p-4">
-              <Skeleton raised className="size-5 shrink-0 rounded-full" />
-              <div className="min-w-0 flex-1 space-y-2">
-                <Skeleton raised className="h-4 w-1/2" />
-                <Skeleton raised className="h-2 w-full rounded-sm" />
-              </div>
-            </div>
-
             <div className="divide-y divide-line-divider overflow-hidden rounded-xl border border-line bg-card">
               {Array.from({ length: rows }, (_, index) => (
                 <div key={index} className="flex gap-4 p-4 sm:p-5">

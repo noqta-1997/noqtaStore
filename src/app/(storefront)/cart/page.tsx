@@ -1,4 +1,4 @@
-import { ArrowRight, ShoppingCart, Truck } from "lucide-react";
+import { ArrowRight, ShoppingCart } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -10,14 +10,13 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { List } from "@/components/ui/list-row";
 import { PageHeader } from "@/components/ui/page-header";
-import { Surface } from "@/components/ui/surface";
 import { getHandoutCart, getShippingRules } from "@/data";
 import { applyCoupon, clearCoupon } from "@/app/actions/cart";
 import { ActionForm } from "@/components/ui/action-form";
 import { getAppliedCoupon } from "@/lib/coupon";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
-import { formatNumber, formatPrice } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
 import { isEmptyPreview, type SearchParamsRecord } from "@/lib/search-params";
 
 interface CartPageProps {
@@ -46,13 +45,7 @@ export default async function CartPage({ searchParams }: CartPageProps) {
   const subtotal = handoutLines.reduce((total, line) => total + line.lineTotal, 0);
   const coupon = await getAppliedCoupon(subtotal);
   const discount = coupon?.discount ?? 0;
-  const qualifiesForFreeShipping = subtotal >= shippingRules.freeThreshold;
-  const shipping = qualifiesForFreeShipping ? 0 : shippingRules.standardCost;
-  const remaining = Math.max(shippingRules.freeThreshold - subtotal, 0);
-  const progress = Math.min(
-    100,
-    Math.round((subtotal / shippingRules.freeThreshold) * 100),
-  );
+  const shipping = shippingRules.standardCost;
   const itemsCount = handoutLines.reduce((total, line) => total + line.quantity, 0);
 
   return (
@@ -75,26 +68,6 @@ export default async function CartPage({ searchParams }: CartPageProps) {
         {hasLines ? (
           <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
             <div className="min-w-0 space-y-4 lg:col-span-8">
-              <Surface
-                appearance="filled-alternative"
-                className="flex items-center gap-3 p-4"
-              >
-                <Truck aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={1.75} />
-                <div className="min-w-0 flex-1 space-y-2">
-                  <p className="text-label-md text-on-surface">
-                    {qualifiesForFreeShipping
-                      ? t.freeShippingReached
-                      : `${t.freeShippingHint} (${formatPrice(remaining, locale)})`}
-                  </p>
-                  <span className="block h-2 w-full overflow-hidden rounded-sm bg-surface-low">
-                    <span
-                      className="block h-full bg-primary-container"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </span>
-                </div>
-              </Surface>
-
               <List>
                 {handoutLines.map((line) => (
                   <HandoutCartLineRow
