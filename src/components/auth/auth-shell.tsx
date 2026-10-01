@@ -23,7 +23,7 @@ interface AuthShellProps {
 export function AuthShell({ title, subtitle, dictionary, children }: AuthShellProps) {
   return (
     <Container className="py-10 lg:py-16">
-      <div className="mx-auto grid max-w-6xl items-stretch overflow-hidden rounded-2xl border border-line bg-card elevation-md lg:min-h-[640px] lg:grid-cols-[1fr_1.15fr] lg:p-3">
+      <div className="mx-auto grid max-w-6xl items-stretch overflow-hidden rounded-2xl border border-line bg-card elevation-md lg:min-h-[640px] lg:grid-cols-[1fr_1.15fr] p-3">
         <section className="flex items-center bg-card p-6 sm:p-10">
           <div className="mx-auto w-full max-w-sm space-y-8">
             <header className="space-y-2 text-center">

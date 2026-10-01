@@ -17,6 +17,10 @@ const MAX_TILT = 10;
  * re-renders anything. Leaving the panel lets the mark settle back flat.
  *
  * Under `prefers-reduced-motion` the mark does not move at all.
+ *
+ * Below `lg` the card is a single column and the panel becomes a short band
+ * above the form, with a smaller mark. A finger has no hover, so the tilt
+ * answers the mouse only and the band stays still on a phone.
  */
 export function AuthAside({ name }: { name: string }) {
   const markRef = useRef<HTMLDivElement>(null);
@@ -32,6 +36,7 @@ export function AuthAside({ name }: { name: string }) {
   };
 
   const onPointerMove = (event: PointerEvent<HTMLElement>) => {
+    if (event.pointerType !== "mouse") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const box = event.currentTarget.getBoundingClientRect();
@@ -45,7 +50,7 @@ export function AuthAside({ name }: { name: string }) {
     <section
       onPointerMove={onPointerMove}
       onPointerLeave={() => tilt(0, 0)}
-      className="relative isolate hidden items-center justify-center overflow-hidden rounded-xl p-10 lg:flex"
+      className="relative isolate order-first flex h-44 items-center justify-center overflow-hidden rounded-xl p-6 lg:order-none lg:h-auto lg:p-10"
       style={{
         backgroundImage: [
           "radial-gradient(60% 50% at 70% 28%, rgb(255 255 255 / 0.38), transparent 70%)",
@@ -65,8 +70,8 @@ export function AuthAside({ name }: { name: string }) {
           src={logoWhite}
           alt={name}
           priority
-          sizes="360px"
-          className="h-64 w-auto object-contain"
+          sizes="(min-width: 1024px) 360px, 160px"
+          className="h-28 w-auto object-contain lg:h-64"
         />
       </div>
     </section>
