@@ -774,13 +774,18 @@ export async function getOrderHandoutItems(order: Order) {
   });
 
   return rows.map((row) => ({
+    // The line's own id: two deleted handouts share a null handoutId.
+    id: row.id,
     handoutId: row.handoutId,
     quantity: row.quantity,
     unitPrice: row.unitPrice,
     // As they read when the order was placed, not as the handout reads now.
     title: { ar: row.titleAr },
     authorName: { ar: row.authorNameAr },
-    handout: toHandout(row.handout),
+    // The handout's own cover while it exists; the copy the delete left after.
+    coverUrl: (row.handout ? row.handout.coverUrl : row.coverUrl) ?? undefined,
+    // Null once the handout is deleted.
+    handout: row.handout ? toHandout(row.handout) : null,
     lineTotal: row.unitPrice * row.quantity,
   }));
 }
@@ -937,6 +942,8 @@ async function soldHandoutItems() {
       quantity: true,
       unitPrice: true,
       handoutId: true,
+      // The branch the delete copied, for a line whose handout is gone.
+      categoryId: true,
       handout: { select: { categoryId: true } },
     },
   });
@@ -948,6 +955,8 @@ export async function getTopHandouts() {
   const totals = new Map<string, { sold: number; revenue: number }>();
 
   for (const row of rows) {
+    // A deleted handout leaves the list; the next best seller takes its place.
+    if (!row.handoutId) continue;
     const entry = totals.get(row.handoutId) ?? { sold: 0, revenue: 0 };
     entry.sold += row.quantity;
     entry.revenue += row.quantity * row.unitPrice;
@@ -1000,7 +1009,8 @@ export async function getHandoutCategoryShares(
 
   for (const row of rows) {
     const value = row.quantity * row.unitPrice;
-    own.set(row.handout.categoryId, (own.get(row.handout.categoryId) ?? 0) + value);
+    const categoryId = row.handout?.categoryId ?? row.categoryId;
+    if (categoryId) own.set(categoryId, (own.get(categoryId) ?? 0) + value);
     grandTotal += value;
   }
 

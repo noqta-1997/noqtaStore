@@ -151,7 +151,8 @@ export interface Customer {
 
 /** An order line: one handout, how many, and at what price. */
 export interface HandoutOrderItem {
-  handoutId: string;
+  /** Null once the handout is deleted. */
+  handoutId: string | null;
   quantity: number;
   /** Unit price at the time of ordering. */
   unitPrice: number;

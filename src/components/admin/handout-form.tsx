@@ -337,7 +337,7 @@ export function HandoutForm({
             fallbackError={dictionary.common.toast.actionFailed}
             errorMessages={{
               inUse: dictionary.common.actionErrors.inUse,
-              archiveInstead: dictionary.common.actionErrors.archiveInstead,
+              openOrders: dictionary.common.actionErrors.openOrders,
               forbidden: dictionary.common.actionErrors.forbidden,
               notFound: dictionary.common.actionErrors.notFound,
               deleteFailed: dictionary.common.actionErrors.deleteFailed,

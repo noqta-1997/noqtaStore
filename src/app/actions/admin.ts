@@ -358,15 +358,38 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
 export async function deleteHandout(handoutId: string): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
-  // An ordered handout stays for the order's sake; archiving is how it leaves.
-  const ordered = await prisma.handoutOrderItem.count({ where: { handoutId } });
-  if (ordered > 0) return fail("archiveInstead");
-
+  // A handout that orders still have to deliver stays until they close;
+  // archiving is how it leaves the shop meanwhile. Once they have closed,
+  // its order lines take the cover and branch and outlive it — the foreign
+  // key sets their handoutId null. The row is locked first, so an order
+  // placed meanwhile either commits before the count, and is counted, or
+  // waits for the delete and finds the handout gone.
   const deleted = await attemptDelete("deleteHandout", { handoutId }, () =>
-    prisma.handout.delete({ where: { id: handoutId }, select: { coverUrl: true } }),
+    prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT 1 FROM "handouts" WHERE "id" = ${handoutId} FOR UPDATE`;
+      const handout = await tx.handout.findUnique({
+        where: { id: handoutId },
+        select: { coverUrl: true, categoryId: true },
+      });
+      if (!handout) return { error: "notFound" } as const;
+
+      const open = await tx.handoutOrderItem.count({
+        where: { handoutId, order: { status: { notIn: ["delivered", "cancelled"] } } },
+      });
+      if (open > 0) return { error: "openOrders" } as const;
+
+      const ordered = await tx.handoutOrderItem.updateMany({
+        where: { handoutId },
+        data: { coverUrl: handout.coverUrl, categoryId: handout.categoryId },
+      });
+      await tx.handout.delete({ where: { id: handoutId } });
+      return { coverUrl: handout.coverUrl, ordered: ordered.count > 0 };
+    }),
   );
   if (!deleted.ok) return deleted;
-  await discardCover(deleted.row.coverUrl);
+  if (deleted.row.error) return fail(deleted.row.error);
+  // The orders show the cover now; it goes only with a handout nobody ordered.
+  if (!deleted.row.ordered) await discardCover(deleted.row.coverUrl);
 
   revalidateHandouts();
   return ok();
@@ -747,6 +770,12 @@ export async function updateOrderStatus(formData: FormData): Promise<ActionResul
       if (!stockMoves) return;
 
       for (const item of order.handoutItems) {
+        // A deleted handout has no shelf: an order holding one cannot come
+        // back from `cancelled`, and cancelling has nothing to return to it.
+        if (!item.handoutId) {
+          if (reclaiming) throw new ShortStock("(deleted)");
+          continue;
+        }
         if (reclaiming) {
           await takeFromShelf(tx, item.handoutId, item.quantity);
         } else {
@@ -814,11 +843,16 @@ export async function deleteOrder(orderId: string): Promise<ActionResult> {
           ]
         : []),
       ...(releasing
-        ? order.handoutItems.map((item) =>
-            prisma.handout.update({
-              where: { id: item.handoutId },
-              data: { stock: { increment: item.quantity } },
-            }),
+        ? order.handoutItems.flatMap((item) =>
+            // A deleted handout has no shelf to take its copies back.
+            item.handoutId
+              ? [
+                  prisma.handout.update({
+                    where: { id: item.handoutId },
+                    data: { stock: { increment: item.quantity } },
+                  }),
+                ]
+              : [],
           )
         : []),
     ]),

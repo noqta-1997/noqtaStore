@@ -158,13 +158,13 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
           <h3 className={surfaceTitleStyles()}>{t.itemsTitle}</h3>
           <ul className="divide-y divide-line-divider">
             {handoutItems.map((item) => (
-              <li key={item.handoutId} className="flex items-center gap-4 p-5">
+              <li key={item.id} className="flex items-center gap-4 p-5">
                 <span className="w-14 shrink-0">
                   <BookCover
                     title={item.title[locale]}
                     author={item.authorName[locale]}
-                    seed={item.handout.slug}
-                    src={item.handout.coverUrl}
+                    seed={item.handout?.slug ?? item.id}
+                    src={item.coverUrl}
                     sizes="3.5rem"
                     className="border border-line"
                     compact
@@ -172,8 +172,9 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
                 </span>
                 <span className="min-w-0 flex-1">
                   <TitleLink
-                    href={`/handouts/${item.handout.slug}`}
-                    archived={item.handout.archived}
+                    href={`/handouts/${item.handout?.slug}`}
+                    // Deleted reads as withdrawn, like archived.
+                    archived={!item.handout || item.handout.archived}
                     archivedNote={dictionary.common.noLongerOnSale}
                     className="block font-display text-base font-bold underline-offset-4 hover:underline"
                   >

@@ -8,6 +8,7 @@ import { PrintButton } from "@/components/ui/print-button";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@/components/admin/data-table";
 import { Panel } from "@/components/admin/panel";
 import { BookCover } from "@/components/book/book-cover";
+import { TitleLink } from "@/components/book/title-link";
 import { OrderSummary } from "@/components/commerce/order-summary";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
@@ -117,27 +118,30 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
               </Thead>
               <Tbody>
                 {handoutItems.map((item) => (
-                  <Tr key={item.handoutId}>
+                  <Tr key={item.id}>
                     <Td>
                       <div className="flex items-center gap-3">
                         <span className="w-9 shrink-0">
                           <BookCover
                             title={item.title[locale]}
                             author={item.authorName[locale]}
-                            seed={item.handout.slug}
-                            src={item.handout.coverUrl}
+                            seed={item.handout?.slug ?? item.id}
+                            src={item.coverUrl}
                             sizes="2.25rem"
                             className="rounded-md elevation-sm"
                             compact
                           />
                         </span>
                         <span className="min-w-0">
-                          <Link
+                          {/* A deleted handout has no edit page to go to. */}
+                          <TitleLink
                             href={`/admin/handouts/${item.handoutId}`}
+                            archived={!item.handout}
+                            archivedNote={dictionary.common.noLongerOnSale}
                             className="block max-w-56 truncate font-semibold underline-offset-4 hover:underline"
                           >
                             {item.title[locale]}
-                          </Link>
+                          </TitleLink>
                           <span className="block text-label-md text-muted">
                             {item.authorName[locale]}
                           </span>

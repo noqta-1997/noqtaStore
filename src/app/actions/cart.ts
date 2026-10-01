@@ -174,9 +174,11 @@ export async function reorder(orderId: string): Promise<ActionResult> {
 
   if (!order) return fail("notFound");
 
-  // Archived titles count as withdrawn: skipped like a sold-out one.
-  const availableHandouts = order.handoutItems.filter(
-    (item) => item.handout.stock > 0 && !item.handout.archivedAt,
+  // Archived and deleted titles count as withdrawn: skipped like a sold-out one.
+  const availableHandouts = order.handoutItems.flatMap(({ handoutId, handout, quantity }) =>
+    handoutId && handout && handout.stock > 0 && !handout.archivedAt
+      ? [{ handoutId, handout, quantity }]
+      : [],
   );
   if (!availableHandouts.length) return fail("outOfStock");
 

@@ -180,11 +180,12 @@ model Handout {
   rating       Float @default(0)
   reviewsCount Int   @default(0)
 
-  /// Set when the panel takes the title off sale without deleting it. A
-  /// handout that has been ordered cannot be deleted — its order lines hold
-  /// it — so archiving is how it leaves the shop: every storefront read
-  /// filters on `archivedAt: null`, while order history and the panel still
-  /// see it.
+  /// Set when the panel takes the title off sale without deleting it: every
+  /// storefront read filters on `archivedAt: null`, while order history and
+  /// the panel still see it. A handout in an order not yet delivered or
+  /// cancelled cannot be deleted, so archiving is how it leaves the shop
+  /// meanwhile; once its orders are closed it can be deleted, and their
+  /// lines keep what they need of it (see HandoutOrderItem).
   archivedAt DateTime?
 
   authorId    String
@@ -336,7 +337,8 @@ model OrderEvent {
 model HandoutOrderItem {
   id        String @id @default(cuid())
   orderId   String
-  handoutId String
+  /// Null once the handout is deleted; the line then stands on its copies.
+  handoutId String?
   quantity  Int    @default(1)
   /// Price at the moment of ordering, not the current catalogue price.
   unitPrice Int
@@ -344,9 +346,15 @@ model HandoutOrderItem {
   /// editing the handout later does not rewrite the order's history.
   titleAr      String
   authorNameAr String
+  /// The handout's cover and branch, copied when it is deleted and null
+  /// until then: the cover file is kept for the order, and the branch keeps
+  /// the line's sales in the category shares. The branch is a plain id, so
+  /// deleting that branch later leaves it pointing at nothing.
+  coverUrl   String?
+  categoryId String?
 
-  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  handout Handout @relation(fields: [handoutId], references: [id])
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  handout Handout? @relation(fields: [handoutId], references: [id], onDelete: SetNull)
 
   @@index([orderId])
   @@index([handoutId])
