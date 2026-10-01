@@ -104,23 +104,6 @@ export async function setDefaultAddress(addressId: string): Promise<ActionResult
   return ok();
 }
 
-/** Marketing opt-ins. An unchecked box posts nothing, which reads as false. */
-export async function savePreferences(formData: FormData): Promise<ActionResult> {
-  const customerId = await requireCustomerId();
-  if (!customerId) return fail("unauthenticated");
-
-  await prisma.customer.update({
-    where: { id: customerId },
-    data: {
-      newsletterOptIn: checkbox(formData, "newsletter"),
-      offersOptIn: checkbox(formData, "offers"),
-    },
-  });
-
-  revalidatePath("/account");
-  return ok();
-}
-
 export async function deleteOwnHandoutReview(reviewId: string): Promise<ActionResult> {
   const customerId = await requireCustomerId();
   if (!customerId) return fail("unauthenticated");

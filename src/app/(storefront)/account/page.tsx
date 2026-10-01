@@ -2,13 +2,12 @@ import { Heart, Library, Package } from "lucide-react";
 import type { Metadata } from "next";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Surface, surfaceTitleStyles } from "@/components/ui/surface";
 import { getCustomer } from "@/data";
 import { ActionForm } from "@/components/ui/action-form";
-import { savePreferences, updateProfile } from "@/app/actions/account";
+import { updateProfile } from "@/app/actions/account";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { formatNumber } from "@/lib/format";
@@ -122,30 +121,6 @@ export default async function ProfilePage() {
               />
             </Field>
           </div>
-          <Button type="submit">{t.saveChanges}</Button>
-        </ActionForm>
-      </Panel>
-
-      <Panel title={t.preferences}>
-        <ActionForm
-          className="space-y-3"
-          action={savePreferences}
-          successTitle={dictionary.common.toast.saved}
-          errorMessages={dictionary.common.actionErrors}
-          fallbackError={dictionary.common.toast.actionFailed}
-        >
-          <Checkbox
-            id="newsletter"
-            name="newsletter"
-            defaultChecked={customer.preferences.newsletter}
-            label={t.newsletterOptIn}
-          />
-          <Checkbox
-            id="offers"
-            name="offers"
-            defaultChecked={customer.preferences.offers}
-            label={t.offersOptIn}
-          />
           <Button type="submit">{t.saveChanges}</Button>
         </ActionForm>
       </Panel>

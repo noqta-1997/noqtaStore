@@ -137,10 +137,6 @@ export interface Customer {
   /** Set from the panel. A blocked account browses, but neither orders nor reviews. */
   status: CustomerStatus;
   addresses: Address[];
-  preferences: {
-    newsletter: boolean;
-    offers: boolean;
-  };
   stats: {
     orders: number;
     wishlist: number;

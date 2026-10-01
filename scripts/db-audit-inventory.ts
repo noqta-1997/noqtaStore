@@ -673,7 +673,7 @@ function render(inv: Capture, schema: PrismaSchema, folders: string[]): string {
   p();
   p(`#### §CUSTOMERS§ — العملاء والعناوين`);
   const userIdType = inv.columns.find((c) => c.schema === "public" && c.table === "customers" && c.name === "userId")?.type ?? "?";
-  p(`§customers§ هو الملف الشخصي داخل التطبيق (اسم، بريد، هاتف، دور §customer|admin§، حالة §active|blocked§، تفضيلات النشرة)؛ §customers.userId§ (§${userIdType}§) يحمل معرّف §auth.users§ — الربط الوحيد بين التطبيق و§AUTH_CORE§${customersFk ? `، بمفتاح أجنبي §${customersFk.name}§ (عند الحذف ${customersFk.on_delete})` : "، وهو بلا FK"}. حالياً ${inv.customers.total} عميل، منهم ${inv.customers.withUserId} مربوط بحساب §auth.users§ (§userId§ غير فارغ). §addresses§ دفتر عناوين متعدد لكل عميل، يُحذف معه (§CASCADE§).`);
+  p(`§customers§ هو الملف الشخصي داخل التطبيق (اسم، بريد، هاتف، دور §customer|admin§، حالة §active|blocked§)؛ §customers.userId§ (§${userIdType}§) يحمل معرّف §auth.users§ — الربط الوحيد بين التطبيق و§AUTH_CORE§${customersFk ? `، بمفتاح أجنبي §${customersFk.name}§ (عند الحذف ${customersFk.on_delete})` : "، وهو بلا FK"}. حالياً ${inv.customers.total} عميل، منهم ${inv.customers.withUserId} مربوط بحساب §auth.users§ (§userId§ غير فارغ). §addresses§ دفتر عناوين متعدد لكل عميل، يُحذف معه (§CASCADE§).`);
   p();
   p(`#### §ORDERS§ — الطلبات`);
   p(`§orders§ رأس الطلب مع لقطة عنوان الشحن ومبالغ بالدينار الصحيح (§subtotal/shippingCost/discount/total§) وطريقة الدفع (§cod|card|wallet§) كعمود، **لا جدول مدفوعات مستقل**. سطور الطلب في §handout_order_items§، وتخزّن §unitPrice§ وقت الطلب. §order_events§ الخط الزمني لحالة الطلب. حذف الطلب يحذف سطوره وأحداثه؛ حذف العميل ممنوع ما دام له طلب (§RESTRICT§).`);

@@ -1,0 +1,26 @@
+{
+  "takenAt": "2026-10-01T14:34:03.092Z",
+  "table": "customers",
+  "columns": [
+    "newsletterOptIn",
+    "offersOptIn"
+  ],
+  "rows": [
+    {
+      "id": "cmthr2sqm000048tqamjn3792",
+      "newsletterOptIn": false,
+      "offersOptIn": false
+    },
+    {
+      "id": "cmu1nqepf000004ktqbs5kdgu",
+      "newsletterOptIn": true,
+      "offersOptIn": false
+    },
+    {
+      "id": "cmupmt3mu000004l9uqz5qx9c",
+      "newsletterOptIn": true,
+      "offersOptIn": false
+    }
+  ],
+  "note": "Restore: UPDATE customers SET \"newsletterOptIn\"=…, \"offersOptIn\"=… WHERE id=… after re-adding the columns (see migration 20260830141224_marketing_and_settings)."
+}

@@ -233,9 +233,6 @@ model Customer {
   /// Grants access to /admin. Set deliberately, never on sign-up.
   role      CustomerRole   @default(customer)
 
-  /// Marketing preferences, edited from /account.
-  newsletterOptIn Boolean @default(true)
-  offersOptIn     Boolean @default(false)
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
 

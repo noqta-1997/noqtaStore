@@ -36,10 +36,6 @@ export const customer: Customer = {
   memberSince: "2024-11-03",
   status: "active",
   addresses,
-  preferences: {
-    newsletter: true,
-    offers: false,
-  },
   stats: {
     orders: 4,
     wishlist: 6,

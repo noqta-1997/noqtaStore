@@ -671,10 +671,6 @@ export async function getCustomer(): Promise<Customer> {
     birthDate: row.birthDate?.toISOString().slice(0, 10) ?? "",
     memberSince: storeDateKey(row.createdAt),
     status: row.status,
-    preferences: {
-      newsletter: row.newsletterOptIn,
-      offers: row.offersOptIn,
-    },
     addresses: row.addresses.map(toAddress),
     stats: {
       orders: row._count.orders,
