@@ -31,8 +31,8 @@ export function sameSitePath(requested: string | null | undefined): string | nul
  * Where a reader belongs once they have a session.
  *
  * An explicit `next` wins — someone bounced off the cart should land back on
- * the cart. Otherwise a manager goes to the panel and everyone else to their
- * account, so signing in never drops the owner on a page they did not want.
+ * the cart. Otherwise a manager goes to the panel and everyone else to the
+ * store, so signing in never drops the owner on a page they did not want.
  */
 export async function landingPath(requestedNext?: string | null): Promise<string> {
   const next = sameSitePath(requestedNext);
@@ -40,5 +40,5 @@ export async function landingPath(requestedNext?: string | null): Promise<string
 
   const customer = await getCurrentCustomer();
 
-  return customer?.role === "admin" ? `/admin` : `/account`;
+  return customer?.role === "admin" ? `/admin` : `/`;
 }
