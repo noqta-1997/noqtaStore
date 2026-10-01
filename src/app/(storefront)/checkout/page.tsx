@@ -25,7 +25,7 @@ import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { requireCustomer } from "@/lib/auth";
 import { getAppliedCoupon } from "@/lib/coupon";
-import { formatPrice } from "@/lib/format";
+import { formatDeliveryTime, formatPrice } from "@/lib/format";
 import { governorates } from "@/lib/constants";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -138,7 +138,7 @@ export default async function CheckoutPage() {
       id: "standard",
       icon: <Truck aria-hidden className="size-5" strokeWidth={1.75} />,
       title: t.shippingOptions.standardTitle,
-      note: t.shippingOptions.standardNote,
+      note: formatDeliveryTime(shippingRules.estimatedDays, dictionary.common),
       price: shipping,
       defaultChecked: true,
     },
