@@ -22,7 +22,9 @@ export default async function LoginPage() {
     <AuthShell title={t.loginTitle} subtitle={t.loginSubtitle} dictionary={dictionary}>
       {/* Reads `?next=` and `?error=oauth`, so it needs a boundary to prerender. */}
       <Suspense fallback={<div className="h-12" />}>
-        <SocialButtons labels={{ google: t.google, failure: t.errors.generic }} />
+        <SocialButtons
+          labels={{ google: t.google, pending: t.googlePending, failure: t.errors.generic }}
+        />
       </Suspense>
     </AuthShell>
   );
