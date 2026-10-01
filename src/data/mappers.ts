@@ -182,6 +182,7 @@ export function toOrder(row: OrderRowWithRelations): Order {
       line: mirror(row.shippingLine),
       isDefault: false,
     },
+    notes: row.notes,
     timeline: row.timeline
       .sort((a, b) => a.occurredAt.getTime() - b.occurredAt.getTime())
       .map((event) => ({

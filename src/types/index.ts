@@ -177,6 +177,7 @@ export interface Order {
   paymentMethod: PaymentMethod;
   shippingMethod: ShippingMethod;
   address: Address;
+  notes: string | null;
   timeline: OrderTimelineEntry[];
 }
 

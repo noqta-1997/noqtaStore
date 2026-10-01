@@ -303,6 +303,12 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
               <span className="block" dir="ltr" data-numeric>
                 {order.address.phone}
               </span>
+              {order.notes ? (
+                <span className="block border-t border-line-divider pt-3 mt-3">
+                  <span className="block label-mono text-muted">{dictionary.checkout.notes}</span>
+                  <span className="block whitespace-pre-line">{order.notes}</span>
+                </span>
+              ) : null}
             </address>
           </Panel>
 
