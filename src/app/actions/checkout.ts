@@ -21,16 +21,14 @@ import { revalidateHandouts } from "@/lib/revalidate";
 import { ShortStock, takeFromShelf } from "@/lib/shelf";
 import { getShippingRules, type ShippingRules } from "@/data";
 
-const shippingMethods = ["standard", "express", "pickup"] as const;
 const paymentMethods = ["cod", "card", "wallet"] as const;
 
-type ShippingMethod = (typeof shippingMethods)[number];
+/** Express stays in the database enum for old orders; checkout no longer sells it. */
+type ShippingMethod = "standard" | "pickup";
 type PaymentMethod = (typeof paymentMethods)[number];
 
 function shippingCostFor(method: ShippingMethod, rules: ShippingRules) {
-  if (method === "pickup") return 0;
-  if (method === "express") return rules.expressCost;
-  return rules.standardCost;
+  return method === "pickup" ? 0 : rules.standardCost;
 }
 
 /**
@@ -68,14 +66,13 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
 
   const rules = await getShippingRules();
 
-  // Pickup is an option only while the settings screen offers it; a form
-  // that names it after it was switched off is charged the standard rate.
-  const rawShipping = text(formData, "shippingMethod") as ShippingMethod;
+  // Standard delivery, or pickup while the settings screen offers it. A form
+  // that names anything else — express, which checkout stopped selling, or
+  // pickup after it was switched off — is charged the standard rate.
+  const rawShipping = text(formData, "shippingMethod");
   const rawPayment = text(formData, "paymentMethod") as PaymentMethod;
-  const shippingMethod =
-    shippingMethods.includes(rawShipping) && (rawShipping !== "pickup" || rules.enablePickup)
-      ? rawShipping
-      : "standard";
+  const shippingMethod: ShippingMethod =
+    rawShipping === "pickup" && rules.enablePickup ? "pickup" : "standard";
   const paymentMethod = paymentMethods.includes(rawPayment) ? rawPayment : "cod";
 
   const fullName = text(formData, "fullName");
