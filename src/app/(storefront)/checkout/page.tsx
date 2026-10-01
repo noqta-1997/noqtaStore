@@ -1,4 +1,4 @@
-import { Ban, Banknote, CreditCard, ShoppingCart, Store, Truck, Wallet, Zap } from "lucide-react";
+import { Ban, Banknote, CreditCard, ShoppingCart, Truck, Wallet } from "lucide-react";
 import type { Metadata } from "next";
 
 import { BookCover } from "@/components/book/book-cover";
@@ -143,22 +143,6 @@ export default async function CheckoutPage() {
       price: shipping,
       defaultChecked: true,
     },
-    {
-      id: "express",
-      icon: <Zap aria-hidden className="size-5" strokeWidth={1.75} />,
-      title: t.shippingOptions.expressTitle,
-      note: t.shippingOptions.expressNote,
-      price: shippingRules.expressCost,
-      defaultChecked: false,
-    },
-    ...(shippingRules.enablePickup ? [{
-      id: "pickup",
-      icon: <Store aria-hidden className="size-5" strokeWidth={1.75} />,
-      title: t.shippingOptions.pickupTitle,
-      note: t.shippingOptions.pickupNote,
-      price: 0,
-      defaultChecked: false,
-    }] : []),
   ];
 
   const paymentOptions = [
@@ -167,7 +151,7 @@ export default async function CheckoutPage() {
       icon: <Banknote aria-hidden className="size-5" strokeWidth={1.75} />,
       title: t.paymentOptions.codTitle,
       note: t.paymentOptions.codNote,
-      defaultChecked: paymentDefault !== "wallet",
+      defaultChecked: true,
       disabled: false,
     },
     {
@@ -175,8 +159,8 @@ export default async function CheckoutPage() {
       icon: <Wallet aria-hidden className="size-5" strokeWidth={1.75} />,
       title: t.paymentOptions.walletTitle,
       note: t.paymentOptions.walletNote,
-      defaultChecked: paymentDefault === "wallet",
-      disabled: false,
+      defaultChecked: false,
+      disabled: true,
     },
     {
       id: "card",
