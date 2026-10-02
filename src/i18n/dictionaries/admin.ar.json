@@ -608,9 +608,7 @@
     "shipping": {
       "title": "قواعد الشحن",
       "standardCost": "كلفة التوصيل الاعتيادي",
-      "expressCost": "كلفة التوصيل السريع",
-      "estimatedDays": "المدة التقديرية بالأيام",
-      "enablePickup": "تفعيل الاستلام من المكتبة"
+      "estimatedDays": "المدة التقديرية بالأيام"
     },
     "payments": {
       "title": "طرق الدفع",

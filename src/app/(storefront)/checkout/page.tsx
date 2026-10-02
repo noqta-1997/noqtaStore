@@ -129,7 +129,6 @@ export default async function CheckoutPage() {
   // Same figures the option cards print; `placeOrder` computes its own.
   const shippingByMethod: Record<string, number> = {
     standard: shipping,
-    ...(shippingRules.enablePickup ? { pickup: 0 } : {}),
   };
 
   const shippingOptions = [

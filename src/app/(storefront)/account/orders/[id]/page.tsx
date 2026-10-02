@@ -65,13 +65,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
     },
     {
       label: t.shippingMethod,
-      value: dictionary.checkout.shippingOptions[
-        order.shippingMethod === "standard"
-          ? "standardTitle"
-          : order.shippingMethod === "express"
-            ? "expressTitle"
-            : "pickupTitle"
-      ],
+      value: dictionary.checkout.shippingOptions.standardTitle,
     },
   ];
 

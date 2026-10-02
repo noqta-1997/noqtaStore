@@ -47,8 +47,6 @@ enum PaymentMethod {
 
 enum ShippingMethod {
   standard
-  express
-  pickup
 }
 
 enum ReviewStatus {

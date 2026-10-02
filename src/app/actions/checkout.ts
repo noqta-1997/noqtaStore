@@ -19,17 +19,11 @@ import { prisma } from "@/lib/prisma";
 import { isCheckViolation } from "@/lib/prisma-errors";
 import { revalidateHandouts } from "@/lib/revalidate";
 import { ShortStock, takeFromShelf } from "@/lib/shelf";
-import { getShippingRules, type ShippingRules } from "@/data";
+import { getShippingRules } from "@/data";
 
 const paymentMethods = ["cod", "card", "wallet"] as const;
 
-/** Express stays in the database enum for old orders; checkout no longer sells it. */
-type ShippingMethod = "standard" | "pickup";
 type PaymentMethod = (typeof paymentMethods)[number];
-
-function shippingCostFor(method: ShippingMethod, rules: ShippingRules) {
-  return method === "pickup" ? 0 : rules.standardCost;
-}
 
 /**
  * Turns the cart into an order: totals are recomputed on the server from
@@ -64,15 +58,7 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
   const shortage = handoutLines.find((line) => line.handout.stock < line.quantity);
   if (shortage) return fail("outOfStock");
 
-  const rules = await getShippingRules();
-
-  // Standard delivery, or pickup while the settings screen offers it. A form
-  // that names anything else — express, which checkout stopped selling, or
-  // pickup after it was switched off — is charged the standard rate.
-  const rawShipping = text(formData, "shippingMethod");
   const rawPayment = text(formData, "paymentMethod") as PaymentMethod;
-  const shippingMethod: ShippingMethod =
-    rawShipping === "pickup" && rules.enablePickup ? "pickup" : "standard";
   const paymentMethod = paymentMethods.includes(rawPayment) ? rawPayment : "cod";
 
   const fullName = text(formData, "fullName");
@@ -90,7 +76,9 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
     (total, item) => total + item.handout.price * item.quantity,
     0,
   );
-  const shippingCost = shippingCostFor(shippingMethod, rules);
+  // Standard delivery is the only method the store sells; whatever a form
+  // names, the order is charged its rate.
+  const { standardCost: shippingCost } = await getShippingRules();
 
   // The order has one phone column. The optional second number the form asks
   // for used to be read by nothing and vanished on submit; it goes into the
@@ -131,7 +119,7 @@ export async function placeOrder(formData: FormData): Promise<ActionResult> {
         total: subtotal + shippingCost - discount,
         couponCode: applied?.ok ? applied.coupon.code : null,
         paymentMethod,
-        shippingMethod,
+        shippingMethod: "standard",
         shippingName: fullName,
         shippingPhone: phone,
         shippingGovernorate: governorate,

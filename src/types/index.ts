@@ -114,7 +114,7 @@ export type OrderStatus =
 
 export type PaymentMethod = "cod" | "card" | "wallet";
 
-export type ShippingMethod = "standard" | "express" | "pickup";
+export type ShippingMethod = "standard";
 
 export interface Address {
   id: string;

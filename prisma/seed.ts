@@ -195,7 +195,7 @@ interface OrderSeed {
   shippingCost: number;
   discount: number;
   paymentMethod: "cod" | "card" | "wallet";
-  shippingMethod: "standard" | "express" | "pickup";
+  shippingMethod: "standard";
 }
 
 const statusFlow: OrderStatus[] = ["pending", "processing", "shipped", "delivered"];
@@ -279,10 +279,10 @@ async function seedOrders() {
         status: random() > 0.08 ? "delivered" : "cancelled",
         createdAt,
         items,
-        shippingCost: random() > 0.5 ? 0 : 5000,
+        shippingCost: 5000,
         discount: 0,
         paymentMethod: random() > 0.25 ? "cod" : "wallet",
-        shippingMethod: random() > 0.85 ? "express" : "standard",
+        shippingMethod: "standard",
       });
     }
   }

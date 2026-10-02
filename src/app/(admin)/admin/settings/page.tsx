@@ -232,17 +232,6 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                 defaultValue={shippingRules.standardCost}
               />
             </Field>
-            <Field label={t.shipping.expressCost} htmlFor="expressCost">
-              <Input
-                id="expressCost"
-                name="expressCost"
-                type="number"
-                dir="ltr"
-                step={500}
-                data-numeric
-                defaultValue={shippingRules.expressCost}
-              />
-            </Field>
             <Field label={t.shipping.estimatedDays} htmlFor="estimatedDays">
               <Input
                 id="estimatedDays"
@@ -253,13 +242,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
               />
             </Field>
 
-            <div className="space-y-4 sm:col-span-2">
-              <Checkbox
-                id="enablePickup"
-                name="enablePickup"
-                defaultChecked={shippingRules.enablePickup}
-                label={t.shipping.enablePickup}
-              />
+            <div className="sm:col-span-2">
               <Button type="submit">{admin.common.saveChanges}</Button>
             </div>
           </ActionForm>

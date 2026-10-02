@@ -14,8 +14,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /**
  * Figures come from the same rules the checkout charges, so the page cannot
- * promise a price or a service the store has since changed. Express delivery
- * is not mentioned: checkout sells standard delivery only.
+ * promise a price the store has since changed. Standard delivery is the only
+ * method the store sells.
  */
 export default async function Page() {
   const locale = defaultLocale;
@@ -25,7 +25,7 @@ export default async function Page() {
     getShippingRules(),
   ]);
   const page = dictionary.info.shipping;
-  const { delivery, cost, pickup } = page.sections;
+  const { delivery, cost } = page.sections;
 
   const sections = [
     {
@@ -39,7 +39,6 @@ export default async function Page() {
       title: cost.title,
       body: cost.body.replace("{cost}", formatPrice(rules.standardCost, locale)),
     },
-    ...(rules.enablePickup ? [pickup] : []),
   ];
 
   return (

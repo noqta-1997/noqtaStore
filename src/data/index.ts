@@ -64,7 +64,6 @@ import type {
 
 /** Commerce rules, kept in one place for the whole storefront. */
 export const STANDARD_SHIPPING_COST = 5000;
-export const EXPRESS_SHIPPING_COST = 10000;
 export const HANDOUTS_PER_PAGE = 12;
 export const LOW_STOCK_THRESHOLD = 12;
 
@@ -1566,9 +1565,7 @@ export async function getDefaultPaymentMethod(): Promise<string> {
 
 export interface ShippingRules {
   standardCost: number;
-  expressCost: number;
   estimatedDays: string;
-  enablePickup: boolean;
 }
 
 /**
@@ -1585,9 +1582,7 @@ export async function getShippingRules(): Promise<ShippingRules> {
 
   return {
     standardCost: money("standardCost", STANDARD_SHIPPING_COST),
-    expressCost: money("expressCost", EXPRESS_SHIPPING_COST),
     estimatedDays: settings.estimatedDays || "2-5",
-    enablePickup: settings.enablePickup !== "false",
   };
 }
 

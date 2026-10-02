@@ -364,11 +364,7 @@
     "saveAddress": "احفظ هذا العنوان لطلباتي القادمة",
     "shippingSection": "طريقة الشحن",
     "shippingOptions": {
-      "standardTitle": "توصيل اعتيادي",
-      "expressTitle": "توصيل سريع",
-      "expressNote": "خلال 24 ساعة داخل بغداد",
-      "pickupTitle": "استلام من المكتبة",
-      "pickupNote": "شارع المتنبي — بغداد"
+      "standardTitle": "توصيل اعتيادي"
     },
     "paymentSection": "طريقة الدفع",
     "paymentOptions": {
@@ -610,10 +606,6 @@
         "cost": {
           "title": "كلفة الشحن",
           "body": "{cost} لكل طلب."
-        },
-        "pickup": {
-          "title": "الاستلام من المكتبة",
-          "body": "يمكنك اختيار الاستلام من فرعنا في شارع المتنبي بلا أي كلفة، ونحتفظ بالطلب 5 أيام."
         }
       }
     },
