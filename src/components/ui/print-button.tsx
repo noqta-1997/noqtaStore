@@ -14,8 +14,8 @@ interface PrintButtonProps {
 }
 
 /**
- * Prints the current page. The invoice layout is handled by the print styles
- * in globals.css, which drop the chrome and keep the order itself.
+ * Prints the current page. On an order page that is the invoice sheet alone:
+ * the print styles in globals.css hide everything else while it is present.
  */
 export function PrintButton({
   label,

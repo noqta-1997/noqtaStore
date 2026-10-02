@@ -5,10 +5,11 @@ import { notFound } from "next/navigation";
 
 import { BookCover } from "@/components/book/book-cover";
 import { TitleLink } from "@/components/book/title-link";
+import { InvoiceSheet } from "@/components/commerce/invoice-sheet";
 import { OrderSummary } from "@/components/commerce/order-summary";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Surface, surfaceTitleStyles } from "@/components/ui/surface";
-import { getOrderById, getOrderHandoutItems } from "@/data";
+import { getOrderById, getOrderHandoutItems, getStoreIdentity } from "@/data";
 import { PrintButton } from "@/components/ui/print-button";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
@@ -41,12 +42,21 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
     notFound();
   }
 
-  const [dictionary, handoutItems] = await Promise.all([
+  const [dictionary, handoutItems, identity] = await Promise.all([
     getDictionary(locale),
     getOrderHandoutItems(order),
+    getStoreIdentity(),
   ]);
 
   const t = dictionary.account.orderDetails;
+
+  const store = {
+    name: identity.name[locale] || dictionary.brand.name,
+    tagline: identity.tagline[locale] || dictionary.brand.tagline,
+    address: identity.address || dictionary.footer.contact.address,
+    phone: identity.phone || dictionary.footer.contact.phone,
+    email: identity.email || dictionary.footer.contact.email,
+  };
 
   const facts = [
     {
@@ -236,6 +246,14 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
           </Surface>
         </div>
       </div>
+
+      <InvoiceSheet
+        order={order}
+        items={handoutItems}
+        store={store}
+        dictionary={dictionary}
+        locale={locale}
+      />
     </div>
   );
 }

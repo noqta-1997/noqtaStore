@@ -9,11 +9,12 @@ import { Table, Tbody, Td, Th, Thead, Tr } from "@/components/admin/data-table";
 import { Panel } from "@/components/admin/panel";
 import { BookCover } from "@/components/book/book-cover";
 import { TitleLink } from "@/components/book/title-link";
+import { InvoiceSheet } from "@/components/commerce/invoice-sheet";
 import { OrderSummary } from "@/components/commerce/order-summary";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { getAdminOrderById, getOrderHandoutItems } from "@/data";
+import { getAdminOrderById, getOrderHandoutItems, getStoreIdentity } from "@/data";
 import { ActionForm } from "@/components/ui/action-form";
 import { updateOrderStatus } from "@/app/actions/admin";
 import { defaultLocale } from "@/i18n/config";
@@ -56,13 +57,22 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
     notFound();
   }
 
-  const [dictionary, admin, handoutItems] = await Promise.all([
+  const [dictionary, admin, handoutItems, identity] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
     getOrderHandoutItems(order),
+    getStoreIdentity(),
   ]);
 
   const t = admin.orderDetails;
+
+  const store = {
+    name: identity.name[locale] || dictionary.brand.name,
+    tagline: identity.tagline[locale] || dictionary.brand.tagline,
+    address: identity.address || dictionary.footer.contact.address,
+    phone: identity.phone || dictionary.footer.contact.phone,
+    email: identity.email || dictionary.footer.contact.email,
+  };
 
   const contact = [
     { label: admin.settings.account.email, value: order.customer?.email ?? "", ltr: true },
@@ -325,6 +335,14 @@ export default async function AdminOrderPage({ params }: AdminOrderPageProps) {
           />
         </div>
       </div>
+
+      <InvoiceSheet
+        order={order}
+        items={handoutItems}
+        store={store}
+        dictionary={dictionary}
+        locale={locale}
+      />
     </>
   );
 }

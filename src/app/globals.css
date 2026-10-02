@@ -581,8 +581,9 @@
 /* ------------------------------------------------------------------ */
 
 /*
- * Invoices are printed from the order page itself rather than a separate
- * document: the chrome steps aside and the order stays exactly as reviewed.
+ * Pages print without their chrome. An order page also carries the invoice
+ * sheet (components/commerce/invoice-sheet.tsx), hidden on screen; when it is
+ * present it is the only thing printed.
  */
 @media print {
   header,
@@ -620,6 +621,43 @@
   a[href]::after {
     content: "";
   }
+
+  /*
+   * The invoice replaces the page. Everything that neither is the sheet, sits
+   * inside it, nor contains it is dropped; the containers that remain are
+   * flattened so none of their padding, height or overflow moves the sheet off
+   * the page's top corner or pushes it onto a second page.
+   */
+  body:has([data-invoice])
+    *:not([data-invoice], [data-invoice] *, :has([data-invoice])) {
+    display: none !important;
+  }
+
+  body:has([data-invoice]),
+  body:has([data-invoice]) :has([data-invoice]) {
+    display: block !important;
+    position: static !important;
+    width: auto !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    overflow: visible !important;
+    background: none !important;
+  }
+
+  [data-invoice] {
+    page: invoice;
+    margin: 0 !important;
+  }
+}
+
+/* The sheet is drawn to A4 edge to edge, so the page adds no margin of its own. */
+@page invoice {
+  size: A4;
+  margin: 0;
 }
 
 /*
