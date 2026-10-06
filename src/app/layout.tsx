@@ -10,6 +10,8 @@ import { ToastProvider } from "@/components/ui/toast";
 import { getStoreIdentity } from "@/data";
 import { defaultLocale, localeDirection } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
+import { OG_LOCALE } from "@/lib/seo";
+import { siteUrl } from "@/lib/site";
 
 import "@/app/globals.css";
 
@@ -56,13 +58,28 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const name = identity.name[defaultLocale] || dictionary.brand.name;
   const tagline = identity.tagline[defaultLocale] || dictionary.brand.tagline;
+  const title = `${name} — ${tagline}`;
 
+  /*
+   * No canonical here: `alternates` would be inherited by every page that
+   * does not set its own and point all of them at the home page. Each
+   * indexable page names itself through `pageMetadata`.
+   */
   return {
-    title: {
-      default: `${name} — ${tagline}`,
-      template: `%s | ${name}`,
-    },
+    metadataBase: new URL(siteUrl),
+    title: { default: title, template: `%s | ${name}` },
     description: dictionary.footer.about,
+    applicationName: name,
+    openGraph: {
+      type: "website",
+      locale: OG_LOCALE,
+      siteName: name,
+      title,
+      description: dictionary.footer.about,
+    },
+    twitter: { card: "summary_large_image" },
+    // Iraqi phone numbers in the copy are not meant to become tel: links.
+    formatDetection: { telephone: false },
   };
 }
 

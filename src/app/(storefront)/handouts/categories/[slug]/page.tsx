@@ -17,6 +17,7 @@ import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { parseBookQuery, toBookQuery } from "@/lib/book-query";
 import type { SearchParamsRecord } from "@/lib/search-params";
+import { listingIndexing, pageMetadata } from "@/lib/seo";
 import { readSlug } from "@/lib/slug";
 
 interface HandoutCategoryPageProps {
@@ -34,15 +35,24 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: HandoutCategoryPageProps): Promise<Metadata> {
   const slug = readSlug((await params).slug);
   const category = await getHandoutCategoryBySlug(slug);
   if (!category) return {};
 
-  const resolved = defaultLocale;
+  const locale = defaultLocale;
+  const dictionary = await getDictionary(locale);
+  const path = `/handouts/categories/${category.slug}`;
+
   return {
-    title: category.name[resolved],
-    description: category.description[resolved],
+    ...(await pageMetadata({
+      title: category.name[locale],
+      description:
+        category.description[locale] || `${dictionary.handouts.title}: ${category.name[locale]}.`,
+      path,
+    })),
+    ...listingIndexing(path, parseBookQuery(await searchParams)),
   };
 }
 

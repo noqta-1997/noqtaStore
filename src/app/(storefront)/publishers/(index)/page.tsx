@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { getPublishers } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
+import { pageMetadata } from "@/lib/seo";
 
 /** Catalogue content is re-fetched at most every five minutes. */
 export const revalidate = 300;
@@ -15,7 +16,13 @@ export const revalidate = 300;
 export async function generateMetadata(): Promise<Metadata> {
   const dictionary = await getDictionary(defaultLocale);
 
-  return { title: dictionary.publishersPage.title };
+  const page = dictionary.publishersPage;
+
+  return pageMetadata({
+    title: page.title,
+    description: `${page.subtitle}. ${dictionary.footer.about}`,
+    path: "/publishers",
+  });
 }
 
 export default async function PublishersPage() {

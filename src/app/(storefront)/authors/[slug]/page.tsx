@@ -11,6 +11,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { formatNumber } from "@/lib/format";
 import { readSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
+import { pageMetadata } from "@/lib/seo";
 
 interface AuthorPageProps {
   params: Promise<{ slug: string }>;
@@ -29,8 +30,15 @@ export async function generateMetadata({ params }: AuthorPageProps): Promise<Met
   const author = await getAuthorBySlug(slug);
   if (!author) return {};
 
-  const resolved = defaultLocale;
-  return { title: author.name[resolved], description: author.bio[resolved] };
+  const locale = defaultLocale;
+  const dictionary = await getDictionary(locale);
+
+  return pageMetadata({
+    title: author.name[locale],
+    description: author.bio[locale] || `${dictionary.authorsPage.handoutsBy}: ${author.name[locale]}.`,
+    path: `/authors/${author.slug}`,
+    image: author.avatarUrl,
+  });
 }
 
 export default async function AuthorPage({ params }: AuthorPageProps) {

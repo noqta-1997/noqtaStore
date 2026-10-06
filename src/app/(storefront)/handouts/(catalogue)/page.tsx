@@ -7,15 +7,23 @@ import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { parseBookQuery, toBookQuery } from "@/lib/book-query";
 import type { SearchParamsRecord } from "@/lib/search-params";
+import { listingIndexing, pageMetadata } from "@/lib/seo";
 
 interface HandoutsPageProps {
   searchParams: Promise<SearchParamsRecord>;
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: HandoutsPageProps): Promise<Metadata> {
   const dictionary = await getDictionary(defaultLocale);
 
-  return { title: dictionary.handouts.title };
+  return {
+    ...(await pageMetadata({
+      title: dictionary.handouts.title,
+      description: `${dictionary.handouts.subtitle}. ${dictionary.footer.about}`,
+      path: "/handouts",
+    })),
+    ...listingIndexing("/handouts", parseBookQuery(await searchParams)),
+  };
 }
 
 export default async function HandoutsPage({ searchParams }: HandoutsPageProps) {

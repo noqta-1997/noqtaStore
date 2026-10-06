@@ -12,6 +12,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { formatNumber } from "@/lib/format";
 import { readSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
+import { pageMetadata } from "@/lib/seo";
 
 interface PublisherPageProps {
   params: Promise<{ slug: string }>;
@@ -30,11 +31,16 @@ export async function generateMetadata({ params }: PublisherPageProps): Promise<
   const publisher = await getPublisherBySlug(slug);
   if (!publisher) return {};
 
-  const resolved = defaultLocale;
-  return {
-    title: publisher.name[resolved],
-    description: publisher.description[resolved] || undefined,
-  };
+  const locale = defaultLocale;
+  const dictionary = await getDictionary(locale);
+
+  return pageMetadata({
+    title: publisher.name[locale],
+    description:
+      publisher.description[locale] ||
+      `${dictionary.publishersPage.handoutsBy}: ${publisher.name[locale]}.`,
+    path: `/publishers/${publisher.slug}`,
+  });
 }
 
 export default async function PublisherPage({ params }: PublisherPageProps) {

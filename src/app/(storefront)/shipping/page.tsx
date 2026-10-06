@@ -5,11 +5,18 @@ import { getShippingRules } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { formatDeliveryTime, formatPrice } from "@/lib/format";
+import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const dictionary = await getDictionary(defaultLocale);
 
-  return { title: dictionary.info.shipping.title };
+  const page = dictionary.info.shipping;
+
+  return pageMetadata({
+    title: page.title,
+    description: `${page.subtitle}. ${dictionary.footer.about}`,
+    path: "/shipping",
+  });
 }
 
 /**

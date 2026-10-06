@@ -27,11 +27,12 @@ import { requireCustomer } from "@/lib/auth";
 import { getAppliedCoupon } from "@/lib/coupon";
 import { formatDeliveryTime, formatPrice } from "@/lib/format";
 import { governorates } from "@/lib/constants";
+import { privatePage } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const dictionary = await getDictionary(defaultLocale);
 
-  return { title: dictionary.checkout.title };
+  return { title: dictionary.checkout.title, ...privatePage };
 }
 
 function SectionCard({

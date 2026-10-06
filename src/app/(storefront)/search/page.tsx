@@ -19,7 +19,9 @@ interface SearchPageProps {
 export async function generateMetadata(): Promise<Metadata> {
   const dictionary = await getDictionary(defaultLocale);
 
-  return { title: dictionary.searchPage.title };
+  // A results page is a query, not a page: followed for the titles it
+  // links to, never listed itself.
+  return { title: dictionary.searchPage.title, robots: { index: false, follow: true } };
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {

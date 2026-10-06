@@ -14,11 +14,18 @@ import { ActionForm } from "@/components/ui/action-form";
 import { getStoreIdentity } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
+import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const dictionary = await getDictionary(defaultLocale);
 
-  return { title: dictionary.info.contact.title };
+  const page = dictionary.info.contact;
+
+  return pageMetadata({
+    title: page.title,
+    description: `${page.subtitle}. ${dictionary.footer.about}`,
+    path: "/contact",
+  });
 }
 
 export default async function ContactPage() {

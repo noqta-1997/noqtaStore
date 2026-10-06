@@ -3,11 +3,18 @@ import type { Metadata } from "next";
 import { InfoPage } from "@/components/layout/info-page";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
+import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const dictionary = await getDictionary(defaultLocale);
 
-  return { title: dictionary.info.careers.title };
+  const page = dictionary.info.careers;
+
+  return pageMetadata({
+    title: page.title,
+    description: `${page.subtitle}. ${dictionary.footer.about}`,
+    path: "/careers",
+  });
 }
 
 export default async function Page() {

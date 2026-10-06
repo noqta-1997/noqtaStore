@@ -12,6 +12,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { requireCustomer } from "@/lib/auth";
 import { formatDate, formatPrice, storeDateKey } from "@/lib/format";
 import { readParam, type SearchParamsRecord } from "@/lib/search-params";
+import { privatePage } from "@/lib/seo";
 
 interface SuccessPageProps {
   searchParams: Promise<SearchParamsRecord>;
@@ -20,7 +21,7 @@ interface SuccessPageProps {
 export async function generateMetadata(): Promise<Metadata> {
   const dictionary = await getDictionary(defaultLocale);
 
-  return { title: dictionary.orderSuccess.title };
+  return { title: dictionary.orderSuccess.title, ...privatePage };
 }
 
 export default async function OrderSuccessPage({

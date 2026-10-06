@@ -18,6 +18,7 @@ import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { formatNumber } from "@/lib/format";
 import { isEmptyPreview, type SearchParamsRecord } from "@/lib/search-params";
+import { privatePage } from "@/lib/seo";
 
 interface CartPageProps {
   searchParams: Promise<SearchParamsRecord>;
@@ -26,7 +27,7 @@ interface CartPageProps {
 export async function generateMetadata(): Promise<Metadata> {
   const dictionary = await getDictionary(defaultLocale);
 
-  return { title: dictionary.cart.title };
+  return { title: dictionary.cart.title, ...privatePage };
 }
 
 export default async function CartPage({ searchParams }: CartPageProps) {

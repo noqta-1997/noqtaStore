@@ -9,11 +9,18 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Surface } from "@/components/ui/surface";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
+import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const dictionary = await getDictionary(defaultLocale);
 
-  return { title: dictionary.info.faq.title };
+  const page = dictionary.info.faq;
+
+  return pageMetadata({
+    title: page.title,
+    description: `${page.subtitle}. ${dictionary.footer.about}`,
+    path: "/faq",
+  });
 }
 
 export default async function FaqPage() {

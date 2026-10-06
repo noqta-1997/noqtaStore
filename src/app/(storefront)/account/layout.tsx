@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Ban } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -7,9 +8,13 @@ import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Container } from "@/components/ui/container";
 import { getCustomer } from "@/data";
 import { requireCustomer } from "@/lib/auth";
+import { privatePage } from "@/lib/seo";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { formatDate } from "@/lib/format";
+
+/** One customer's orders, addresses and lists: never indexed. */
+export const metadata: Metadata = privatePage;
 
 export default async function AccountLayout({
   children,

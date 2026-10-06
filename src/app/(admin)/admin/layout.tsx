@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ExternalLink, Search } from "lucide-react";
 import Form from "next/form";
 import Link from "next/link";
@@ -13,6 +14,10 @@ import { getAdminNotifications, getStoreSettings } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 import { requireAdmin } from "@/lib/auth";
+import { privatePage } from "@/lib/seo";
+
+/** The panel is behind a sign-in; nothing in it is for a search engine. */
+export const metadata: Metadata = privatePage;
 
 /**
  * The admin panel is fully separate from the storefront: its own sidebar,

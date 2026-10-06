@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -7,6 +8,10 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Container } from "@/components/ui/container";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
+import { privatePage } from "@/lib/seo";
+
+/** The sign-in page is a step, not a destination worth a result. */
+export const metadata: Metadata = privatePage;
 
 /**
  * Auth pages get their own minimal frame — no storefront header or

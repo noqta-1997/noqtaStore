@@ -11,6 +11,7 @@ import { HandoutReviews } from "@/components/handout/handout-reviews";
 import { HandoutShelf } from "@/components/handout/handout-shelf";
 import { HandoutSpecs } from "@/components/handout/handout-specs";
 import { HandoutWishlistButton } from "@/components/handout/handout-wishlist-button";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Container } from "@/components/ui/container";
@@ -22,11 +23,15 @@ import {
   getHandoutSlugs,
   getRelatedHandouts,
   getReviewsByHandout,
+  getShippingRules,
 } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { formatDiscount, formatNumber } from "@/lib/format";
+import { getSiteName, pageMetadata } from "@/lib/seo";
+import { absoluteUrl } from "@/lib/site";
 import { readSlug } from "@/lib/slug";
+import type { HandoutReview, HandoutWithRelations } from "@/types";
 
 interface HandoutPageProps {
   params: Promise<{ slug: string }>;
@@ -45,11 +50,100 @@ export async function generateMetadata({ params }: HandoutPageProps): Promise<Me
   const handout = await getHandoutBySlug(slug);
   if (!handout) return {};
 
-  const resolved = defaultLocale;
+  const locale = defaultLocale;
+  const title = handout.title[locale];
+  const author = handout.author.name[locale];
+
+  /* The teacher's name is half of what people search for — "ملزمة فيزياء
+     الأستاذ فلان" — so it sits in the title beside the handout's own. */
+  return pageMetadata({
+    title: `${title} — ${author}`,
+    description:
+      handout.description[locale] || `${title}، ${author}. ${handout.category.name[locale]}.`,
+    path: `/handouts/${handout.slug}`,
+    image: handout.coverUrl,
+  });
+}
+
+/**
+ * The handout as a schema.org `Product` (what search engines read price,
+ * stock and stars from) that is also a `Book` (what lets it carry a teacher,
+ * a page count and a year). Prices are whole dinars, the same figure the
+ * page prints.
+ */
+function handoutData(
+  handout: HandoutWithRelations,
+  reviews: HandoutReview[],
+  shippingCost: number,
+  storeName: string,
+) {
+  const locale = defaultLocale;
+  const url = absoluteUrl(`/handouts/${handout.slug}`);
 
   return {
-    title: handout.title[resolved],
-    description: handout.description[resolved],
+    "@type": ["Product", "Book"],
+    "@id": `${url}#handout`,
+    name: handout.title[locale],
+    url,
+    description: handout.description[locale] || undefined,
+    ...(handout.coverUrl ? { image: [handout.coverUrl] } : {}),
+    sku: handout.id,
+    category: handout.category.name[locale],
+    inLanguage: "ar",
+    numberOfPages: handout.pages,
+    datePublished: String(handout.publishedYear),
+    author: {
+      "@type": "Person",
+      name: handout.author.name[locale],
+      url: absoluteUrl(`/authors/${handout.author.slug}`),
+    },
+    brand: { "@type": "Brand", name: handout.publisher.name[locale] },
+    publisher: {
+      "@type": "Organization",
+      name: handout.publisher.name[locale],
+      url: absoluteUrl(`/publishers/${handout.publisher.slug}`),
+    },
+    offers: {
+      "@type": "Offer",
+      url,
+      price: handout.price,
+      priceCurrency: "IQD",
+      availability:
+        handout.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      itemCondition: "https://schema.org/NewCondition",
+      seller: { "@type": "Organization", name: storeName },
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: { "@type": "MonetaryAmount", value: shippingCost, currency: "IQD" },
+        shippingDestination: { "@type": "DefinedRegion", addressCountry: "IQ" },
+      },
+    },
+    /* Stars only once someone has given them: a zero rating published as
+       an aggregate is an error to a validator, not an absence. */
+    ...(handout.reviewsCount > 0 && handout.rating > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: handout.rating,
+            reviewCount: handout.reviewsCount,
+            bestRating: 5,
+            worstRating: 1,
+          },
+          review: reviews.map((review) => ({
+            "@type": "Review",
+            author: { "@type": "Person", name: review.authorName },
+            datePublished: review.createdAt,
+            name: review.title[locale] || undefined,
+            reviewBody: review.body[locale] || undefined,
+            reviewRating: {
+              "@type": "Rating",
+              ratingValue: review.rating,
+              bestRating: 5,
+              worstRating: 1,
+            },
+          })),
+        }
+      : {}),
   };
 }
 
@@ -64,10 +158,12 @@ export default async function HandoutPage({ params }: HandoutPageProps) {
     notFound();
   }
 
-  const [dictionary, reviews, related] = await Promise.all([
+  const [dictionary, reviews, related, shipping, storeName] = await Promise.all([
     getDictionary(locale),
     getReviewsByHandout(handout.id),
     getRelatedHandouts(handout, 5),
+    getShippingRules(),
+    getSiteName(),
   ]);
 
   const t = dictionary.handoutDetails;
@@ -80,6 +176,8 @@ export default async function HandoutPage({ params }: HandoutPageProps) {
 
   return (
     <>
+      <JsonLd data={handoutData(handout, reviews, shipping.standardCost, storeName)} />
+
       <div className="border-b border-line-divider bg-surface-low">
         <Container className="py-4">
           <Breadcrumb

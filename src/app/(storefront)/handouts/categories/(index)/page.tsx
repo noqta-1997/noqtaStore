@@ -6,11 +6,18 @@ import { PageHeader } from "@/components/ui/page-header";
 import { getHandoutCategoryTree, queryHandouts } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
+import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const dictionary = await getDictionary(defaultLocale);
 
-  return { title: dictionary.handoutCategoriesPage.title };
+  const page = dictionary.handoutCategoriesPage;
+
+  return pageMetadata({
+    title: page.title,
+    description: `${page.subtitle}. ${dictionary.footer.about}`,
+    path: "/handouts/categories",
+  });
 }
 
 /**
