@@ -57,7 +57,9 @@ export function toHandoutCategoryWithCount(
   return { ...toHandoutCategory(row), handoutsCount: row._count?.handouts ?? 0 };
 }
 
-export function toAuthor(row: AuthorRow & { _count?: { handouts: number } }): Author {
+export function toAuthor(
+  row: AuthorRow & { _count?: { handouts: number }; subjects?: { subject: SubjectRow }[] },
+): Author {
   return {
     id: row.id,
     slug: row.slug,
@@ -65,6 +67,9 @@ export function toAuthor(row: AuthorRow & { _count?: { handouts: number } }): Au
     bio: { ar: row.bioAr },
     handoutsCount: row._count?.handouts ?? 0,
     avatarUrl: row.avatarUrl ?? undefined,
+    subjects: row.subjects
+      ?.map((link) => toSubject(link.subject))
+      .sort((a, b) => a.name.ar.localeCompare(b.name.ar, "ar")),
   };
 }
 

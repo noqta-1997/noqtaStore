@@ -7,7 +7,7 @@ import { Panel } from "@/components/admin/panel";
 import { RowActions } from "@/components/admin/row-actions";
 import { SubjectForm } from "@/components/admin/subject-form";
 import { CategoryIcon } from "@/components/ui/category-icon";
-import { getSubjects } from "@/data";
+import { getSubjects, getSubjectTeacherCounts } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 
@@ -21,10 +21,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AdminSubjectsPage() {
   const locale = defaultLocale;
 
-  const [dictionary, admin, subjects] = await Promise.all([
+  const [dictionary, admin, subjects, teachers] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
     getSubjects(),
+    getSubjectTeacherCounts(),
   ]);
 
   const t = admin.subjects;
@@ -39,6 +40,7 @@ export default async function AdminSubjectsPage() {
             <Thead>
               <Tr>
                 <Th>{t.table.name}</Th>
+                <Th>{t.table.teachers}</Th>
                 <Th className="text-end">{admin.common.actions}</Th>
               </Tr>
             </Thead>
@@ -55,6 +57,7 @@ export default async function AdminSubjectsPage() {
                       </span>
                     </div>
                   </Td>
+                  <Td data-numeric>{teachers.get(subject.id) ?? 0}</Td>
                   <Td>
                     <RowActions
                       editHref={`/admin/subjects/${subject.id}/edit`}

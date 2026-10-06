@@ -124,7 +124,24 @@ model Subject {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  authors AuthorSubject[]
+
   @@map("subjects")
+}
+
+/// What a teacher teaches — any number of subjects, none for a teacher not yet
+/// given one. A teacher's rows go with the teacher; a subject a teacher still
+/// teaches cannot be deleted (RESTRICT), and `deleteSubject` says so first.
+model AuthorSubject {
+  authorId  String
+  subjectId String
+
+  author  Author  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  @@id([authorId, subjectId])
+  @@index([subjectId])
+  @@map("author_subjects")
 }
 
 model Publisher {
@@ -159,6 +176,7 @@ model Author {
   updatedAt DateTime @updatedAt
 
   handouts Handout[]
+  subjects AuthorSubject[]
 
   @@map("authors")
 }

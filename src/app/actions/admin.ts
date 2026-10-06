@@ -584,20 +584,33 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
 
   const authorId = text(formData, "authorId");
 
+  /* The ticked subjects, none being a valid answer. One deleted while the
+     form was open is a stale form: the form draws its list again. */
+  const subjectIds = [...new Set(formData.getAll("subjectIds").filter((id) => typeof id === "string"))];
+  const known = await prisma.subject.count({ where: { id: { in: subjectIds } } });
+  if (known !== subjectIds.length) return fail("staleSubject");
+  const links = subjectIds.map((subjectId) => ({ subjectId }));
+
   try {
     if (authorId) {
-      await prisma.author.update({ where: { id: authorId }, data });
+      // One statement, so the old ticks are replaced, never half-replaced.
+      await prisma.author.update({
+        where: { id: authorId },
+        data: { ...data, subjects: { deleteMany: {}, create: links } },
+      });
     } else {
       await createUnderFreeSlug(
         slugify(nameAr, `author-${Date.now()}`),
         "authors_slug_key",
         (base) =>
           prisma.author.findMany({ where: { slug: { startsWith: base } }, select: { slug: true } }),
-        (slug) => prisma.author.create({ data: { ...data, slug } }),
+        (slug) => prisma.author.create({ data: { ...data, slug, subjects: { create: links } } }),
       );
     }
   } catch (error) {
     if (isUniqueViolation(error)) return fail("duplicate");
+    // A subject deleted between the count above and the write.
+    if (isForeignKeyViolation(error)) return fail("staleSubject");
     // Deleted while the edit page was open — as in `saveHandoutCategory`.
     if (isMissingRecord(error)) return fail("notFound");
     logActionError("saveAuthor", error, { authorId: authorId || null });
@@ -608,6 +621,8 @@ export async function saveAuthor(formData: FormData): Promise<ActionResult> {
      reached it only when its five-minute window ran out. */
   revalidateHandouts();
   revalidatePath("/admin/authors");
+  // The subjects table counts each subject's teachers.
+  revalidatePath("/admin/subjects");
   return ok();
 }
 
@@ -624,6 +639,7 @@ export async function deleteAuthor(authorId: string): Promise<ActionResult> {
 
   revalidateHandouts();
   revalidatePath("/admin/authors");
+  revalidatePath("/admin/subjects");
   return ok();
 }
 
@@ -722,9 +738,11 @@ export async function saveSubject(formData: FormData): Promise<ActionResult> {
   return ok();
 }
 
-/** Nothing points at a subject yet; teachers and handouts will, and then this checks them. */
+/** A subject a teacher still teaches stays; the panel says so before the database refuses it. */
 export async function deleteSubject(subjectId: string): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
+
+  if (await prisma.authorSubject.count({ where: { subjectId } })) return fail("subjectTaught");
 
   const deleted = await attemptDelete("deleteSubject", { subjectId }, () =>
     prisma.subject.delete({ where: { id: subjectId } }),

@@ -50,6 +50,8 @@ export interface Author {
   /** Handouts by this teacher on the shelf. */
   handoutsCount: number;
   avatarUrl?: string;
+  /** What the teacher teaches, by name; absent where the read did not load it. */
+  subjects?: Subject[];
 }
 
 export interface Publisher {

@@ -214,9 +214,10 @@ export async function getHandoutCategoryById(
   return (await loadHandoutCategoryIndex()).byId.get(id);
 }
 
-/** What the teacher has on the shelf. */
+/** What the teacher has on the shelf, and what they teach. */
 const authorInclude = {
   _count: { select: { handouts: { where: handoutOnShelf } } },
+  subjects: { include: { subject: true } },
 } as const;
 
 type AuthorRowWithCounts = Prisma.AuthorGetPayload<{ include: typeof authorInclude }>;
@@ -1539,6 +1540,13 @@ export async function getSubjectById(id: string): Promise<Subject | null> {
   const row = await prisma.subject.findUnique({ where: { id } });
 
   return row ? toSubject(row) : null;
+}
+
+/** Teachers per subject, for the panel's table: a subject someone teaches cannot be deleted. */
+export async function getSubjectTeacherCounts(): Promise<Map<string, number>> {
+  const rows = await prisma.authorSubject.groupBy({ by: ["subjectId"], _count: true });
+
+  return new Map(rows.map((row) => [row.subjectId, row._count]));
 }
 
 /* ------------------------------------------------------------------ */

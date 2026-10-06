@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AuthorForm } from "@/components/admin/author-form";
 import { Panel } from "@/components/admin/panel";
-import { getAuthorById } from "@/data";
+import { getAuthorById, getSubjects } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 
@@ -30,9 +30,10 @@ export default async function EditAuthorPage({ params }: EditAuthorPageProps) {
     notFound();
   }
 
-  const [dictionary, admin] = await Promise.all([
+  const [dictionary, admin, subjects] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
+    getSubjects(),
   ]);
 
   const t = admin.authors.form;
@@ -53,6 +54,7 @@ export default async function EditAuthorPage({ params }: EditAuthorPageProps) {
         <AuthorForm
           admin={admin}
           dictionary={dictionary}
+          subjects={subjects}
           author={author}
         />
       </Panel>

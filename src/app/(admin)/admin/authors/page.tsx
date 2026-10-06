@@ -9,7 +9,7 @@ import { deleteAuthor } from "@/app/actions/admin";
 import { TableToolbar } from "@/components/admin/table-toolbar";
 import { authorTone, getAuthorInitials } from "@/components/author/author-card";
 import { HeldCount } from "@/components/admin/held-count";
-import { getArchivedTitleCounts, getAuthors } from "@/data";
+import { getArchivedTitleCounts, getAuthors, getSubjects } from "@/data";
 import { arabicKey } from "@/lib/arabic";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
@@ -33,11 +33,12 @@ export default async function AdminAuthorsPage({
 
   const term = readParam(await searchParams, "q");
 
-  const [dictionary, admin, allAuthors, archived] = await Promise.all([
+  const [dictionary, admin, allAuthors, archived, subjects] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
     getAuthors(),
     getArchivedTitleCounts("authorId"),
+    getSubjects(),
   ]);
 
   // Spelling-blind, like the key that refuses a second «أحمد» spelled «احمد».
@@ -62,10 +63,11 @@ export default async function AdminAuthorsPage({
             defaultValue={term}
           />
 
-          <Table minWidth="38rem">
+          <Table minWidth="46rem">
             <Thead>
               <Tr>
                 <Th>{t.table.author}</Th>
+                <Th>{t.table.subjects}</Th>
                 <Th>{t.table.handouts}</Th>
                 <Th className="text-end">{admin.common.actions}</Th>
               </Tr>
@@ -93,6 +95,13 @@ export default async function AdminAuthorsPage({
                         </span>
                       </span>
                     </div>
+                  </Td>
+                  <Td>
+                    <span className="block max-w-48 text-label-md text-muted">
+                      {author.subjects?.length
+                        ? author.subjects.map((subject) => subject.name[locale]).join("، ")
+                        : "—"}
+                    </span>
                   </Td>
                   <Td data-numeric>
                     <HeldCount
@@ -144,7 +153,7 @@ export default async function AdminAuthorsPage({
         </div>
 
         <Panel title={t.form.title} className="min-w-0 lg:col-span-4">
-          <AuthorForm admin={admin} dictionary={dictionary} />
+          <AuthorForm admin={admin} dictionary={dictionary} subjects={subjects} />
         </Panel>
       </div>
     </>
