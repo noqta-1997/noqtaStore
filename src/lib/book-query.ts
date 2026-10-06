@@ -30,6 +30,7 @@ export function parseBookQuery(params: SearchParamsRecord): ParsedBookQuery {
     values: {
       q: readParam(params, "q"),
       category: readParam(params, "category"),
+      subject: readParam(params, "subject"),
       publisher: readParam(params, "publisher"),
       minPrice: readNumberParam(params, "minPrice"),
       maxPrice: readNumberParam(params, "maxPrice"),
@@ -49,6 +50,7 @@ export function toBookQuery(
   return {
     q: values.q,
     category: values.category,
+    subject: values.subject,
     publisher: values.publisher,
     minPrice: values.minPrice,
     maxPrice: values.maxPrice,

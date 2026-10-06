@@ -227,12 +227,24 @@ export default async function HandoutPage({ params }: HandoutPageProps) {
 
         <div className="space-y-6 lg:col-span-7">
           <div className="space-y-3">
-            <Link
-              href={`/handouts/categories/${handout.category.slug}`}
-              className="text-label-md font-semibold text-primary underline-offset-4 hover:underline"
-            >
-              {handout.category.name[locale]}
-            </Link>
+            <p className="flex flex-wrap items-center gap-x-2 text-label-md font-semibold text-primary">
+              <Link
+                href={`/handouts/categories/${handout.category.slug}`}
+                className="underline-offset-4 hover:underline"
+              >
+                {handout.category.name[locale]}
+              </Link>
+              <span aria-hidden className="text-muted">
+                ·
+              </span>
+              {/* The same branch, narrowed to this subject. */}
+              <Link
+                href={`/handouts/categories/${handout.category.slug}?subject=${encodeURIComponent(handout.subject.slug)}`}
+                className="underline-offset-4 hover:underline"
+              >
+                {handout.subject.name[locale]}
+              </Link>
+            </p>
             <h1 className="text-headline-lg sm:text-headline-xl">
               {handout.title[locale]}
             </h1>

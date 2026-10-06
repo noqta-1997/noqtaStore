@@ -1,5 +1,5 @@
 import type { Locale } from "@/i18n/config";
-import type { HandoutCategoryNode } from "@/types";
+import type { HandoutCategoryNode, Subject } from "@/types";
 
 /**
  * A branch as the header's menus and the phone drawer list it: a name, where
@@ -34,13 +34,28 @@ export interface CatalogueMenu {
 
 type TreeNode = HandoutCategoryNode;
 
-function toMenuBranch(node: TreeNode, locale: Locale, hrefFor: (slug: string) => string): MenuBranch {
-  return {
-    id: node.id,
-    name: node.name[locale],
-    href: hrefFor(node.slug),
-    children: node.children.map((child) => toMenuBranch(child, locale, hrefFor)),
-  };
+/**
+ * A branch with nothing under it opens on the subjects it has handouts in, if
+ * any — the branch's page filtered to each — so the deepest level of the
+ * menu is "السادس العلمي ← الفيزياء" without the tree holding subjects.
+ */
+function toMenuBranch(
+  node: TreeNode,
+  locale: Locale,
+  hrefFor: (slug: string) => string,
+  subjectsOf: (branchId: string) => Subject[],
+): MenuBranch {
+  const href = hrefFor(node.slug);
+  const children = node.children.length
+    ? node.children.map((child) => toMenuBranch(child, locale, hrefFor, subjectsOf))
+    : subjectsOf(node.id).map((subject) => ({
+        id: `${node.id}/${subject.id}`,
+        name: subject.name[locale],
+        href: `${href}?subject=${encodeURIComponent(subject.slug)}`,
+        children: [],
+      }));
+
+  return { id: node.id, name: node.name[locale], href, children };
 }
 
 export function buildCatalogueMenu(
@@ -48,8 +63,9 @@ export function buildCatalogueMenu(
   locale: Locale,
   hrefFor: (slug: string) => string,
   wording: Pick<CatalogueMenu, "label" | "href" | "allLabel" | "othersLabel">,
+  subjectsOf: (branchId: string) => Subject[] = () => [],
 ): CatalogueMenu {
-  const branches = roots.map((root) => toMenuBranch(root, locale, hrefFor));
+  const branches = roots.map((root) => toMenuBranch(root, locale, hrefFor, subjectsOf));
 
   return {
     ...wording,

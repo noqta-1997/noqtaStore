@@ -83,7 +83,8 @@ export function HandoutCard({
         </h3>
 
         <p className="mt-1 line-clamp-2 text-label-md text-on-anchor-variant sm:text-body-md">
-          {dictionary.by} {handout.author.name[locale]} · {handout.category.name[locale]}
+          {dictionary.by} {handout.author.name[locale]} · {handout.subject.name[locale]} ·{" "}
+          {handout.category.name[locale]}
         </p>
 
         <div className="mt-3 flex items-center justify-between gap-1 text-center sm:mt-4">

@@ -361,6 +361,8 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
   await discardCover(replaced);
 
   revalidateHandouts();
+  // The header menu lists the subjects each branch has handouts in.
+  revalidateCategoryMenu();
   return ok();
 }
 
@@ -401,6 +403,7 @@ export async function deleteHandout(handoutId: string): Promise<ActionResult> {
   if (!deleted.row.ordered) await discardCover(deleted.row.coverUrl);
 
   revalidateHandouts();
+  revalidateCategoryMenu();
   return ok();
 }
 
@@ -434,6 +437,7 @@ export async function setHandoutArchived(
   }
 
   revalidateHandouts();
+  revalidateCategoryMenu();
   revalidatePath("/cart");
   revalidatePath("/admin/handouts");
   revalidatePath(`/admin/handouts/${handoutId}`);
@@ -743,6 +747,9 @@ export async function saveSubject(formData: FormData): Promise<ActionResult> {
     return fail("saveFailed");
   }
 
+  // The cards, the handout pages and the header menu name the subject.
+  revalidateHandouts();
+  revalidateCategoryMenu();
   revalidatePath("/admin/subjects");
   return ok();
 }

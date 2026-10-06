@@ -94,6 +94,7 @@ export function toSubject(row: SubjectRow): Subject {
 
 export type HandoutRowWithRelations = HandoutRow & {
   author: AuthorRow & { _count?: { handouts: number } };
+  subject: SubjectRow;
   category: HandoutCategoryRow & { _count?: { handouts: number } };
   publisher: PublisherRow & { _count?: { handouts: number } };
 };
@@ -121,6 +122,7 @@ export function toHandout(row: HandoutRowWithRelations): HandoutWithRelations {
     archived: row.archivedAt !== null,
     createdAt: storeDateKey(row.createdAt),
     author: toAuthor(row.author),
+    subject: toSubject(row.subject),
     category: toHandoutCategoryWithCount(row.category),
     publisher: toPublisher(row.publisher),
   };

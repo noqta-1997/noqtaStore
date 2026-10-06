@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { authorTone, getAuthorInitials } from "@/components/author/author-card";
 import { HandoutGrid } from "@/components/handout/handout-grid";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { CategoryIcon } from "@/components/ui/category-icon";
 import { Container } from "@/components/ui/container";
 import { getAuthorBySlug, getAuthors, getHandoutsByAuthor } from "@/data";
 import { defaultLocale } from "@/i18n/config";
@@ -97,6 +99,22 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
               <p className="max-w-2xl text-body-lg text-on-surface-variant">
                 {author.bio[locale]}
               </p>
+              {/* What the teacher teaches, each leading to its handouts across the store. */}
+              {author.subjects?.length ? (
+                <ul aria-label={t.subjects} className="flex flex-wrap gap-2">
+                  {author.subjects.map((subject) => (
+                    <li key={subject.id}>
+                      <Link
+                        href={`/handouts?subject=${encodeURIComponent(subject.slug)}`}
+                        className="flex items-center gap-2 rounded-xl border border-line bg-card px-3 py-1.5 text-label-md text-on-surface transition-colors duration-100 ease-fluent hover:border-line-hover hover:bg-card-hover"
+                      >
+                        <CategoryIcon name={subject.icon} className="size-5" />
+                        {subject.name[locale]}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
               <dl className="flex flex-wrap gap-x-8 gap-y-2 pt-1">
                 {facts.map((fact) => (
                   <div key={fact.label} className="flex items-baseline gap-2">

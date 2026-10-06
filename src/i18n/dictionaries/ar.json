@@ -255,7 +255,9 @@
       "action": "مسح الفلاتر"
     },
     "publisher": "المطبعة / المكتبة",
-    "allPublishers": "كل المطابع والمكتبات"
+    "allPublishers": "كل المطابع والمكتبات",
+    "subject": "المادة الدراسية",
+    "allSubjects": "كل المواد"
   },
   "handoutDetails": {
     "addToWishlist": "أضف إلى المفضلة",
@@ -299,11 +301,15 @@
     "browse": "تصفّح التصنيف",
     "branches": "الفروع",
     "branchesSubtitle": "اختر فرعًا لتضييق القائمة",
+    "subjects": "المواد",
+    "subjectsSubtitle": "اختر مادة لتعرض ملازمها في هذا التصنيف",
+    "allSubjects": "الكل",
     "count": "ملزمة"
   },
   "authorsPage": {
     "title": "المدرسون",
     "subtitle": "الأسماء التي تصنع مكتبتنا",
+    "subjects": "المواد",
     "handoutsBy": "ملازم المدرس",
     "viewProfile": "الملف الكامل",
     "handoutsCount": "عدد الملازم"

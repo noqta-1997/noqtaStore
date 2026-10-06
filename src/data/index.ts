@@ -111,6 +111,8 @@ export type SortKey =
 export interface BookQuery {
   q?: string;
   category?: string;
+  /** A subject's slug. */
+  subject?: string;
   author?: string;
   publisher?: string;
   minPrice?: number;
@@ -337,7 +339,7 @@ export async function getAuthorIds() {
 /* Handouts                                                            */
 /* ------------------------------------------------------------------ */
 
-const handoutInclude = { author: true, category: true, publisher: true } as const;
+const handoutInclude = { author: true, subject: true, category: true, publisher: true } as const;
 
 /**
  * The listing's filters. `BookQuery` keeps the name of the school-book
@@ -374,7 +376,7 @@ const handoutOrderByForSort: Record<SortKey, Prisma.HandoutOrderByWithRelationIn
  * ways: a reader who types «احمد» found nothing by «أحمد». The comparison is
  * made in SQL over `arabic_key()`, the same spelling-blind form the unique
  * keys use (migration 20260917160000_normalized_name_keys), on the title and
- * on the teacher, press and branch names — the term folded the same way. The
+ * on the teacher, press, branch and subject names — the term folded the same way. The
  * slug clause answers a Latin-script query. The ids then go into an ordinary
  * `where`, which is what keeps the filters, the count and the pagination.
  */
@@ -386,11 +388,13 @@ async function searchHandoutIds(term: string): Promise<string[]> {
     JOIN authors a ON a.id = h."authorId"
     JOIN publishers p ON p.id = h."publisherId"
     JOIN handout_categories c ON c.id = h."categoryId"
+    JOIN subjects s ON s.id = h."subjectId"
     WHERE arabic_key(h."titleAr") LIKE arabic_key(${pattern}) ESCAPE '\\'
        OR lower(h.slug) LIKE lower(${pattern}) ESCAPE '\\'
        OR arabic_key(a."nameAr") LIKE arabic_key(${pattern}) ESCAPE '\\'
        OR arabic_key(p."nameAr") LIKE arabic_key(${pattern}) ESCAPE '\\'
-       OR arabic_key(c."nameAr") LIKE arabic_key(${pattern}) ESCAPE '\\'`;
+       OR arabic_key(c."nameAr") LIKE arabic_key(${pattern}) ESCAPE '\\'
+       OR arabic_key(s."nameAr") LIKE arabic_key(${pattern}) ESCAPE '\\'`;
   return rows.map((row) => row.id);
 }
 
@@ -406,6 +410,7 @@ async function handoutWhere(query: HandoutQuery): Promise<Prisma.HandoutWhereInp
   if (query.category) {
     where.categoryId = { in: await handoutCategorySubtreeIds(query.category) };
   }
+  if (query.subject) where.subject = { slug: query.subject };
   if (query.author) where.author = { slug: query.author };
   if (query.publisher) where.publisher = { slug: query.publisher };
   if (query.inStock) where.stock = { gt: 0 };
@@ -1541,6 +1546,52 @@ export async function getSubjectById(id: string): Promise<Subject | null> {
 
   return row ? toSubject(row) : null;
 }
+
+const bySubjectName = (a: Subject, b: Subject) => a.name.ar.localeCompare(b.name.ar, "ar");
+
+/**
+ * The subjects a branch has handouts in, anywhere under it, each with how
+ * many are on the shelf: the branch page's chips. A subject with nothing on
+ * the shelf there is left out.
+ */
+export async function getHandoutSubjectCounts(
+  categorySlug: string,
+): Promise<{ subject: Subject; count: number }[]> {
+  const rows = await prisma.handout.groupBy({
+    by: ["subjectId"],
+    where: { ...handoutOnShelf, categoryId: { in: await handoutCategorySubtreeIds(categorySlug) } },
+    _count: true,
+  });
+  if (!rows.length) return [];
+
+  const counts = new Map(rows.map((row) => [row.subjectId, row._count]));
+  const subjects = await prisma.subject.findMany({ where: { id: { in: [...counts.keys()] } } });
+
+  return subjects
+    .map(toSubject)
+    .sort(bySubjectName)
+    .map((subject) => ({ subject, count: counts.get(subject.id) ?? 0 }));
+}
+
+/**
+ * The subjects each branch has handouts filed directly under, by branch id:
+ * the header menu hangs them under its deepest branches. Read once per
+ * render of the storefront layout.
+ */
+export const getShelfSubjectsByCategory = cache(async (): Promise<Map<string, Subject[]>> => {
+  const rows = await prisma.handout.findMany({
+    where: handoutOnShelf,
+    distinct: ["categoryId", "subjectId"],
+    select: { categoryId: true, subject: true },
+  });
+
+  const byCategory = new Map<string, Subject[]>();
+  for (const row of rows) {
+    byCategory.set(row.categoryId, [...(byCategory.get(row.categoryId) ?? []), toSubject(row.subject)]);
+  }
+  for (const subjects of byCategory.values()) subjects.sort(bySubjectName);
+  return byCategory;
+});
 
 /** Teachers per subject, for the panel's table: a subject someone teaches cannot be deleted. */
 export async function getSubjectTeacherCounts(): Promise<Map<string, number>> {

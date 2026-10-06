@@ -102,6 +102,7 @@ export interface Handout {
 /** A handout joined with its author, category and publisher, ready for the UI. */
 export interface HandoutWithRelations extends Handout {
   author: Author;
+  subject: Subject;
   category: HandoutCategory;
   publisher: Publisher;
 }

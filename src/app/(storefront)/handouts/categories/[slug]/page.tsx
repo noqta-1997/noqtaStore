@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { HandoutBranchStrip } from "@/components/handout/handout-branch-strip";
 import { HandoutCatalogue } from "@/components/handout/handout-catalogue";
+import { HandoutSubjectStrip } from "@/components/handout/handout-subject-strip";
 import { CategoryIcon } from "@/components/ui/category-icon";
 import { PageHeader } from "@/components/ui/page-header";
 import {
@@ -10,7 +11,9 @@ import {
   getHandoutCategoryAncestors,
   getHandoutCategoryBySlug,
   getHandoutPriceBounds,
+  getHandoutSubjectCounts,
   getPublishers,
+  getSubjects,
   queryHandouts,
 } from "@/data";
 import { defaultLocale } from "@/i18n/config";
@@ -76,14 +79,17 @@ export default async function HandoutCategoryPage({
 
   const parsed = parseBookQuery(await searchParams);
 
-  const [dictionary, trail, categories, publishers, bounds, result] = await Promise.all([
-    getDictionary(locale),
-    getHandoutCategoryAncestors(category),
-    getHandoutCategories(),
-    getPublishers(),
-    getHandoutPriceBounds(),
-    queryHandouts(toBookQuery(parsed, { category: slug })),
-  ]);
+  const [dictionary, trail, categories, subjects, subjectCounts, publishers, bounds, result] =
+    await Promise.all([
+      getDictionary(locale),
+      getHandoutCategoryAncestors(category),
+      getHandoutCategories(),
+      getSubjects(),
+      getHandoutSubjectCounts(slug),
+      getPublishers(),
+      getHandoutPriceBounds(),
+      queryHandouts(toBookQuery(parsed, { category: slug })),
+    ]);
 
   const t = dictionary.handoutCategoriesPage;
 
@@ -120,10 +126,24 @@ export default async function HandoutCategoryPage({
         />
       ) : null}
 
+      {subjectCounts.length ? (
+        <HandoutSubjectStrip
+          subjects={subjectCounts}
+          basePath={`/handouts/categories/${category.slug}`}
+          current={parsed.values.subject}
+          locale={locale}
+          title={t.subjects}
+          subtitle={t.subjectsSubtitle}
+          allLabel={t.allSubjects}
+          countLabel={t.count}
+        />
+      ) : null}
+
       <HandoutCatalogue
         locale={locale}
         dictionary={dictionary}
         categories={categories}
+        subjects={subjects}
         publishers={publishers}
         bounds={bounds}
         result={result}

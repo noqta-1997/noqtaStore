@@ -11,10 +11,11 @@ import type { Dictionary } from "@/i18n/get-dictionary";
 import { indentFor } from "@/lib/category-tree";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { CategoryOption, Publisher } from "@/types";
+import type { CategoryOption, Publisher, Subject } from "@/types";
 
 export interface BookFilterValues {
   category?: string;
+  subject?: string;
   publisher?: string;
   minPrice?: number;
   maxPrice?: number;
@@ -32,6 +33,7 @@ interface BookFiltersProps {
   dictionary: Dictionary;
   /** The category tree in order; each branch is indented under its parent. */
   categories: CategoryOption[];
+  subjects: Subject[];
   publishers: Publisher[];
   values: BookFilterValues;
   bounds: { min: number; max: number };
@@ -68,6 +70,7 @@ export function BookFilters({
   locale,
   dictionary,
   categories,
+  subjects,
   publishers,
   values,
   bounds,
@@ -103,6 +106,17 @@ export function BookFilters({
           </Select>
         </Group>
       ) : null}
+
+      <Group title={t.subject}>
+        <Select name="subject" defaultValue={values.subject ?? ""} aria-label={t.subject}>
+          <option value="">{t.allSubjects}</option>
+          {subjects.map((subject) => (
+            <option key={subject.id} value={subject.slug}>
+              {subject.name[locale]}
+            </option>
+          ))}
+        </Select>
+      </Group>
 
       <Group title={t.publisher}>
         <Select

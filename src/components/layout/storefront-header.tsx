@@ -14,7 +14,7 @@ import type { Dictionary } from "@/i18n/get-dictionary";
 import { buildCatalogueMenu } from "@/lib/category-menu";
 import { getMainNav } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
-import type { HandoutCategoryNode } from "@/types";
+import type { HandoutCategoryNode, Subject } from "@/types";
 
 const iconLinkStyles =
   "relative inline-flex size-10 items-center justify-center rounded-md text-on-surface " +
@@ -29,6 +29,8 @@ interface StorefrontHeaderProps {
   dictionary: Dictionary;
   /** The top-level branches of the handouts' tree, each with what hangs under it. */
   handoutCategories: HandoutCategoryNode[];
+  /** By branch id, the subjects it has handouts filed under; the menu's last level. */
+  shelfSubjects: Map<string, Subject[]>;
   /** Overrides the shipped copy when the settings screen has been filled in. */
   brand: { name: string; tagline: string };
 }
@@ -59,6 +61,7 @@ export function StorefrontHeader({
   locale,
   dictionary,
   handoutCategories,
+  shelfSubjects,
   brand,
 }: StorefrontHeaderProps) {
   const navItems = getMainNav(dictionary.nav);
@@ -73,6 +76,7 @@ export function StorefrontHeader({
         allLabel: dictionary.handouts.title,
         othersLabel: dictionary.nav.otherBranches,
       },
+      (branchId) => shelfSubjects.get(branchId) ?? [],
     ),
   };
 

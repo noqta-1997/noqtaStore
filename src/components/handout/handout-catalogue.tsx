@@ -13,12 +13,13 @@ import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { formatNumber } from "@/lib/format";
 import { buildQueryString } from "@/lib/search-params";
-import type { CategoryOption, Publisher } from "@/types";
+import type { CategoryOption, Publisher, Subject } from "@/types";
 
 interface HandoutCatalogueProps {
   locale: Locale;
   dictionary: Dictionary;
   categories: CategoryOption[];
+  subjects: Subject[];
   publishers: Publisher[];
   bounds: { min: number; max: number };
   result: HandoutQueryResult;
@@ -39,6 +40,7 @@ export function HandoutCatalogue({
   locale,
   dictionary,
   categories,
+  subjects,
   publishers,
   bounds,
   result,
@@ -62,6 +64,7 @@ export function HandoutCatalogue({
     `${basePath}${buildQueryString({
       q: values.q,
       category: showCategory ? values.category : undefined,
+      subject: values.subject,
       publisher: values.publisher,
       minPrice: values.minPrice,
       maxPrice: values.maxPrice,
@@ -79,6 +82,7 @@ export function HandoutCatalogue({
       locale={locale}
       dictionary={dictionary}
       categories={categories}
+      subjects={subjects}
       publishers={publishers}
       values={values}
       bounds={bounds}
