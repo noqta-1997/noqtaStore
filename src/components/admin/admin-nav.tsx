@@ -5,6 +5,7 @@ import {
   Building2,
   FolderKanban,
   LayoutDashboard,
+  Library,
   Mail,
   NotebookPen,
   NotebookText,
@@ -28,6 +29,7 @@ export interface AdminNavLabels {
   dashboard: string;
   handouts: string;
   handoutCategories: string;
+  subjects: string;
   authors: string;
   publishers: string;
   orders: string;
@@ -69,6 +71,7 @@ export function AdminNav({ labels, iconsOnly = false, onNavigate }: AdminNavProp
       items: [
         { href: `${base}/handouts`, label: labels.handouts, icon: NotebookText },
         { href: `${base}/handout-categories`, label: labels.handoutCategories, icon: FolderKanban },
+        { href: `${base}/subjects`, label: labels.subjects, icon: Library },
         { href: `${base}/authors`, label: labels.authors, icon: PenLine },
         { href: `${base}/publishers`, label: labels.publishers, icon: Building2 },
       ],

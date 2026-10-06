@@ -61,6 +61,15 @@ export interface Publisher {
   handoutsCount: number;
 }
 
+/** A school subject — one flat list, shared by every grade. */
+export interface Subject {
+  id: string;
+  slug: string;
+  name: Localized;
+  /** A picture name `CategoryIcon` draws. */
+  icon: string;
+}
+
 /** A lecture-note booklet (ملزمة) — what the store sells. */
 export interface Handout {
   id: string;

@@ -684,6 +684,57 @@ export async function deletePublisher(publisherId: string): Promise<ActionResult
   return ok();
 }
 
+export async function saveSubject(formData: FormData): Promise<ActionResult> {
+  if (!(await requireManager())) return fail("forbidden");
+
+  const nameAr = name(formData, "nameAr");
+  if (!nameAr) return fail("missingTitle");
+
+  // The slug is not on the form, as for a publisher.
+  const data = {
+    nameAr,
+    icon: text(formData, "icon") || "الكتاب",
+  };
+
+  const subjectId = text(formData, "subjectId");
+
+  try {
+    if (subjectId) {
+      await prisma.subject.update({ where: { id: subjectId }, data });
+    } else {
+      await createUnderFreeSlug(
+        slugify(nameAr, `subject-${Date.now()}`),
+        "subjects_slug_key",
+        (base) =>
+          prisma.subject.findMany({ where: { slug: { startsWith: base } }, select: { slug: true } }),
+        (slug) => prisma.subject.create({ data: { ...data, slug } }),
+      );
+    }
+  } catch (error) {
+    if (isUniqueViolation(error)) return fail("duplicate");
+    // Deleted while the edit page was open — as in `saveHandoutCategory`.
+    if (isMissingRecord(error)) return fail("notFound");
+    logActionError("saveSubject", error, { subjectId: subjectId || null });
+    return fail("saveFailed");
+  }
+
+  revalidatePath("/admin/subjects");
+  return ok();
+}
+
+/** Nothing points at a subject yet; teachers and handouts will, and then this checks them. */
+export async function deleteSubject(subjectId: string): Promise<ActionResult> {
+  if (!(await requireManager())) return fail("forbidden");
+
+  const deleted = await attemptDelete("deleteSubject", { subjectId }, () =>
+    prisma.subject.delete({ where: { id: subjectId } }),
+  );
+  if (!deleted.ok) return deleted;
+
+  revalidatePath("/admin/subjects");
+  return ok();
+}
+
 /* ------------------------------------------------------------------ */
 /* Orders, reviews and customers                                       */
 /* ------------------------------------------------------------------ */

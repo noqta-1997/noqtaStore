@@ -9,6 +9,7 @@ import {
   toHandoutReviewWithStatus,
   toOrder,
   toPublisher,
+  toSubject,
 } from "@/data/mappers";
 import type { Prisma } from "@/generated/prisma/client";
 import { escapeLike } from "@/lib/arabic";
@@ -53,6 +54,7 @@ import type {
   PickOption,
   Publisher,
   ReviewStatus,
+  Subject,
 } from "@/types";
 
 /**
@@ -1520,6 +1522,23 @@ export async function searchPublisherPicks(
       seed: row.slug,
       picture: { kind: "mark" },
     }));
+}
+
+/* ------------------------------------------------------------------ */
+/* Subjects                                                            */
+/* ------------------------------------------------------------------ */
+
+/** Every subject, by name — sorted here so ties never depend on the plan. */
+export async function getSubjects(): Promise<Subject[]> {
+  const rows = await prisma.subject.findMany();
+
+  return rows.sort((a, b) => a.nameAr.localeCompare(b.nameAr, "ar")).map(toSubject);
+}
+
+export async function getSubjectById(id: string): Promise<Subject | null> {
+  const row = await prisma.subject.findUnique({ where: { id } });
+
+  return row ? toSubject(row) : null;
 }
 
 /* ------------------------------------------------------------------ */

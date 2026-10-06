@@ -112,6 +112,21 @@ model HandoutCategory {
   @@map("handout_categories")
 }
 
+/// The school subjects, one flat list beside the tree: «الرياضيات» is one row
+/// for every grade, not a branch repeated under each of them.
+model Subject {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  /// Unique, spelling-blind key included, like Publisher.nameAr.
+  nameAr    String   @unique
+  /// A picture in public/images/Icons, by file name; the UI layer owns the mapping.
+  icon      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("subjects")
+}
+
 model Publisher {
   id            String   @id @default(cuid())
   slug          String   @unique

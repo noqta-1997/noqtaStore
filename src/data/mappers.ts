@@ -8,6 +8,7 @@ import type {
   OrderEventModel as OrderEventRow,
   OrderModel as OrderRow,
   PublisherModel as PublisherRow,
+  SubjectModel as SubjectRow,
 } from "@/generated/prisma/models";
 import type {
   Address,
@@ -19,6 +20,7 @@ import type {
   Localized,
   Order,
   Publisher,
+  Subject,
 } from "@/types";
 import { storeDateKey } from "@/lib/format";
 
@@ -73,6 +75,15 @@ export function toPublisher(row: PublisherRow & { _count?: { handouts: number } 
     name: { ar: row.nameAr },
     description: { ar: row.descriptionAr },
     handoutsCount: row._count?.handouts ?? 0,
+  };
+}
+
+export function toSubject(row: SubjectRow): Subject {
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: { ar: row.nameAr },
+    icon: row.icon,
   };
 }
 
