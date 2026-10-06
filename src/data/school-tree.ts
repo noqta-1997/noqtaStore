@@ -1,6 +1,7 @@
 /**
  * The Iraqi school ladder as the two catalogues file under it: three stages,
- * their grades, and the scientific/literary split of the preparatory grades.
+ * their grades, and the scientific/literary/vocational split of the
+ * preparatory grades.
  * Each catalogue seeds its own copy of this tree into its own table, so the
  * shape is written once here and the ids and blurbs are stamped per copy.
  *
@@ -48,7 +49,7 @@ const stages = [
   {
     slug: "preparatory",
     name: "المرحلة الإعدادية",
-    description: "الصفوف الرابع والخامس والسادس الإعدادي بفرعيهما العلمي والأدبي",
+    description: "الصفوف الرابع والخامس والسادس الإعدادي بفروعها العلمي والأدبي والمهني",
     icon: "GraduationCap",
     adjective: "الإعدادي",
     grades: [4, 5, 6],
@@ -59,6 +60,7 @@ const stages = [
 const branches = [
   { slug: "scientific", name: "العلمي", icon: "FlaskConical" },
   { slug: "literary", name: "الأدبي", icon: "Feather" },
+  { slug: "vocational", name: "المهني", icon: "Wrench" },
 ] as const;
 
 /** The whole ladder, parents before children, ids prefixed for one table. */

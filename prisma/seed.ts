@@ -131,6 +131,8 @@ async function seedCatalogue() {
       rating: handout.rating,
       reviewsCount: handout.reviewsCount,
       authorId: handout.authorId,
+      // The subjects come from their migration, which the seed does not clear.
+      subjectId: handout.subjectId,
       categoryId: handout.categoryId,
       createdAt: new Date(handout.createdAt),
     })),

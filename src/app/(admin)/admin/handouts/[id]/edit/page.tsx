@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { HandoutForm } from "@/components/admin/handout-form";
-import { getAuthors, getHandoutCategories, getHandoutById, getPublishers } from "@/data";
+import { getAuthors, getHandoutCategories, getHandoutById, getPublishers, getSubjects } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 
@@ -27,12 +27,13 @@ export default async function EditHandoutPage({ params }: EditHandoutPageProps) 
     notFound();
   }
 
-  const [dictionary, admin, authors, publishers, categories] = await Promise.all([
+  const [dictionary, admin, authors, publishers, categories, subjects] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
     getAuthors(),
     getPublishers(),
     getHandoutCategories(),
+    getSubjects(),
   ]);
 
   return (
@@ -47,6 +48,7 @@ export default async function EditHandoutPage({ params }: EditHandoutPageProps) 
         admin={admin}
         dictionary={dictionary}
         authors={authors}
+        subjects={subjects}
         categories={categories}
         publishers={publishers}
         handout={handout}

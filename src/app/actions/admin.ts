@@ -218,9 +218,17 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
   if (!titleAr) return fail("missingTitle");
 
   const authorId = text(formData, "authorId");
+  const subjectId = text(formData, "subjectId");
   const categoryId = text(formData, "categoryId");
   const publisherId = text(formData, "publisherId");
-  if (!authorId || !categoryId || !publisherId) return fail("missingRelation");
+  if (!authorId || !subjectId || !categoryId || !publisherId) return fail("missingRelation");
+
+  /* A teacher given subjects teaches only those; one with none yet can be
+     given any. The table cannot hold this, so the save does. */
+  const taught = await prisma.authorSubject.findMany({ where: { authorId }, select: { subjectId: true } });
+  if (taught.length && !taught.some((link) => link.subjectId === subjectId)) {
+    return fail("subjectNotTaught");
+  }
 
   const cover = readCoverImage(formData);
   if (!cover.ok) return fail(cover.error);
@@ -251,6 +259,7 @@ export async function saveHandout(formData: FormData): Promise<ActionResult> {
     publishedYear: number(formData, "publishedYear", storeYear()),
     tags: formData.getAll("tags").filter((tag): tag is string => typeof tag === "string") as BookTag[],
     authorId,
+    subjectId,
     categoryId,
     publisherId,
   } as const;
@@ -738,10 +747,12 @@ export async function saveSubject(formData: FormData): Promise<ActionResult> {
   return ok();
 }
 
-/** A subject a teacher still teaches stays; the panel says so before the database refuses it. */
+/** A subject a handout covers or a teacher teaches stays; the panel says which before the database refuses it. */
 export async function deleteSubject(subjectId: string): Promise<ActionResult> {
   if (!(await requireManager())) return fail("forbidden");
 
+  const held = await titlesHolding({ subjectId });
+  if (held) return fail(held);
   if (await prisma.authorSubject.count({ where: { subjectId } })) return fail("subjectTaught");
 
   const deleted = await attemptDelete("deleteSubject", { subjectId }, () =>

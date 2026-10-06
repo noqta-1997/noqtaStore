@@ -124,7 +124,8 @@ model Subject {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  authors AuthorSubject[]
+  authors  AuthorSubject[]
+  handouts Handout[]
 
   @@map("subjects")
 }
@@ -220,12 +221,16 @@ model Handout {
   archivedAt DateTime?
 
   authorId    String
+  /// The subject the handout covers; when its teacher has subjects, one of
+  /// theirs (`saveHandout` holds that, the table cannot).
+  subjectId   String
   categoryId  String
   publisherId String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   author        Author                @relation(fields: [authorId], references: [id])
+  subject       Subject               @relation(fields: [subjectId], references: [id])
   category      HandoutCategory       @relation(fields: [categoryId], references: [id])
   publisher     Publisher             @relation(fields: [publisherId], references: [id])
   reviews       HandoutReview[]
@@ -235,6 +240,7 @@ model Handout {
 
   @@index([categoryId])
   @@index([authorId])
+  @@index([subjectId])
   @@index([publisherId])
   @@index([createdAt])
   @@map("handouts")

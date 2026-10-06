@@ -104,6 +104,7 @@ export function toHandout(row: HandoutRowWithRelations): HandoutWithRelations {
     slug: row.slug,
     title: { ar: row.titleAr },
     authorId: row.authorId,
+    subjectId: row.subjectId,
     categoryId: row.categoryId,
     price: row.price,
     compareAtPrice: row.compareAtPrice ?? undefined,

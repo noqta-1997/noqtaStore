@@ -15,6 +15,7 @@ import {
   Sprout,
   ToyBrick,
   UserRound,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 
@@ -54,6 +55,7 @@ const legacyIcons: Record<string, LucideIcon> = {
   Sprout,
   ToyBrick,
   UserRound,
+  Wrench,
 };
 
 /** Every name the panel's icon pickers offer. */

@@ -19,6 +19,7 @@ import type {
   HandoutCategoryNode,
   HandoutWithRelations,
   Publisher,
+  Subject,
 } from "@/types";
 import { ActionForm } from "@/components/ui/action-form";
 import { deleteHandout, saveHandout } from "@/app/actions/admin";
@@ -31,6 +32,7 @@ interface HandoutFormProps {
   /** Storefront dictionary — reused for tag and cover-type labels. */
   dictionary: Dictionary;
   authors: Author[];
+  subjects: Subject[];
   /** The handouts' own tree in order; the select indents each branch under its parent. */
   categories: HandoutCategoryNode[];
   publishers: Publisher[];
@@ -47,6 +49,7 @@ export function HandoutForm({
   admin,
   dictionary,
   authors,
+  subjects,
   categories,
   publishers,
   handout,
@@ -80,6 +83,7 @@ export function HandoutForm({
         saveFailed: dictionary.common.actionErrors.saveFailed,
         missingTitle: dictionary.common.actionErrors.missingHandoutTitle,
         missingRelation: dictionary.common.actionErrors.missingRelation,
+        subjectNotTaught: dictionary.common.actionErrors.subjectNotTaught,
         invalidImage: dictionary.common.actionErrors.invalidImage,
         imageTooLarge: dictionary.common.actionErrors.imageTooLarge,
         uploadFailed: dictionary.common.actionErrors.uploadFailed,
@@ -123,6 +127,37 @@ export function HandoutForm({
                 {authors.map((author) => (
                   <option key={author.id} value={author.id}>
                     {author.name[locale]}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <Field
+              label={t.fields.subject}
+              htmlFor="subjectId"
+              hint={
+                subjects.length ? (
+                  t.hints.subject
+                ) : (
+                  <EmptyListHint
+                    text={t.hints.noSubjects}
+                    href="/admin/subjects"
+                    page={admin.nav.subjects}
+                  />
+                )
+              }
+            >
+              <Select
+                id="subjectId"
+                name="subjectId"
+                defaultValue={handout?.subjectId ?? ""}
+                required
+              >
+                <option value="" disabled>
+                  —
+                </option>
+                {subjects.map((subject) => (
+                  <option key={subject.id} value={subject.id}>
+                    {subject.name[locale]}
                   </option>
                 ))}
               </Select>

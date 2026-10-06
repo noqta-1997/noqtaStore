@@ -78,6 +78,7 @@ export interface Handout {
   slug: string;
   title: Localized;
   authorId: string;
+  subjectId: string;
   categoryId: string;
   /** Whole Iraqi dinars — no minor units. */
   price: number;

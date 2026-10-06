@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { HandoutForm } from "@/components/admin/handout-form";
-import { getAuthors, getHandoutCategories, getPublishers } from "@/data";
+import { getAuthors, getHandoutCategories, getPublishers, getSubjects } from "@/data";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 
@@ -15,12 +15,13 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function NewHandoutPage() {
   const locale = defaultLocale;
 
-  const [dictionary, admin, authors, publishers, categories] = await Promise.all([
+  const [dictionary, admin, authors, publishers, categories, subjects] = await Promise.all([
     getDictionary(locale),
     getAdminDictionary(locale),
     getAuthors(),
     getPublishers(),
     getHandoutCategories(),
+    getSubjects(),
   ]);
 
   return (
@@ -35,6 +36,7 @@ export default async function NewHandoutPage() {
         admin={admin}
         dictionary={dictionary}
         authors={authors}
+        subjects={subjects}
         categories={categories}
         publishers={publishers}
         cancelHref={`/admin/handouts`}
