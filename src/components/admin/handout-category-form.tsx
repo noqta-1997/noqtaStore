@@ -99,6 +99,12 @@ export function HandoutCategoryForm({
         </Field>
         <Field label={t.icon} htmlFor="icon">
           <Select id="icon" name="icon" defaultValue={category?.icon ?? categoryIconNames[0]}>
+            {/* A row still on a retired icon keeps it until someone picks a new one. */}
+            {category && !categoryIconNames.includes(category.icon) ? (
+              <option value={category.icon}>
+                {t.iconCurrent.replace("{name}", category.icon)}
+              </option>
+            ) : null}
             {categoryIconNames.map((icon) => (
               <option key={icon} value={icon}>
                 {icon}

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   Atom,
   Backpack,
@@ -17,11 +18,27 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { cn } from "@/lib/utils";
+
 /**
  * Category data stores an icon name; the UI layer owns the mapping. The
- * school ladder brought the stage and subject marks; the genres keep theirs.
+ * pictures in `public/images/Icons/` are what the panel offers now, each named
+ * after its file. The Lucide marks are what the seeded ladder and genres were
+ * filed under; they stay drawable so those rows keep their look, but the
+ * picker no longer offers them.
  */
-const icons: Record<string, LucideIcon> = {
+const pictures = [
+  "الكتاب",
+  "اللغة العربية",
+  "اللغة الانكليزية",
+  "التربية الاسلامية",
+  "الرياضيات",
+  "الفيزياء",
+  "الكيمياء",
+  "الاحياء",
+] as const;
+
+const legacyIcons: Record<string, LucideIcon> = {
   Atom,
   Backpack,
   BookMarked,
@@ -39,8 +56,8 @@ const icons: Record<string, LucideIcon> = {
   UserRound,
 };
 
-/** Every name the map knows, for the panel's icon pickers. */
-export const categoryIconNames = Object.keys(icons);
+/** Every name the panel's icon pickers offer. */
+export const categoryIconNames: readonly string[] = pictures;
 
 interface CategoryIconProps {
   name: string;
@@ -48,6 +65,18 @@ interface CategoryIconProps {
 }
 
 export function CategoryIcon({ name, className }: CategoryIconProps) {
-  const Icon = icons[name] ?? BookOpen;
+  if (categoryIconNames.includes(name)) {
+    return (
+      <Image
+        src={`/images/Icons/${name}.png`}
+        alt=""
+        aria-hidden
+        width={64}
+        height={64}
+        className={cn("object-contain", className)}
+      />
+    );
+  }
+  const Icon = legacyIcons[name] ?? BookOpen;
   return <Icon aria-hidden className={className} strokeWidth={1.75} />;
 }
