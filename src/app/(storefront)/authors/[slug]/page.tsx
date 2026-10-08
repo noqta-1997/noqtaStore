@@ -108,7 +108,7 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
                         href={`/handouts?subject=${encodeURIComponent(subject.slug)}`}
                         className="flex items-center gap-2 rounded-xl border border-line bg-card px-3 py-1.5 text-label-md text-on-surface transition-colors duration-100 ease-fluent hover:border-line-hover hover:bg-card-hover"
                       >
-                        <CategoryIcon name={subject.icon} className="size-5" />
+                        <CategoryIcon name={subject.icon} src={subject.imageUrl} className="size-5" />
                         {subject.name[locale]}
                       </Link>
                     </li>

@@ -121,6 +121,8 @@ model Subject {
   nameAr    String   @unique
   /// A picture in public/images/Icons, by file name; the UI layer owns the mapping.
   icon      String
+  /// A picture uploaded from the subject's add form; drawn in place of `icon` when set.
+  imageUrl  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

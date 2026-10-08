@@ -89,6 +89,7 @@ export function toSubject(row: SubjectRow): Subject {
     slug: row.slug,
     name: { ar: row.nameAr },
     icon: row.icon,
+    imageUrl: row.imageUrl,
   };
 }
 

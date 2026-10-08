@@ -727,6 +727,23 @@ export async function saveSubject(formData: FormData): Promise<ActionResult> {
 
   const subjectId = text(formData, "subjectId");
 
+  // The add form's uploaded picture, handled as a handout's cover is: read
+  // first, stored before the row is written, dropped again if the write
+  // fails. The edit page takes none.
+  const image = readCoverImage(formData);
+  if (!image.ok) return fail(image.error);
+
+  let imageUrl: string | undefined;
+  if (!subjectId && image.file) {
+    try {
+      imageUrl = await storeCover("subjects", image.file);
+    } catch (error) {
+      logActionError("saveSubject (image)", error, { subjectId: null });
+      if (error instanceof StorageNotConfiguredError) return fail("storageNotConfigured");
+      return fail("uploadFailed");
+    }
+  }
+
   try {
     if (subjectId) {
       await prisma.subject.update({ where: { id: subjectId }, data });
@@ -736,10 +753,11 @@ export async function saveSubject(formData: FormData): Promise<ActionResult> {
         "subjects_slug_key",
         (base) =>
           prisma.subject.findMany({ where: { slug: { startsWith: base } }, select: { slug: true } }),
-        (slug) => prisma.subject.create({ data: { ...data, slug } }),
+        (slug) => prisma.subject.create({ data: { ...data, slug, imageUrl } }),
       );
     }
   } catch (error) {
+    await discardCover(imageUrl);
     if (isUniqueViolation(error)) return fail("duplicate");
     // Deleted while the edit page was open — as in `saveHandoutCategory`.
     if (isMissingRecord(error)) return fail("notFound");
@@ -763,9 +781,11 @@ export async function deleteSubject(subjectId: string): Promise<ActionResult> {
   if (await prisma.authorSubject.count({ where: { subjectId } })) return fail("subjectTaught");
 
   const deleted = await attemptDelete("deleteSubject", { subjectId }, () =>
-    prisma.subject.delete({ where: { id: subjectId } }),
+    prisma.subject.delete({ where: { id: subjectId }, select: { imageUrl: true } }),
   );
   if (!deleted.ok) return deleted;
+
+  await discardCover(deleted.row.imageUrl);
 
   revalidatePath("/admin/subjects");
   return ok();

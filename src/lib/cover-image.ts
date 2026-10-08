@@ -31,6 +31,13 @@ export const MAX_COVER_BYTES = 2 * 1024 * 1024;
 export const MAX_COVER_EDGE = 1600;
 
 /**
+ * The long edge a subject's picture is brought down to. It is drawn at
+ * 1.5rem at most, so 512 — what the pictures in `public/images/Icons/` are —
+ * is plenty on any display.
+ */
+export const MAX_ICON_EDGE = 512;
+
+/**
  * The picker says PNG or JPG; WebP is accepted as well because it is what a
  * phone's share sheet increasingly hands over. Keyed by MIME type because the
  * type is what the browser reports, and the file name is whatever the owner

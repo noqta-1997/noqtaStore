@@ -1,21 +1,29 @@
 "use client";
 
-import { ImagePlus } from "lucide-react";
+import { ImagePlus, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { AdminDictionary, Dictionary } from "@/i18n/get-dictionary";
 import { COVER_EXTENSIONS, COVER_MIME_TYPES, MAX_COVER_BYTES } from "@/lib/cover-image";
-import { prepareCover } from "@/lib/cover-resize";
+import { prepareCover, prepareIcon } from "@/lib/cover-resize";
 
 interface CoverFieldProps {
   labels: AdminDictionary["handoutForm"]["upload"];
+  /**
+   * A handout's 2:3 jacket, or a subject's square picture — kept a PNG, so
+   * its transparent background survives, and shown whole rather than cropped.
+   */
+  kind?: "cover" | "icon";
   errors: Pick<Dictionary["common"]["actionErrors"], "invalidImage" | "imageTooLarge">;
   /** The cover the row has now, or its typographic placeholder. */
   children: ReactNode;
   /** The row has an uploaded cover, which the field then offers to remove. */
   hasCover?: boolean;
+  /** Given, a picked file gets a button that drops it before the form is saved. */
+  clearLabel?: string;
 }
 
 interface Chosen {
@@ -46,8 +54,17 @@ interface Chosen {
  * without it a cover could be replaced but never taken off, so a wrong one
  * stayed until another picture was found for it. Choosing a file hides the
  * box — a new cover and a removal cannot both be meant.
+ *
+ * The subject form uses it too, with `kind="icon"`, for the subject's picture.
  */
-export function CoverField({ labels, errors, children, hasCover = false }: CoverFieldProps) {
+export function CoverField({
+  labels,
+  kind = "cover",
+  errors,
+  children,
+  hasCover = false,
+  clearLabel,
+}: CoverFieldProps) {
   const [chosen, setChosen] = useState<Chosen | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [preparing, setPreparing] = useState(false);
@@ -55,11 +72,30 @@ export function CoverField({ labels, errors, children, hasCover = false }: Cover
   // Counts picks, so a slow resize cannot land after a newer pick.
   const pick = useRef(0);
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
   // The preview is an object URL, released once it is no longer shown.
   useEffect(() => {
     if (!chosen) return;
     return () => URL.revokeObjectURL(chosen.url);
   }, [chosen]);
+
+  // A form emptied after a save (the subject add form) empties the input, so
+  // the field forgets its pick too, or its preview would outlive the file.
+  useEffect(() => {
+    const form = inputRef.current?.form;
+    if (!form) return;
+    const onReset = () => {
+      pick.current++;
+      inputRef.current?.setCustomValidity("");
+      setPreparing(false);
+      setChosen(null);
+      setError(null);
+      setRemoving(false);
+    };
+    form.addEventListener("reset", onReset);
+    return () => form.removeEventListener("reset", onReset);
+  }, []);
 
   const onChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
@@ -86,7 +122,7 @@ export function CoverField({ labels, errors, children, hasCover = false }: Cover
     // Native validation holds a submit back until the picture is ready.
     setPreparing(true);
     input.setCustomValidity(labels.preparing);
-    const prepared = await prepareCover(file);
+    const prepared = await (kind === "icon" ? prepareIcon : prepareCover)(file);
     if (ticket !== pick.current) return;
     input.setCustomValidity("");
     setPreparing(false);
@@ -114,6 +150,19 @@ export function CoverField({ labels, errors, children, hasCover = false }: Cover
     });
   };
 
+  // The picked file was never sent anywhere — it rides with the form until a
+  // save — so emptying the input is all it takes to be rid of it.
+  const clear = () => {
+    const input = inputRef.current;
+    if (!input) return;
+    pick.current++;
+    input.value = "";
+    input.setCustomValidity("");
+    setPreparing(false);
+    setChosen(null);
+    setError(null);
+  };
+
   const status = preparing
     ? labels.preparing
     : chosen?.resizedTo
@@ -132,9 +181,15 @@ export function CoverField({ labels, errors, children, hasCover = false }: Cover
     <div className="space-y-3" aria-busy={preparing}>
       <div className="mx-auto w-full max-w-40 rounded-xl bg-surface-low p-4">
         {chosen ? (
-          <div className="relative aspect-[2/3] w-full overflow-hidden rounded-lg bg-surface-low elevation-sm">
-            <Image src={chosen.url} alt="" fill sizes="8rem" className="object-cover" />
-          </div>
+          kind === "icon" ? (
+            <div className="relative aspect-square w-full">
+              <Image src={chosen.url} alt="" fill sizes="8rem" className="object-contain" />
+            </div>
+          ) : (
+            <div className="relative aspect-[2/3] w-full overflow-hidden rounded-lg bg-surface-low elevation-sm">
+              <Image src={chosen.url} alt="" fill sizes="8rem" className="object-cover" />
+            </div>
+          )
         ) : (
           <div className={removing ? "opacity-40" : undefined}>{children}</div>
         )}
@@ -150,6 +205,7 @@ export function CoverField({ labels, errors, children, hasCover = false }: Cover
         </span>
         <span className="text-label-md text-muted">{labels.hint}</span>
         <input
+          ref={inputRef}
           id="coverImage"
           name="coverImage"
           type="file"
@@ -170,6 +226,13 @@ export function CoverField({ labels, errors, children, hasCover = false }: Cover
           {status}
         </p>
       )}
+
+      {clearLabel && (chosen || preparing) ? (
+        <Button type="button" variant="outline" size="sm" fullWidth onClick={clear}>
+          <X aria-hidden className="size-4" strokeWidth={1.75} />
+          {clearLabel}
+        </Button>
+      ) : null}
 
       {hasCover && !chosen && !preparing ? (
         <Checkbox

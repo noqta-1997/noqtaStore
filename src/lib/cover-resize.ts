@@ -1,6 +1,7 @@
 import {
   MAX_COVER_BYTES,
   MAX_COVER_EDGE,
+  MAX_ICON_EDGE,
   type CoverProblem,
 } from "@/lib/cover-image";
 
@@ -50,6 +51,23 @@ const ATTEMPTS: ReadonlyArray<readonly [scale: number, quality: number]> = [
  * brought under the size limit is reported as too large.
  */
 export async function prepareCover(file: File): Promise<PreparedCover> {
+  return prepare(file, MAX_COVER_EDGE, "image/jpeg");
+}
+
+/**
+ * The same for a subject's picture, which is small and usually a PNG drawn
+ * on nothing: it is brought down to `MAX_ICON_EDGE` and kept a PNG, since a
+ * JPEG would fill its transparent background with white.
+ */
+export function prepareIcon(file: File): Promise<PreparedCover> {
+  return prepare(file, MAX_ICON_EDGE, "image/png");
+}
+
+async function prepare(
+  file: File,
+  maxEdge: number,
+  type: "image/jpeg" | "image/png",
+): Promise<PreparedCover> {
   const url = URL.createObjectURL(file);
 
   try {
@@ -62,20 +80,20 @@ export async function prepareCover(file: File): Promise<PreparedCover> {
 
     const { naturalWidth: width, naturalHeight: height } = image;
     const edge = Math.max(width, height);
-    if (edge <= MAX_COVER_EDGE && file.size <= MAX_COVER_BYTES) {
+    if (edge <= maxEdge && file.size <= MAX_COVER_BYTES) {
       return { ok: true, file, width, height, resized: false };
     }
 
     for (const [scale, quality] of ATTEMPTS) {
-      const factor = Math.min(1, (MAX_COVER_EDGE * scale) / edge);
+      const factor = Math.min(1, (maxEdge * scale) / edge);
       const targetWidth = Math.max(1, Math.round(width * factor));
       const targetHeight = Math.max(1, Math.round(height * factor));
-      const blob = await encode(image, targetWidth, targetHeight, quality);
+      const blob = await encode(image, targetWidth, targetHeight, quality, type);
 
       if (blob.size <= MAX_COVER_BYTES) {
         return {
           ok: true,
-          file: new File([blob], jpegName(file.name), { type: "image/jpeg" }),
+          file: new File([blob], renamed(file.name, type), { type }),
           width: targetWidth,
           height: targetHeight,
           resized: true,
@@ -104,6 +122,7 @@ function encode(
   width: number,
   height: number,
   quality: number,
+  type: "image/jpeg" | "image/png",
 ): Promise<Blob> {
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -113,21 +132,23 @@ function encode(
   if (!context) return Promise.reject(new Error("canvas has no 2d context"));
 
   // JPEG has no alpha: what a PNG left transparent becomes white, not black.
-  context.fillStyle = "#fff";
-  context.fillRect(0, 0, width, height);
+  if (type === "image/jpeg") {
+    context.fillStyle = "#fff";
+    context.fillRect(0, 0, width, height);
+  }
   context.imageSmoothingQuality = "high";
   context.drawImage(image, 0, 0, width, height);
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(
       (blob) => (blob ? resolve(blob) : reject(new Error("canvas could not encode"))),
-      "image/jpeg",
+      type,
       quality,
     );
   });
 }
 
 /** `cover.png` → `cover.jpg`; the name is only ever shown back to the owner. */
-function jpegName(name: string) {
-  return `${name.replace(/\.[^.]+$/, "")}.jpg`;
+function renamed(name: string, type: "image/jpeg" | "image/png") {
+  return `${name.replace(/\.[^.]+$/, "")}.${type === "image/png" ? "png" : "jpg"}`;
 }

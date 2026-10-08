@@ -68,7 +68,7 @@ export function HandoutSubjectStrip({
                 aria-current={current === subject.slug ? "page" : undefined}
                 className={chip(current === subject.slug)}
               >
-                <CategoryIcon name={subject.icon} className="size-5" />
+                <CategoryIcon name={subject.icon} src={subject.imageUrl} className="size-5" />
                 <span>{subject.name[locale]}</span>
                 <span className="text-muted" data-numeric>
                   {formatNumber(count, locale)} {countLabel}

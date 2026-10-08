@@ -50,7 +50,7 @@ export default async function AdminSubjectsPage() {
                   <Td>
                     <div className="flex items-center gap-3">
                       <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-primary">
-                        <CategoryIcon name={subject.icon} className="size-6" />
+                        <CategoryIcon name={subject.icon} src={subject.imageUrl} className="size-6" />
                       </span>
                       <span className="font-semibold text-on-surface">
                         {subject.name[locale]}

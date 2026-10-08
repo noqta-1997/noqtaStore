@@ -26,7 +26,8 @@ import { cn } from "@/lib/utils";
  * pictures in `public/images/Icons/` are what the panel offers now, each named
  * after its file. The Lucide marks are what the seeded ladder and genres were
  * filed under; they stay drawable so those rows keep their look, but the
- * picker no longer offers them.
+ * picker no longer offers them. A subject may also carry a picture uploaded
+ * from its edit page, which `src` passes in and which wins over the name.
  */
 const pictures = [
   "الكتاب",
@@ -63,10 +64,24 @@ export const categoryIconNames: readonly string[] = pictures;
 
 interface CategoryIconProps {
   name: string;
+  /** An uploaded picture's URL; drawn instead of `name` when set. */
+  src?: string | null;
   className?: string;
 }
 
-export function CategoryIcon({ name, className }: CategoryIconProps) {
+export function CategoryIcon({ name, src, className }: CategoryIconProps) {
+  if (src) {
+    return (
+      <Image
+        src={src}
+        alt=""
+        aria-hidden
+        width={64}
+        height={64}
+        className={cn("object-contain", className)}
+      />
+    );
+  }
   if (categoryIconNames.includes(name)) {
     return (
       <Image

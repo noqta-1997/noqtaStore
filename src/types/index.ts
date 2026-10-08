@@ -70,6 +70,8 @@ export interface Subject {
   name: Localized;
   /** A picture name `CategoryIcon` draws. */
   icon: string;
+  /** An uploaded picture, drawn in place of `icon` when there is one. */
+  imageUrl: string | null;
 }
 
 /** A lecture-note booklet (ملزمة) — what the store sells. */
