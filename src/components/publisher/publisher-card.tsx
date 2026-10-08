@@ -1,4 +1,5 @@
 import { Building2 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import type { Locale } from "@/i18n/config";
@@ -15,6 +16,49 @@ const markTones = [
 
 export function publisherTone(slug: string) {
   return markTones[hashString(slug) % markTones.length];
+}
+
+interface PublisherMarkProps {
+  publisher: Pick<Publisher, "slug" | "logoUrl">;
+  /** The circle's size, e.g. `size-11`. */
+  className?: string;
+  /** The building glyph's size when there is no logo. */
+  iconClassName?: string;
+}
+
+/**
+ * The press's round mark: its uploaded logo, or a building on a tone picked
+ * from its slug. A logo sits on a white plate in both themes — it is the
+ * press's own artwork, usually dark ink drawn for paper, and would vanish on
+ * the dark card.
+ */
+export function PublisherMark({ publisher, className, iconClassName }: PublisherMarkProps) {
+  if (publisher.logoUrl) {
+    return (
+      <span
+        aria-hidden
+        className={cn(
+          "relative flex shrink-0 overflow-hidden rounded-full border border-line bg-[#fff]",
+          className,
+        )}
+      >
+        <Image src={publisher.logoUrl} alt="" fill sizes="5rem" className="object-contain p-[12%]" />
+      </span>
+    );
+  }
+
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "flex shrink-0 items-center justify-center rounded-full",
+        publisherTone(publisher.slug),
+        className,
+      )}
+    >
+      <Building2 className={iconClassName} strokeWidth={1.75} />
+    </span>
+  );
 }
 
 interface PublisherCardProps {
@@ -40,15 +84,7 @@ export function PublisherCard({
         className,
       )}
     >
-      <span
-        aria-hidden
-        className={cn(
-          "flex size-11 items-center justify-center rounded-full",
-          publisherTone(publisher.slug),
-        )}
-      >
-        <Building2 className="size-5" strokeWidth={1.75} />
-      </span>
+      <PublisherMark publisher={publisher} className="size-11" iconClassName="size-5" />
 
       <span className="text-body-lg leading-snug font-bold text-balance text-on-surface">
         {publisher.name[locale]}

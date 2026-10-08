@@ -671,25 +671,58 @@ export async function savePublisher(formData: FormData): Promise<ActionResult> {
 
   const publisherId = text(formData, "publisherId");
 
+  // The logo is handled as a handout's cover is — read first, stored before
+  // the row is written, dropped again if the write fails — on both the add
+  // form and the edit page, which can also take it off.
+  const logo = readCoverImage(formData);
+  if (!logo.ok) return fail(logo.error);
+  const dropLogo = Boolean(publisherId) && !logo.file && checkbox(formData, "removeCover");
+
+  let logoUrl: string | undefined;
+  if (logo.file) {
+    try {
+      logoUrl = await storeCover("publishers", logo.file);
+    } catch (error) {
+      logActionError("savePublisher (logo)", error, { publisherId: publisherId || null });
+      if (error instanceof StorageNotConfiguredError) return fail("storageNotConfigured");
+      return fail("uploadFailed");
+    }
+  }
+
+  let replaced: string | null = null;
   try {
     if (publisherId) {
-      await prisma.publisher.update({ where: { id: publisherId }, data });
+      if (logoUrl || dropLogo) {
+        const current = await prisma.publisher.findUnique({
+          where: { id: publisherId },
+          select: { logoUrl: true },
+        });
+        replaced = current?.logoUrl ?? null;
+      }
+      await prisma.publisher.update({
+        where: { id: publisherId },
+        data: { ...data, logoUrl: dropLogo ? null : logoUrl },
+      });
     } else {
       await createUnderFreeSlug(
         slugify(nameAr, `publisher-${Date.now()}`),
         "publishers_slug_key",
         (base) =>
           prisma.publisher.findMany({ where: { slug: { startsWith: base } }, select: { slug: true } }),
-        (slug) => prisma.publisher.create({ data: { ...data, slug } }),
+        (slug) => prisma.publisher.create({ data: { ...data, slug, logoUrl } }),
       );
     }
   } catch (error) {
+    await discardCover(logoUrl);
     if (isUniqueViolation(error)) return fail("duplicate");
     // Deleted while the edit page was open — as in `saveHandoutCategory`.
     if (isMissingRecord(error)) return fail("notFound");
     logActionError("savePublisher", error, { publisherId: publisherId || null });
     return fail("saveFailed");
   }
+
+  // Nothing refers to the logo this one replaced any more.
+  await discardCover(replaced);
 
   // The handouts' pages name their press as well — see `saveAuthor`.
   revalidateHandouts();
@@ -704,9 +737,11 @@ export async function deletePublisher(publisherId: string): Promise<ActionResult
   if (held) return fail(held);
 
   const deleted = await attemptDelete("deletePublisher", { publisherId }, () =>
-    prisma.publisher.delete({ where: { id: publisherId } }),
+    prisma.publisher.delete({ where: { id: publisherId }, select: { logoUrl: true } }),
   );
   if (!deleted.ok) return deleted;
+
+  await discardCover(deleted.row.logoUrl);
 
   revalidateHandouts();
   revalidatePath("/admin/publishers");

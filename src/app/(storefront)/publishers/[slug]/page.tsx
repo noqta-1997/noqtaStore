@@ -1,9 +1,8 @@
-import { Building2 } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { HandoutGrid } from "@/components/handout/handout-grid";
-import { publisherTone } from "@/components/publisher/publisher-card";
+import { PublisherMark } from "@/components/publisher/publisher-card";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Container } from "@/components/ui/container";
 import { getHandoutsByPublisher, getPublisherBySlug, getPublishers } from "@/data";
@@ -11,7 +10,6 @@ import { defaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { formatNumber } from "@/lib/format";
 import { readSlug } from "@/lib/slug";
-import { cn } from "@/lib/utils";
 import { pageMetadata } from "@/lib/seo";
 
 interface PublisherPageProps {
@@ -82,15 +80,11 @@ export default async function PublisherPage({ params }: PublisherPageProps) {
           />
 
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-            <span
-              aria-hidden
-              className={cn(
-                "flex size-20 shrink-0 items-center justify-center rounded-full elevation-md",
-                publisherTone(publisher.slug),
-              )}
-            >
-              <Building2 className="size-9" strokeWidth={1.75} />
-            </span>
+            <PublisherMark
+              publisher={publisher}
+              className="size-20 elevation-md"
+              iconClassName="size-9"
+            />
 
             <div className="space-y-3">
               <h1 className="text-headline-lg sm:text-headline-xl">

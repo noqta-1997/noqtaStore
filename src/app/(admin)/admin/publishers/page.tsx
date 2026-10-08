@@ -1,4 +1,3 @@
-import { Building2 } from "lucide-react";
 import type { Metadata } from "next";
 
 import { deletePublisher } from "@/app/actions/admin";
@@ -8,14 +7,13 @@ import { Panel } from "@/components/admin/panel";
 import { PublisherForm } from "@/components/admin/publisher-form";
 import { RowActions } from "@/components/admin/row-actions";
 import { TableToolbar } from "@/components/admin/table-toolbar";
-import { publisherTone } from "@/components/publisher/publisher-card";
+import { PublisherMark } from "@/components/publisher/publisher-card";
 import { HeldCount } from "@/components/admin/held-count";
 import { getArchivedTitleCounts, getPublishers } from "@/data";
 import { arabicKey } from "@/lib/arabic";
 import { defaultLocale } from "@/i18n/config";
 import { getAdminDictionary, getDictionary } from "@/i18n/get-dictionary";
 import { readParam, type SearchParamsRecord } from "@/lib/search-params";
-import { cn } from "@/lib/utils";
 
 interface AdminPublishersPageProps {
   searchParams: Promise<SearchParamsRecord>;
@@ -76,15 +74,11 @@ export default async function AdminPublishersPage({
                 <Tr key={publisher.id}>
                   <Td>
                     <div className="flex items-center gap-3">
-                      <span
-                        aria-hidden
-                        className={cn(
-                          "flex size-9 shrink-0 items-center justify-center rounded-full",
-                          publisherTone(publisher.slug),
-                        )}
-                      >
-                        <Building2 className="size-4" strokeWidth={1.75} />
-                      </span>
+                      <PublisherMark
+                        publisher={publisher}
+                        className="size-9"
+                        iconClassName="size-4"
+                      />
                       <span className="min-w-0">
                         <span className="block font-semibold text-on-surface">
                           {publisher.name[locale]}

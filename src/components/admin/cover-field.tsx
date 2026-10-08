@@ -13,7 +13,7 @@ import { prepareCover, prepareIcon } from "@/lib/cover-resize";
 interface CoverFieldProps {
   labels: AdminDictionary["handoutForm"]["upload"];
   /**
-   * A handout's 2:3 jacket, or a subject's square picture — kept a PNG, so
+   * A handout's 2:3 jacket, or a subject's or a press's square picture — kept a PNG, so
    * its transparent background survives, and shown whole rather than cropped.
    */
   kind?: "cover" | "icon";
@@ -55,7 +55,8 @@ interface Chosen {
  * stayed until another picture was found for it. Choosing a file hides the
  * box — a new cover and a removal cannot both be meant.
  *
- * The subject form uses it too, with `kind="icon"`, for the subject's picture.
+ * The subject and publisher forms use it too, with `kind="icon"`, for a
+ * subject's picture and a press's logo.
  */
 export function CoverField({
   labels,

@@ -158,6 +158,8 @@ model Publisher {
   /// which Prisma cannot declare) treats «مكتبة» and «مكتبه» as one name.
   nameAr        String   @unique
   descriptionAr String   @default("")
+  /// A logo uploaded from the panel; the press is drawn as a plain mark without one.
+  logoUrl       String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

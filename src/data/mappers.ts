@@ -79,6 +79,7 @@ export function toPublisher(row: PublisherRow & { _count?: { handouts: number } 
     slug: row.slug,
     name: { ar: row.nameAr },
     description: { ar: row.descriptionAr },
+    logoUrl: row.logoUrl,
     handoutsCount: row._count?.handouts ?? 0,
   };
 }

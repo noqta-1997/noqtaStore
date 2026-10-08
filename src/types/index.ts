@@ -59,6 +59,8 @@ export interface Publisher {
   slug: string;
   name: Localized;
   description: Localized;
+  /** An uploaded logo, drawn in place of the plain mark when there is one. */
+  logoUrl: string | null;
   /** Handouts from this press on the shelf. */
   handoutsCount: number;
 }
