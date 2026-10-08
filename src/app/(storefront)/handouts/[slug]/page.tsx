@@ -1,4 +1,4 @@
-import { PackageCheck, RotateCcw, Truck } from "lucide-react";
+import { PackageCheck, Truck } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -171,7 +171,6 @@ export default async function HandoutPage({ params }: HandoutPageProps) {
 
   const highlights = [
     { icon: Truck, text: t.deliveryNote },
-    { icon: RotateCcw, text: t.returnsNote },
   ];
 
   return (
